@@ -12,13 +12,12 @@ import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -54,7 +53,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -62,10 +60,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import javax.net.ssl.HttpsURLConnection;
-
 public class ChooseRouteActivity extends AppCompatActivity implements NetworkingCallback, AdapterView.OnItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener
 {
+    private final int LOCATION_PERMISSION_REQUEST_CODE = 36;
     private BusStop nearestBusStops[] = new BusStop[4];
     private int position = 0;
     private EditText routeNumberEditText;
@@ -79,7 +76,6 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private boolean mRequestingLocationUpdates = false;
-    private final int LOCATION_PERMISSION_REQUEST_CODE = 36;
     private boolean locationIsToBeUpdated = true;
     private LocationManager locationManager;
     private boolean updateBusList = false;
@@ -630,10 +626,12 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                 routeNumberTextView.setMinLines(3);
                 routeNumberTextView.setMinEms(5);
                 routeNumberTextView.setMaxWidth(30);
+                routeNumberTextView.setTextSize(16);
 
                 routeDirectionTextView.setText(route.getUpRouteName());
                 routeDirectionTextView.setPadding(20, 20, 20, 20);
                 routeDirectionTextView.setMinLines(3);
+                routeDirectionTextView.setTextSize(14);
 
                 separatorView.setMinimumHeight(1);
                 separatorView.setBackgroundColor(Color.BLACK);

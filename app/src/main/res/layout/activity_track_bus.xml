@@ -12,7 +12,10 @@
         android:id="@+id/direction_selection_radio_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
+        android:layout_marginBottom="4dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="2dp"
         android:orientation="vertical"
         android:visibility="visible">
 
@@ -22,7 +25,8 @@
             android:layout_marginBottom="5dp"
             android:gravity="start"
             android:text="@string/direction_label_text"
-            android:textColor="#FFFFFF"/>
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"/>
 
         <RadioButton
             android:id="@+id/direction_up_radio_button"
@@ -31,7 +35,8 @@
             android:background="@drawable/white_rounded_background_borderless"
             android:maxLines="2"
             android:onClick="directionChosen"
-            android:padding="8dp"/>
+            android:padding="8dp"
+            android:textSize="16sp"/>
 
         <RadioButton
             android:id="@+id/direction_down_radio_button"
@@ -41,7 +46,8 @@
             android:background="@drawable/white_rounded_background_borderless"
             android:maxLines="2"
             android:onClick="directionChosen"
-            android:padding="8dp"/>
+            android:padding="8dp"
+            android:textSize="16sp"/>
     </RadioGroup>
 
     <LinearLayout
@@ -57,7 +63,8 @@
             android:layout_height="match_parent"
             android:layout_marginBottom="5dp"
             android:text="@string/bus_stop_label_text"
-            android:textColor="#FFFFFF"/>
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"/>
 
         <RelativeLayout
             android:layout_width="wrap_content"
