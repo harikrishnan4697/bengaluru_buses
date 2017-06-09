@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- The refresh action item -->
+    <item
+        android:id="@+id/track_bus_action_refresh"
+        android:icon="@drawable/ic_refresh_white"
+        android:title="@string/refresh_action_title"
+        app:showAsAction="ifRoom"/>
+
+</menu>
