@@ -5,8 +5,8 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -104,9 +104,6 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
     {
         switch (item.getItemId())
         {
-            case R.id.track_bus_action_refresh:
-                refresh();
-                break;
             case android.R.id.home:
                 finish();
                 break;
@@ -148,7 +145,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
         }
     }
 
-    private void refresh()
+    public void refresh(View view)
     {
         errorMessageTextView.setVisibility(View.GONE);
         busDetailsLinearLayout1.setVisibility(View.INVISIBLE);
@@ -348,14 +345,14 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
             else
             {
                 progressDialog.hide();
-                errorMessageTextView.setText("There aren't any buses in this direction, please try again later...");
+                errorMessageTextView.setText("There aren't any " + route.getRouteNumber() + " buses arriving at " + busStopList[position].getBusStopName() + " in this direction");
                 errorMessageTextView.setVisibility(View.VISIBLE);
             }
         }
         else
         {
             progressDialog.hide();
-            errorMessageTextView.setText("There aren't any buses in this direction, please try again later...");
+            errorMessageTextView.setText("There aren't any " + route.getRouteNumber() + " buses arriving at " + busStopList[position].getBusStopName() + " in this direction");
             errorMessageTextView.setVisibility(View.VISIBLE);
         }
     }

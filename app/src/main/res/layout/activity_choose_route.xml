@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.nihar.bangalorebuses.ChooseRouteActivity">
 
     <ListView
-
         android:id="@+id/bus_route_list_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -15,51 +15,53 @@
         android:visibility="gone"/>
 
     <LinearLayout
+        android:id="@+id/nearest_bus_stop_selection_linear_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/bus_route_list_view"
+        android:background="@color/colorPrimary"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/info_text_view_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:text="@string/bus_stops_nearby_label_text"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            />
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/white_rounded_background_borderless">
+
+            <Spinner
+                android:id="@+id/stop_list_spinner"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:dropDownSelector="#000000"
+                android:spinnerMode="dropdown"
+                android:textAlignment="viewStart"/>
+
+            <View
+                android:layout_width="wrap_content"
+                android:layout_height="1dp"
+                android:layout_below="@id/stop_list_spinner"
+                android:background="#000000"/>
+        </RelativeLayout>
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/bus_stop_and_list_linear_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentBottom="true"
-        android:layout_below="@id/bus_route_list_view"
+        android:layout_below="@id/nearest_bus_stop_selection_linear_layout"
         android:orientation="vertical">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <TextView
-                android:id="@+id/info_text_view_1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:text="@string/bus_stops_nearby_label_text"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
-                />
-
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/white_rounded_background_borderless">
-
-                <Spinner
-                    android:id="@+id/stop_list_spinner"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="start"
-                    android:dropDownSelector="#000000"
-                    android:spinnerMode="dropdown"
-                    android:textAlignment="viewStart"/>
-
-                <View
-                    android:layout_width="wrap_content"
-                    android:layout_height="1dp"
-                    android:layout_below="@id/stop_list_spinner"
-                    android:background="#000000"/>
-            </RelativeLayout>
-        </LinearLayout>
 
         <TextView
             android:id="@+id/choose_route_activity_error_message_text_view"
@@ -89,5 +91,19 @@
         </ScrollView>
 
     </LinearLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/floatingRefreshActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="10dp"
+        android:clickable="true"
+        android:longClickable="true"
+        android:onClick="softRefresh"
+        android:src="@drawable/ic_refresh_white"
+        app:fabSize="mini"/>
 
 </RelativeLayout>

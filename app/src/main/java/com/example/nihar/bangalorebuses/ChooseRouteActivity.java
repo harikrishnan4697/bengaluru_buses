@@ -15,6 +15,7 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -106,7 +107,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
             {
                 if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER))
                 {
-                    onTrackBusButtonClick();
+                    trackBus(routeNumberEditText.getText().toString());
                     return true;
                 }
                 return false;
@@ -125,6 +126,16 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
             mGoogleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
         }
         initialiseRouteNumberList();
+        FloatingActionButton refreshFloatingActionButton = (FloatingActionButton) findViewById(R.id.floatingRefreshActionButton);
+        refreshFloatingActionButton.setOnLongClickListener(new View.OnLongClickListener()
+        {
+            @Override
+            public boolean onLongClick(View v)
+            {
+                hardRefresh(v);
+                return true;
+            }
+        });
     }
 
     private void initialiseRouteNumberList()
@@ -171,7 +182,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
-                routeNumberEditText.setText(parent.getItemAtPosition(position).toString());
+                trackBus(parent.getItemAtPosition(position).toString());
                 routeNumberListView.setVisibility(View.GONE);
             }
         });
@@ -409,8 +420,8 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     {
         switch (item.getItemId())
         {
-            case R.id.choose_route_action_refresh:
-                createLocationRequest();
+            case R.id.choose_route_action_track_entered_bus:
+                trackBus(routeNumberEditText.getText().toString());
                 break;
 
             default:
@@ -648,12 +659,33 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         }
     }
 
-    public void onTrackBusButtonClick()
+    public void softRefresh(View view)
+    {
+        if (isNetworkAvailable())
+        {
+            progressDialog = ProgressDialog.show(this, "Please wait", "Getting buses...");
+            String requestBody = "stopID=" + Integer.toString(nearestBusStops[position].getBusStopId());
+            busesSet.clear();
+            new GetBusesAtStopTask(this, this).execute(requestBody);
+        }
+        else
+        {
+            errorMessageTextView.setText(R.string.error_connecting_to_the_internet_text);
+            errorMessageTextView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public void hardRefresh(View view)
+    {
+        createLocationRequest();
+    }
+
+    public void trackBus(String busNumberToTrack)
     {
         if (isNetworkAvailable())
         {
             progressDialog = ProgressDialog.show(this, "Please wait", "Getting bus details...");
-            new GetBusRouteDetailsTask(this, this, false, false).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, routeNumberEditText.getText().toString());
+            new GetBusRouteDetailsTask(this, this, false, false).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, busNumberToTrack);
         }
         else
         {
@@ -772,7 +804,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         {
             if (!isForList)
             {
-                Toast.makeText(this, "Please enter a valid bus number!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "This bus cannot be tracked.", Toast.LENGTH_SHORT).show();
             }
         }
     }

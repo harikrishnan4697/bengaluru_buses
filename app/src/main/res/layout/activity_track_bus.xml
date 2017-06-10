@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
-    android:orientation="vertical"
     tools:context="com.example.nihar.bangalorebuses.TrackBusActivity">
 
     <RadioGroup
         android:id="@+id/direction_selection_radio_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
         android:layout_marginBottom="4dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
@@ -54,6 +55,7 @@
         android:id="@+id/bus_stop_selection_linear_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/direction_selection_radio_group"
         android:layout_margin="8dp"
         android:orientation="vertical"
         android:visibility="visible">
@@ -92,6 +94,7 @@
         android:id="@+id/buses_linear_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/bus_stop_selection_linear_layout"
         android:layout_marginTop="5dp"
         android:background="#FFFFFF"
         android:orientation="vertical"
@@ -285,4 +288,17 @@
 
     </LinearLayout>
 
-</LinearLayout>
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/floatingBusTimingsRefreshActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="10dp"
+        android:clickable="true"
+        android:onClick="refresh"
+        android:src="@drawable/ic_refresh_white"
+        app:fabSize="mini"/>
+
+</RelativeLayout>

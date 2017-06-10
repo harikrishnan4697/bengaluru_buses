@@ -2,11 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!-- The refresh action item -->
     <item
-        android:id="@+id/choose_route_action_refresh"
-        android:icon="@drawable/ic_refresh_white"
-        android:title="@string/refresh_action_title"
-        app:showAsAction="ifRoom"/>
+        android:id="@+id/choose_route_action_track_entered_bus"
+        android:icon="@drawable/ic_arrow_forward_white"
+        android:title="@string/track_entered_bus_action_title"
+        app:showAsAction="always"/>
 
 </menu>
