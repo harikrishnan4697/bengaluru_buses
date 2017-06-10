@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
@@ -18,6 +19,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,6 +32,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,6 +56,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -79,6 +84,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     private boolean locationIsToBeUpdated = true;
     private LocationManager locationManager;
     private boolean updateBusList = false;
+    private ArrayAdapter<String> listAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -118,6 +124,84 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         {
             mGoogleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
         }
+        initialiseRouteNumberList();
+    }
+
+    private void initialiseRouteNumberList()
+    {
+        final ListView routeNumberListView = (ListView) findViewById(R.id.bus_route_list_view);
+        AssetManager assetManager = getAssets();
+        InputStream inputStream;
+        InputStreamReader inputStreamReader;
+        routeNumberListView.setVisibility(View.GONE);
+
+        try
+        {
+            inputStream = assetManager.open("bangalore_city_bus_routes.txt");
+            inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+            StringBuilder stringBuilder = new StringBuilder();
+            String line;
+
+            while ((line = bufferedReader.readLine()) != null)
+            {
+                stringBuilder.append(line);
+            }
+
+            JSONArray jsonArray = new JSONArray(stringBuilder.toString());
+            String[] listViewAdapterContent = new String[jsonArray.length()];
+
+            for (int i = 0; i < jsonArray.length(); i++)
+            {
+                listViewAdapterContent[i] = jsonArray.getJSONObject(i).getString("routename");
+            }
+
+            listAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, listViewAdapterContent);
+
+            routeNumberListView.setAdapter(listAdapter);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        routeNumberListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                routeNumberEditText.setText(parent.getItemAtPosition(position).toString());
+                routeNumberListView.setVisibility(View.GONE);
+            }
+        });
+        routeNumberEditText.addTextChangedListener(new TextWatcher()
+        {
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count)
+            {
+                if (routeNumberEditText.getText().toString().equals(""))
+                {
+                    routeNumberListView.setVisibility(View.GONE);
+                }
+                else
+                {
+                    listAdapter.getFilter().filter(s);
+                    routeNumberListView.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s)
+            {
+            }
+        });
     }
 
     @Override
