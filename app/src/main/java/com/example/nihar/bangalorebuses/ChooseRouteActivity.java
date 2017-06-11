@@ -30,6 +30,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -189,8 +190,13 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
+                View keyBoardView = ChooseRouteActivity.this.getCurrentFocus();
+                if (keyBoardView != null)
+                {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(keyBoardView.getWindowToken(), 0);
+                }
                 trackBus(parent.getItemAtPosition(position).toString());
-                routeNumberListView.setVisibility(View.GONE);
             }
         });
         routeNumberEditText.addTextChangedListener(new TextWatcher()
@@ -428,6 +434,12 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         switch (item.getItemId())
         {
             case R.id.choose_route_action_track_entered_bus:
+                View view = this.getCurrentFocus();
+                if (view != null)
+                {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                }
                 if (!routeNumberEditText.getText().toString().equals(""))
                 {
                     trackBus(routeNumberEditText.getText().toString());
@@ -814,6 +826,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
             }
             else
             {
+                routeNumberListView.setVisibility(View.GONE);
                 routeNumberEditText.setText("");
                 trackBusIntent = new Intent(ChooseRouteActivity.this, TrackBusActivity.class);
                 if (nearestBusStops[position] != null)
