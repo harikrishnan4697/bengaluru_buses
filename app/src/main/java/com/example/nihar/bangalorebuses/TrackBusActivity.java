@@ -158,6 +158,9 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
     {
         if (canRefresh)
         {
+            downDirectionRadioButton.setEnabled(false);
+            upDirectionRadioButton.setEnabled(false);
+            stopsOnRouteSpinner.setEnabled(false);
             errorMessageTextView.setVisibility(View.GONE);
             busDetailsLinearLayout1.setVisibility(View.INVISIBLE);
             busDetailsLinearLayout2.setVisibility(View.INVISIBLE);
@@ -382,6 +385,9 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
                 errorMessageTextView.setVisibility(View.VISIBLE);
                 busTimingsRefreshFloatingActionButton.clearAnimation();
                 busTimingsRefreshFloatingActionButton.setEnabled(true);
+                downDirectionRadioButton.setEnabled(true);
+                upDirectionRadioButton.setEnabled(true);
+                stopsOnRouteSpinner.setEnabled(true);
             }
         }
         else
@@ -391,12 +397,18 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
             errorMessageTextView.setVisibility(View.VISIBLE);
             busTimingsRefreshFloatingActionButton.clearAnimation();
             busTimingsRefreshFloatingActionButton.setEnabled(true);
+            downDirectionRadioButton.setEnabled(true);
+            upDirectionRadioButton.setEnabled(true);
+            stopsOnRouteSpinner.setEnabled(true);
         }
     }
 
     @Override
     public void onTimeToBusesFound(boolean isError, Bus[] buses)
     {
+        downDirectionRadioButton.setEnabled(true);
+        upDirectionRadioButton.setEnabled(true);
+        stopsOnRouteSpinner.setEnabled(true);
         ImageView busIcon1 = (ImageView) findViewById(R.id.bus_icon_1);
         ImageView busIcon2 = (ImageView) findViewById(R.id.bus_icon_2);
         ImageView busIcon3 = (ImageView) findViewById(R.id.bus_icon_3);
