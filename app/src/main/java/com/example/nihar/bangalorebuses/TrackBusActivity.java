@@ -6,6 +6,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -57,6 +58,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
     private JSONArray routeBusStopList;
     private Animation rotatingAnimation;
     private FloatingActionButton busTimingsRefreshFloatingActionButton;
+    private boolean canRefresh = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -154,22 +156,46 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
 
     public void refresh(View view)
     {
-        errorMessageTextView.setVisibility(View.GONE);
-        busDetailsLinearLayout1.setVisibility(View.INVISIBLE);
-        busDetailsLinearLayout2.setVisibility(View.INVISIBLE);
-        busDetailsLinearLayout3.setVisibility(View.INVISIBLE);
-        busDetailsLinearLayout4.setVisibility(View.INVISIBLE);
-
-        if (isNetworkAvailable())
+        if (canRefresh)
         {
-            //busTimingsRefreshFloatingActionButton.startAnimation(rotatingAnimation);
-            String requestBody = "routeNO=" + route.getRouteNumber() + "&" + "direction=" + route.getDirection();
-            new GetBusesEnRouteTask(this, busStopList[position]).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, requestBody);
+            errorMessageTextView.setVisibility(View.GONE);
+            busDetailsLinearLayout1.setVisibility(View.INVISIBLE);
+            busDetailsLinearLayout2.setVisibility(View.INVISIBLE);
+            busDetailsLinearLayout3.setVisibility(View.INVISIBLE);
+            busDetailsLinearLayout4.setVisibility(View.INVISIBLE);
+
+            if (isNetworkAvailable())
+            {
+                busTimingsRefreshFloatingActionButton.setEnabled(false);
+                busTimingsRefreshFloatingActionButton.startAnimation(rotatingAnimation);
+                String requestBody = "routeNO=" + route.getRouteNumber() + "&" + "direction=" + route.getDirection();
+                new GetBusesEnRouteTask(this, busStopList[position]).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, requestBody);
+            }
+            else
+            {
+                errorMessageTextView.setText(R.string.error_connecting_to_the_internet_text);
+                errorMessageTextView.setVisibility(View.VISIBLE);
+            }
         }
         else
         {
-            errorMessageTextView.setText(R.string.error_connecting_to_the_internet_text);
-            errorMessageTextView.setVisibility(View.VISIBLE);
+            busTimingsRefreshFloatingActionButton.setEnabled(false);
+            busTimingsRefreshFloatingActionButton.startAnimation(rotatingAnimation);
+            new CountDownTimer(2000, 2000)
+            {
+                @Override
+                public void onTick(long millisUntilFinished)
+                {
+
+                }
+
+                @Override
+                public void onFinish()
+                {
+                    busTimingsRefreshFloatingActionButton.setEnabled(true);
+                    busTimingsRefreshFloatingActionButton.clearAnimation();
+                }
+            }.start();
         }
     }
 
@@ -575,12 +601,29 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
                 errorMessageTextView.setText("There are currently no buses in service! Please try again later.");
                 errorMessageTextView.setVisibility(View.VISIBLE);
             }
+            canRefresh = false;
+            new CountDownTimer(20000, 20000)
+            {
+                @Override
+                public void onTick(long millisUntilFinished)
+                {
+
+                }
+
+                @Override
+                public void onFinish()
+                {
+                    canRefresh = true;
+                }
+            }.start();
         }
         else
         {
             errorMessageTextView.setText("Could not locate buses! Please try again later...");
             errorMessageTextView.setVisibility(View.VISIBLE);
         }
+        busTimingsRefreshFloatingActionButton.clearAnimation();
+        busTimingsRefreshFloatingActionButton.setEnabled(true);
         progressDialog.hide();
     }
 }
