@@ -192,8 +192,8 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
                 @Override
                 public void onFinish()
                 {
-                    busTimingsRefreshFloatingActionButton.setEnabled(true);
                     busTimingsRefreshFloatingActionButton.clearAnimation();
+                    busTimingsRefreshFloatingActionButton.setEnabled(true);
                 }
             }.start();
         }
@@ -380,6 +380,8 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
                 progressDialog.hide();
                 errorMessageTextView.setText("There aren't any " + route.getRouteNumber() + " buses arriving at " + busStopList[position].getBusStopName() + " in this direction");
                 errorMessageTextView.setVisibility(View.VISIBLE);
+                busTimingsRefreshFloatingActionButton.clearAnimation();
+                busTimingsRefreshFloatingActionButton.setEnabled(true);
             }
         }
         else
@@ -387,6 +389,8 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
             progressDialog.hide();
             errorMessageTextView.setText("There aren't any " + route.getRouteNumber() + " buses arriving at " + busStopList[position].getBusStopName() + " in this direction");
             errorMessageTextView.setVisibility(View.VISIBLE);
+            busTimingsRefreshFloatingActionButton.clearAnimation();
+            busTimingsRefreshFloatingActionButton.setEnabled(true);
         }
     }
 
