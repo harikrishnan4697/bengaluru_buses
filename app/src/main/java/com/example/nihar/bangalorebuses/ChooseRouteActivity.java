@@ -691,6 +691,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     {
         if (isNetworkAvailable())
         {
+            errorMessageTextView.setVisibility(View.GONE);
             refreshFloatingActionButton.setEnabled(false);
             refreshFloatingActionButton.startAnimation(rotatingAnimation);
             String requestBody = "stopID=" + Integer.toString(nearestBusStops[position].getBusStopId());
@@ -706,6 +707,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
 
     public void hardRefresh(View view)
     {
+        errorMessageTextView.setVisibility(View.GONE);
         createLocationRequest();
     }
 
