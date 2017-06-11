@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/choose_route_action_track_entered_bus"
-        android:icon="@drawable/ic_arrow_forward_white"
+        android:icon="@drawable/ic_search_white"
         android:title="@string/track_entered_bus_action_title"
         app:showAsAction="always"/>
 

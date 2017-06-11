@@ -28,6 +28,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -86,6 +88,10 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     private LocationManager locationManager;
     private boolean updateBusList = false;
     private ArrayAdapter<String> listAdapter;
+    private FloatingActionButton refreshFloatingActionButton;
+    private Animation rotatingAnimation;
+    private int numberOfBusesArrivingAtNearestStop = 0;
+    private ListView routeNumberListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -99,6 +105,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         actionBar.setDisplayShowCustomEnabled(true);
         setContentView(R.layout.activity_choose_route);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        rotatingAnimation = AnimationUtils.loadAnimation(this, R.anim.rotate);
         routeNumberEditText = (EditText) findViewById(R.id.action_bar_edit_text);
         routeNumberEditText.setOnKeyListener(new View.OnKeyListener()
         {
@@ -126,7 +133,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
             mGoogleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
         }
         initialiseRouteNumberList();
-        FloatingActionButton refreshFloatingActionButton = (FloatingActionButton) findViewById(R.id.floatingRefreshActionButton);
+        refreshFloatingActionButton = (FloatingActionButton) findViewById(R.id.floatingRefreshActionButton);
         refreshFloatingActionButton.setOnLongClickListener(new View.OnLongClickListener()
         {
             @Override
@@ -140,7 +147,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
 
     private void initialiseRouteNumberList()
     {
-        final ListView routeNumberListView = (ListView) findViewById(R.id.bus_route_list_view);
+        routeNumberListView = (ListView) findViewById(R.id.bus_route_list_view);
         AssetManager assetManager = getAssets();
         InputStream inputStream;
         InputStreamReader inputStreamReader;
@@ -421,7 +428,14 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         switch (item.getItemId())
         {
             case R.id.choose_route_action_track_entered_bus:
-                trackBus(routeNumberEditText.getText().toString());
+                if (!routeNumberEditText.getText().toString().equals(""))
+                {
+                    trackBus(routeNumberEditText.getText().toString());
+                }
+                else
+                {
+                    Toast.makeText(this, "Please enter a bus number!", Toast.LENGTH_SHORT).show();
+                }
                 break;
 
             default:
@@ -533,9 +547,11 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                 }
                 if (isNetworkAvailable())
                 {
+                    numberOfBusesArrivingAtNearestStop = 0;
                     Iterator<String> busesSetIterator = busesSet.iterator();
                     while (busesSetIterator.hasNext())
                     {
+                        numberOfBusesArrivingAtNearestStop++;
                         new GetBusRouteDetailsTask(this, this, false, true).execute(busesSetIterator.next());
                     }
                 }
@@ -663,7 +679,8 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     {
         if (isNetworkAvailable())
         {
-            progressDialog = ProgressDialog.show(this, "Please wait", "Getting buses...");
+            refreshFloatingActionButton.setEnabled(false);
+            refreshFloatingActionButton.startAnimation(rotatingAnimation);
             String requestBody = "stopID=" + Integer.toString(nearestBusStops[position].getBusStopId());
             busesSet.clear();
             new GetBusesAtStopTask(this, this).execute(requestBody);
@@ -704,6 +721,15 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     public void onBusRouteDetailsFound(boolean isError, final Route route, boolean isForList)
     {
         progressDialog.hide();
+        if (numberOfBusesArrivingAtNearestStop != 1)
+        {
+            numberOfBusesArrivingAtNearestStop--;
+        }
+        else
+        {
+            refreshFloatingActionButton.clearAnimation();
+            refreshFloatingActionButton.setEnabled(true);
+        }
         if (!isError)
         {
             if (isForList)
@@ -731,6 +757,10 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                 else if (route.getRouteNumber().contains("V-"))
                 {
                     imageView.setImageResource(R.drawable.ic_directions_bus_ac);
+                }
+                else if (route.getRouteNumber().contains("CHAKRA-") || route.getRouteNumber().contains("MF"))
+                {
+                    imageView.setImageResource(R.drawable.ic_directions_bus_special);
                 }
                 else
                 {
@@ -805,6 +835,8 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
             if (!isForList)
             {
                 Toast.makeText(this, "This bus cannot be tracked.", Toast.LENGTH_SHORT).show();
+                routeNumberListView.setVisibility(View.VISIBLE);
+
             }
         }
     }

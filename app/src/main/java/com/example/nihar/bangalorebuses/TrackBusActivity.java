@@ -6,11 +6,14 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -52,6 +55,8 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
     private BusStop[] busStopList;
     private int position;
     private JSONArray routeBusStopList;
+    private Animation rotatingAnimation;
+    private FloatingActionButton busTimingsRefreshFloatingActionButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -77,6 +82,8 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
         busDetailsLinearLayout3 = (LinearLayout) findViewById(R.id.bus_linear_layout_3);
         busDetailsLinearLayout4 = (LinearLayout) findViewById(R.id.bus_linear_layout_4);
         stopsOnRouteSpinner = (Spinner) findViewById(R.id.route_stop_list_spinner);
+        rotatingAnimation = AnimationUtils.loadAnimation(this, R.anim.rotate);
+        busTimingsRefreshFloatingActionButton = (FloatingActionButton) findViewById(R.id.floatingBusTimingsRefreshActionButton);
         route = new Route();
         route.setRouteNumber(getIntent().getStringExtra("ROUTE_NUMBER"));
         route.setUpRouteId(getIntent().getStringExtra("UP_ROUTE_ID"));
@@ -155,7 +162,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
 
         if (isNetworkAvailable())
         {
-            progressDialog = ProgressDialog.show(this, "Please wait", "Locating buses...");
+            //busTimingsRefreshFloatingActionButton.startAnimation(rotatingAnimation);
             String requestBody = "routeNO=" + route.getRouteNumber() + "&" + "direction=" + route.getDirection();
             new GetBusesEnRouteTask(this, busStopList[position]).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, requestBody);
         }
@@ -377,6 +384,13 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
             busIcon2.setImageResource(R.drawable.ic_directions_bus_ac);
             busIcon3.setImageResource(R.drawable.ic_directions_bus_ac);
             busIcon4.setImageResource(R.drawable.ic_directions_bus_ac);
+        }
+        else if (route.getRouteNumber().contains("CHAKRA-") || route.getRouteNumber().contains("MF"))
+        {
+            busIcon1.setImageResource(R.drawable.ic_directions_bus_special);
+            busIcon2.setImageResource(R.drawable.ic_directions_bus_special);
+            busIcon3.setImageResource(R.drawable.ic_directions_bus_special);
+            busIcon4.setImageResource(R.drawable.ic_directions_bus_special);
         }
         else
         {
