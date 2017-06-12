@@ -616,6 +616,8 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                             JSONArray jsonArray = new JSONArray(stringBuilder.toString());
                             onBusesAtStopFound(false, jsonArray);
                             nearestStopListSpinner.setEnabled(false);
+                            refreshFloatingActionButton.setEnabled(false);
+                            refreshFloatingActionButton.startAnimation(rotatingAnimation);
                             String requestBody = "stopID=" + Integer.toString(nearestBusStops[position].getBusStopId());
                             busesSet.clear();
                             new GetBusesAtStopTask(this, this).execute(requestBody);
