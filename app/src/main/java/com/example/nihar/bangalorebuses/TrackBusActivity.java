@@ -169,17 +169,16 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
     {
         if (canRefresh)
         {
-            downDirectionRadioButton.setEnabled(false);
-            upDirectionRadioButton.setEnabled(false);
-            stopsOnRouteSpinner.setEnabled(false);
-            errorMessageTextView.setVisibility(View.GONE);
-            busDetailsLinearLayout1.setVisibility(View.INVISIBLE);
-            busDetailsLinearLayout2.setVisibility(View.INVISIBLE);
-            busDetailsLinearLayout3.setVisibility(View.INVISIBLE);
-            busDetailsLinearLayout4.setVisibility(View.INVISIBLE);
-
             if (isNetworkAvailable())
             {
+                downDirectionRadioButton.setEnabled(false);
+                upDirectionRadioButton.setEnabled(false);
+                stopsOnRouteSpinner.setEnabled(false);
+                errorMessageTextView.setVisibility(View.GONE);
+                busDetailsLinearLayout1.setVisibility(View.INVISIBLE);
+                busDetailsLinearLayout2.setVisibility(View.INVISIBLE);
+                busDetailsLinearLayout3.setVisibility(View.INVISIBLE);
+                busDetailsLinearLayout4.setVisibility(View.INVISIBLE);
                 busTimingsRefreshFloatingActionButton.setEnabled(false);
                 busTimingsRefreshFloatingActionButton.startAnimation(rotatingAnimation);
                 String requestBody = "routeNO=" + route.getRouteNumber() + "&" + "direction=" + route.getDirection();
