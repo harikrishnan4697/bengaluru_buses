@@ -89,7 +89,7 @@ public class GetBusesAtStopTask extends AsyncTask<String, Void, JSONArray>
     @Override
     protected void onPostExecute(JSONArray jsonArray)
     {
-        //progressDialog.hide();
+        //progressDialog.dismiss();
         caller.onBusesAtStopFound(errorOccurred, jsonArray);
     }
 }

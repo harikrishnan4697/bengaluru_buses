@@ -83,7 +83,7 @@ class GetNearestBusStopsTask extends AsyncTask<URL, Void, JSONArray>
     @Override
     protected void onPostExecute(JSONArray busStops)
     {
-        progressDialog.hide();
+        progressDialog.dismiss();
         caller.onBusStopsFound(errorOccurred, busStops);
     }
 }

@@ -82,7 +82,14 @@ class GetBusRouteDetailsTask extends AsyncTask<String, Void, Void>
             route.setUpRouteName(jsonArray.getJSONObject(0).getString("upRouteName"));
             route.setDownRouteName((jsonArray.getJSONObject(0).getString("downRouteName")));
             route.setUpRouteId(jsonArray.getJSONArray(1).getJSONObject(0).getString("busRouteDetailId"));
-            route.setDownRouteId(jsonArray.getJSONArray(2).getJSONObject(0).getString("busRouteDetailId"));
+            if (jsonArray.getJSONArray(2).length() == 0)
+            {
+                route.setDownRouteId("");
+            }
+            else
+            {
+                route.setDownRouteId(jsonArray.getJSONArray(2).getJSONObject(0).getString("busRouteDetailId"));
+            }
         }
         catch (org.json.JSONException i)
         {
@@ -97,7 +104,7 @@ class GetBusRouteDetailsTask extends AsyncTask<String, Void, Void>
     {
         if (shouldShowProgressDialog)
         {
-            progressDialog.hide();
+            progressDialog.dismiss();
         }
         caller.onBusRouteDetailsFound(errorOccurred, route, isForBusList);
     }

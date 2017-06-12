@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary"
+    android:background="#FFFFFF"
     tools:context="com.example.nihar.bangalorebuses.TrackBusActivity">
 
     <RadioGroup
@@ -13,11 +14,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_marginBottom="4dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginTop="2dp"
+        android:background="@color/colorPrimary"
         android:orientation="vertical"
+        android:paddingBottom="4dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
         android:visibility="visible">
 
         <TextView
@@ -56,8 +57,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/direction_selection_radio_group"
-        android:layout_margin="8dp"
+        android:background="@color/colorPrimary"
         android:orientation="vertical"
+        android:padding="8dp"
         android:visibility="visible">
 
         <TextView
@@ -90,21 +92,31 @@
         </RelativeLayout>
     </LinearLayout>
 
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/track_bus_activity_footer_ad"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
+        ads:adSize="BANNER"
+        ads:adUnitId="AD_UNIT_ID_HERE"/>
+
     <LinearLayout
         android:id="@+id/buses_linear_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/track_bus_activity_footer_ad"
         android:layout_below="@id/bus_stop_selection_linear_layout"
         android:layout_marginTop="5dp"
         android:background="#FFFFFF"
         android:orientation="vertical"
-        android:padding="8dp"
         android:visibility="visible">
 
         <TextView
             android:id="@+id/error_message_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="8dp"
             android:gravity="center"
             android:textColor="#000000"
             android:textSize="16sp"
@@ -113,6 +125,7 @@
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:padding="8dp"
             android:scrollbars="none">
 
             <LinearLayout
@@ -291,7 +304,7 @@
         android:id="@+id/floatingBusTimingsRefreshActionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_above="@id/track_bus_activity_footer_ad"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_margin="10dp"

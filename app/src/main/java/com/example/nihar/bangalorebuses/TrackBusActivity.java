@@ -25,6 +25,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -59,6 +62,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
     private Animation rotatingAnimation;
     private FloatingActionButton busTimingsRefreshFloatingActionButton;
     private boolean canRefresh = true;
+    private AdView adView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -83,6 +87,9 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
         busDetailsLinearLayout2 = (LinearLayout) findViewById(R.id.bus_linear_layout_2);
         busDetailsLinearLayout3 = (LinearLayout) findViewById(R.id.bus_linear_layout_3);
         busDetailsLinearLayout4 = (LinearLayout) findViewById(R.id.bus_linear_layout_4);
+        adView = (AdView) findViewById(R.id.track_bus_activity_footer_ad);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        adView.loadAd(adRequest);
         stopsOnRouteSpinner = (Spinner) findViewById(R.id.route_stop_list_spinner);
         rotatingAnimation = AnimationUtils.loadAnimation(this, R.anim.rotate);
         busTimingsRefreshFloatingActionButton = (FloatingActionButton) findViewById(R.id.floatingBusTimingsRefreshActionButton);
@@ -150,6 +157,10 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
             downDirectionRadioButton.setText(route.getDownRouteName());
             directionSelectionRadioGroup.check(R.id.direction_up_radio_button);
             directionSelectionRadioGroup.setVisibility(View.VISIBLE);
+            if (route.getDownRouteId().equals(""))
+            {
+                downDirectionRadioButton.setVisibility(View.GONE);
+            }
             upDirectionRadioButton.callOnClick();
         }
     }
@@ -250,7 +261,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
     {
         if (isError)
         {
-            progressDialog.hide();
+            progressDialog.dismiss();
             errorMessageTextView.setText(R.string.error_getting_stop_details_text);
             errorMessageTextView.setVisibility(View.VISIBLE);
         }
@@ -303,7 +314,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
             }
             catch (JSONException r)
             {
-                progressDialog.hide();
+                progressDialog.dismiss();
                 r.printStackTrace();
                 Toast.makeText(this, "Unknown error occurred!", Toast.LENGTH_LONG).show();
             }
@@ -313,7 +324,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
     {
-        progressDialog.hide();
+        progressDialog.dismiss();
         if (isNetworkAvailable())
         {
             progressDialog = ProgressDialog.show(this, "Please wait", "Locating buses...");
@@ -380,7 +391,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
             }
             else
             {
-                progressDialog.hide();
+                progressDialog.dismiss();
                 errorMessageTextView.setText("There aren't any " + route.getRouteNumber() + " buses arriving at " + busStopList[position].getBusStopName() + " in this direction");
                 errorMessageTextView.setVisibility(View.VISIBLE);
                 busTimingsRefreshFloatingActionButton.clearAnimation();
@@ -392,7 +403,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
         }
         else
         {
-            progressDialog.hide();
+            progressDialog.dismiss();
             errorMessageTextView.setText("There aren't any " + route.getRouteNumber() + " buses arriving at " + busStopList[position].getBusStopName() + " in this direction");
             errorMessageTextView.setVisibility(View.VISIBLE);
             busTimingsRefreshFloatingActionButton.clearAnimation();
@@ -559,7 +570,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
             }
             while (sorts != 0);
 
-            progressDialog.hide();
+            progressDialog.dismiss();
             if (buses[0].getTimeToBus() != null)
             {
                 if (buses[0].getIsDue())
@@ -640,6 +651,36 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
         }
         busTimingsRefreshFloatingActionButton.clearAnimation();
         busTimingsRefreshFloatingActionButton.setEnabled(true);
-        progressDialog.hide();
+        progressDialog.dismiss();
+    }
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        if (adView != null)
+        {
+            adView.pause();
+        }
+    }
+
+    @Override
+    public void onResume()
+    {
+        if (adView != null)
+        {
+            adView.resume();
+        }
+        super.onResume();
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        if (adView != null)
+        {
+            adView.destroy();
+        }
+        super.onDestroy();
     }
 }

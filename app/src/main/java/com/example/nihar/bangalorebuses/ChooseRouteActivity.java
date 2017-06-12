@@ -41,6 +41,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -93,6 +95,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     private Animation rotatingAnimation;
     private int numberOfBusesArrivingAtNearestStop = 0;
     private ListView routeNumberListView;
+    private AdView adView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -106,6 +109,9 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         actionBar.setDisplayShowCustomEnabled(true);
         setContentView(R.layout.activity_choose_route);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        adView = (AdView) findViewById(R.id.choose_route_activity_footer_ad);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        adView.loadAd(adRequest);
         rotatingAnimation = AnimationUtils.loadAnimation(this, R.anim.rotate);
         routeNumberEditText = (EditText) findViewById(R.id.action_bar_edit_text);
         routeNumberEditText.setOnKeyListener(new View.OnKeyListener()
@@ -295,7 +301,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
             Toast.makeText(this, "Error generating URL! Error code: BB-CRA-URL-01", Toast.LENGTH_LONG).show();
         }
         stopLocationUpdates();
-        progressDialog.hide();
+        progressDialog.dismiss();
 
     }
 
@@ -467,7 +473,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         {
             if (busStopsArray == null || busStopsArray.length() == 0)
             {
-                progressDialog.hide();
+                progressDialog.dismiss();
                 errorMessageTextView.setText(R.string.error_no_bus_stops_found_text);
                 errorMessageTextView.setVisibility(View.VISIBLE);
                 return;
@@ -515,14 +521,14 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
             catch (JSONException e)
             {
                 e.printStackTrace();
-                progressDialog.hide();
+                progressDialog.dismiss();
                 errorMessageTextView.setText(R.string.error_no_bus_stops_found_text);
                 errorMessageTextView.setVisibility(View.VISIBLE);
             }
         }
         else
         {
-            progressDialog.hide();
+            progressDialog.dismiss();
             errorMessageTextView.setText(R.string.error_connecting_to_the_internet_text);
             errorMessageTextView.setVisibility(View.VISIBLE);
         }
@@ -575,13 +581,13 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
             }
             catch (JSONException e)
             {
-                progressDialog.hide();
+                progressDialog.dismiss();
                 e.printStackTrace();
             }
         }
         else
         {
-            progressDialog.hide();
+            progressDialog.dismiss();
             errorMessageTextView.setText(R.string.error_could_not_get_buses_at_stop_text);
             errorMessageTextView.setVisibility(View.VISIBLE);
         }
@@ -667,7 +673,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
             }
             catch (JSONException e)
             {
-                progressDialog.hide();
+                progressDialog.dismiss();
                 e.printStackTrace();
             }
         }
@@ -736,7 +742,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     @Override
     public void onBusRouteDetailsFound(boolean isError, final Route route, boolean isForList)
     {
-        progressDialog.hide();
+        progressDialog.dismiss();
         if (numberOfBusesArrivingAtNearestStop != 1)
         {
             numberOfBusesArrivingAtNearestStop--;
@@ -894,9 +900,33 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     protected void onPause()
     {
         super.onPause();
+        if (adView != null)
+        {
+            adView.pause();
+        }
         stopLocationUpdates();
         mRequestingLocationUpdates = false;
         locationIsToBeUpdated = false;
+    }
+
+    @Override
+    public void onResume()
+    {
+        if (adView != null)
+        {
+            adView.resume();
+        }
+        super.onResume();
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        if (adView != null)
+        {
+            adView.destroy();
+        }
+        super.onDestroy();
     }
 
     protected void stopLocationUpdates()
