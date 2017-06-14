@@ -30,12 +30,13 @@ class GetTimeToBusesTask extends AsyncTask<Bus, Void, Bus[]>
     @Override
     protected Bus[] doInBackground(Bus... buses)
     {
+        final String GOOGLE_MAPS_DISTANCE_MATRIX_API_KEY = "AIzaSyAw-TgEaB_2uGV5UhxjZVpvRdtQHF9HgIU";
         try
         {
-            googleMapsURL[0] = new URL("https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + buses[0].getLatitude() + "," + buses[0].getLongitude() + "&destinations=" + nearestBusStop.getLatitude() + "," + nearestBusStop.getLongitude() + "&mode=transit&transit_mode=bus&key=AIzaSyAw-TgEaB_2uGV5UhxjZVpvRdtQHF9HgIU");
-            googleMapsURL[1] = new URL("https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + buses[1].getLatitude() + "," + buses[1].getLongitude() + "&destinations=" + nearestBusStop.getLatitude() + "," + nearestBusStop.getLongitude() + "&mode=transit&transit_mode=bus&key=AIzaSyAw-TgEaB_2uGV5UhxjZVpvRdtQHF9HgIU");
-            googleMapsURL[2] = new URL("https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + buses[2].getLatitude() + "," + buses[2].getLongitude() + "&destinations=" + nearestBusStop.getLatitude() + "," + nearestBusStop.getLongitude() + "&mode=transit&transit_mode=bus&key=AIzaSyAw-TgEaB_2uGV5UhxjZVpvRdtQHF9HgIU");
-            googleMapsURL[3] = new URL("https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + buses[3].getLatitude() + "," + buses[3].getLongitude() + "&destinations=" + nearestBusStop.getLatitude() + "," + nearestBusStop.getLongitude() + "&mode=transit&transit_mode=bus&key=AIzaSyAw-TgEaB_2uGV5UhxjZVpvRdtQHF9HgIU");
+            googleMapsURL[0] = new URL("https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + buses[0].getLatitude() + "," + buses[0].getLongitude() + "&destinations=" + nearestBusStop.getLatitude() + "," + nearestBusStop.getLongitude() + "&mode=transit&transit_mode=bus&key=" + GOOGLE_MAPS_DISTANCE_MATRIX_API_KEY);
+            googleMapsURL[1] = new URL("https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + buses[1].getLatitude() + "," + buses[1].getLongitude() + "&destinations=" + nearestBusStop.getLatitude() + "," + nearestBusStop.getLongitude() + "&mode=transit&transit_mode=bus&key=" + GOOGLE_MAPS_DISTANCE_MATRIX_API_KEY);
+            googleMapsURL[2] = new URL("https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + buses[2].getLatitude() + "," + buses[2].getLongitude() + "&destinations=" + nearestBusStop.getLatitude() + "," + nearestBusStop.getLongitude() + "&mode=transit&transit_mode=bus&key=" + GOOGLE_MAPS_DISTANCE_MATRIX_API_KEY);
+            googleMapsURL[3] = new URL("https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + buses[3].getLatitude() + "," + buses[3].getLongitude() + "&destinations=" + nearestBusStop.getLatitude() + "," + nearestBusStop.getLongitude() + "&mode=transit&transit_mode=bus&key=" + GOOGLE_MAPS_DISTANCE_MATRIX_API_KEY);
         }
         catch (MalformedURLException r)
         {
