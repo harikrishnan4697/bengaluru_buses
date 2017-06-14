@@ -1,4 +1,4 @@
-package com.example.nihar.bangalorebuses;
+package com.bangalorebuses;
 
 import org.json.JSONArray;
 

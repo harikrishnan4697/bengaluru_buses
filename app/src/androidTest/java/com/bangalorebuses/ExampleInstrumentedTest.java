@@ -1,4 +1,4 @@
-package com.example.nihar.bangalorebuses;
+package com.bangalorebuses;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -23,6 +23,6 @@ public class ExampleInstrumentedTest
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.example.nihar.bangalorebuses", appContext.getPackageName());
+        assertEquals("com.bangalorebuses", appContext.getPackageName());
     }
 }

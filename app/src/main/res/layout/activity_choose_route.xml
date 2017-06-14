@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
-    tools:context="com.example.nihar.bangalorebuses.ChooseRouteActivity">
+    tools:context="com.bangalorebuses.ChooseRouteActivity">
 
     <com.google.android.gms.ads.AdView
         android:id="@+id/choose_route_activity_footer_ad"

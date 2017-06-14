@@ -1,9 +1,8 @@
-package com.example.nihar.bangalorebuses;
+package com.bangalorebuses;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import org.json.JSONArray;
 
@@ -52,7 +51,6 @@ class GetNearestBusStopsTask extends AsyncTask<URL, Void, JSONArray>
         catch (IOException e)
         {
             errorOccurred = true;
-            Log.e("Network Error", "Unable to retrieve data!");
         }
 
         try

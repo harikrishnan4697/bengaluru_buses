@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
-    tools:context="com.example.nihar.bangalorebuses.TrackBusActivity">
+    tools:context="com.bangalorebuses.TrackBusActivity">
 
     <RadioGroup
         android:id="@+id/direction_selection_radio_group"

@@ -1,4 +1,4 @@
-package com.example.nihar.bangalorebuses;
+package com.bangalorebuses;
 
 import android.app.ProgressDialog;
 import android.content.Context;

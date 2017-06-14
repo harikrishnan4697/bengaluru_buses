@@ -1,7 +1,6 @@
-package com.example.nihar.bangalorebuses;
+package com.bangalorebuses;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import org.json.JSONArray;
 
@@ -55,7 +54,6 @@ class GetBusRouteDetailsTask extends AsyncTask<String, Void, Void>
         catch (IOException e)
         {
             errorOccurred = true;
-            Log.e("Network Error", "Unable to retrieve data!");
         }
 
         try
