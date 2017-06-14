@@ -43,6 +43,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -96,6 +97,8 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     private int numberOfBusesArrivingAtNearestStop = 0;
     private ListView routeNumberListView;
     private AdView adView;
+    private boolean routeListIsVisible = false;
+    private LinearLayout nearestBusStopSelectionLinearLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -109,10 +112,12 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         actionBar.setDisplayShowCustomEnabled(true);
         setContentView(R.layout.activity_choose_route);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        MobileAds.initialize(this, "ca-app-pub-4515741125560154~6681035222");
         adView = (AdView) findViewById(R.id.choose_route_activity_footer_ad);
         AdRequest adRequest = new AdRequest.Builder().build();
         adView.loadAd(adRequest);
         rotatingAnimation = AnimationUtils.loadAnimation(this, R.anim.rotate);
+        nearestBusStopSelectionLinearLayout = (LinearLayout) findViewById(R.id.nearest_bus_stop_selection_linear_layout);
         routeNumberEditText = (EditText) findViewById(R.id.action_bar_edit_text);
         routeNumberEditText.setOnKeyListener(new View.OnKeyListener()
         {
@@ -141,7 +146,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         }
         initialiseRouteNumberList();
         refreshFloatingActionButton = (FloatingActionButton) findViewById(R.id.floatingRefreshActionButton);
-        refreshFloatingActionButton.setOnLongClickListener(new View.OnLongClickListener()
+        /*refreshFloatingActionButton.setOnLongClickListener(new View.OnLongClickListener()
         {
             @Override
             public boolean onLongClick(View v)
@@ -149,7 +154,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                 hardRefresh(v);
                 return true;
             }
-        });
+        });*/
     }
 
     private void initialiseRouteNumberList()
@@ -159,6 +164,8 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         InputStream inputStream;
         InputStreamReader inputStreamReader;
         routeNumberListView.setVisibility(View.GONE);
+        routeListIsVisible = false;
+        nearestBusStopSelectionLinearLayout.setVisibility(View.VISIBLE);
 
         try
         {
@@ -202,6 +209,9 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(keyBoardView.getWindowToken(), 0);
                 }
+                routeNumberListView.setVisibility(View.GONE);
+                routeListIsVisible = false;
+                nearestBusStopSelectionLinearLayout.setVisibility(View.VISIBLE);
                 trackBus(parent.getItemAtPosition(position).toString());
             }
         });
@@ -219,11 +229,15 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                 if (routeNumberEditText.getText().toString().equals(""))
                 {
                     routeNumberListView.setVisibility(View.GONE);
+                    routeListIsVisible = false;
+                    nearestBusStopSelectionLinearLayout.setVisibility(View.VISIBLE);
                 }
                 else
                 {
                     listAdapter.getFilter().filter(s);
                     routeNumberListView.setVisibility(View.VISIBLE);
+                    routeListIsVisible = true;
+                    nearestBusStopSelectionLinearLayout.setVisibility(View.GONE);
                 }
             }
 
@@ -291,7 +305,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
             }
             else
             {
-                errorMessageTextView.setText(R.string.error_connecting_to_the_internet_text);
+                errorMessageTextView.setText(R.string.error_connecting_to_the_internet_click_refresh_text);
                 errorMessageTextView.setVisibility(View.VISIBLE);
             }
         }
@@ -439,7 +453,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     {
         switch (item.getItemId())
         {
-            case R.id.choose_route_action_track_entered_bus:
+            /*case R.id.choose_route_action_track_entered_bus:
                 View view = this.getCurrentFocus();
                 if (view != null)
                 {
@@ -454,12 +468,12 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                 {
                     Toast.makeText(this, "Please enter a bus number!", Toast.LENGTH_SHORT).show();
                 }
-                break;
+                break;*/
 
             default:
                 return super.onOptionsItemSelected(item);
         }
-        return true;
+        //return true;
     }
 
     @Override
@@ -588,8 +602,18 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         else
         {
             progressDialog.dismiss();
-            errorMessageTextView.setText(R.string.error_could_not_get_buses_at_stop_text);
-            errorMessageTextView.setVisibility(View.VISIBLE);
+            refreshFloatingActionButton.clearAnimation();
+            refreshFloatingActionButton.setEnabled(true);
+            if (isNetworkAvailable())
+            {
+                errorMessageTextView.setText(R.string.error_could_not_get_buses_at_stop_text);
+                errorMessageTextView.setVisibility(View.VISIBLE);
+            }
+            else
+            {
+                errorMessageTextView.setText(R.string.error_connecting_to_the_internet_click_refresh_text);
+                errorMessageTextView.setVisibility(View.VISIBLE);
+            }
         }
     }
 
@@ -599,6 +623,8 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         this.position = position;
         busDetailsLinearLayout.removeAllViews();
         errorMessageTextView.setVisibility(View.GONE);
+        TextView busesArrivingAtStopListDescriptionTextView = (TextView) findViewById(R.id.buses_at_stop_list_description);
+        busesArrivingAtStopListDescriptionTextView.setText("Buses arriving at " + nearestBusStops[position].getBusStopName());
         if (position == 0 && !updateBusList)
         {
             try
@@ -695,24 +721,6 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         }
     }
 
-    public void softRefresh(View view)
-    {
-        if (isNetworkAvailable())
-        {
-            errorMessageTextView.setVisibility(View.GONE);
-            refreshFloatingActionButton.setEnabled(false);
-            refreshFloatingActionButton.startAnimation(rotatingAnimation);
-            String requestBody = "stopID=" + Integer.toString(nearestBusStops[position].getBusStopId());
-            busesSet.clear();
-            new GetBusesAtStopTask(this, this).execute(requestBody);
-        }
-        else
-        {
-            errorMessageTextView.setText(R.string.error_connecting_to_the_internet_text);
-            errorMessageTextView.setVisibility(View.VISIBLE);
-        }
-    }
-
     public void hardRefresh(View view)
     {
         errorMessageTextView.setVisibility(View.GONE);
@@ -749,8 +757,11 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         }
         else
         {
-            refreshFloatingActionButton.clearAnimation();
-            refreshFloatingActionButton.setEnabled(true);
+            if (nearestStopListSpinner.isEnabled())
+            {
+                refreshFloatingActionButton.clearAnimation();
+                refreshFloatingActionButton.setEnabled(true);
+            }
         }
         if (!isError)
         {
@@ -812,7 +823,6 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                 busDetailsLinearLayout.addView(busDetailsRowLinearLayout);
                 busDetailsLinearLayout.addView(separatorView);
                 busDetailsLinearLayout.setVisibility(View.VISIBLE);
-
                 busDetailsRowLinearLayout.setOnClickListener(new View.OnClickListener()
                 {
                     @Override
@@ -836,7 +846,6 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
             }
             else
             {
-                routeNumberListView.setVisibility(View.GONE);
                 routeNumberEditText.setText("");
                 trackBusIntent = new Intent(ChooseRouteActivity.this, TrackBusActivity.class);
                 if (nearestBusStops[position] != null)
@@ -880,6 +889,11 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     public void onTimeToBusesFound(boolean isError, Bus[] buses)
     {
 
+    }
+
+    protected void stopLocationUpdates()
+    {
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
     }
 
     protected void onStart()
@@ -929,8 +943,19 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         super.onDestroy();
     }
 
-    protected void stopLocationUpdates()
+    @Override
+    public void onBackPressed()
     {
-        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+        if (routeListIsVisible)
+        {
+            routeNumberListView.setVisibility(View.GONE);
+            routeListIsVisible = false;
+            nearestBusStopSelectionLinearLayout.setVisibility(View.VISIBLE);
+            routeNumberEditText.setText("");
+        }
+        else
+        {
+            super.onBackPressed();
+        }
     }
 }

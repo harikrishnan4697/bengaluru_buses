@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -70,6 +71,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
         super.onCreate(savedInstanceState);
         getSupportActionBar().setElevation(0);
         setContentView(R.layout.activity_track_bus);
+        MobileAds.initialize(this, "ca-app-pub-4515741125560154~6681035222");
         directionSelectionRadioGroup = (RadioGroup) findViewById(R.id.direction_selection_radio_group);
         upDirectionRadioButton = (RadioButton) findViewById(R.id.direction_up_radio_button);
         downDirectionRadioButton = (RadioButton) findViewById(R.id.direction_down_radio_button);
@@ -139,10 +141,10 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
     public void trackBus()
     {
         errorMessageTextView.setVisibility(View.GONE);
-        busDetailsLinearLayout1.setVisibility(View.INVISIBLE);
-        busDetailsLinearLayout2.setVisibility(View.INVISIBLE);
-        busDetailsLinearLayout3.setVisibility(View.INVISIBLE);
-        busDetailsLinearLayout4.setVisibility(View.INVISIBLE);
+        busDetailsLinearLayout1.setVisibility(View.GONE);
+        busDetailsLinearLayout2.setVisibility(View.GONE);
+        busDetailsLinearLayout3.setVisibility(View.GONE);
+        busDetailsLinearLayout4.setVisibility(View.GONE);
         directionSelectionRadioGroup.setVisibility(View.GONE);
         busStopSelectionLinearLayout.setVisibility(View.GONE);
 
@@ -171,22 +173,29 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
         {
             if (isNetworkAvailable())
             {
-                downDirectionRadioButton.setEnabled(false);
-                upDirectionRadioButton.setEnabled(false);
-                stopsOnRouteSpinner.setEnabled(false);
-                errorMessageTextView.setVisibility(View.GONE);
-                busDetailsLinearLayout1.setVisibility(View.INVISIBLE);
-                busDetailsLinearLayout2.setVisibility(View.INVISIBLE);
-                busDetailsLinearLayout3.setVisibility(View.INVISIBLE);
-                busDetailsLinearLayout4.setVisibility(View.INVISIBLE);
-                busTimingsRefreshFloatingActionButton.setEnabled(false);
-                busTimingsRefreshFloatingActionButton.startAnimation(rotatingAnimation);
-                String requestBody = "routeNO=" + route.getRouteNumber() + "&" + "direction=" + route.getDirection();
-                new GetBusesEnRouteTask(this, busStopList[position]).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, requestBody);
+                if(busStopList != null)
+                {
+                    downDirectionRadioButton.setEnabled(false);
+                    upDirectionRadioButton.setEnabled(false);
+                    stopsOnRouteSpinner.setEnabled(false);
+                    errorMessageTextView.setVisibility(View.GONE);
+                    busDetailsLinearLayout1.setVisibility(View.GONE);
+                    busDetailsLinearLayout2.setVisibility(View.GONE);
+                    busDetailsLinearLayout3.setVisibility(View.GONE);
+                    busDetailsLinearLayout4.setVisibility(View.GONE);
+                    busTimingsRefreshFloatingActionButton.setEnabled(false);
+                    busTimingsRefreshFloatingActionButton.startAnimation(rotatingAnimation);
+                    String requestBody = "routeNO=" + route.getRouteNumber() + "&" + "direction=" + route.getDirection();
+                    new GetBusesEnRouteTask(this, busStopList[position]).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, requestBody);
+                }
+                else
+                {
+                    trackBus();
+                }
             }
             else
             {
-                errorMessageTextView.setText(R.string.error_connecting_to_the_internet_text);
+                errorMessageTextView.setText(R.string.error_connecting_to_the_internet_click_refresh_text);
                 errorMessageTextView.setVisibility(View.VISIBLE);
             }
         }
@@ -232,7 +241,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
         }
         else
         {
-            errorMessageTextView.setText(R.string.error_connecting_to_the_internet_text);
+            errorMessageTextView.setText(R.string.error_connecting_to_the_internet_click_refresh_text);
             errorMessageTextView.setVisibility(View.VISIBLE);
         }
     }
@@ -328,17 +337,17 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
         {
             progressDialog = ProgressDialog.show(this, "Please wait", "Locating buses...");
             errorMessageTextView.setVisibility(View.GONE);
-            busDetailsLinearLayout1.setVisibility(View.INVISIBLE);
-            busDetailsLinearLayout2.setVisibility(View.INVISIBLE);
-            busDetailsLinearLayout3.setVisibility(View.INVISIBLE);
-            busDetailsLinearLayout4.setVisibility(View.INVISIBLE);
+            busDetailsLinearLayout1.setVisibility(View.GONE);
+            busDetailsLinearLayout2.setVisibility(View.GONE);
+            busDetailsLinearLayout3.setVisibility(View.GONE);
+            busDetailsLinearLayout4.setVisibility(View.GONE);
             this.position = position;
             String requestBody = "routeNO=" + route.getRouteNumber() + "&" + "direction=" + route.getDirection();
             new GetBusesEnRouteTask(this, busStopList[position]).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, requestBody);
         }
         else
         {
-            errorMessageTextView.setText(R.string.error_connecting_to_the_internet_text);
+            errorMessageTextView.setText(R.string.error_connecting_to_the_internet_click_refresh_text);
             errorMessageTextView.setVisibility(View.VISIBLE);
         }
     }
@@ -384,7 +393,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
                 }
                 else
                 {
-                    errorMessageTextView.setText(R.string.error_connecting_to_the_internet_text);
+                    errorMessageTextView.setText(R.string.error_connecting_to_the_internet_click_refresh_text);
                     errorMessageTextView.setVisibility(View.VISIBLE);
                 }
             }

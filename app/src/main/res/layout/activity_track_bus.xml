@@ -99,7 +99,7 @@
         android:layout_alignParentBottom="true"
         android:layout_centerInParent="true"
         ads:adSize="BANNER"
-        ads:adUnitId="AD_UNIT_ID_HERE"/>
+        ads:adUnitId="ca-app-pub-4515741125560154/2111234828"/>
 
     <LinearLayout
         android:id="@+id/buses_linear_layout"
@@ -107,7 +107,6 @@
         android:layout_height="wrap_content"
         android:layout_above="@id/track_bus_activity_footer_ad"
         android:layout_below="@id/bus_stop_selection_linear_layout"
-        android:layout_marginTop="5dp"
         android:background="#FFFFFF"
         android:orientation="vertical"
         android:visibility="visible">
@@ -121,6 +120,11 @@
             android:textColor="#000000"
             android:textSize="16sp"
             android:visibility="gone"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="#000000"/>
 
         <ScrollView
             android:layout_width="match_parent"
