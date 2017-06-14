@@ -128,7 +128,7 @@
         android:layout_alignParentRight="true"
         android:layout_margin="10dp"
         android:clickable="true"
-        android:onClick="hardRefresh"
+        android:onClick="refresh"
         android:src="@drawable/ic_refresh_white"
         app:fabSize="mini"/>
 

@@ -22,7 +22,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -104,59 +103,64 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setElevation(0);
-        actionBar.setCustomView(R.layout.track_bus_edit_text);
-        actionBar.setDisplayShowTitleEnabled(false);
-        actionBar.setDisplayHomeAsUpEnabled(false);
-        actionBar.setDisplayShowCustomEnabled(true);
         setContentView(R.layout.activity_choose_route);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+        // Configure the actionbar
+        ActionBar actionBar = getSupportActionBar();
+        try
+        {
+            actionBar.setElevation(0);
+            actionBar.setCustomView(R.layout.track_bus_edit_text);
+            actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setDisplayHomeAsUpEnabled(false);
+            actionBar.setDisplayShowCustomEnabled(true);
+        }
+        catch (java.lang.NullPointerException e)
+        {
+            e.printStackTrace();
+        }
+
+        // Start the Google AdMob service
         MobileAds.initialize(this, "ca-app-pub-4515741125560154~6681035222");
         adView = (AdView) findViewById(R.id.choose_route_activity_footer_ad);
         AdRequest adRequest = new AdRequest.Builder().build();
         adView.loadAd(adRequest);
-        rotatingAnimation = AnimationUtils.loadAnimation(this, R.anim.rotate);
-        nearestBusStopSelectionLinearLayout = (LinearLayout) findViewById(R.id.nearest_bus_stop_selection_linear_layout);
+
+        // Initialize and setup some instance variables
         routeNumberEditText = (EditText) findViewById(R.id.action_bar_edit_text);
-        routeNumberEditText.setOnKeyListener(new View.OnKeyListener()
-        {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event)
-            {
-                if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER))
-                {
-                    trackBus(routeNumberEditText.getText().toString());
-                    return true;
-                }
-                return false;
-            }
-        });
+        nearestBusStopSelectionLinearLayout = (LinearLayout) findViewById(R.id.nearest_bus_stop_selection_linear_layout);
+        refreshFloatingActionButton = (FloatingActionButton) findViewById(R.id.floatingRefreshActionButton);
+        rotatingAnimation = AnimationUtils.loadAnimation(this, R.anim.rotate);
         locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
         busesSet = new HashSet<>();
         busDetailsLinearLayout = (LinearLayout) findViewById(R.id.bus_details_linear_layout);
         errorMessageTextView = (TextView) findViewById(R.id.choose_route_activity_error_message_text_view);
-        errorMessageTextView.setVisibility(View.GONE);
         nearestStopListSpinner = (Spinner) findViewById(R.id.stop_list_spinner);
+        errorMessageTextView.setVisibility(View.GONE);
         updateBusList = false;
         locationIsToBeUpdated = true;
         if (mGoogleApiClient == null)
         {
             mGoogleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
         }
+
         initialiseRouteNumberList();
-        refreshFloatingActionButton = (FloatingActionButton) findViewById(R.id.floatingRefreshActionButton);
-        /*refreshFloatingActionButton.setOnLongClickListener(new View.OnLongClickListener()
-        {
-            @Override
-            public boolean onLongClick(View v)
-            {
-                hardRefresh(v);
-                return true;
-            }
-        });*/
     }
 
+
+
+    // Returns true if the user's device has a Wi-Fi or Data connection, else, returns false
+    private boolean isNetworkAvailable()
+    {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null;
+    }
+
+
+
+    // Handle the route number list that filters bus routes as the user starts typing in the search box
     private void initialiseRouteNumberList()
     {
         routeNumberListView = (ListView) findViewById(R.id.bus_route_list_view);
@@ -212,7 +216,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                 routeNumberListView.setVisibility(View.GONE);
                 routeListIsVisible = false;
                 nearestBusStopSelectionLinearLayout.setVisibility(View.VISIBLE);
-                trackBus(parent.getItemAtPosition(position).toString());
+                startTrackingBus(parent.getItemAtPosition(position).toString());
             }
         });
         routeNumberEditText.addTextChangedListener(new TextWatcher()
@@ -248,6 +252,9 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         });
     }
 
+
+
+    // Methods to initialize and handle the GoogleApiClient
     @Override
     public void onConnected(Bundle connectionHint)
     {
@@ -260,7 +267,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult)
     {
-        Toast.makeText(this, "Couldn't get current location! Please try again later...", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Couldn't get current location! Please try again later.", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -269,68 +276,9 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
 
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults)
-    {
-        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE)
-        {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-            {
-                createLocationRequest();
-            }
-            else
-            {
-                Toast.makeText(this, "Location access was denied! Couldn't locate bus stops nearby...", Toast.LENGTH_LONG).show();
-            }
-        }
-    }
 
-    private boolean isNetworkAvailable()
-    {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null;
-    }
 
-    @Override
-    public void onLocationChanged(Location location)
-    {
-        mRequestingLocationUpdates = false;
-        try
-        {
-            if (isNetworkAvailable())
-            {
-                URL nearestBusStopURL = new URL("http://bmtcmob.hostg.in/api/busstops/stopnearby/lat/" + String.valueOf(location.getLatitude()) + "/lon/" + String.valueOf(location.getLongitude()) + "/rad/0.6");
-                new GetNearestBusStopsTask(this, this).execute(nearestBusStopURL);
-            }
-            else
-            {
-                errorMessageTextView.setText(R.string.error_connecting_to_the_internet_click_refresh_text);
-                errorMessageTextView.setVisibility(View.VISIBLE);
-            }
-        }
-        catch (MalformedURLException e)
-        {
-            e.printStackTrace();
-            Toast.makeText(this, "Error generating URL! Error code: BB-CRA-URL-01", Toast.LENGTH_LONG).show();
-        }
-        stopLocationUpdates();
-        progressDialog.dismiss();
-
-    }
-
-    protected void startLocationUpdates()
-    {
-        try
-        {
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-        }
-        catch (SecurityException e)
-        {
-            Toast.makeText(this, "Please grant the location permission in app info...", Toast.LENGTH_LONG).show();
-        }
-    }
-
+    // Creates the location request to get the user's current location
     protected void createLocationRequest()
     {
         busDetailsLinearLayout.setVisibility(View.INVISIBLE);
@@ -406,6 +354,72 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         });
     }
 
+    // Starts location updates from the location service provider
+    protected void startLocationUpdates()
+    {
+        try
+        {
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        }
+        catch (SecurityException e)
+        {
+            Toast.makeText(this, "Please grant the location permission in app info...", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    // Stops location updates from the location service provider
+    protected void stopLocationUpdates()
+    {
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+    }
+
+    // Finds bus stops nearby after a location update has been received
+    @Override
+    public void onLocationChanged(Location location)
+    {
+        mRequestingLocationUpdates = false;
+        try
+        {
+            if (isNetworkAvailable())
+            {
+                URL nearestBusStopURL = new URL("http://bmtcmob.hostg.in/api/busstops/stopnearby/lat/" + String.valueOf(location.getLatitude()) + "/lon/" + String.valueOf(location.getLongitude()) + "/rad/0.6");
+                new GetNearestBusStopsTask(this, this).execute(nearestBusStopURL);
+            }
+            else
+            {
+                errorMessageTextView.setText(R.string.error_connecting_to_the_internet_click_refresh_text);
+                errorMessageTextView.setVisibility(View.VISIBLE);
+            }
+        }
+        catch (MalformedURLException e)
+        {
+            e.printStackTrace();
+            Toast.makeText(this, "Error generating URL! Error code: BB-CRA-URL-01", Toast.LENGTH_LONG).show();
+        }
+        stopLocationUpdates();
+        progressDialog.dismiss();
+
+    }
+
+    // What to do after the user has granted or denied permission to use their device's location service
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults)
+    {
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE)
+        {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+            {
+                createLocationRequest();
+            }
+            else
+            {
+                Toast.makeText(this, "Location access was denied! Couldn't locate bus stops nearby...", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+
+    // What to do after the user has allowed or denied location services to be turned on
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
@@ -440,6 +454,9 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         }
     }
 
+
+
+    // Inflate the menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
@@ -448,175 +465,21 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         return super.onCreateOptionsMenu(menu);
     }
 
+    // Handle clicks of the menu buttons
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
         switch (item.getItemId())
         {
-            /*case R.id.choose_route_action_track_entered_bus:
-                View view = this.getCurrentFocus();
-                if (view != null)
-                {
-                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-                }
-                if (!routeNumberEditText.getText().toString().equals(""))
-                {
-                    trackBus(routeNumberEditText.getText().toString());
-                }
-                else
-                {
-                    Toast.makeText(this, "Please enter a bus number!", Toast.LENGTH_SHORT).show();
-                }
-                break;*/
-
             default:
                 return super.onOptionsItemSelected(item);
         }
         //return true;
     }
 
-    @Override
-    public void onBusStopsFound(boolean isError, JSONArray busStopsArray)
-    {
-        ArrayList<String> stopList = new ArrayList<>();
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item, stopList);
-        busDetailsLinearLayout.removeAllViews();
 
-        if (!isError)
-        {
-            if (busStopsArray == null || busStopsArray.length() == 0)
-            {
-                progressDialog.dismiss();
-                errorMessageTextView.setText(R.string.error_no_bus_stops_found_text);
-                errorMessageTextView.setVisibility(View.VISIBLE);
-                return;
-            }
 
-            nearestBusStops[0] = new BusStop();
-            nearestBusStops[1] = new BusStop();
-            nearestBusStops[2] = new BusStop();
-            nearestBusStops[3] = new BusStop();
-            int i = 0;
-
-            try
-            {
-                for (int h = 0; h < 4; h++)
-                {
-                    for (; i < busStopsArray.length(); i++)
-                    {
-                        String busStopName = busStopsArray.getJSONObject(i).getString("StopName");
-                        if (!(busStopName.contains("CS-")))
-                        {
-                            if (busStopName.substring(busStopName.indexOf("(") - 1, busStopName.indexOf("(")).equals(" "))
-                            {
-                                busStopName = busStopsArray.getJSONObject(i).getString("StopName").replace(" (", "(");
-                            }
-                            if (!stopList.contains(busStopName.substring(0, busStopName.indexOf("("))))
-                            {
-                                nearestBusStops[h].setBusStopName(busStopName.substring(0, busStopName.indexOf("(")));
-                                nearestBusStops[h].setLatitude(busStopsArray.getJSONObject(i).getString("StopLat"));
-                                nearestBusStops[h].setLongitude(busStopsArray.getJSONObject(i).getString("StopLong"));
-                                nearestBusStops[h].setBusStopId(busStopsArray.getJSONObject(i).getInt("StopId"));
-                                stopList.add(nearestBusStops[h].getBusStopName());
-                                i++;
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            i++;
-                        }
-                    }
-                }
-                nearestStopListSpinner.setAdapter(adapter);
-                nearestStopListSpinner.setOnItemSelectedListener(this);
-            }
-            catch (JSONException e)
-            {
-                e.printStackTrace();
-                progressDialog.dismiss();
-                errorMessageTextView.setText(R.string.error_no_bus_stops_found_text);
-                errorMessageTextView.setVisibility(View.VISIBLE);
-            }
-        }
-        else
-        {
-            progressDialog.dismiss();
-            errorMessageTextView.setText(R.string.error_connecting_to_the_internet_text);
-            errorMessageTextView.setVisibility(View.VISIBLE);
-        }
-    }
-
-    @Override
-    public void onBusesAtStopFound(boolean isError, JSONArray buses)
-    {
-        if (!isError)
-        {
-            busDetailsLinearLayout.removeAllViews();
-            busesSet.clear();
-            try
-            {
-                if (position == 0)
-                {
-                    try
-                    {
-                        deleteFile(FILENAME);
-                        FileOutputStream fileOutputStream = openFileOutput(FILENAME, MODE_PRIVATE);
-                        fileOutputStream.write((nearestBusStops[position].getBusStopName() + "\n").getBytes());
-                        fileOutputStream.write(buses.toString().getBytes());
-                        fileOutputStream.close();
-                        nearestStopListSpinner.setEnabled(true);
-                    }
-                    catch (IOException e)
-                    {
-                        e.printStackTrace();
-                    }
-                }
-                for (int i = 0; i < buses.length(); i++)
-                {
-                    busesSet.add(buses.getJSONArray(i).get(3).toString().substring(buses.getJSONArray(i).get(3).toString().indexOf(":") + 1, buses.getJSONArray(i).get(3).toString().length()).replace("DN", "").replace("UP", ""));
-                }
-                if (isNetworkAvailable())
-                {
-                    numberOfBusesArrivingAtNearestStop = 0;
-                    Iterator<String> busesSetIterator = busesSet.iterator();
-                    while (busesSetIterator.hasNext())
-                    {
-                        numberOfBusesArrivingAtNearestStop++;
-                        new GetBusRouteDetailsTask(this, this, false, true).execute(busesSetIterator.next());
-                    }
-                }
-                else
-                {
-                    errorMessageTextView.setText(R.string.error_connecting_to_the_internet_text);
-                    errorMessageTextView.setVisibility(View.VISIBLE);
-                }
-            }
-            catch (JSONException e)
-            {
-                progressDialog.dismiss();
-                e.printStackTrace();
-            }
-        }
-        else
-        {
-            progressDialog.dismiss();
-            refreshFloatingActionButton.clearAnimation();
-            refreshFloatingActionButton.setEnabled(true);
-            if (isNetworkAvailable())
-            {
-                errorMessageTextView.setText(R.string.error_could_not_get_buses_at_stop_text);
-                errorMessageTextView.setVisibility(View.VISIBLE);
-            }
-            else
-            {
-                errorMessageTextView.setText(R.string.error_connecting_to_the_internet_click_refresh_text);
-                errorMessageTextView.setVisibility(View.VISIBLE);
-            }
-        }
-    }
-
+    // What to do when a bus stop has been selected from the dropdown of nearest bus stops
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
     {
@@ -721,13 +584,16 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         }
     }
 
-    public void hardRefresh(View view)
+    @Override
+    public void onNothingSelected(AdapterView<?> parent)
     {
-        errorMessageTextView.setVisibility(View.GONE);
-        createLocationRequest();
+        Toast.makeText(this, "Please choose a bus stop!", Toast.LENGTH_LONG).show();
     }
 
-    public void trackBus(String busNumberToTrack)
+
+
+    // Track a bus
+    public void startTrackingBus(String busNumberToTrack)
     {
         if (isNetworkAvailable())
         {
@@ -741,12 +607,159 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         }
     }
 
-    @Override
-    public void onNothingSelected(AdapterView<?> parent)
+    // What to do when the floating refresh button has been clicked
+    public void refresh(View view)
     {
-        Toast.makeText(this, "Please choose a bus stop!", Toast.LENGTH_LONG).show();
+        errorMessageTextView.setVisibility(View.GONE);
+        createLocationRequest();
     }
 
+
+
+    // What to do once bus stops nearby have been found
+    @Override
+    public void onBusStopsFound(boolean isError, JSONArray busStopsArray)
+    {
+        ArrayList<String> stopList = new ArrayList<>();
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item, stopList);
+        busDetailsLinearLayout.removeAllViews();
+
+        if (!isError)
+        {
+            if (busStopsArray == null || busStopsArray.length() == 0)
+            {
+                progressDialog.dismiss();
+                errorMessageTextView.setText(R.string.error_no_bus_stops_found_text);
+                errorMessageTextView.setVisibility(View.VISIBLE);
+                return;
+            }
+
+            nearestBusStops[0] = new BusStop();
+            nearestBusStops[1] = new BusStop();
+            nearestBusStops[2] = new BusStop();
+            nearestBusStops[3] = new BusStop();
+            int i = 0;
+
+            try
+            {
+                for (int h = 0; h < 4; h++)
+                {
+                    for (; i < busStopsArray.length(); i++)
+                    {
+                        String busStopName = busStopsArray.getJSONObject(i).getString("StopName");
+                        if (!(busStopName.contains("CS-")))
+                        {
+                            if (busStopName.substring(busStopName.indexOf("(") - 1, busStopName.indexOf("(")).equals(" "))
+                            {
+                                busStopName = busStopsArray.getJSONObject(i).getString("StopName").replace(" (", "(");
+                            }
+                            if (!stopList.contains(busStopName.substring(0, busStopName.indexOf("("))))
+                            {
+                                nearestBusStops[h].setBusStopName(busStopName.substring(0, busStopName.indexOf("(")));
+                                nearestBusStops[h].setLatitude(busStopsArray.getJSONObject(i).getString("StopLat"));
+                                nearestBusStops[h].setLongitude(busStopsArray.getJSONObject(i).getString("StopLong"));
+                                nearestBusStops[h].setBusStopId(busStopsArray.getJSONObject(i).getInt("StopId"));
+                                stopList.add(nearestBusStops[h].getBusStopName());
+                                i++;
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            i++;
+                        }
+                    }
+                }
+                nearestStopListSpinner.setAdapter(adapter);
+                nearestStopListSpinner.setOnItemSelectedListener(this);
+            }
+            catch (JSONException e)
+            {
+                e.printStackTrace();
+                progressDialog.dismiss();
+                errorMessageTextView.setText(R.string.error_no_bus_stops_found_text);
+                errorMessageTextView.setVisibility(View.VISIBLE);
+            }
+        }
+        else
+        {
+            progressDialog.dismiss();
+            errorMessageTextView.setText(R.string.error_connecting_to_the_internet_text);
+            errorMessageTextView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    // What to do once buses arriving at the selected stop have been found
+    @Override
+    public void onBusesAtStopFound(boolean isError, JSONArray buses)
+    {
+        if (!isError)
+        {
+            busDetailsLinearLayout.removeAllViews();
+            busesSet.clear();
+            try
+            {
+                if (position == 0)
+                {
+                    try
+                    {
+                        deleteFile(FILENAME);
+                        FileOutputStream fileOutputStream = openFileOutput(FILENAME, MODE_PRIVATE);
+                        fileOutputStream.write((nearestBusStops[position].getBusStopName() + "\n").getBytes());
+                        fileOutputStream.write(buses.toString().getBytes());
+                        fileOutputStream.close();
+                        nearestStopListSpinner.setEnabled(true);
+                    }
+                    catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+                for (int i = 0; i < buses.length(); i++)
+                {
+                    busesSet.add(buses.getJSONArray(i).get(3).toString().substring(buses.getJSONArray(i).get(3).toString().indexOf(":") + 1, buses.getJSONArray(i).get(3).toString().length()).replace("DN", "").replace("UP", ""));
+                }
+                if (isNetworkAvailable())
+                {
+                    numberOfBusesArrivingAtNearestStop = 0;
+                    Iterator<String> busesSetIterator = busesSet.iterator();
+                    while (busesSetIterator.hasNext())
+                    {
+                        numberOfBusesArrivingAtNearestStop++;
+                        new GetBusRouteDetailsTask(this, this, false, true).execute(busesSetIterator.next());
+                    }
+                }
+                else
+                {
+                    errorMessageTextView.setText(R.string.error_connecting_to_the_internet_text);
+                    errorMessageTextView.setVisibility(View.VISIBLE);
+                }
+            }
+            catch (JSONException e)
+            {
+                progressDialog.dismiss();
+                e.printStackTrace();
+            }
+        }
+        else
+        {
+            progressDialog.dismiss();
+            refreshFloatingActionButton.clearAnimation();
+            refreshFloatingActionButton.setEnabled(true);
+            if (isNetworkAvailable())
+            {
+                errorMessageTextView.setText(R.string.error_could_not_get_buses_at_stop_text);
+                errorMessageTextView.setVisibility(View.VISIBLE);
+            }
+            else
+            {
+                errorMessageTextView.setText(R.string.error_connecting_to_the_internet_click_refresh_text);
+                errorMessageTextView.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    // What to do once bus route details have been found
     @Override
     public void onBusRouteDetailsFound(boolean isError, final Route route, boolean isForList)
     {
@@ -873,28 +886,28 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         }
     }
 
+    // What to do once stops on bus route have been found
     @Override
     public void onStopsOnBusRouteFound(boolean isError, final JSONArray stopListArray)
     {
 
     }
 
+    // Not used
     @Override
     public void onBusesEnRouteFound(boolean isError, Bus[] buses, int numberOfBusesFound)
     {
 
     }
 
+    // Not used
     @Override
     public void onTimeToBusesFound(boolean isError, Bus[] buses)
     {
 
     }
 
-    protected void stopLocationUpdates()
-    {
-        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-    }
+
 
     protected void onStart()
     {
@@ -943,9 +956,13 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         super.onDestroy();
     }
 
+
+
+    // What to do when the Android back button is pressed
     @Override
     public void onBackPressed()
     {
+        // If the list of bus routes for the search feature is visible, hide the list instead of exiting the app
         if (routeListIsVisible)
         {
             routeNumberListView.setVisibility(View.GONE);
@@ -955,7 +972,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         }
         else
         {
-            super.onBackPressed();
+            super.onBackPressed(); // Else, exit the app as usual
         }
     }
 }
