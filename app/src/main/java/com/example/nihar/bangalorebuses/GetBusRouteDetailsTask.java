@@ -1,7 +1,5 @@
 package com.example.nihar.bangalorebuses;
 
-import android.app.ProgressDialog;
-import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -16,30 +14,15 @@ import java.net.URL;
 class GetBusRouteDetailsTask extends AsyncTask<String, Void, Void>
 {
     private NetworkingCallback caller;
-    private Context callerContext;
     private URL busRouteTimetableURL;
-    private ProgressDialog progressDialog;
     private boolean errorOccurred = false;
     private Route route;
-    private boolean shouldShowProgressDialog;
     private boolean isForBusList = false;
 
-    GetBusRouteDetailsTask(NetworkingCallback caller, Context context, Boolean shouldShowProgressDialog, boolean isForBusList)
+    GetBusRouteDetailsTask(NetworkingCallback caller, boolean isForBusList)
     {
         this.caller = caller;
-        this.callerContext = context;
-        this.shouldShowProgressDialog = shouldShowProgressDialog;
         this.isForBusList = isForBusList;
-    }
-
-    @Override
-    protected void onPreExecute()
-    {
-        if (shouldShowProgressDialog)
-        {
-            progressDialog = ProgressDialog.show(callerContext, "", "Getting route details...", true);
-        }
-        errorOccurred = false;
     }
 
     @Override
@@ -102,10 +85,6 @@ class GetBusRouteDetailsTask extends AsyncTask<String, Void, Void>
     @Override
     protected void onPostExecute(Void params)
     {
-        if (shouldShowProgressDialog)
-        {
-            progressDialog.dismiss();
-        }
         caller.onBusRouteDetailsFound(errorOccurred, route, isForBusList);
     }
 }

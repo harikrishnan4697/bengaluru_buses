@@ -1,7 +1,5 @@
 package com.example.nihar.bangalorebuses;
 
-import android.app.ProgressDialog;
-import android.content.Context;
 import android.os.AsyncTask;
 
 import org.json.JSONArray;
@@ -13,28 +11,24 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class GetBusesAtStopTask extends AsyncTask<String, Void, JSONArray>
+class GetBusesAtStopTask extends AsyncTask<String, Void, JSONArray>
 {
     private NetworkingCallback caller;
-    private Context callerContext;
-    private ProgressDialog progressDialog;
-    private URL bussesAtStopURL;
+    private URL busesAtStopURL;
     private boolean errorOccurred = false;
 
-    GetBusesAtStopTask(NetworkingCallback aCaller, Context aContext)
+    GetBusesAtStopTask(NetworkingCallback aCaller)
     {
         caller = aCaller;
-        callerContext = aContext;
     }
 
     @Override
     protected void onPreExecute()
     {
-        //progressDialog = ProgressDialog.show(callerContext, "", "Getting buses...", true);
         errorOccurred = false;
         try
         {
-            bussesAtStopURL = new URL("http://bmtcmob.hostg.in/api/itsstopwise/details");
+            busesAtStopURL = new URL("http://bmtcmob.hostg.in/api/itsstopwise/details");
         }
         catch (java.net.MalformedURLException e)
         {
@@ -51,7 +45,7 @@ public class GetBusesAtStopTask extends AsyncTask<String, Void, JSONArray>
         StringBuilder result = new StringBuilder();
         try
         {
-            client = (HttpURLConnection) bussesAtStopURL.openConnection();
+            client = (HttpURLConnection) busesAtStopURL.openConnection();
             client.setRequestMethod("POST");
             client.setRequestProperty("Accept", "application/json");
             client.setDoOutput(true);
@@ -75,8 +69,7 @@ public class GetBusesAtStopTask extends AsyncTask<String, Void, JSONArray>
 
         try
         {
-            JSONArray jsonArray = new JSONArray(result.toString());
-            return jsonArray;
+            return new JSONArray(result.toString());
         }
         catch (JSONException e)
         {
@@ -89,7 +82,6 @@ public class GetBusesAtStopTask extends AsyncTask<String, Void, JSONArray>
     @Override
     protected void onPostExecute(JSONArray jsonArray)
     {
-        //progressDialog.dismiss();
         caller.onBusesAtStopFound(errorOccurred, jsonArray);
     }
 }

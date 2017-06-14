@@ -1,6 +1,5 @@
 package com.example.nihar.bangalorebuses;
 
-import android.app.ProgressDialog;
 import android.os.AsyncTask;
 
 import org.json.JSONArray;
@@ -14,7 +13,6 @@ import java.net.URL;
 class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
 {
     private NetworkingCallback caller;
-    private ProgressDialog progressDialog;
     private URL busesEnRouteURL;
     private boolean errorOccurred = false;
     private BusStop nearestBusStop;
@@ -85,7 +83,7 @@ class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
             JSONArray jsonArray = new JSONArray(busesEnRouteResult.toString());
             for (int i = 0; i < jsonArray.length(); i++)
             {
-                if (Integer.parseInt(jsonArray.getJSONArray(i).getString(12).replace("routeorder:", "")) <= nearestBusStop.getRouteOrder() /*&& Integer.parseInt(jsonArray.getJSONArray(i).getString(12).replace("routeorder:", "")) > 1*/)
+                if (Integer.parseInt(jsonArray.getJSONArray(i).getString(12).replace("routeorder:", "")) <= nearestBusStop.getRouteOrder())
                 {
                     if (Integer.parseInt(jsonArray.getJSONArray(i).getString(12).replace("routeorder:", "")) == nearestBusStop.getRouteOrder())
                     {

@@ -57,20 +57,7 @@ class GetNearestBusStopsTask extends AsyncTask<URL, Void, JSONArray>
 
         try
         {
-            JSONArray jsonArray = new JSONArray(result.toString());
-            return  jsonArray;
-            /*busStop1.setBusStopName(jsonArray.getJSONObject(0).getString("StopName"));
-            busStop1.setLatitude(jsonArray.getJSONObject(0).getString("StopLat"));
-            busStop1.setLongitude(jsonArray.getJSONObject(0).getString("StopLong"));
-            busStop2.setBusStopName(jsonArray.getJSONObject(1).getString("StopName"));
-            busStop2.setLatitude(jsonArray.getJSONObject(1).getString("StopLat"));
-            busStop2.setLongitude(jsonArray.getJSONObject(1).getString("StopLong"));
-            busStop3.setBusStopName(jsonArray.getJSONObject(2).getString("StopName"));
-            busStop3.setLatitude(jsonArray.getJSONObject(2).getString("StopLat"));
-            busStop3.setLongitude(jsonArray.getJSONObject(2).getString("StopLong"));
-            busStop4.setBusStopName(jsonArray.getJSONObject(3).getString("StopName"));
-            busStop4.setLatitude(jsonArray.getJSONObject(3).getString("StopLat"));
-            busStop4.setLongitude(jsonArray.getJSONObject(3).getString("StopLong"));*/
+            return  new JSONArray(result.toString());
         }
         catch (org.json.JSONException i)
         {

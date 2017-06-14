@@ -149,7 +149,6 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     }
 
 
-
     // Returns true if the user's device has a Wi-Fi or Data connection, else, returns false
     private boolean isNetworkAvailable()
     {
@@ -157,7 +156,6 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null;
     }
-
 
 
     // Handle the route number list that filters bus routes as the user starts typing in the search box
@@ -253,7 +251,6 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     }
 
 
-
     // Methods to initialize and handle the GoogleApiClient
     @Override
     public void onConnected(Bundle connectionHint)
@@ -275,7 +272,6 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     {
 
     }
-
 
 
     // Creates the location request to get the user's current location
@@ -455,7 +451,6 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     }
 
 
-
     // Inflate the menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
@@ -476,7 +471,6 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         }
         //return true;
     }
-
 
 
     // What to do when a bus stop has been selected from the dropdown of nearest bus stops
@@ -515,7 +509,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                             refreshFloatingActionButton.startAnimation(rotatingAnimation);
                             String requestBody = "stopID=" + Integer.toString(nearestBusStops[position].getBusStopId());
                             busesSet.clear();
-                            new GetBusesAtStopTask(this, this).execute(requestBody);
+                            new GetBusesAtStopTask(this).execute(requestBody);
                         }
                         else
                         {
@@ -530,7 +524,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                             progressDialog = ProgressDialog.show(this, "Please wait", "Getting buses...");
                             String requestBody = "stopID=" + Integer.toString(nearestBusStops[position].getBusStopId());
                             busesSet.clear();
-                            new GetBusesAtStopTask(this, this).execute(requestBody);
+                            new GetBusesAtStopTask(this).execute(requestBody);
                         }
                         else
                         {
@@ -552,7 +546,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                     progressDialog = ProgressDialog.show(this, "Please wait", "Getting buses...");
                     String requestBody = "stopID=" + Integer.toString(nearestBusStops[position].getBusStopId());
                     busesSet.clear();
-                    new GetBusesAtStopTask(this, this).execute(requestBody);
+                    new GetBusesAtStopTask(this).execute(requestBody);
                 }
                 else
                 {
@@ -573,7 +567,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                 progressDialog = ProgressDialog.show(this, "Please wait", "Getting buses...");
                 String requestBody = "stopID=" + Integer.toString(nearestBusStops[position].getBusStopId());
                 busesSet.clear();
-                new GetBusesAtStopTask(this, this).execute(requestBody);
+                new GetBusesAtStopTask(this).execute(requestBody);
                 updateBusList = false;
             }
             else
@@ -591,14 +585,13 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     }
 
 
-
     // Track a bus
     public void startTrackingBus(String busNumberToTrack)
     {
         if (isNetworkAvailable())
         {
             progressDialog = ProgressDialog.show(this, "Please wait", "Getting bus details...");
-            new GetBusRouteDetailsTask(this, this, false, false).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, busNumberToTrack);
+            new GetBusRouteDetailsTask(this, false).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, busNumberToTrack);
         }
         else
         {
@@ -613,7 +606,6 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         errorMessageTextView.setVisibility(View.GONE);
         createLocationRequest();
     }
-
 
 
     // What to do once bus stops nearby have been found
@@ -726,7 +718,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                     while (busesSetIterator.hasNext())
                     {
                         numberOfBusesArrivingAtNearestStop++;
-                        new GetBusRouteDetailsTask(this, this, false, true).execute(busesSetIterator.next());
+                        new GetBusRouteDetailsTask(this, true).execute(busesSetIterator.next());
                     }
                 }
                 else
@@ -908,7 +900,6 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     }
 
 
-
     protected void onStart()
     {
         updateBusList = false;
@@ -955,7 +946,6 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         }
         super.onDestroy();
     }
-
 
 
     // What to do when the Android back button is pressed
