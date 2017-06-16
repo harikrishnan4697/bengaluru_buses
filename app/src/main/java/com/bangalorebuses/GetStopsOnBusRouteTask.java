@@ -26,22 +26,17 @@ class GetStopsOnBusRouteTask extends AsyncTask<Void, Void, JSONArray>
     }
 
     @Override
-    protected void onPreExecute()
+    protected JSONArray doInBackground(Void... params)
     {
         try
         {
             stopsOnRouteURL = new URL("http://bmtcmob.hostg.in/api/tripdetails/routestop/routeid/" + routeId);
         }
-        catch (MalformedURLException b)
+        catch (MalformedURLException e)
         {
-            b.printStackTrace();
             errorOccurred = true;
+            return null;
         }
-    }
-
-    @Override
-    protected JSONArray doInBackground(Void... params)
-    {
         StringBuilder result = new StringBuilder();
         JSONArray jsonArray;
         try
@@ -62,10 +57,10 @@ class GetStopsOnBusRouteTask extends AsyncTask<Void, Void, JSONArray>
         catch (IOException e)
         {
             errorOccurred = true;
+            return null;
         }
         catch (JSONException e)
         {
-            e.printStackTrace();
             errorOccurred = true;
         }
         return null;

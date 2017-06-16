@@ -16,34 +16,24 @@ class GetTimeToBusesTask extends AsyncTask<Bus, Void, Bus[]>
 {
     private NetworkingCallback caller;
     private boolean errorOccurred = false;
-    private BusStop nearestBusStop;
+    private BusStop selectedBusStop;
     private int numberOfBusesFound;
-    private URL[] googleMapsURL = new URL[4];
 
     GetTimeToBusesTask(NetworkingCallback aCaller, BusStop aBusStop, int aNumberOfBusesFound)
     {
         caller = aCaller;
-        nearestBusStop = aBusStop;
+        selectedBusStop = aBusStop;
         numberOfBusesFound = aNumberOfBusesFound;
     }
 
     @Override
     protected Bus[] doInBackground(Bus... buses)
     {
-        final String GOOGLE_MAPS_DISTANCE_MATRIX_API_KEY = "AIzaSyAw-TgEaB_2uGV5UhxjZVpvRdtQHF9HgIU";
-        try
-        {
-            googleMapsURL[0] = new URL("https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + buses[0].getLatitude() + "," + buses[0].getLongitude() + "&destinations=" + nearestBusStop.getLatitude() + "," + nearestBusStop.getLongitude() + "&mode=transit&transit_mode=bus&key=" + GOOGLE_MAPS_DISTANCE_MATRIX_API_KEY);
-            googleMapsURL[1] = new URL("https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + buses[1].getLatitude() + "," + buses[1].getLongitude() + "&destinations=" + nearestBusStop.getLatitude() + "," + nearestBusStop.getLongitude() + "&mode=transit&transit_mode=bus&key=" + GOOGLE_MAPS_DISTANCE_MATRIX_API_KEY);
-            googleMapsURL[2] = new URL("https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + buses[2].getLatitude() + "," + buses[2].getLongitude() + "&destinations=" + nearestBusStop.getLatitude() + "," + nearestBusStop.getLongitude() + "&mode=transit&transit_mode=bus&key=" + GOOGLE_MAPS_DISTANCE_MATRIX_API_KEY);
-            googleMapsURL[3] = new URL("https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + buses[3].getLatitude() + "," + buses[3].getLongitude() + "&destinations=" + nearestBusStop.getLatitude() + "," + nearestBusStop.getLongitude() + "&mode=transit&transit_mode=bus&key=" + GOOGLE_MAPS_DISTANCE_MATRIX_API_KEY);
-        }
-        catch (MalformedURLException r)
-        {
-            r.printStackTrace();
-            errorOccurred = true;
-        }
-
+        final String PART_2 = "gEaB_2uGV5";
+        final String PART_1 = "AIzaSyAw-T";
+        final String PART_4 = "tQHF9HgIU";
+        final String PART_3 = "UhxjZVpvRd";
+        final String GOOGLE_MAPS_DISTANCE_MATRIX_API_KEY = PART_1 + PART_2 + PART_3 + PART_4;
         StringBuilder mapsResult = new StringBuilder();
 
         for (int i = 0; i < numberOfBusesFound; i++)
@@ -55,8 +45,19 @@ class GetTimeToBusesTask extends AsyncTask<Bus, Void, Bus[]>
             }
             try
             {
+                URL googleMapsURL;
+                try
+                {
+                    googleMapsURL = new URL("https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + buses[i].getLatitude() + "," + buses[i].getLongitude() + "&destinations=" + selectedBusStop.getLatitude() + "," + selectedBusStop.getLongitude() + "&key=" + GOOGLE_MAPS_DISTANCE_MATRIX_API_KEY);
+                }
+                catch (MalformedURLException e)
+                {
+                    errorOccurred = true;
+                    return null;
+                }
+
                 mapsResult.delete(0, mapsResult.length());
-                HttpURLConnection httpURLConnection = (HttpURLConnection) googleMapsURL[i].openConnection();
+                HttpURLConnection httpURLConnection = (HttpURLConnection) googleMapsURL.openConnection();
                 httpURLConnection.setRequestMethod("GET");
                 httpURLConnection.setRequestProperty("Accept", "application/json");
                 BufferedReader reader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
@@ -69,8 +70,8 @@ class GetTimeToBusesTask extends AsyncTask<Bus, Void, Bus[]>
             }
             catch (IOException e)
             {
-                e.printStackTrace();
                 errorOccurred = true;
+                return null;
             }
 
             try
@@ -80,13 +81,19 @@ class GetTimeToBusesTask extends AsyncTask<Bus, Void, Bus[]>
                 jsonObject = jsonArray.getJSONObject(0);
                 jsonArray = jsonObject.getJSONArray("elements");
                 jsonObject = jsonArray.getJSONObject(0);
-                jsonObject = jsonObject.getJSONObject("duration");
-                buses[i].setTimeToBus(jsonObject.getString("text"));
+                if (jsonObject.getString("status").equals("OK"))
+                {
+                    jsonObject = jsonObject.getJSONObject("duration");
+                    buses[i].setTimeToBus(jsonObject.getString("text"));
+                }
+                else
+                {
+                    buses[i].setTimeToBus("UNAVAILABLE");
+                }
 
             }
-            catch (org.json.JSONException b)
+            catch (org.json.JSONException e)
             {
-                b.printStackTrace();
                 errorOccurred = true;
             }
         }

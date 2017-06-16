@@ -173,7 +173,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
         {
             if (isNetworkAvailable())
             {
-                if(busStopList != null)
+                if (busStopList != null)
                 {
                     downDirectionRadioButton.setEnabled(false);
                     upDirectionRadioButton.setEnabled(false);
@@ -270,8 +270,16 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
         if (isError)
         {
             progressDialog.dismiss();
-            errorMessageTextView.setText(R.string.error_getting_stop_details_text);
-            errorMessageTextView.setVisibility(View.VISIBLE);
+            if (isNetworkAvailable())
+            {
+                errorMessageTextView.setText(R.string.error_getting_stop_details_text);
+                errorMessageTextView.setVisibility(View.VISIBLE);
+            }
+            else
+            {
+                errorMessageTextView.setText(R.string.error_connecting_to_the_internet_click_refresh_text);
+                errorMessageTextView.setVisibility(View.VISIBLE);
+            }
         }
         else
         {
@@ -320,10 +328,9 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
                 stopsOnRouteSpinner.setSelection(nearestBusStopIndex);
                 busStopSelectionLinearLayout.setVisibility(View.VISIBLE);
             }
-            catch (JSONException r)
+            catch (JSONException e)
             {
                 progressDialog.dismiss();
-                r.printStackTrace();
                 Toast.makeText(this, "Unknown error occurred!", Toast.LENGTH_LONG).show();
             }
         }
@@ -383,7 +390,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
                         }
                         catch (JSONException e)
                         {
-                            e.printStackTrace();
+                            buses[i].setNameOfStopBusIsAt("bus stop unknown");
                         }
                     }
                 }
@@ -412,13 +419,21 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
         else
         {
             progressDialog.dismiss();
-            errorMessageTextView.setText("There aren't any " + route.getRouteNumber() + " buses arriving at " + busStopList[position].getBusStopName() + " in this direction");
-            errorMessageTextView.setVisibility(View.VISIBLE);
             busTimingsRefreshFloatingActionButton.clearAnimation();
             busTimingsRefreshFloatingActionButton.setEnabled(true);
             downDirectionRadioButton.setEnabled(true);
             upDirectionRadioButton.setEnabled(true);
             stopsOnRouteSpinner.setEnabled(true);
+            if (isNetworkAvailable())
+            {
+                errorMessageTextView.setText("There aren't any " + route.getRouteNumber() + " buses arriving at " + busStopList[position].getBusStopName() + " in this direction");
+                errorMessageTextView.setVisibility(View.VISIBLE);
+            }
+            else
+            {
+                errorMessageTextView.setText(R.string.error_connecting_to_the_internet_click_refresh_text);
+                errorMessageTextView.setVisibility(View.VISIBLE);
+            }
         }
     }
 
@@ -428,6 +443,188 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
         downDirectionRadioButton.setEnabled(true);
         upDirectionRadioButton.setEnabled(true);
         stopsOnRouteSpinner.setEnabled(true);
+        setBusIcons();
+        if (!isError)
+        {
+            /*int previousTimeToBus;
+            int currentTimeToBus;
+            int sorts;
+            do
+            {
+                sorts = 0;
+                if (buses[0] != null && buses[0].getTimeToBus() != null && !buses[0].getTimeToBus().equals("UNAVAILABLE"))
+                {
+                    previousTimeToBus = getTimeToBusValue(buses[0].getTimeToBus());
+                }
+                else
+                {
+                    break;
+                }
+
+                for (int i = 1; i < buses.length; i++)
+                {
+                    String timeToBus = buses[i].getTimeToBus();
+                    if (buses[i] != null && timeToBus != null && !timeToBus.equals("UNAVAILABLE"))
+                    {
+                        currentTimeToBus = getTimeToBusValue(timeToBus);
+                    }
+                    else
+                    {
+                        break;
+                    }
+
+                    if (currentTimeToBus < previousTimeToBus)
+                    {
+                        sorts++;
+                        buses[i - 1] = buses[i];
+                        buses[i] = buses[i - 1];
+                    }
+
+                    previousTimeToBus = currentTimeToBus;
+                }
+            }
+            while (sorts != 0);*/
+
+            if (buses[0].getTimeToBus() != null)
+            {
+                if (buses[0].getIsDue())
+                {
+                    busTimingTextView1.setText(buses[0].getRegistrationNumber() + "  is Due");
+                }
+                else if (buses[0].getTimeToBus().equals("UNAVAILABLE"))
+                {
+                    busTimingTextView1.setText("arrival time is unavailable");
+                }
+                else
+                {
+                    busTimingTextView1.setText(buses[0].getRegistrationNumber() + "  in " + buses[0].getTimeToBus());
+                }
+                busIsAtTextView1.setText("currently near " + buses[0].getNameOfStopBusIsAt());
+                busDetailsLinearLayout1.setVisibility(View.VISIBLE);
+            }
+
+            if (buses[1].getTimeToBus() != null)
+            {
+                if (buses[1].getIsDue())
+                {
+                    busTimingTextView2.setText(buses[1].getRegistrationNumber() + "  is Due");
+                }
+                else if (buses[1].getTimeToBus().equals("UNAVAILABLE"))
+                {
+                    busTimingTextView2.setText("arrival time is unavailable");
+                }
+                else
+                {
+                    busTimingTextView2.setText(buses[1].getRegistrationNumber() + "  in " + buses[1].getTimeToBus());
+                }
+                busIsAtTextView2.setText("currently near " + buses[1].getNameOfStopBusIsAt());
+                busDetailsLinearLayout2.setVisibility(View.VISIBLE);
+            }
+
+            if (buses[2].getTimeToBus() != null)
+            {
+                if (buses[2].getIsDue())
+                {
+                    busTimingTextView3.setText(buses[2].getRegistrationNumber() + "  is Due");
+                }
+                else if (buses[2].getTimeToBus().equals("UNAVAILABLE"))
+                {
+                    busTimingTextView3.setText("arrival time is unavailable");
+                }
+                else
+                {
+                    busTimingTextView3.setText(buses[2].getRegistrationNumber() + "  in " + buses[2].getTimeToBus());
+                }
+                busIsAtTextView3.setText("currently near " + buses[2].getNameOfStopBusIsAt());
+                busDetailsLinearLayout3.setVisibility(View.VISIBLE);
+            }
+
+            if (buses[3].getTimeToBus() != null)
+            {
+                if (buses[3].getIsDue())
+                {
+                    busTimingTextView4.setText(buses[3].getRegistrationNumber() + "  is Due");
+                }
+                else if (buses[3].getTimeToBus().equals("UNAVAILABLE"))
+                {
+                    busTimingTextView4.setText("arrival time is unavailable");
+                }
+                else
+                {
+                    busTimingTextView4.setText(buses[3].getRegistrationNumber() + "  in " + buses[3].getTimeToBus());
+                }
+                busIsAtTextView4.setText("currently near " + buses[3].getNameOfStopBusIsAt());
+                busDetailsLinearLayout4.setVisibility(View.VISIBLE);
+            }
+
+            canRefresh = false;
+            new CountDownTimer(20000, 20000)
+            {
+                @Override
+                public void onTick(long millisUntilFinished)
+                {
+
+                }
+
+                @Override
+                public void onFinish()
+                {
+                    canRefresh = true;
+                }
+            }.start();
+        }
+        else
+        {
+            if (isNetworkAvailable())
+            {
+                errorMessageTextView.setText("Could not get bus arrival timings! Please try again later.");
+                errorMessageTextView.setVisibility(View.VISIBLE);
+            }
+            else
+            {
+                errorMessageTextView.setText(R.string.error_connecting_to_the_internet_click_refresh_text);
+                errorMessageTextView.setVisibility(View.VISIBLE);
+            }
+        }
+        busTimingsRefreshFloatingActionButton.clearAnimation();
+        busTimingsRefreshFloatingActionButton.setEnabled(true);
+        progressDialog.dismiss();
+    }
+
+    private int getTimeToBusValue(String timeToBus)
+    {
+        int outputTimeToBus;
+
+        if (timeToBus.contains("hours"))
+        {
+            int hours = Integer.parseInt(timeToBus.substring(0, timeToBus.indexOf("h") - 1));
+            int minutes = 0;
+            if (timeToBus.contains("min"))
+            {
+                minutes = Integer.parseInt(timeToBus.substring(timeToBus.indexOf("rs") + 3, timeToBus.indexOf("m") - 1));
+            }
+            outputTimeToBus = (hours * 60) + minutes;
+        }
+        else if (timeToBus.contains("hour"))
+        {
+            int hours = Integer.parseInt(timeToBus.substring(0, timeToBus.indexOf("h") - 1));
+            int minutes = 0;
+            if (timeToBus.contains("min"))
+            {
+                minutes = Integer.parseInt(timeToBus.substring(timeToBus.indexOf("r") + 2, timeToBus.indexOf("m") - 1));
+            }
+            outputTimeToBus = (hours * 60) + minutes;
+        }
+        else
+        {
+            outputTimeToBus = Integer.parseInt(timeToBus.substring(0, timeToBus.indexOf("m") - 1));
+        }
+
+        return outputTimeToBus;
+    }
+
+    private void setBusIcons()
+    {
         ImageView busIcon1 = (ImageView) findViewById(R.id.bus_icon_1);
         ImageView busIcon2 = (ImageView) findViewById(R.id.bus_icon_2);
         ImageView busIcon3 = (ImageView) findViewById(R.id.bus_icon_3);
@@ -460,206 +657,6 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingCal
             busIcon3.setImageResource(R.drawable.ic_directions_bus_ordinary);
             busIcon4.setImageResource(R.drawable.ic_directions_bus_ordinary);
         }
-
-        if (!isError)
-        {
-            int prevStopTime;
-            int crntStopTime;
-            int sorts;
-            do
-            {
-                sorts = 0;
-                if (buses[0] != null && buses[0].getTimeToBus() != null)
-                {
-                    if (buses[0].getTimeToBus().contains("hours"))
-                    {
-                        int hours = Integer.parseInt(buses[0].getTimeToBus().substring(0, buses[0].getTimeToBus().indexOf("h") - 1));
-                        int minutes = 0;
-                        if (buses[0].getTimeToBus().contains("min"))
-                        {
-                            minutes = Integer.parseInt(buses[0].getTimeToBus().substring(buses[0].getTimeToBus().indexOf("rs") + 3, buses[0].getTimeToBus().indexOf("m") - 1));
-                        }
-                        prevStopTime = (hours * 60) + minutes;
-                    }
-                    else if (buses[0].getTimeToBus().contains("hour"))
-                    {
-                        int hours = Integer.parseInt(buses[0].getTimeToBus().substring(0, buses[0].getTimeToBus().indexOf("h") - 1));
-                        int minutes = 0;
-                        if (buses[0].getTimeToBus().contains("min"))
-                        {
-                            minutes = Integer.parseInt(buses[0].getTimeToBus().substring(buses[0].getTimeToBus().indexOf("r") + 2, buses[0].getTimeToBus().indexOf("m") - 1));
-                        }
-                        prevStopTime = (hours * 60) + minutes;
-                    }
-                    else
-                    {
-                        prevStopTime = Integer.parseInt(buses[0].getTimeToBus().substring(0, buses[0].getTimeToBus().indexOf("m") - 1));
-                    }
-                }
-                else
-                {
-                    break;
-                }
-
-                for (int i = 1; i < buses.length; i++)
-                {
-                    String timeToBus = buses[i].getTimeToBus();
-                    if (buses[i] != null && timeToBus != null)
-                    {
-                        if (timeToBus.contains("hours"))
-                        {
-                            int hours = Integer.parseInt(timeToBus.substring(0, timeToBus.indexOf("h") - 1));
-                            int minutes = 0;
-                            if (timeToBus.contains("min"))
-                            {
-                                minutes = Integer.parseInt(timeToBus.substring(timeToBus.indexOf("rs") + 3, timeToBus.indexOf("m") - 1));
-                            }
-                            crntStopTime = (hours * 60) + minutes;
-                        }
-                        else if (timeToBus.contains("hour"))
-                        {
-                            int hours = Integer.parseInt(timeToBus.substring(0, timeToBus.indexOf("h") - 1));
-                            int minutes = 0;
-                            if (timeToBus.contains("min"))
-                            {
-                                minutes = Integer.parseInt(timeToBus.substring(timeToBus.indexOf("r") + 2, timeToBus.indexOf("m") - 1));
-                            }
-                            crntStopTime = (hours * 60) + minutes;
-                        }
-                        else
-                        {
-                            crntStopTime = Integer.parseInt(timeToBus.substring(0, timeToBus.indexOf("m") - 1));
-                        }
-                    }
-                    else
-                    {
-                        break;
-                    }
-
-                    if (crntStopTime < prevStopTime)
-                    {
-                        sorts++;
-                        buses[i - 1] = buses[i];
-                        buses[i] = buses[i - 1];
-                    }
-
-                    if (buses[i] != null)
-                    {
-                        if (timeToBus.contains("hours"))
-                        {
-                            int hours = Integer.parseInt(timeToBus.substring(0, timeToBus.indexOf("h") - 1));
-                            int minutes = 0;
-                            if (timeToBus.contains("min"))
-                            {
-                                minutes = Integer.parseInt(timeToBus.substring(timeToBus.indexOf("rs") + 3, timeToBus.indexOf("m") - 1));
-                            }
-                            prevStopTime = (hours * 60) + minutes;
-                        }
-                        else if (timeToBus.contains("hour"))
-                        {
-                            int hours = Integer.parseInt(timeToBus.substring(0, timeToBus.indexOf("h") - 1));
-                            int minutes = 0;
-                            if (timeToBus.contains("min"))
-                            {
-                                minutes = Integer.parseInt(timeToBus.substring(timeToBus.indexOf("r") + 2, timeToBus.indexOf("m") - 1));
-                            }
-                            prevStopTime = (hours * 60) + minutes;
-                        }
-                        else
-                        {
-                            prevStopTime = Integer.parseInt(timeToBus.substring(0, timeToBus.indexOf("m") - 1));
-                        }
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-            }
-            while (sorts != 0);
-
-            progressDialog.dismiss();
-            if (buses[0].getTimeToBus() != null)
-            {
-                if (buses[0].getIsDue())
-                {
-                    busTimingTextView1.setText("is Due");
-                }
-                else
-                {
-                    busTimingTextView1.setText("in " + buses[0].getTimeToBus());
-                }
-                busIsAtTextView1.setText("currently near " + buses[0].getNameOfStopBusIsAt());
-                busDetailsLinearLayout1.setVisibility(View.VISIBLE);
-            }
-            if (buses[1].getTimeToBus() != null)
-            {
-                if (buses[1].getIsDue())
-                {
-                    busTimingTextView2.setText("is Due");
-                }
-                else
-                {
-                    busTimingTextView2.setText("in " + buses[1].getTimeToBus());
-                }
-                busIsAtTextView2.setText("currently near " + buses[1].getNameOfStopBusIsAt());
-                busDetailsLinearLayout2.setVisibility(View.VISIBLE);
-            }
-            if (buses[2].getTimeToBus() != null)
-            {
-                if (buses[2].getIsDue())
-                {
-                    busTimingTextView3.setText("is Due");
-                }
-                else
-                {
-                    busTimingTextView3.setText("in " + buses[2].getTimeToBus());
-                }
-                busIsAtTextView3.setText("currently near " + buses[2].getNameOfStopBusIsAt());
-                busDetailsLinearLayout3.setVisibility(View.VISIBLE);
-            }
-            if (buses[3].getTimeToBus() != null)
-            {
-                if (buses[3].getIsDue())
-                {
-                    busTimingTextView4.setText("is Due");
-                }
-                else
-                {
-                    busTimingTextView4.setText("in " + buses[3].getTimeToBus());
-                }
-                busIsAtTextView4.setText("currently near " + buses[3].getNameOfStopBusIsAt());
-                busDetailsLinearLayout4.setVisibility(View.VISIBLE);
-            }
-            if (buses[0].getTimeToBus() == null && buses[1].getTimeToBus() == null && buses[2].getTimeToBus() == null && buses[3].getTimeToBus() == null)
-            {
-                errorMessageTextView.setText("There are currently no buses in service! Please try again later.");
-                errorMessageTextView.setVisibility(View.VISIBLE);
-            }
-            canRefresh = false;
-            new CountDownTimer(20000, 20000)
-            {
-                @Override
-                public void onTick(long millisUntilFinished)
-                {
-
-                }
-
-                @Override
-                public void onFinish()
-                {
-                    canRefresh = true;
-                }
-            }.start();
-        }
-        else
-        {
-            errorMessageTextView.setText("Could not locate buses! Please try again later...");
-            errorMessageTextView.setVisibility(View.VISIBLE);
-        }
-        busTimingsRefreshFloatingActionButton.clearAnimation();
-        busTimingsRefreshFloatingActionButton.setEnabled(true);
-        progressDialog.dismiss();
     }
 
     @Override

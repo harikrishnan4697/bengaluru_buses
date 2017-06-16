@@ -23,9 +23,8 @@ class GetBusesAtStopTask extends AsyncTask<String, Void, JSONArray>
     }
 
     @Override
-    protected void onPreExecute()
+    protected JSONArray doInBackground(String... params)
     {
-        errorOccurred = false;
         try
         {
             busesAtStopURL = new URL("http://bmtcmob.hostg.in/api/itsstopwise/details");
@@ -33,13 +32,8 @@ class GetBusesAtStopTask extends AsyncTask<String, Void, JSONArray>
         catch (java.net.MalformedURLException e)
         {
             errorOccurred = true;
-            e.printStackTrace();
+            return null;
         }
-    }
-
-    @Override
-    protected JSONArray doInBackground(String... params)
-    {
         HttpURLConnection client;
         String line;
         StringBuilder result = new StringBuilder();
@@ -63,8 +57,8 @@ class GetBusesAtStopTask extends AsyncTask<String, Void, JSONArray>
         }
         catch (java.io.IOException e)
         {
-            e.printStackTrace();
             errorOccurred = true;
+            return null;
         }
 
         try
@@ -74,7 +68,6 @@ class GetBusesAtStopTask extends AsyncTask<String, Void, JSONArray>
         catch (JSONException e)
         {
             errorOccurred = true;
-            e.printStackTrace();
         }
         return null;
     }

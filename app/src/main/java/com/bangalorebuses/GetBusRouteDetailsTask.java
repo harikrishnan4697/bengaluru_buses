@@ -35,7 +35,7 @@ class GetBusRouteDetailsTask extends AsyncTask<String, Void, Void>
         catch (java.net.MalformedURLException e)
         {
             errorOccurred = true;
-            e.printStackTrace();
+            return null;
         }
         StringBuilder result = new StringBuilder();
         try
@@ -54,6 +54,7 @@ class GetBusRouteDetailsTask extends AsyncTask<String, Void, Void>
         catch (IOException e)
         {
             errorOccurred = true;
+            return null;
         }
 
         try
@@ -72,10 +73,9 @@ class GetBusRouteDetailsTask extends AsyncTask<String, Void, Void>
                 route.setDownRouteId(jsonArray.getJSONArray(2).getJSONObject(0).getString("busRouteDetailId"));
             }
         }
-        catch (org.json.JSONException i)
+        catch (org.json.JSONException e)
         {
             errorOccurred = true;
-            i.printStackTrace();
         }
         return null;
     }

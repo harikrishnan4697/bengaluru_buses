@@ -10,13 +10,11 @@ class Bus
     private boolean isDue = false;
     private String nameOfStopBusIsAt;
 
-    // Getter methods
     String getLatitude()
     {
         return latitude;
     }
 
-    // Setter methods
     void setLatitude(String inputLatitude)
     {
         latitude = inputLatitude;

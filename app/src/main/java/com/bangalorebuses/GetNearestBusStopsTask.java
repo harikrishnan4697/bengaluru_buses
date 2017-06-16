@@ -51,6 +51,7 @@ class GetNearestBusStopsTask extends AsyncTask<URL, Void, JSONArray>
         catch (IOException e)
         {
             errorOccurred = true;
+            return null;
         }
 
         try
@@ -60,7 +61,6 @@ class GetNearestBusStopsTask extends AsyncTask<URL, Void, JSONArray>
         catch (org.json.JSONException i)
         {
             errorOccurred = true;
-            i.printStackTrace();
         }
         return null;
     }

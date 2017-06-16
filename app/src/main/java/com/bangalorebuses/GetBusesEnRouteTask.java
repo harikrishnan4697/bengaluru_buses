@@ -17,10 +17,7 @@ class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
     private boolean errorOccurred = false;
     private BusStop nearestBusStop;
     private int numberOfBusesFound;
-    private Bus bus1;
-    private Bus bus2;
-    private Bus bus3;
-    private Bus bus4;
+    private Bus[] buses = new Bus[4];
 
     GetBusesEnRouteTask(NetworkingCallback aCaller, BusStop aBusStop)
     {
@@ -31,7 +28,6 @@ class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
     @Override
     protected void onPreExecute()
     {
-        errorOccurred = false;
         try
         {
             busesEnRouteURL = new URL("http://bmtcmob.hostg.in/api/itsroutewise/details");
@@ -39,17 +35,17 @@ class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
         catch (java.net.MalformedURLException e)
         {
             errorOccurred = true;
-            e.printStackTrace();
+            cancel(true);
         }
     }
 
     @Override
     protected Void doInBackground(String... requestBody)
     {
-        bus1 = new Bus();
-        bus2 = new Bus();
-        bus3 = new Bus();
-        bus4 = new Bus();
+        buses[0] = new Bus();
+        buses[1] = new Bus();
+        buses[2] = new Bus();
+        buses[3] = new Bus();
         numberOfBusesFound = 0;
         HttpURLConnection client;
         String line;
@@ -74,8 +70,8 @@ class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
         }
         catch (java.io.IOException e)
         {
-            e.printStackTrace();
             errorOccurred = true;
+            return null;
         }
 
         try
@@ -85,82 +81,24 @@ class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
             {
                 if (Integer.parseInt(jsonArray.getJSONArray(i).getString(12).replace("routeorder:", "")) <= nearestBusStop.getRouteOrder())
                 {
-                    if (Integer.parseInt(jsonArray.getJSONArray(i).getString(12).replace("routeorder:", "")) == nearestBusStop.getRouteOrder())
+                    for (int j = 0; j < 4; j++)
                     {
-                        numberOfBusesFound++;
-                        bus1.setLatitude(jsonArray.getJSONArray(i).getString(2).replace("vehiclelat:", ""));
-                        bus1.setLongitude(jsonArray.getJSONArray(i).getString(3).replace("vehiclelng:", ""));
-                        bus1.setIsDue(true);
-                        bus1.setRegistrationNumber(jsonArray.getJSONArray(i).getString(0).replace("vehicleno:", ""));
-                        bus1.setRouteOrder(Integer.parseInt(jsonArray.getJSONArray(i).getString(12).replace("routeorder:", "")));
-                    }
-                    else
-                    {
-                        numberOfBusesFound++;
-                        bus1.setLatitude(jsonArray.getJSONArray(i).getString(2).replace("vehiclelat:", ""));
-                        bus1.setLongitude(jsonArray.getJSONArray(i).getString(3).replace("vehiclelng:", ""));
-                        bus1.setRegistrationNumber(jsonArray.getJSONArray(i).getString(0).replace("vehicleno:", ""));
-                        bus1.setRouteOrder(Integer.parseInt(jsonArray.getJSONArray(i).getString(12).replace("routeorder:", "")));
-                    }
-
-                    if ((i + 1) < (jsonArray.length() - 1))
-                    {
-                        if (Integer.parseInt(jsonArray.getJSONArray(i + 1).getString(12).replace("routeorder:", "")) == nearestBusStop.getRouteOrder())
+                        if ((i + j) < jsonArray.length())
                         {
+                            if (Integer.parseInt(jsonArray.getJSONArray(i + j).getString(12).replace("routeorder:", "")) == nearestBusStop.getRouteOrder())
+                            {
+                                buses[j].setIsDue(true);
+                            }
+                            String nearestLatLong = jsonArray.getJSONArray(i + j).getString(6).replace("nearestlatlng:", "");
+                            buses[j].setLatitude(nearestLatLong.substring(0, nearestLatLong.indexOf(",")));
+                            buses[j].setLongitude(nearestLatLong.substring(nearestLatLong.indexOf(",") + 1, nearestLatLong.length() - 1));
+                            buses[j].setRegistrationNumber(jsonArray.getJSONArray(i + j).getString(0).replace("vehicleno:", ""));
+                            buses[j].setRouteOrder(Integer.parseInt(jsonArray.getJSONArray(i + j).getString(12).replace("routeorder:", "")));
                             numberOfBusesFound++;
-                            bus2.setIsDue(true);
-                            bus2.setLatitude(jsonArray.getJSONArray(i + 1).getString(2).replace("vehiclelat:", ""));
-                            bus2.setLongitude(jsonArray.getJSONArray(i + 1).getString(3).replace("vehiclelng:", ""));
-                            bus2.setRegistrationNumber(jsonArray.getJSONArray(i + 1).getString(0).replace("vehicleno:", ""));
-                            bus2.setRouteOrder(Integer.parseInt(jsonArray.getJSONArray(i + 1).getString(12).replace("routeorder:", "")));
                         }
                         else
                         {
-                            numberOfBusesFound++;
-                            bus2.setLatitude(jsonArray.getJSONArray(i + 1).getString(2).replace("vehiclelat:", ""));
-                            bus2.setLongitude(jsonArray.getJSONArray(i + 1).getString(3).replace("vehiclelng:", ""));
-                            bus2.setRegistrationNumber(jsonArray.getJSONArray(i + 1).getString(0).replace("vehicleno:", ""));
-                            bus2.setRouteOrder(Integer.parseInt(jsonArray.getJSONArray(i + 1).getString(12).replace("routeorder:", "")));
-                        }
-                    }
-                    if ((i + 2) < (jsonArray.length() - 1))
-                    {
-                        if (Integer.parseInt(jsonArray.getJSONArray(i + 2).getString(12).replace("routeorder:", "")) == nearestBusStop.getRouteOrder())
-                        {
-                            numberOfBusesFound++;
-                            bus3.setIsDue(true);
-                            bus3.setLatitude(jsonArray.getJSONArray(i + 2).getString(2).replace("vehiclelat:", ""));
-                            bus3.setLongitude(jsonArray.getJSONArray(i + 2).getString(3).replace("vehiclelng:", ""));
-                            bus3.setRegistrationNumber(jsonArray.getJSONArray(i + 2).getString(0).replace("vehicleno:", ""));
-                            bus3.setRouteOrder(Integer.parseInt(jsonArray.getJSONArray(i + 2).getString(12).replace("routeorder:", "")));
-                        }
-                        else
-                        {
-                            numberOfBusesFound++;
-                            bus3.setLatitude(jsonArray.getJSONArray(i + 2).getString(2).replace("vehiclelat:", ""));
-                            bus3.setLongitude(jsonArray.getJSONArray(i + 2).getString(3).replace("vehiclelng:", ""));
-                            bus3.setRegistrationNumber(jsonArray.getJSONArray(i + 2).getString(0).replace("vehicleno:", ""));
-                            bus3.setRouteOrder(Integer.parseInt(jsonArray.getJSONArray(i + 2).getString(12).replace("routeorder:", "")));
-                        }
-                    }
-                    if ((i + 3) < (jsonArray.length() - 1))
-                    {
-                        if (Integer.parseInt(jsonArray.getJSONArray(i + 3).getString(12).replace("routeorder:", "")) == nearestBusStop.getRouteOrder())
-                        {
-                            numberOfBusesFound++;
-                            bus4.setIsDue(true);
-                            bus4.setLatitude(jsonArray.getJSONArray(i + 3).getString(2).replace("vehiclelat:", ""));
-                            bus4.setLongitude(jsonArray.getJSONArray(i + 3).getString(3).replace("vehiclelng:", ""));
-                            bus4.setRegistrationNumber(jsonArray.getJSONArray(i + 3).getString(0).replace("vehicleno:", ""));
-                            bus4.setRouteOrder(Integer.parseInt(jsonArray.getJSONArray(i + 3).getString(12).replace("routeorder:", "")));
-                        }
-                        else
-                        {
-                            numberOfBusesFound++;
-                            bus4.setLatitude(jsonArray.getJSONArray(i + 3).getString(2).replace("vehiclelat:", ""));
-                            bus4.setLongitude(jsonArray.getJSONArray(i + 3).getString(3).replace("vehiclelng:", ""));
-                            bus4.setRegistrationNumber(jsonArray.getJSONArray(i + 3).getString(0).replace("vehicleno:", ""));
-                            bus4.setRouteOrder(Integer.parseInt(jsonArray.getJSONArray(i + 3).getString(12).replace("routeorder:", "")));
+                            break;
                         }
                     }
                     break;
@@ -169,7 +107,6 @@ class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
         }
         catch (org.json.JSONException e)
         {
-            e.printStackTrace();
             errorOccurred = true;
         }
         return null;
@@ -178,6 +115,6 @@ class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
     @Override
     protected void onPostExecute(Void aVoid)
     {
-        caller.onBusesEnRouteFound(errorOccurred, new Bus[]{bus1, bus2, bus3, bus4}, numberOfBusesFound);
+        caller.onBusesEnRouteFound(errorOccurred, buses, numberOfBusesFound);
     }
 }

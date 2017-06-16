@@ -68,13 +68,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 public class ChooseRouteActivity extends AppCompatActivity implements NetworkingCallback, AdapterView.OnItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener
 {
     private final int LOCATION_PERMISSION_REQUEST_CODE = 36;
-    private BusStop nearestBusStops[] = new BusStop[4];
+    private BusStop nearestBusStops[] = new BusStop[6];
     private int position = 0;
     private EditText routeNumberEditText;
     private Set<String> busesSet;
@@ -98,6 +97,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     private AdView adView;
     private boolean routeListIsVisible = false;
     private LinearLayout nearestBusStopSelectionLinearLayout;
+    private boolean busesAtStopListHasTraceableBuses = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -108,17 +108,13 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
 
         // Configure the actionbar
         ActionBar actionBar = getSupportActionBar();
-        try
+        if (actionBar != null)
         {
             actionBar.setElevation(0);
             actionBar.setCustomView(R.layout.track_bus_edit_text);
             actionBar.setDisplayShowTitleEnabled(false);
             actionBar.setDisplayHomeAsUpEnabled(false);
             actionBar.setDisplayShowCustomEnabled(true);
-        }
-        catch (java.lang.NullPointerException e)
-        {
-            e.printStackTrace();
         }
 
         // Start the Google AdMob service
@@ -196,7 +192,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            Toast.makeText(this, "Couldn't load bus number suggestions!", Toast.LENGTH_SHORT).show();
         }
 
         routeNumberListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
@@ -289,7 +285,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         result.setResultCallback(new ResultCallback<LocationSettingsResult>()
         {
             @Override
-            public void onResult(LocationSettingsResult result)
+            public void onResult(@NonNull LocationSettingsResult result)
             {
                 final Status status = result.getStatus();
                 switch (status.getStatusCode())
@@ -322,7 +318,6 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                                     progressDialog = ProgressDialog.show(ChooseRouteActivity.this, "Please wait", "Getting your location...", true);
                                     startLocationUpdates();
                                     mRequestingLocationUpdates = true;
-
                                 }
                             }
                             else
@@ -333,7 +328,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                                 }
                                 catch (IntentSender.SendIntentException e)
                                 {
-                                    // Ignore the error.
+                                    Toast.makeText(ChooseRouteActivity.this, "Failed to enable location services!", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         }
@@ -359,7 +354,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         }
         catch (SecurityException e)
         {
-            Toast.makeText(this, "Please grant the location permission in app info...", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Please grant the location permission in Settings > Apps > Bangalore Buses.", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -378,7 +373,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         {
             if (isNetworkAvailable())
             {
-                URL nearestBusStopURL = new URL("http://bmtcmob.hostg.in/api/busstops/stopnearby/lat/" + String.valueOf(location.getLatitude()) + "/lon/" + String.valueOf(location.getLongitude()) + "/rad/0.6");
+                URL nearestBusStopURL = new URL("http://bmtcmob.hostg.in/api/busstops/stopnearby/lat/" + String.valueOf(location.getLatitude()) + "/lon/" + String.valueOf(location.getLongitude()) + "/rad/3.0");
                 new GetNearestBusStopsTask(this, this).execute(nearestBusStopURL);
             }
             else
@@ -389,8 +384,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         }
         catch (MalformedURLException e)
         {
-            e.printStackTrace();
-            Toast.makeText(this, "Error generating URL! Error code: BB-CRA-URL-01", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Couldn't find bus stops nearby! Please try again later.", Toast.LENGTH_SHORT).show();
         }
         stopLocationUpdates();
         progressDialog.dismiss();
@@ -399,7 +393,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
 
     // What to do after the user has granted or denied permission to use their device's location service
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults)
+    public void onRequestPermissionsResult(int requestCode,@NonNull String permissions[],@NonNull int[] grantResults)
     {
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE)
         {
@@ -473,7 +467,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     }
 
 
-    // What to do when a bus stop has been selected from the dropdown of nearest bus stops
+    // What to do when a bus stop has been selected or not selected from the dropdown of nearest bus stops
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
     {
@@ -535,7 +529,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                 }
                 else
                 {
-                    Toast.makeText(this, "Unknown error occurred! Please try again later...", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Unknown error occurred! Please try again later...", Toast.LENGTH_SHORT).show();
                 }
             }
             catch (IOException e)
@@ -557,7 +551,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
             catch (JSONException e)
             {
                 progressDialog.dismiss();
-                e.printStackTrace();
+                Toast.makeText(this, "Unknown error occurred! Please try again later...", Toast.LENGTH_SHORT).show();
             }
         }
         else
@@ -630,11 +624,13 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
             nearestBusStops[1] = new BusStop();
             nearestBusStops[2] = new BusStop();
             nearestBusStops[3] = new BusStop();
+            nearestBusStops[4] = new BusStop();
+            nearestBusStops[5] = new BusStop();
             int i = 0;
 
             try
             {
-                for (int h = 0; h < 4; h++)
+                for (int h = 0; h < 6; h++)
                 {
                     for (; i < busStopsArray.length(); i++)
                     {
@@ -687,6 +683,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     {
         if (!isError)
         {
+            busesAtStopListHasTraceableBuses = false;
             busDetailsLinearLayout.removeAllViews();
             busesSet.clear();
             try
@@ -714,11 +711,10 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                 if (isNetworkAvailable())
                 {
                     numberOfBusesArrivingAtNearestStop = 0;
-                    Iterator<String> busesSetIterator = busesSet.iterator();
-                    while (busesSetIterator.hasNext())
+                    for (String bus: busesSet)
                     {
                         numberOfBusesArrivingAtNearestStop++;
-                        new GetBusRouteDetailsTask(this, true).execute(busesSetIterator.next());
+                        new GetBusRouteDetailsTask(this, true).execute(bus);
                     }
                 }
                 else
@@ -730,7 +726,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
             catch (JSONException e)
             {
                 progressDialog.dismiss();
-                e.printStackTrace();
+                errorMessageTextView.setText("Could not get buses arriving at selected bus stop!");
             }
         }
         else
@@ -738,6 +734,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
             progressDialog.dismiss();
             refreshFloatingActionButton.clearAnimation();
             refreshFloatingActionButton.setEnabled(true);
+            nearestStopListSpinner.setEnabled(true);
             if (isNetworkAvailable())
             {
                 errorMessageTextView.setText(R.string.error_could_not_get_buses_at_stop_text);
@@ -766,12 +763,17 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
             {
                 refreshFloatingActionButton.clearAnimation();
                 refreshFloatingActionButton.setEnabled(true);
+                if (!busesAtStopListHasTraceableBuses)
+                {
+                    errorMessageTextView.setText("Cannot get buses arriving at this bus stop! Please select another bus stop and try again.");
+                }
             }
         }
         if (!isError)
         {
             if (isForList)
             {
+                busesAtStopListHasTraceableBuses = true;
                 LinearLayout busDetailsRowLinearLayout = new LinearLayout(this);
                 busDetailsRowLinearLayout.removeAllViews();
                 busDetailsRowLinearLayout.setMinimumHeight(100);
@@ -869,11 +871,18 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         }
         else
         {
-            if (!isForList)
+            if (isNetworkAvailable())
             {
-                Toast.makeText(this, "This bus cannot be tracked.", Toast.LENGTH_SHORT).show();
-                routeNumberListView.setVisibility(View.VISIBLE);
-
+                if (!isForList)
+                {
+                    Toast.makeText(this, "This bus cannot be tracked.", Toast.LENGTH_SHORT).show();
+                    routeNumberListView.setVisibility(View.VISIBLE);
+                }
+            }
+            else
+            {
+                errorMessageTextView.setText(R.string.error_connecting_to_the_internet_click_refresh_text);
+                errorMessageTextView.setVisibility(View.VISIBLE);
             }
         }
     }
