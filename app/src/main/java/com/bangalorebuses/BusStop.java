@@ -8,13 +8,11 @@ class BusStop
     private int busStopId;
     private int routeOrder;
 
-    //Getter methods
     String getBusStopName()
     {
         return busStopName;
     }
 
-    //Setter methods
     void setBusStopName(String inputBusStopName)
     {
         busStopName = inputBusStopName;

@@ -11,20 +11,45 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+/**
+ * This class extends AsyncTask and is used for querying the BMTC
+ * server for a list of all the buses scheduled to arrive
+ * at a particular bus stop.
+ *
+ * @author Nihar Thakkar
+ * @version 1.0
+ * @since 18-6-2017
+ */
+
 class GetBusesAtStopTask extends AsyncTask<String, Void, JSONArray>
 {
-    private NetworkingCallback caller;
-    private URL busesAtStopURL;
+    private NetworkingManager caller;
     private boolean errorOccurred = false;
 
-    GetBusesAtStopTask(NetworkingCallback aCaller)
+    /**
+     * This method is the constructor.
+     *
+     * @param aCaller This parameter is an instance of a class that
+     *                implements the NetworkingManager interface.
+     */
+    GetBusesAtStopTask(NetworkingManager aCaller)
     {
         caller = aCaller;
     }
 
+    /**
+     * This method gets buses arriving at a specified bus stop using a separate
+     * background thread.
+     *
+     * @param busStopIds This parameter is a String[] of bus stop ids to get buses at.
+     *                   NOTE: In this case, only the 0th position parameter is used.
+     * @return This returns a JSONArray of buses at the busStopIds[0] bus stop.
+     */
     @Override
-    protected JSONArray doInBackground(String... params)
+    protected JSONArray doInBackground(String... busStopIds)
     {
+        // Create a new URL for the request
+        URL busesAtStopURL;
         try
         {
             busesAtStopURL = new URL("http://bmtcmob.hostg.in/api/itsstopwise/details");
@@ -34,6 +59,8 @@ class GetBusesAtStopTask extends AsyncTask<String, Void, JSONArray>
             errorOccurred = true;
             return null;
         }
+
+        // Make the connection to the BMTC server and send the request
         HttpURLConnection client;
         String line;
         StringBuilder result = new StringBuilder();
@@ -45,9 +72,10 @@ class GetBusesAtStopTask extends AsyncTask<String, Void, JSONArray>
             client.setDoOutput(true);
             client.connect();
             BufferedOutputStream writer = new BufferedOutputStream(client.getOutputStream());
-            writer.write(params[0].getBytes());
+            writer.write(busStopIds[0].getBytes());
             writer.flush();
             writer.close();
+            // Store the result in 'result'
             BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
             while ((line = reader.readLine()) != null)
             {
@@ -61,6 +89,7 @@ class GetBusesAtStopTask extends AsyncTask<String, Void, JSONArray>
             return null;
         }
 
+        // Assign the result of the request to a JSONArray and then return the JSONArray
         try
         {
             return new JSONArray(result.toString());
@@ -72,9 +101,21 @@ class GetBusesAtStopTask extends AsyncTask<String, Void, JSONArray>
         return null;
     }
 
+    /**
+     * This method is called automatically by AsyncTask after doInBackground()
+     * above is executed.
+     *
+     * @param jsonArray This parameter is returned by doInBackground() above
+     *                  and is a JSONArray of the list of buses arriving at
+     *                  a bus stop.
+     */
     @Override
     protected void onPostExecute(JSONArray jsonArray)
     {
+        /*
+         Calls the onBusesAtStopFound() callback method defined in the
+         NetworkingManager interface
+        */
         caller.onBusesAtStopFound(errorOccurred, jsonArray);
     }
 }

@@ -1,26 +1,32 @@
 package com.bangalorebuses;
 
+/**
+ * This class is used to keep all details about a bus route together.
+ *
+ * @author Nihar Thakkar
+ * @version 1.0
+ * @since 18-6-2017
+ */
+
 class Route
 {
     private String routeNumber;
     private String upRouteId;
     private String downRouteId;
-    private int numberOfBusesInService;
     private String direction;
     private String upRouteName;
     private String downRouteName;
 
-    //Getter methods
     String getRouteNumber()
     {
         return routeNumber;
     }
 
-    //Setter methods
     void setRouteNumber(String inputRouteNumber)
     {
         routeNumber = inputRouteNumber;
     }
+
 
     String getUpRouteId()
     {
@@ -32,6 +38,7 @@ class Route
         upRouteId = inputUpRouteId;
     }
 
+
     String getDownRouteId()
     {
         return downRouteId;
@@ -42,15 +49,6 @@ class Route
         downRouteId = inputDownRouteId;
     }
 
-    int getNumberOfBusesInService()
-    {
-        return numberOfBusesInService;
-    }
-
-    void setNumberOfBusesInService(int inputNumberOfBusesInService)
-    {
-        numberOfBusesInService = inputNumberOfBusesInService;
-    }
 
     String getDirection()
     {
@@ -62,6 +60,7 @@ class Route
         direction = inputDirection;
     }
 
+
     String getUpRouteName()
     {
         return upRouteName;
@@ -71,6 +70,7 @@ class Route
     {
         upRouteName = inputUpRouteName;
     }
+
 
     String getDownRouteName()
     {

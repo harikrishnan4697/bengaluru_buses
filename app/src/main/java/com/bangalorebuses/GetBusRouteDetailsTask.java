@@ -12,13 +12,13 @@ import java.net.URL;
 
 class GetBusRouteDetailsTask extends AsyncTask<String, Void, Void>
 {
-    private NetworkingCallback caller;
+    private NetworkingManager caller;
     private URL busRouteTimetableURL;
     private boolean errorOccurred = false;
     private Route route;
     private boolean isForBusList = false;
 
-    GetBusRouteDetailsTask(NetworkingCallback caller, boolean isForBusList)
+    GetBusRouteDetailsTask(NetworkingManager caller, boolean isForBusList)
     {
         this.caller = caller;
         this.isForBusList = isForBusList;

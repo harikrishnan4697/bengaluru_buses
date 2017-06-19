@@ -60,6 +60,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
@@ -106,7 +109,6 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     private boolean routeListIsVisible = false;
     private LinearLayout nearestBusStopSelectionLinearLayout;
     private boolean busesAtStopListHasTraceableBuses = false;
-    private int numberOfBusesArrivingAtStopGotten = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -578,20 +580,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         errorMessageTextView.setVisibility(View.GONE);
         TextView busesArrivingAtStopListDescriptionTextView = (TextView) findViewById(R.id.buses_at_stop_list_description);
         busesArrivingAtStopListDescriptionTextView.setText("Buses arriving at " + nearestBusStops[position].getBusStopName());
-        progressDialog = ProgressDialog.show(this, "Please wait", "Getting buses...");
-        busesSet.clear();
-        numberOfBusesArrivingAtStopGotten = 0;
-        numberOfRefreshIconRotationsRemaining = 0;
-        Toast.makeText(this, "Merging " + nearestBusStops[position].getIdListSize() + " bus stops", Toast.LENGTH_SHORT).show();
-
-        for (int i = 0; i < nearestBusStops[position].getIdListSize(); i++)
-        {
-            String requestBody = "stopID=" + Integer.toString(nearestBusStops[position].getId(i));
-            new GetBusesAtStopTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, requestBody);
-        }
-
-
-        /*if (position == 0 && !updateBusList)
+        if (position == 0 && !updateBusList)
         {
             try
             {
@@ -684,7 +673,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                 errorMessageTextView.setText(R.string.error_connecting_to_the_internet_text);
                 errorMessageTextView.setVisibility(View.VISIBLE);
             }
-        }*/
+        }
     }
 
     @Override
@@ -765,24 +754,10 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                                 nearestBusStops[h].setBusStopName(busStopName.substring(0, busStopName.indexOf("(")));
                                 nearestBusStops[h].setLatitude(busStopsArray.getJSONObject(i).getString("StopLat"));
                                 nearestBusStops[h].setLongitude(busStopsArray.getJSONObject(i).getString("StopLong"));
-                                nearestBusStops[h].addId(busStopsArray.getJSONObject(i).getInt("StopId"));
                                 nearestBusStops[h].setBusStopId(busStopsArray.getJSONObject(i).getInt("StopId"));
                                 stopList.add(nearestBusStops[h].getBusStopName());
                                 i++;
                                 break;
-                            }
-                            else if (stopList.contains(busStopName.substring(0, busStopName.indexOf("("))))
-                            {
-                                for (int j = 0; j < 8; j++)
-                                {
-                                    if (nearestBusStops[j].getBusStopName() != null)
-                                    {
-                                        if (nearestBusStops[j].getBusStopName().equals(busStopName.substring(0, busStopName.indexOf("("))))
-                                        {
-                                            nearestBusStops[j].addId(busStopsArray.getJSONObject(i).getInt("StopId"));
-                                        }
-                                    }
-                                }
                             }
                         }
                     }
@@ -810,13 +785,14 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     @Override
     public void onBusesAtStopFound(boolean isError, JSONArray buses)
     {
-        numberOfBusesArrivingAtStopGotten++;
         if (!isError)
         {
             busesAtStopListHasTraceableBuses = false;
+            busDetailsLinearLayout.removeAllViews();
+            busesSet.clear();
             try
             {
-                /*if (position == 0)
+                if (position == 0)
                 {
                     try
                     {
@@ -831,27 +807,24 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                     {
                         e.printStackTrace();
                     }
-                }*/
+                }
                 for (int i = 0; i < buses.length(); i++)
                 {
                     busesSet.add(buses.getJSONArray(i).get(3).toString().substring(buses.getJSONArray(i).get(3).toString().indexOf(":") + 1, buses.getJSONArray(i).get(3).toString().length()).replace("DN", "").replace("UP", ""));
                 }
-                if (numberOfBusesArrivingAtStopGotten == nearestBusStops[position].getIdListSize())
+                if (isNetworkAvailable())
                 {
-                    if (isNetworkAvailable())
+                    numberOfRefreshIconRotationsRemaining = 0;
+                    for (String bus: busesSet)
                     {
-                        for (String bus : busesSet)
-                        {
-                            numberOfRefreshIconRotationsRemaining++;
-                            new GetBusRouteDetailsTask(this, true).execute(bus);
-                        }
+                        numberOfRefreshIconRotationsRemaining++;
+                        new GetBusRouteDetailsTask(this, true).execute(bus);
                     }
-                    else
-                    {
-                        progressDialog.dismiss();
-                        errorMessageTextView.setText(R.string.error_connecting_to_the_internet_text);
-                        errorMessageTextView.setVisibility(View.VISIBLE);
-                    }
+                }
+                else
+                {
+                    errorMessageTextView.setText(R.string.error_connecting_to_the_internet_text);
+                    errorMessageTextView.setVisibility(View.VISIBLE);
                 }
             }
             catch (JSONException e)
@@ -863,7 +836,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         }
         else
         {
-            /*progressDialog.dismiss();
+            progressDialog.dismiss();
             refreshFloatingActionButton.clearAnimation();
             refreshFloatingActionButton.setEnabled(true);
             nearestStopListSpinner.setEnabled(true);
@@ -876,7 +849,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
             {
                 errorMessageTextView.setText(R.string.error_connecting_to_the_internet_click_refresh_text);
                 errorMessageTextView.setVisibility(View.VISIBLE);
-            }*/
+            }
         }
     }
 
@@ -885,10 +858,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     public void onBusRouteDetailsFound(boolean isError, final Route route, boolean isForList)
     {
         progressDialog.dismiss();
-        refreshFloatingActionButton.clearAnimation();
-        refreshFloatingActionButton.setEnabled(true);
-
-        /*if (numberOfRefreshIconRotationsRemaining != 1)
+        if (numberOfRefreshIconRotationsRemaining != 1)
         {
             numberOfRefreshIconRotationsRemaining--;
         }
@@ -903,8 +873,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                     errorMessageTextView.setText("Cannot get buses arriving at this bus stop! Please select another bus stop and try again.");
                 }
             }
-        }*/
-
+        }
         if (!isError)
         {
             if (isForList)

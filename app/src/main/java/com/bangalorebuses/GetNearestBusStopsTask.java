@@ -1,7 +1,5 @@
 package com.bangalorebuses;
 
-import android.app.ProgressDialog;
-import android.content.Context;
 import android.os.AsyncTask;
 
 import org.json.JSONArray;
@@ -14,21 +12,12 @@ import java.net.URL;
 
 class GetNearestBusStopsTask extends AsyncTask<URL, Void, JSONArray>
 {
-    private NetworkingCallback caller;
-    private Context callerContext;
-    private ProgressDialog progressDialog;
+    private NetworkingManager caller;
     private boolean errorOccurred = false;
 
-    GetNearestBusStopsTask(NetworkingCallback aCaller, Context aContext)
+    GetNearestBusStopsTask(NetworkingManager aCaller)
     {
         caller = aCaller;
-        callerContext = aContext;
-    }
-
-    @Override
-    protected void onPreExecute()
-    {
-        progressDialog = ProgressDialog.show(callerContext, "Please wait", "Locating bus stops nearby...", true);
     }
 
     @Override
@@ -68,7 +57,6 @@ class GetNearestBusStopsTask extends AsyncTask<URL, Void, JSONArray>
     @Override
     protected void onPostExecute(JSONArray busStops)
     {
-        progressDialog.dismiss();
         caller.onBusStopsFound(errorOccurred, busStops);
     }
 }

@@ -14,12 +14,12 @@ import java.net.URL;
 
 class GetStopsOnBusRouteTask extends AsyncTask<Void, Void, JSONArray>
 {
-    private NetworkingCallback caller;
+    private NetworkingManager caller;
     private URL stopsOnRouteURL;
     private String routeId;
     private boolean errorOccurred = false;
 
-    GetStopsOnBusRouteTask(NetworkingCallback aCaller, String inputRouteId)
+    GetStopsOnBusRouteTask(NetworkingManager aCaller, String inputRouteId)
     {
         caller = aCaller;
         routeId = inputRouteId;

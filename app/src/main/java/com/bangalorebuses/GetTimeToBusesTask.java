@@ -12,14 +12,22 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+/**
+ * This is an interface used for callback methods.
+ *
+ * @author Nihar Thakkar
+ * @version 1.0
+ * @since 18-6-2017
+ */
+
 class GetTimeToBusesTask extends AsyncTask<Bus, Void, Bus[]>
 {
-    private NetworkingCallback caller;
+    private NetworkingManager caller;
     private boolean errorOccurred = false;
     private BusStop selectedBusStop;
     private int numberOfBusesFound;
 
-    GetTimeToBusesTask(NetworkingCallback aCaller, BusStop aBusStop, int aNumberOfBusesFound)
+    GetTimeToBusesTask(NetworkingManager aCaller, BusStop aBusStop, int aNumberOfBusesFound)
     {
         caller = aCaller;
         selectedBusStop = aBusStop;
@@ -48,7 +56,7 @@ class GetTimeToBusesTask extends AsyncTask<Bus, Void, Bus[]>
                 URL googleMapsURL;
                 try
                 {
-                    googleMapsURL = new URL("https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + buses[i].getLatitude() + "," + buses[i].getLongitude() + "&destinations=" + selectedBusStop.getLatitude() + "," + selectedBusStop.getLongitude() + "&key=" + GOOGLE_MAPS_DISTANCE_MATRIX_API_KEY);
+                    googleMapsURL = new URL("https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + buses[i].getLatitude() + "," + buses[i].getLongitude() + "&destinations=" + selectedBusStop.getLatitude() + "," + selectedBusStop.getLongitude() + "&mode=transit&transit_mode=bus&key=" + GOOGLE_MAPS_DISTANCE_MATRIX_API_KEY);
                 }
                 catch (MalformedURLException e)
                 {

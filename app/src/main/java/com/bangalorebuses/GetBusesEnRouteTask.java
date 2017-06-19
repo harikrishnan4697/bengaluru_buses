@@ -12,14 +12,14 @@ import java.net.URL;
 
 class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
 {
-    private NetworkingCallback caller;
+    private NetworkingManager caller;
     private URL busesEnRouteURL;
     private boolean errorOccurred = false;
     private BusStop nearestBusStop;
     private int numberOfBusesFound;
     private Bus[] buses = new Bus[4];
 
-    GetBusesEnRouteTask(NetworkingCallback aCaller, BusStop aBusStop)
+    GetBusesEnRouteTask(NetworkingManager aCaller, BusStop aBusStop)
     {
         caller = aCaller;
         nearestBusStop = aBusStop;
