@@ -114,48 +114,68 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_choose_route);
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-
-        // Configure the actionbar
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null)
         {
-            actionBar.setElevation(0);
-            actionBar.setCustomView(R.layout.track_bus_edit_text);
-            actionBar.setDisplayShowTitleEnabled(false);
-            actionBar.setDisplayHomeAsUpEnabled(false);
-            actionBar.setDisplayShowCustomEnabled(true);
+            actionBar.hide();
         }
-
-        // Start the Google AdMob service
-        MobileAds.initialize(this, "ca-app-pub-4515741125560154~6681035222");
-        adView = (AdView) findViewById(R.id.choose_route_activity_footer_ad);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        adView.loadAd(adRequest);
-
-        // Initialize and setup some instance variables
-        routeNumberEditText = (EditText) findViewById(R.id.action_bar_edit_text);
-        nearestBusStopSelectionLinearLayout = (LinearLayout) findViewById(R.id.nearest_bus_stop_selection_linear_layout);
-        refreshFloatingActionButton = (FloatingActionButton) findViewById(R.id.floatingRefreshActionButton);
-        rotatingAnimation = AnimationUtils.loadAnimation(this, R.anim.rotate);
-        locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
-        busesSet = new HashSet<>();
-        busDetailsLinearLayout = (LinearLayout) findViewById(R.id.bus_details_linear_layout);
-        errorMessageTextView = (TextView) findViewById(R.id.choose_route_activity_error_message_text_view);
-        nearestStopListSpinner = (Spinner) findViewById(R.id.stop_list_spinner);
-        errorMessageTextView.setVisibility(View.GONE);
-        updateBusList = false;
-        locationIsToBeUpdated = true;
-
-        // Connect to the Google api client for location services
-        if (mGoogleApiClient == null)
+        setContentView(R.layout.splash_screen);
+        new CountDownTimer(2000, 2000)
         {
-            mGoogleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
-        }
+            @Override
+            public void onTick(long millisUntilFinished)
+            {
 
-        // Initialise the list of bus routes for search results
-        initialiseRouteNumberList();
+            }
+
+            @Override
+            public void onFinish()
+            {
+                setContentView(R.layout.activity_choose_route);
+                getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+                // Configure the actionbar
+                ActionBar actionBar = getSupportActionBar();
+                if (actionBar != null)
+                {
+                    actionBar.show();
+                    actionBar.setElevation(0);
+                    actionBar.setCustomView(R.layout.track_bus_edit_text);
+                    actionBar.setDisplayShowTitleEnabled(false);
+                    actionBar.setDisplayHomeAsUpEnabled(false);
+                    actionBar.setDisplayShowCustomEnabled(true);
+                }
+
+                // Start the Google AdMob service
+                MobileAds.initialize(ChooseRouteActivity.this, "ca-app-pub-4515741125560154~6681035222");
+                adView = (AdView) findViewById(R.id.choose_route_activity_footer_ad);
+                AdRequest adRequest = new AdRequest.Builder().build();
+                adView.loadAd(adRequest);
+
+                // Initialize and setup some instance variables
+                routeNumberEditText = (EditText) findViewById(R.id.action_bar_edit_text);
+                nearestBusStopSelectionLinearLayout = (LinearLayout) findViewById(R.id.nearest_bus_stop_selection_linear_layout);
+                refreshFloatingActionButton = (FloatingActionButton) findViewById(R.id.floatingRefreshActionButton);
+                rotatingAnimation = AnimationUtils.loadAnimation(ChooseRouteActivity.this, R.anim.rotate);
+                locationManager = (LocationManager) ChooseRouteActivity.this.getSystemService(LOCATION_SERVICE);
+                busesSet = new HashSet<>();
+                busDetailsLinearLayout = (LinearLayout) findViewById(R.id.bus_details_linear_layout);
+                errorMessageTextView = (TextView) findViewById(R.id.choose_route_activity_error_message_text_view);
+                nearestStopListSpinner = (Spinner) findViewById(R.id.stop_list_spinner);
+                errorMessageTextView.setVisibility(View.GONE);
+                updateBusList = false;
+                locationIsToBeUpdated = true;
+
+                // Connect to the Google api client for location services
+                if (mGoogleApiClient == null)
+                {
+                    mGoogleApiClient = new GoogleApiClient.Builder(ChooseRouteActivity.this).addConnectionCallbacks(ChooseRouteActivity.this).addOnConnectionFailedListener(ChooseRouteActivity.this).addApi(LocationServices.API).build();
+                    mGoogleApiClient.connect();
+                }
+
+                // Initialise the list of bus routes for search results
+                initialiseRouteNumberList();
+            }
+        }.start();
     }
 
 
@@ -326,7 +346,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         final int REQUEST_CHECK_SETTINGS = 0x1;
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(5000);
-        mLocationRequest.setFastestInterval(3000);
+        mLocationRequest.setFastestInterval(5000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(mLocationRequest);
         PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient, builder.build());
@@ -347,7 +367,6 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                             {
                                 progressDialog = ProgressDialog.show(ChooseRouteActivity.this, "Please wait", "Getting your location...", true);
                                 startLocationUpdates();
-                                mRequestingLocationUpdates = true;
                             }
                             else
                             {
@@ -366,7 +385,6 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                                 {
                                     progressDialog = ProgressDialog.show(ChooseRouteActivity.this, "Please wait", "Getting your location...", true);
                                     startLocationUpdates();
-                                    mRequestingLocationUpdates = true;
                                 }
                             }
                             else
@@ -407,12 +425,13 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         {
             if (mGoogleApiClient.isConnected())
             {
+                mRequestingLocationUpdates = true;
                 LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
             }
         }
         catch (SecurityException e)
         {
-            errorMessageTextView.setText("Please grant the location permission in Settings > Apps > Bangalore Buses.");
+            errorMessageTextView.setText("Please grant the location permission in Settings > Apps > Bengaluru Buses.");
             errorMessageTextView.setVisibility(View.VISIBLE);
         }
     }
@@ -423,7 +442,11 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
      */
     protected void stopLocationUpdates()
     {
-        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected())
+        {
+            mRequestingLocationUpdates = false;
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+        }
     }
 
     /**
@@ -438,27 +461,17 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     {
         mRequestingLocationUpdates = false;
         locationIsToBeUpdated = false;
-        progressDialog.dismiss();
+        if (progressDialog != null)
+        {
+            progressDialog.dismiss();
+        }
         try
         {
             if (isNetworkAvailable())
             {
                 progressDialog = ProgressDialog.show(this, "Please wait", "Locating bus stops nearby...", true);
-                final URL nearestBusStopURL = new URL("http://bmtcmob.hostg.in/api/busstops/stopnearby/lat/" + String.valueOf(location.getLatitude()) + "/lon/" + String.valueOf(location.getLongitude()) + "/rad/1.0");
-                new CountDownTimer(2000, 2000)
-                {
-                    @Override
-                    public void onTick(long millisUntilFinished)
-                    {
-
-                    }
-
-                    @Override
-                    public void onFinish()
-                    {
-                        new GetNearestBusStopsTask(ChooseRouteActivity.this).execute(nearestBusStopURL);
-                    }
-                }.start();
+                URL nearestBusStopURL = new URL("http://bmtcmob.hostg.in/api/busstops/stopnearby/lat/" + String.valueOf(location.getLatitude()) + "/lon/" + String.valueOf(location.getLongitude()) + "/rad/1.0");
+                new GetNearestBusStopsTask(ChooseRouteActivity.this).execute(nearestBusStopURL);
             }
             else
             {
@@ -485,6 +498,8 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
             }
             else
             {
+                refreshFloatingActionButton.clearAnimation();
+                refreshFloatingActionButton.setEnabled(true);
                 Toast.makeText(this, "Location access was denied! Couldn't locate bus stops nearby...", Toast.LENGTH_LONG).show();
             }
         }
@@ -503,7 +518,6 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                 {
                     progressDialog = ProgressDialog.show(this, "Please wait", "Getting your location...", true);
                     startLocationUpdates();
-                    mRequestingLocationUpdates = true;
 
                 }
             }
@@ -515,7 +529,6 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                     {
                         progressDialog = ProgressDialog.show(this, "Please wait", "Getting your location...", true);
                         startLocationUpdates();
-                        mRequestingLocationUpdates = true;
                     }
                 }
                 else
@@ -733,6 +746,18 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                         String busStopName = busStopsArray.getJSONObject(i).getString("StopName");
                         if (!(busStopName.contains("CS-")))
                         {
+                            if (busStopName.charAt(busStopName.indexOf("(") - 1) == ' ')
+                            {
+                                busStopName = busStopName.replace(" (", "(");
+                            }
+                            if (busStopName.contains("Towards"))
+                            {
+                                busStopName = busStopName.replace("Towards", "-->");
+                            }
+                            else if (busStopName.contains("towards -"))
+                            {
+                                busStopName = busStopName.replace("towards -", "-->");
+                            }
                             nearestBusStops[h].setBusStopName(busStopName.substring(0, busStopName.indexOf(")") + 1));
                             nearestBusStops[h].setLatitude(busStopsArray.getJSONObject(i).getString("StopLat"));
                             nearestBusStops[h].setLongitude(busStopsArray.getJSONObject(i).getString("StopLong"));
@@ -791,7 +816,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                 }
                 for (int i = 0; i < buses.length(); i++)
                 {
-                    busesSet.add(buses.getJSONArray(i).get(3).toString().substring(buses.getJSONArray(i).get(3).toString().indexOf(":") + 1, buses.getJSONArray(i).get(3).toString().length()).replace("DN", "").replace("UP", ""));
+                    busesSet.add(buses.getJSONArray(i).get(3).toString().substring(buses.getJSONArray(i).get(3).toString().indexOf(":") + 1, buses.getJSONArray(i).get(3).toString().length()));
                 }
                 if (isNetworkAvailable())
                 {
@@ -836,7 +861,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
 
     // What to do once bus route details have been found
     @Override
-    public void onBusRouteDetailsFound(boolean isError, final Route route, boolean isForList)
+    public void onBusRouteDetailsFound(boolean isError, final Route route, boolean isForList, final String routeDirection)
     {
         progressDialog.dismiss();
         if (numberOfRefreshIconRotationsRemaining != 1)
@@ -900,7 +925,14 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                 routeNumberTextView.setMaxWidth(30);
                 routeNumberTextView.setTextSize(16);
 
-                routeDirectionTextView.setText(route.getUpRouteName());
+                if (routeDirection.equals("UP"))
+                {
+                    routeDirectionTextView.setText(route.getUpRouteName());
+                }
+                else
+                {
+                    routeDirectionTextView.setText(route.getDownRouteName());
+                }
                 routeDirectionTextView.setPadding(20, 20, 20, 20);
                 routeDirectionTextView.setMinLines(3);
                 routeDirectionTextView.setTextSize(14);
@@ -929,6 +961,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                             trackBusIntent.putExtra("STOP_LONG", nearestBusStops[position].getLongitude());
                         }
                         trackBusIntent.putExtra("ROUTE_NUMBER", route.getRouteNumber());
+                        trackBusIntent.putExtra("ROUTE_DIRECTION", routeDirection);
                         trackBusIntent.putExtra("UP_ROUTE_ID", route.getUpRouteId());
                         trackBusIntent.putExtra("UP_ROUTE_NAME", route.getUpRouteName());
                         trackBusIntent.putExtra("DOWN_ROUTE_ID", route.getDownRouteId());
@@ -995,13 +1028,19 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     protected void onStart()
     {
         updateBusList = false;
-        mGoogleApiClient.connect();
+        if (mGoogleApiClient != null)
+        {
+            mGoogleApiClient.connect();
+        }
         super.onStart();
     }
 
     protected void onStop()
     {
-        mGoogleApiClient.disconnect();
+        if (mGoogleApiClient != null)
+        {
+            mGoogleApiClient.disconnect();
+        }
         super.onStop();
     }
 
@@ -1030,8 +1069,11 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         }
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected() && locationIsToBeUpdated)
         {
-            mRequestingLocationUpdates = true;
-            startLocationUpdates();
+            int permissionCheck = ContextCompat.checkSelfPermission(ChooseRouteActivity.this, Manifest.permission.ACCESS_FINE_LOCATION);
+            if (permissionCheck == PackageManager.PERMISSION_GRANTED)
+            {
+                createLocationRequest();
+            }
         }
         super.onResume();
     }

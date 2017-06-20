@@ -13,10 +13,10 @@ import java.net.URL;
 class GetBusRouteDetailsTask extends AsyncTask<String, Void, Void>
 {
     private NetworkingManager caller;
-    private URL busRouteTimetableURL;
     private boolean errorOccurred = false;
     private Route route;
     private boolean isForBusList = false;
+    private String routeDirection;
 
     GetBusRouteDetailsTask(NetworkingManager caller, boolean isForBusList)
     {
@@ -27,9 +27,19 @@ class GetBusRouteDetailsTask extends AsyncTask<String, Void, Void>
     @Override
     protected Void doInBackground(String... routeNumber)
     {
+        URL busRouteTimetableURL;
         route = new Route();
         try
         {
+            if (routeNumber[0].substring(routeNumber[0].length() - 2, routeNumber[0].length()).equals("UP"))
+            {
+                routeDirection = "UP";
+            }
+            else
+            {
+                routeDirection = "DN";
+            }
+            routeNumber[0] = routeNumber[0].replace("UP", "").replace("DN", "");
             busRouteTimetableURL = new URL("http://bmtcmob.hostg.in/index.php/api/routetiming/timedetails/service/ord/routeno/" + routeNumber[0]);
         }
         catch (java.net.MalformedURLException e)
@@ -83,6 +93,6 @@ class GetBusRouteDetailsTask extends AsyncTask<String, Void, Void>
     @Override
     protected void onPostExecute(Void params)
     {
-        caller.onBusRouteDetailsFound(errorOccurred, route, isForBusList);
+        caller.onBusRouteDetailsFound(errorOccurred, route, isForBusList, routeDirection);
     }
 }

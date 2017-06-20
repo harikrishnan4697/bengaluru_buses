@@ -24,14 +24,16 @@ interface NetworkingManager
     /**
      * This is a callback method called by the GetBusRouteDetailsTask.
      *
-     * @param isError      This parameter is to convey if the task encountered an error.
-     * @param route        This parameter is a Route object with all the details set.
-     * @param isForBusList This parameter is returned back as it was passed to the
-     *                     constructor. If true, the bus route details are for
-     *                     the list of buses at route. Else, the bus route details
-     *                     are for a route number the user entered manually.
+     * @param isError        This parameter is to convey if the task encountered an error.
+     * @param route          This parameter is a Route object with all the details set.
+     * @param isForBusList   This parameter is returned back as it was passed to the
+     *                       constructor. If true, the bus route details are for
+     *                       the list of buses at route. Else, the bus route details
+     *                       are for a route number the user entered manually.
+     * @param routeDirection This parameter is to convey if the route number that was passed
+     *                       to the task had a direction of UP or DN.
      */
-    void onBusRouteDetailsFound(boolean isError, Route route, boolean isForBusList);
+    void onBusRouteDetailsFound(boolean isError, Route route, boolean isForBusList, String routeDirection);
 
     /**
      * This is a callback method called by the GetStopsOnBusRouteTask.

@@ -113,6 +113,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
         route.setDownRouteId(getIntent().getStringExtra("DOWN_ROUTE_ID"));
         route.setUpRouteName(getIntent().getStringExtra("UP_ROUTE_NAME"));
         route.setDownRouteName(getIntent().getStringExtra("DOWN_ROUTE_NAME"));
+        route.setDirection(getIntent().getStringExtra("ROUTE_DIRECTION"));
         selectedBusStop = new BusStop();
         selectedBusStop.setBusStopName(getIntent().getStringExtra("STOP_NAME"));
         selectedBusStop.setLatitude(getIntent().getStringExtra("STOP_LAT"));
@@ -169,13 +170,24 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
         {
             upDirectionRadioButton.setText(route.getUpRouteName());
             downDirectionRadioButton.setText(route.getDownRouteName());
-            directionSelectionRadioGroup.check(R.id.direction_up_radio_button);
             directionSelectionRadioGroup.setVisibility(View.VISIBLE);
             if (route.getDownRouteId().equals(""))
             {
                 downDirectionRadioButton.setVisibility(View.GONE);
             }
-            upDirectionRadioButton.callOnClick();
+
+            if (route.getDirection().equals("UP"))
+            {
+                upDirectionRadioButton.callOnClick();
+            }
+            else if (route.getDirection().equals("DN"))
+            {
+                downDirectionRadioButton.callOnClick();
+            }
+            else
+            {
+                upDirectionRadioButton.callOnClick();
+            }
         }
     }
 
@@ -244,6 +256,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
         if (view.getId() == R.id.direction_up_radio_button)
         {
             route.setDirection(DIRECTION_UP);
+            directionSelectionRadioGroup.check(R.id.direction_up_radio_button);
             if (isNetworkAvailable())
             {
                 progressDialog = ProgressDialog.show(this, "Please wait", "Locating buses...");
@@ -258,6 +271,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
         else if (view.getId() == R.id.direction_down_radio_button)
         {
             route.setDirection(DIRECTION_DOWN);
+            directionSelectionRadioGroup.check(R.id.direction_down_radio_button);
             if (isNetworkAvailable())
             {
                 progressDialog = ProgressDialog.show(this, "Please wait", "Locating buses...");
@@ -284,7 +298,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
     }
 
     @Override
-    public void onBusRouteDetailsFound(boolean isError, Route inputRoute, boolean isForList)
+    public void onBusRouteDetailsFound(boolean isError, Route inputRoute, boolean isForList, String routeDirection)
     {
 
     }
@@ -321,7 +335,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
                 {
                     if (selectedBusStop.getBusStopName().contains("("))
                     {
-                        selectedBusStopName = selectedBusStop.getBusStopName().substring(0, selectedBusStop.getBusStopName().indexOf("(") - 1);
+                        selectedBusStopName = selectedBusStop.getBusStopName().substring(0, selectedBusStop.getBusStopName().indexOf("("));
                     }
                     else
                     {

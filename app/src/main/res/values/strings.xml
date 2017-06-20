@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Bangalore Buses</string>
+    <string name="app_name">Bengaluru Buses</string>
     <string name="error_connecting_to_the_internet_text">Cannot connect to the internet!</string>
     <string name="error_connecting_to_the_internet_click_refresh_text">Cannot connect to the internet! Please click the refresh button below to try again.</string>
 
