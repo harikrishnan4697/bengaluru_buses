@@ -333,22 +333,26 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
                 String selectedBusStopName = "";
                 if (selectedBusStop != null && selectedBusStop.getBusStopName() != null)
                 {
-                    if (selectedBusStop.getBusStopName().contains("("))
+                    selectedBusStopName = selectedBusStop.getBusStopName();
+
+                    if (selectedBusStopName.contains("("))
                     {
-                        selectedBusStopName = selectedBusStop.getBusStopName().substring(0, selectedBusStop.getBusStopName().indexOf("("));
-                    }
-                    else
-                    {
-                        selectedBusStopName = selectedBusStop.getBusStopName();
+                        selectedBusStopName = selectedBusStopName.substring(0, selectedBusStopName.indexOf("("));
                     }
                 }
 
                 for (int i = 0; i < stopListArray.length(); i++)
                 {
                     String busStopName = stopListArray.getJSONObject(i).getString("busStopName");
+                    // Check if the bus stop name has a parenthesis character in it. If yes, remove it and the direction that precedes.
                     if (busStopName.contains("("))
                     {
                         busStopName = busStopName.substring(0, busStopName.indexOf("(") - 1);
+                    }
+                    // Check if the bus stop name has a space character at the end. If yes, remove it.
+                    if (busStopName.substring(busStopName.length() - 1, busStopName.length()).equals(" "))
+                    {
+                        busStopName = busStopName.substring(0, busStopName.length() - 1);
                     }
                     if (busStopName.equals(selectedBusStopName))
                     {

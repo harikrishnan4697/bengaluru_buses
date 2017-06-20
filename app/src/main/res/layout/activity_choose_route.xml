@@ -11,7 +11,7 @@
 
     <com.google.android.gms.ads.AdView
         android:id="@+id/choose_route_activity_footer_ad"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerInParent="true"
@@ -33,7 +33,10 @@
         android:layout_below="@id/bus_route_list_view"
         android:background="@color/colorPrimary"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:paddingBottom="5dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="16dp">
 
         <TextView
             android:id="@+id/info_text_view_1"
@@ -71,7 +74,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:textAlignment="center"
+            android:ellipsize="end"
+            android:gravity="start"
+            android:maxLines="1"
+            android:textAlignment="viewStart"
             android:textColor="#FFFFFF"
             android:textSize="16sp"/>
     </LinearLayout>

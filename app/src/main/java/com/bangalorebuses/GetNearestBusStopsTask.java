@@ -29,6 +29,8 @@ class GetNearestBusStopsTask extends AsyncTask<URL, Void, JSONArray>
             HttpURLConnection httpURLConnection = (HttpURLConnection) urls[0].openConnection();
             httpURLConnection.setRequestMethod("GET");
             httpURLConnection.setRequestProperty("Accept", "application/json");
+            httpURLConnection.setConnectTimeout(10000);
+            httpURLConnection.setReadTimeout(30000);
             BufferedReader reader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
             String line;
             while ((line = reader.readLine()) != null)
@@ -36,6 +38,11 @@ class GetNearestBusStopsTask extends AsyncTask<URL, Void, JSONArray>
                 result.append(line);
             }
             reader.close();
+        }
+        catch (java.net.SocketTimeoutException e)
+        {
+            errorOccurred = true;
+            return null;
         }
         catch (IOException e)
         {

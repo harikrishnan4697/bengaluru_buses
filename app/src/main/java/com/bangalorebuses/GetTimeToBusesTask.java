@@ -68,6 +68,8 @@ class GetTimeToBusesTask extends AsyncTask<Bus, Void, Bus[]>
                 HttpURLConnection httpURLConnection = (HttpURLConnection) googleMapsURL.openConnection();
                 httpURLConnection.setRequestMethod("GET");
                 httpURLConnection.setRequestProperty("Accept", "application/json");
+                httpURLConnection.setConnectTimeout(10000);
+                httpURLConnection.setReadTimeout(30000);
                 BufferedReader reader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
                 String mapsLine;
                 while ((mapsLine = reader.readLine()) != null)
@@ -75,6 +77,11 @@ class GetTimeToBusesTask extends AsyncTask<Bus, Void, Bus[]>
                     mapsResult.append(mapsLine);
                 }
                 reader.close();
+            }
+            catch (java.net.SocketTimeoutException e)
+            {
+                errorOccurred = true;
+                return null;
             }
             catch (IOException e)
             {

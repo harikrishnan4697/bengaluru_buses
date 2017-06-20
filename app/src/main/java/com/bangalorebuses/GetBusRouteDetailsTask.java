@@ -53,6 +53,8 @@ class GetBusRouteDetailsTask extends AsyncTask<String, Void, Void>
             HttpURLConnection httpURLConnection = (HttpURLConnection) busRouteTimetableURL.openConnection();
             httpURLConnection.setRequestMethod("GET");
             httpURLConnection.setRequestProperty("Accept", "application/json");
+            httpURLConnection.setConnectTimeout(10000);
+            httpURLConnection.setReadTimeout(30000);
             BufferedReader reader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
             String line;
             while ((line = reader.readLine()) != null)
@@ -60,6 +62,11 @@ class GetBusRouteDetailsTask extends AsyncTask<String, Void, Void>
                 result.append(line);
             }
             reader.close();
+        }
+        catch (java.net.SocketTimeoutException e)
+        {
+            errorOccurred = true;
+            return null;
         }
         catch (IOException e)
         {

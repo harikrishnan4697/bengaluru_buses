@@ -23,6 +23,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -153,6 +154,19 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
 
                 // Initialize and setup some instance variables
                 routeNumberEditText = (EditText) findViewById(R.id.action_bar_edit_text);
+                routeNumberEditText.setOnKeyListener(new View.OnKeyListener()
+                {
+                    @Override
+                    public boolean onKey(View v, int keyCode, KeyEvent event)
+                    {
+                        if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER))
+                        {
+                            startTrackingBus(routeNumberEditText.getText().toString());
+                            return true;
+                        }
+                        return false;
+                    }
+                });
                 nearestBusStopSelectionLinearLayout = (LinearLayout) findViewById(R.id.nearest_bus_stop_selection_linear_layout);
                 refreshFloatingActionButton = (FloatingActionButton) findViewById(R.id.floatingRefreshActionButton);
                 rotatingAnimation = AnimationUtils.loadAnimation(ChooseRouteActivity.this, R.anim.rotate);
@@ -477,6 +491,9 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
             {
                 errorMessageTextView.setText(R.string.error_connecting_to_the_internet_click_refresh_text);
                 errorMessageTextView.setVisibility(View.VISIBLE);
+                refreshFloatingActionButton.clearAnimation();
+                refreshFloatingActionButton.setEnabled(true);
+
             }
         }
         catch (MalformedURLException e)
@@ -703,6 +720,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     public void refresh(View view)
     {
         refreshFloatingActionButton.startAnimation(rotatingAnimation);
+        refreshFloatingActionButton.setEnabled(false);
         errorMessageTextView.setVisibility(View.GONE);
         createLocationRequest();
     }
@@ -864,22 +882,6 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     public void onBusRouteDetailsFound(boolean isError, final Route route, boolean isForList, final String routeDirection)
     {
         progressDialog.dismiss();
-        if (numberOfRefreshIconRotationsRemaining != 1)
-        {
-            numberOfRefreshIconRotationsRemaining--;
-        }
-        else
-        {
-            if (nearestStopListSpinner.isEnabled())
-            {
-                refreshFloatingActionButton.clearAnimation();
-                refreshFloatingActionButton.setEnabled(true);
-                if (!busesAtStopListHasTraceableBuses)
-                {
-                    errorMessageTextView.setText("Cannot get buses arriving at this bus stop! Please select another bus stop and try again.");
-                }
-            }
-        }
         if (!isError)
         {
             if (isForList)
@@ -981,6 +983,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                     trackBusIntent.putExtra("STOP_LONG", nearestBusStops[position].getLongitude());
                 }
                 trackBusIntent.putExtra("ROUTE_NUMBER", route.getRouteNumber());
+                trackBusIntent.putExtra("ROUTE_DIRECTION", "UP");
                 trackBusIntent.putExtra("UP_ROUTE_ID", route.getUpRouteId());
                 trackBusIntent.putExtra("UP_ROUTE_NAME", route.getUpRouteName());
                 trackBusIntent.putExtra("DOWN_ROUTE_ID", route.getDownRouteId());
@@ -1002,6 +1005,23 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
             {
                 errorMessageTextView.setText(R.string.error_connecting_to_the_internet_click_refresh_text);
                 errorMessageTextView.setVisibility(View.VISIBLE);
+            }
+        }
+        if (numberOfRefreshIconRotationsRemaining != 1)
+        {
+            numberOfRefreshIconRotationsRemaining--;
+        }
+        else
+        {
+            if (nearestStopListSpinner.isEnabled())
+            {
+                refreshFloatingActionButton.clearAnimation();
+                refreshFloatingActionButton.setEnabled(true);
+                if (!busesAtStopListHasTraceableBuses)
+                {
+                    errorMessageTextView.setText("Cannot get buses arriving at this bus stop! Please select another bus stop and try again.");
+                    errorMessageTextView.setVisibility(View.VISIBLE);
+                }
             }
         }
     }

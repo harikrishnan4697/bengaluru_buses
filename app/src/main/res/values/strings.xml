@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Bengaluru Buses</string>
-    <string name="error_connecting_to_the_internet_text">Cannot connect to the internet!</string>
-    <string name="error_connecting_to_the_internet_click_refresh_text">Cannot connect to the internet! Please click the refresh button below to try again.</string>
+    <string name="error_connecting_to_the_internet_text">Cannot connect to the Internet!</string>
+    <string name="error_connecting_to_the_internet_click_refresh_text">Cannot connect to the Internet! Please click the refresh button below to try again.</string>
 
     <!-- Strings for menus -->
     <string name="refresh_action_title">Refresh</string>

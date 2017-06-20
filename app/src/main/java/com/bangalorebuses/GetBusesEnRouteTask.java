@@ -56,6 +56,8 @@ class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
             client.setRequestMethod("POST");
             client.setRequestProperty("Accept", "application/json");
             client.setDoOutput(true);
+            client.setConnectTimeout(10000);
+            client.setReadTimeout(30000);
             client.connect();
             BufferedOutputStream writer = new BufferedOutputStream(client.getOutputStream());
             writer.write(requestBody[0].getBytes());
@@ -67,6 +69,11 @@ class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
                 busesEnRouteResult.append(line);
             }
             reader.close();
+        }
+        catch (java.net.SocketTimeoutException e)
+        {
+            errorOccurred = true;
+            return null;
         }
         catch (java.io.IOException e)
         {
