@@ -346,21 +346,8 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                             if (permissionCheck == PackageManager.PERMISSION_GRANTED)
                             {
                                 progressDialog = ProgressDialog.show(ChooseRouteActivity.this, "Please wait", "Getting your location...", true);
-                                new CountDownTimer(2000, 2000)
-                                {
-                                    @Override
-                                    public void onTick(long millisUntilFinished)
-                                    {
-
-                                    }
-
-                                    @Override
-                                    public void onFinish()
-                                    {
-                                        startLocationUpdates();
-                                        mRequestingLocationUpdates = true;
-                                    }
-                                }.start();
+                                startLocationUpdates();
+                                mRequestingLocationUpdates = true;
                             }
                             else
                             {
@@ -418,7 +405,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     {
         try
         {
-            if(mGoogleApiClient.isConnected())
+            if (mGoogleApiClient.isConnected())
             {
                 LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
             }
@@ -450,6 +437,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     public void onLocationChanged(Location location)
     {
         mRequestingLocationUpdates = false;
+        locationIsToBeUpdated = false;
         progressDialog.dismiss();
         try
         {
@@ -745,20 +733,13 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                         String busStopName = busStopsArray.getJSONObject(i).getString("StopName");
                         if (!(busStopName.contains("CS-")))
                         {
-                            if (busStopName.substring(busStopName.indexOf("(") - 1, busStopName.indexOf("(")).equals(" "))
-                            {
-                                busStopName = busStopsArray.getJSONObject(i).getString("StopName").replace(" (", "(");
-                            }
-                            if (!stopList.contains(busStopName.substring(0, busStopName.indexOf("("))))
-                            {
-                                nearestBusStops[h].setBusStopName(busStopName.substring(0, busStopName.indexOf("(")));
-                                nearestBusStops[h].setLatitude(busStopsArray.getJSONObject(i).getString("StopLat"));
-                                nearestBusStops[h].setLongitude(busStopsArray.getJSONObject(i).getString("StopLong"));
-                                nearestBusStops[h].setBusStopId(busStopsArray.getJSONObject(i).getInt("StopId"));
-                                stopList.add(nearestBusStops[h].getBusStopName());
-                                i++;
-                                break;
-                            }
+                            nearestBusStops[h].setBusStopName(busStopName.substring(0, busStopName.indexOf(")") + 1));
+                            nearestBusStops[h].setLatitude(busStopsArray.getJSONObject(i).getString("StopLat"));
+                            nearestBusStops[h].setLongitude(busStopsArray.getJSONObject(i).getString("StopLong"));
+                            nearestBusStops[h].setBusStopId(busStopsArray.getJSONObject(i).getInt("StopId"));
+                            stopList.add(nearestBusStops[h].getBusStopName());
+                            i++;
+                            break;
                         }
                     }
                 }
@@ -815,7 +796,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                 if (isNetworkAvailable())
                 {
                     numberOfRefreshIconRotationsRemaining = 0;
-                    for (String bus: busesSet)
+                    for (String bus : busesSet)
                     {
                         numberOfRefreshIconRotationsRemaining++;
                         new GetBusRouteDetailsTask(this, true).execute(bus);
@@ -1020,7 +1001,6 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
 
     protected void onStop()
     {
-        locationIsToBeUpdated = false;
         mGoogleApiClient.disconnect();
         super.onStop();
     }
@@ -1029,13 +1009,16 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     protected void onPause()
     {
         super.onPause();
+        if (progressDialog != null && mRequestingLocationUpdates)
+        {
+            progressDialog.dismiss();
+        }
         if (adView != null)
         {
             adView.pause();
         }
         stopLocationUpdates();
         mRequestingLocationUpdates = false;
-        locationIsToBeUpdated = false;
     }
 
     @Override
@@ -1045,8 +1028,9 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         {
             adView.resume();
         }
-        if(mGoogleApiClient != null && mGoogleApiClient.isConnected() && locationIsToBeUpdated)
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected() && locationIsToBeUpdated)
         {
+            mRequestingLocationUpdates = true;
             startLocationUpdates();
         }
         super.onResume();
