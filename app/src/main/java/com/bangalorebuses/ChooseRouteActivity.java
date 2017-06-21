@@ -167,6 +167,12 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                             }
                             else
                             {
+                                View view = ChooseRouteActivity.this.getCurrentFocus();
+                                if (view != null)
+                                {
+                                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                                }
                                 Toast.makeText(ChooseRouteActivity.this, "Please enter a bus number!", Toast.LENGTH_SHORT).show();
                             }
                             return true;
@@ -586,6 +592,12 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                 }
                 else
                 {
+                    View view = this.getCurrentFocus();
+                    if (view != null)
+                    {
+                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                    }
                     Toast.makeText(this, "Please enter a bus number!", Toast.LENGTH_SHORT).show();
                 }
                 break;
@@ -711,6 +723,12 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     // Track a bus
     public void startTrackingBus(String busNumberToTrack)
     {
+        View view = this.getCurrentFocus();
+        if (view != null)
+        {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
         if (isNetworkAvailable())
         {
             progressDialog = ProgressDialog.show(this, "Please wait", "Getting bus details...");
