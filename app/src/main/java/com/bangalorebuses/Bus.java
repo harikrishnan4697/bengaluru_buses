@@ -9,6 +9,7 @@ class Bus
     private String timeToBus;
     private boolean isDue = false;
     private String nameOfStopBusIsAt;
+    private boolean tripIsYetToBegin;
 
     String getLatitude()
     {
@@ -48,6 +49,16 @@ class Bus
     void setIsDue(boolean isDue)
     {
         this.isDue = isDue;
+    }
+
+    boolean getTripIsYetToBegin()
+    {
+        return tripIsYetToBegin;
+    }
+
+    void setTripIsYetToBegin(boolean tripIsYetToBegin)
+    {
+        this.tripIsYetToBegin = tripIsYetToBegin;
     }
 
     String getRegistrationNumber()

@@ -419,30 +419,40 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
         {
             if (!(numberOfBusesFound == 0))
             {
-                for (int i = 0; i < buses.length; i++)
+                // For each bus in the 'buses' Bus[]
+                for (Bus bus : buses)
                 {
-                    buses[i].setNameOfStopBusIsAt("bus stop unknown");
+                    if (bus.getRouteOrder() == 1)
+                    {
+                        bus.setTripIsYetToBegin(true);
+                    }
+                    else
+                    {
+                        bus.setTripIsYetToBegin(false);
+                    }
+                    bus.setNameOfStopBusIsAt("bus stop unknown");
                     for (int j = 0; j < routeBusStopList.length(); j++)
                     {
                         try
                         {
-                            if (buses[i].getRouteOrder() == routeBusStopList.getJSONObject(j).getInt("routeorder"))
+                            if (bus.getRouteOrder() == routeBusStopList.getJSONObject(j).getInt("routeorder"))
                             {
                                 String stopName = routeBusStopList.getJSONObject(j).getString("busStopName");
                                 if (routeBusStopList.getJSONObject(j).getString("busStopName").contains("("))
                                 {
                                     stopName = routeBusStopList.getJSONObject(j).getString("busStopName").substring(0, routeBusStopList.getJSONObject(j).getString("busStopName").indexOf("("));
                                 }
-                                buses[i].setNameOfStopBusIsAt(stopName);
+                                bus.setNameOfStopBusIsAt(stopName);
                             }
                         }
                         catch (JSONException e)
                         {
-                            buses[i].setNameOfStopBusIsAt("bus stop unknown");
+                            bus.setNameOfStopBusIsAt("bus stop unknown");
                         }
                     }
                 }
 
+                // Compute the arrival time of each bus
                 try
                 {
                     for (int i = 0; i < numberOfBusesFound; i++)
@@ -463,11 +473,11 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
                                         {
                                             if (route.getRouteNumber().contains("KIAS-"))
                                             {
-                                                timeToBus = (int) ((k - j) * 3.5);
+                                                timeToBus = (k - j) * 4;
                                             }
                                             else
                                             {
-                                                timeToBus = (int) ((k - j) * 2.25);
+                                                timeToBus = (k - j) * 2;
                                             }
                                         }
                                         else if ((calendar.get(Calendar.HOUR_OF_DAY) > 7 && calendar.get(Calendar.HOUR_OF_DAY) < 11) || (calendar.get(Calendar.HOUR_OF_DAY) > 16 && calendar.get(Calendar.HOUR_OF_DAY) < 21))
@@ -478,7 +488,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
                                             }
                                             else
                                             {
-                                                timeToBus = (int) ((k - j) * 3.5);
+                                                timeToBus = (k - j) * 3;
                                             }
                                         }
                                         else
@@ -574,73 +584,105 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
         {
             if (buses[0].getTimeToBus() != null)
             {
-                if (buses[0].getIsDue())
+                if (!buses[0].getTripIsYetToBegin())
                 {
-                    busTimingTextView1.setText("is Due");
-                }
-                else if (buses[0].getTimeToBus().equals("UNAVAILABLE"))
-                {
-                    busTimingTextView1.setText("arrival time is unavailable");
+                    if (buses[0].getIsDue())
+                    {
+                        busTimingTextView1.setText("is Due");
+                    }
+                    else if (buses[0].getTimeToBus().equals("UNAVAILABLE"))
+                    {
+                        busTimingTextView1.setText("arrival time is unavailable");
+                    }
+                    else
+                    {
+                        busTimingTextView1.setText("in " + buses[0].getTimeToBus());
+                    }
+                    busIsAtTextView1.setText("currently near " + buses[0].getNameOfStopBusIsAt());
                 }
                 else
                 {
-                    busTimingTextView1.setText("in " + buses[0].getTimeToBus());
+                    busTimingTextView1.setText("trip is yet to begin");
+                    busIsAtTextView1.setText("currently at " + buses[0].getNameOfStopBusIsAt());
                 }
-                busIsAtTextView1.setText("currently near " + buses[0].getNameOfStopBusIsAt());
                 busDetailsLinearLayout1.setVisibility(View.VISIBLE);
             }
 
             if (buses[1].getTimeToBus() != null)
             {
-                if (buses[1].getIsDue())
+                if (!buses[1].getTripIsYetToBegin())
                 {
-                    busTimingTextView2.setText("is Due");
-                }
-                else if (buses[1].getTimeToBus().equals("UNAVAILABLE"))
-                {
-                    busTimingTextView2.setText("arrival time is unavailable");
+                    if (buses[1].getIsDue())
+                    {
+                        busTimingTextView2.setText("is Due");
+                    }
+                    else if (buses[1].getTimeToBus().equals("UNAVAILABLE"))
+                    {
+                        busTimingTextView2.setText("arrival time is unavailable");
+                    }
+                    else
+                    {
+                        busTimingTextView2.setText("in " + buses[1].getTimeToBus());
+                    }
+                    busIsAtTextView2.setText("currently near " + buses[1].getNameOfStopBusIsAt());
                 }
                 else
                 {
-                    busTimingTextView2.setText("in " + buses[1].getTimeToBus());
+                    busTimingTextView2.setText("trip is yet to begin");
+                    busIsAtTextView2.setText("currently at " + buses[1].getNameOfStopBusIsAt());
                 }
-                busIsAtTextView2.setText("currently near " + buses[1].getNameOfStopBusIsAt());
                 busDetailsLinearLayout2.setVisibility(View.VISIBLE);
             }
 
             if (buses[2].getTimeToBus() != null)
             {
-                if (buses[2].getIsDue())
+                if (!buses[2].getTripIsYetToBegin())
                 {
-                    busTimingTextView3.setText("is Due");
-                }
-                else if (buses[2].getTimeToBus().equals("UNAVAILABLE"))
-                {
-                    busTimingTextView3.setText("arrival time is unavailable");
+                    if (buses[2].getIsDue())
+                    {
+                        busTimingTextView3.setText("is Due");
+                    }
+                    else if (buses[2].getTimeToBus().equals("UNAVAILABLE"))
+                    {
+                        busTimingTextView3.setText("arrival time is unavailable");
+                    }
+                    else
+                    {
+                        busTimingTextView3.setText("in " + buses[2].getTimeToBus());
+                    }
+                    busIsAtTextView3.setText("currently near " + buses[2].getNameOfStopBusIsAt());
                 }
                 else
                 {
-                    busTimingTextView3.setText("in " + buses[2].getTimeToBus());
+                    busTimingTextView3.setText("trip is yet to begin");
+                    busIsAtTextView3.setText("currently at " + buses[2].getNameOfStopBusIsAt());
                 }
-                busIsAtTextView3.setText("currently near " + buses[2].getNameOfStopBusIsAt());
                 busDetailsLinearLayout3.setVisibility(View.VISIBLE);
             }
 
             if (buses[3].getTimeToBus() != null)
             {
-                if (buses[3].getIsDue())
+                if (!buses[3].getTripIsYetToBegin())
                 {
-                    busTimingTextView4.setText("is Due");
-                }
-                else if (buses[3].getTimeToBus().equals("UNAVAILABLE"))
-                {
-                    busTimingTextView4.setText("arrival time is unavailable");
+                    if (buses[3].getIsDue())
+                    {
+                        busTimingTextView4.setText("is Due");
+                    }
+                    else if (buses[3].getTimeToBus().equals("UNAVAILABLE"))
+                    {
+                        busTimingTextView4.setText("arrival time is unavailable");
+                    }
+                    else
+                    {
+                        busTimingTextView4.setText("in " + buses[3].getTimeToBus());
+                    }
+                    busIsAtTextView4.setText("currently near " + buses[3].getNameOfStopBusIsAt());
                 }
                 else
                 {
-                    busTimingTextView4.setText("in " + buses[3].getTimeToBus());
+                    busTimingTextView4.setText("trip is yet to begin");
+                    busIsAtTextView4.setText("currently at " + buses[3].getNameOfStopBusIsAt());
                 }
-                busIsAtTextView4.setText("currently near " + buses[3].getNameOfStopBusIsAt());
                 busDetailsLinearLayout4.setVisibility(View.VISIBLE);
             }
 

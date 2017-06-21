@@ -70,8 +70,8 @@ class GetBusesAtStopTask extends AsyncTask<String, Void, JSONArray>
             client.setRequestMethod("POST");
             client.setRequestProperty("Accept", "application/json");
             client.setDoOutput(true);
-            client.setConnectTimeout(10000);
-            client.setReadTimeout(30000);
+            client.setConnectTimeout(Constants.NETWORK_QUERY_CONNECT_TIMEOUT);
+            client.setReadTimeout(Constants.NETWORK_QUERY_READ_TIMEOUT);
             client.connect();
             BufferedOutputStream writer = new BufferedOutputStream(client.getOutputStream());
             writer.write(busStopIds[0].getBytes());

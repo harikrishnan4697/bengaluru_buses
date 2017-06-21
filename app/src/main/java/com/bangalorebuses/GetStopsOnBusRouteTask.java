@@ -44,8 +44,8 @@ class GetStopsOnBusRouteTask extends AsyncTask<Void, Void, JSONArray>
             HttpURLConnection httpURLConnection = (HttpURLConnection) stopsOnRouteURL.openConnection();
             httpURLConnection.setRequestMethod("GET");
             httpURLConnection.setRequestProperty("Accept", "application/json");
-            httpURLConnection.setConnectTimeout(10000);
-            httpURLConnection.setReadTimeout(30000);
+            httpURLConnection.setConnectTimeout(Constants.NETWORK_QUERY_CONNECT_TIMEOUT);
+            httpURLConnection.setReadTimeout(Constants.NETWORK_QUERY_READ_TIMEOUT);
             BufferedReader reader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
             String line;
             while ((line = reader.readLine()) != null)

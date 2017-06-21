@@ -31,13 +31,16 @@ class GetBusRouteDetailsTask extends AsyncTask<String, Void, Void>
         route = new Route();
         try
         {
-            if (routeNumber[0].substring(routeNumber[0].length() - 2, routeNumber[0].length()).equals("UP"))
+            if (routeNumber[0].contains("UP") || routeNumber[0].contains("DN"))
             {
-                routeDirection = "UP";
-            }
-            else
-            {
-                routeDirection = "DN";
+                if (routeNumber[0].substring(routeNumber[0].length() - 2, routeNumber[0].length()).equals("UP"))
+                {
+                    routeDirection = "UP";
+                }
+                else
+                {
+                    routeDirection = "DN";
+                }
             }
             routeNumber[0] = routeNumber[0].replace("UP", "").replace("DN", "");
             busRouteTimetableURL = new URL("http://bmtcmob.hostg.in/index.php/api/routetiming/timedetails/service/ord/routeno/" + routeNumber[0]);
@@ -53,8 +56,8 @@ class GetBusRouteDetailsTask extends AsyncTask<String, Void, Void>
             HttpURLConnection httpURLConnection = (HttpURLConnection) busRouteTimetableURL.openConnection();
             httpURLConnection.setRequestMethod("GET");
             httpURLConnection.setRequestProperty("Accept", "application/json");
-            httpURLConnection.setConnectTimeout(10000);
-            httpURLConnection.setReadTimeout(30000);
+            httpURLConnection.setConnectTimeout(Constants.NETWORK_QUERY_CONNECT_TIMEOUT);
+            httpURLConnection.setReadTimeout(Constants.NETWORK_QUERY_READ_TIMEOUT);
             BufferedReader reader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
             String line;
             while ((line = reader.readLine()) != null)
