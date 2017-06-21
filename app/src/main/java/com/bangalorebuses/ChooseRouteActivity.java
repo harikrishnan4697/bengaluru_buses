@@ -231,6 +231,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         InputStream inputStream;
         InputStreamReader inputStreamReader;
         routeNumberListView.setVisibility(View.GONE);
+        refreshFloatingActionButton.setVisibility(View.VISIBLE);
         routeListIsVisible = false;
         nearestBusStopSelectionLinearLayout.setVisibility(View.VISIBLE);
 
@@ -281,6 +282,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                     imm.hideSoftInputFromWindow(keyBoardView.getWindowToken(), 0);
                 }
                 routeNumberListView.setVisibility(View.GONE);
+                refreshFloatingActionButton.setVisibility(View.VISIBLE);
                 routeListIsVisible = false;
                 nearestBusStopSelectionLinearLayout.setVisibility(View.VISIBLE);
                 startTrackingBus(parent.getItemAtPosition(position).toString());
@@ -300,6 +302,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                 if (routeNumberEditText.getText().toString().equals(""))
                 {
                     routeNumberListView.setVisibility(View.GONE);
+                    refreshFloatingActionButton.setVisibility(View.VISIBLE);
                     routeListIsVisible = false;
                     nearestBusStopSelectionLinearLayout.setVisibility(View.VISIBLE);
                 }
@@ -307,6 +310,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                 {
                     listAdapter.getFilter().filter(s);
                     routeNumberListView.setVisibility(View.VISIBLE);
+                    refreshFloatingActionButton.setVisibility(View.GONE);
                     routeListIsVisible = true;
                     nearestBusStopSelectionLinearLayout.setVisibility(View.GONE);
                 }
@@ -1028,6 +1032,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                 {
                     Toast.makeText(this, "This bus cannot be tracked.", Toast.LENGTH_SHORT).show();
                     routeNumberListView.setVisibility(View.VISIBLE);
+                    refreshFloatingActionButton.setVisibility(View.GONE);
                 }
             }
             else
@@ -1146,6 +1151,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         if (routeListIsVisible)
         {
             routeNumberListView.setVisibility(View.GONE);
+            refreshFloatingActionButton.setVisibility(View.VISIBLE);
             routeListIsVisible = false;
             nearestBusStopSelectionLinearLayout.setVisibility(View.VISIBLE);
             routeNumberEditText.setText("");
