@@ -11,7 +11,7 @@
     <string name="bus_stops_nearby_label_text">Bus stops nearby</string>
     <string name="track_bus_edit_text_hint">Enter a bus number or choose one below</string>
     <string name="error_could_not_get_buses_at_stop_text">There are no buses arriving at this bus stop anytime soon!</string>
-    <string name="error_no_bus_stops_found_text">Could not find any Bangalore city bus stops nearby!</string>
+    <string name="error_no_bus_stops_found_text">Could not find any Bengaluru city bus stops nearby!</string>
 
     <!-- Strings for TrackBusActivity -->
     <string name="direction_label_text">Direction</string>

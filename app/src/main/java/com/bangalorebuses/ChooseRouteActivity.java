@@ -742,6 +742,8 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                 progressDialog.dismiss();
                 errorMessageTextView.setText(R.string.error_no_bus_stops_found_text);
                 errorMessageTextView.setVisibility(View.VISIBLE);
+                refreshFloatingActionButton.clearAnimation();
+                refreshFloatingActionButton.setEnabled(true);
                 return;
             }
 
@@ -800,6 +802,8 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         else
         {
             progressDialog.dismiss();
+            refreshFloatingActionButton.clearAnimation();
+            refreshFloatingActionButton.setEnabled(true);
             errorMessageTextView.setText(R.string.error_connecting_to_the_internet_text);
             errorMessageTextView.setVisibility(View.VISIBLE);
         }
