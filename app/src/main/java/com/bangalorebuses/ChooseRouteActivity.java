@@ -161,7 +161,14 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                     {
                         if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER))
                         {
-                            startTrackingBus(routeNumberEditText.getText().toString());
+                            if (!routeNumberEditText.getText().toString().equals(""))
+                            {
+                                startTrackingBus(routeNumberEditText.getText().toString());
+                            }
+                            else
+                            {
+                                Toast.makeText(ChooseRouteActivity.this, "Please enter a bus number!", Toast.LENGTH_SHORT).show();
+                            }
                             return true;
                         }
                         return false;
