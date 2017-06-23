@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">Bengaluru Buses</string>
+    <string name="track_buses_navigation_item_text">Bus tracker</string>
+    <string name="trip_planner_navigation_item_text">Trip planner</string>
+    <string name="settings_navigation_item_text">Settings</string>
     <string name="error_connecting_to_the_internet_text">Cannot connect to the Internet!</string>
     <string name="error_connecting_to_the_internet_click_refresh_text">Cannot connect to the Internet! Please click the refresh button below to try again.</string>
 
@@ -19,4 +22,8 @@
     <string name="image_content_description_text">Type of bus service</string>
     <string name="error_invalid_route_text">This bus cannot be tracked.</string>
     <string name="error_getting_stop_details_text">Error getting bus stop details! Please try again later.</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
 </resources>
