@@ -1,5 +1,14 @@
 package com.bangalorebuses;
 
+/**
+ * This class is used to keep track of all the characteristics
+ * of a bus.
+ *
+ * @author Nihar Thakkar
+ * @version 1.0
+ * @since 23-6-2017
+ */
+
 class Bus
 {
     private String latitude;
