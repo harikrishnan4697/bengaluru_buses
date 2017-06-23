@@ -8,7 +8,7 @@ package com.bangalorebuses;
  * @version 1.0
  * @since 23-6-2017
  */
-
+// test
 class Bus
 {
     private String latitude;
