@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/grey_rounded_background_borderless"
+    android:padding="16dp">
+
+    <RelativeLayout
+        android:id="@+id/bus_1_relative_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp">
+
+        <ImageView
+            android:id="@+id/imageView_1"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_directions_bus_black"/>
+
+        <LinearLayout
+            android:id="@+id/bus_1_details_container_linear_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_toEndOf="@id/imageView_1"
+            android:layout_toRightOf="@id/imageView_1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/bus_1_number_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="500-D"
+                android:textColor="#000000"
+                android:textSize="18sp"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/bus_1_eta_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="3 mins"
+            android:textColor="#000000"
+            android:textSize="18sp"/>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/transit_point_linear_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/bus_1_relative_layout"
+        android:background="#B0BEC5"
+        android:orientation="horizontal"
+        android:padding="5dp">
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/ic_transfer_within_a_station_black"/>
+
+        <TextView
+            android:id="@+id/transit_point_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:text="Change at B Channasandra Bridge"
+            android:textColor="#000000"
+            android:textSize="14sp"/>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/bus_2_relative_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/transit_point_linear_layout"
+        android:layout_marginTop="16dp">
+
+        <ImageView
+            android:id="@+id/imageView_2"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_directions_bus_black"/>
+
+        <LinearLayout
+            android:id="@+id/bus_2_details_container_linear_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_toEndOf="@id/imageView_2"
+            android:layout_toRightOf="@id/imageView_2"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/bus_2_number_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="300-E"
+                android:textColor="#000000"
+                android:textSize="18sp"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/bus_2_eta_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="21 mins"
+            android:textColor="#000000"
+            android:textSize="18sp"/>
+
+    </RelativeLayout>
+</RelativeLayout>

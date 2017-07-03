@@ -286,6 +286,30 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
     }
 
     @Override
+    public void onDirectBusesFound(String errorMessage, Bus[] buses)
+    {
+
+    }
+
+    @Override
+    public void onTransitPointsFound(String errorMessage, BusStop[] transitPoints)
+    {
+
+    }
+
+    @Override
+    public void onTransitPointBusCountFound(String errorMessage, int originToTransitPointBusCount, int transitPointToDestinationBusCount, BusStop transitPoint)
+    {
+
+    }
+
+    @Override
+    public void onIndirectBusesFound(String errorMessage, BusStop transitPoint, Bus[] originToTransitPointBuses, Bus[] transitPointToDestinationBuses)
+    {
+
+    }
+
+    @Override
     public void onBusesAtStopFound(boolean isError, JSONArray buses)
     {
 

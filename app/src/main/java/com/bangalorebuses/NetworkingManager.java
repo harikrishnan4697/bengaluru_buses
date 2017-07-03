@@ -68,4 +68,43 @@ interface NetworkingManager
      * @param buses   This parameter is a JSONArray of arriving at a bus stop.
      */
     void onBusesAtStopFound(boolean isError, JSONArray buses);
+
+    /**
+     * This is a callback method called by the GetDirectBusesTask.
+     *
+     * @param errorMessage This parameter is to convey an error message.
+     * @param buses        This parameter is a Bus[] of buses from the origin
+     *                     bus stop to the destination bus stop.
+     */
+    void onDirectBusesFound(String errorMessage, Bus[] buses);
+
+    /**
+     * This is a callback method called by the GetDirectBusesTask.
+     *
+     * @param errorMessage                   This parameter is to convey an error message.
+     * @param originToTransitPointBuses      This parameter is a Bus[] of buses from the origin
+     *                                       bus stop to the transit point bus stop.
+     * @param transitPointToDestinationBuses This parameter is a Bus[] of buses from the transit
+     *                                       point bus stop to the destination bus stop.
+     */
+    void onIndirectBusesFound(String errorMessage, BusStop transitPoint, Bus[] originToTransitPointBuses, Bus[] transitPointToDestinationBuses);
+
+    /**
+     * This is a callback method called by the GetTransitPointsTask.
+     *
+     * @param errorMessage  This parameter is to convey an error message.
+     * @param transitPoints This parameter is a BusStop[] of transit points.
+     */
+    void onTransitPointsFound(String errorMessage, BusStop[] transitPoints);
+
+    /**
+     * This is a callback method called by the GetTransitPointsTask.
+     *
+     * @param errorMessage                      This parameter is to convey an error message.
+     * @param originToTransitPointBusCount      This parameter is the bus count from origin to
+     *                                          transit point.
+     * @param transitPointToDestinationBusCount This parameter is the bus count from transit point
+     *                                          to destination.
+     */
+    void onTransitPointBusCountFound(String errorMessage, int originToTransitPointBusCount, int transitPointToDestinationBusCount, BusStop transitPoint);
 }

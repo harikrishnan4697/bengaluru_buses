@@ -2,25 +2,32 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!--<item
+        android:id="@+id/navigation_favourites"
+        android:icon="@drawable/ic_favorite_black"
+        android:orderInCategory="1"
+        android:title="@string/favourites_navigation_item_text"
+        app:showAsAction="withText"/>-->
+
+    <item
+        android:id="@+id/navigation_near_me"
+        android:icon="@drawable/ic_near_me_black"
+        android:orderInCategory="2"
+        android:title="@string/near_me_navigation_item_text"
+        app:showAsAction="withText"/>
+
     <item
         android:id="@+id/navigation_track_bus"
         android:icon="@drawable/ic_directions_bus_black"
-        android:orderInCategory="1"
+        android:orderInCategory="3"
         android:title="@string/track_buses_navigation_item_text"
         app:showAsAction="withText"/>
 
     <item
         android:id="@+id/navigation_trip_planner"
-        android:icon="@drawable/ic_directions_transit_black"
-        android:orderInCategory="2"
+        android:icon="@drawable/ic_directions_black"
+        android:orderInCategory="4"
         android:title="@string/trip_planner_navigation_item_text"
-        app:showAsAction="withText"/>
-
-    <item
-        android:id="@+id/navigation_settings"
-        android:icon="@drawable/ic_settings_black"
-        android:orderInCategory="3"
-        android:title="@string/settings_navigation_item_text"
         app:showAsAction="withText"/>
 
 </menu>

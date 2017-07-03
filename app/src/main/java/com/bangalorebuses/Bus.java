@@ -11,6 +11,8 @@ package com.bangalorebuses;
 
 class Bus
 {
+    private String routeNumber;
+    private int serviceID;
     private String latitude;
     private String longitude;
     private int routeOrder;
@@ -19,6 +21,7 @@ class Bus
     private boolean isDue = false;
     private String nameOfStopBusIsAt;
     private boolean tripIsYetToBegin;
+    private int ETA;
 
     String getLatitude()
     {
@@ -48,6 +51,36 @@ class Bus
     void setRouteOrder(int inputRouteOrder)
     {
         routeOrder = inputRouteOrder;
+    }
+
+    public String getRouteNumber()
+    {
+        return routeNumber;
+    }
+
+    public void setRouteNumber(String routeNumber)
+    {
+        this.routeNumber = routeNumber;
+    }
+
+    public int getServiceID()
+    {
+        return serviceID;
+    }
+
+    public void setServiceID(int serviceID)
+    {
+        this.serviceID = serviceID;
+    }
+
+    int getETA()
+    {
+        return ETA;
+    }
+
+    public void setETA(int ETA)
+    {
+        this.ETA = ETA;
     }
 
     boolean getIsDue()

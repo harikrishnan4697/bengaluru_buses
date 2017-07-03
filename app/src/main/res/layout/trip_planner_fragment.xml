@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/trip_planner_container_relative_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/origin_destination_linear_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/colorPrimary"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/trip_planner_origin_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:background="@drawable/white_rounded_background_borderless"
+                android:ellipsize="end"
+                android:hint="Starting bus stop"
+                android:maxLines="1"
+                android:minHeight="40dp"
+                android:paddingBottom="5dp"
+                android:paddingEnd="5dp"
+                android:paddingLeft="12dp"
+                android:paddingRight="5dp"
+                android:paddingStart="12dp"
+                android:paddingTop="5dp"
+                android:textAlignment="viewStart"
+                android:textAllCaps="false"
+                android:textSize="16sp"/>
+
+            <Button
+                android:id="@+id/trip_planner_destination_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/white_rounded_background_borderless"
+                android:ellipsize="end"
+                android:hint="Ending bus stop"
+                android:maxLines="1"
+                android:minHeight="40dp"
+                android:paddingBottom="5dp"
+                android:paddingEnd="5dp"
+                android:paddingLeft="12dp"
+                android:paddingRight="5dp"
+                android:paddingStart="12dp"
+                android:paddingTop="5dp"
+                android:textAlignment="viewStart"
+                android:textAllCaps="false"
+                android:textSize="16sp"/>
+
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/ic_swap_vert_white"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/trip_planner_fragment_error_message_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/origin_destination_linear_layout"
+        android:layout_marginBottom="50dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="50dp"
+        android:gravity="center"
+        android:textColor="#000000"
+        android:textSize="16sp"
+        android:visibility="gone"/>
+
+    <View
+        android:id="@+id/separator_view"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_below="@id/trip_planner_fragment_error_message_text_view"
+        android:background="#000000"/>
+
+    <ListView
+        android:id="@+id/route_options_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/separator_view"
+        android:animateLayoutChanges="true"
+        android:divider="#FFFFFF"
+        android:dividerHeight="5dp"
+        android:padding="5dp"
+        android:scrollbars="none"/>
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone"/>
+
+</RelativeLayout>
