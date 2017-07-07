@@ -18,6 +18,8 @@ class Constants
     static final String NETWORK_QUERY_REQUEST_TIMEOUT_EXCEPTION = "ERROR_REQUEST_TIMED_OUT";
     static final String NETWORK_QUERY_IO_EXCEPTION = "ERROR_IO_EXCEPTION";
     static final String NETWORK_QUERY_JSON_EXCEPTION = "ERROR_JSON_EXCEPTION";
+    static final String ROUTE_TYPE_ORIGIN_TO_TRANSIT_POINT = "ORIGIN_TO_TRANSIT_POINT";
+    static final String ROUTE_TYPE_TRANSIT_POINT_TO_DESTINATION = "TRANSIT_POINT_TO_DESTINATION";
 
     // Constants for fragments
     static final String SEARCH_TYPE_BUS_STOP = "Bus_Stop";

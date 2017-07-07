@@ -11,7 +11,10 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -38,12 +41,16 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager
     private GetDirectBusesTask getDirectBusesTask;
     private GetTransitPointsTask getTransitPointsTask;
     private GetTransitPointBusCountTask getTransitPointBusCountTask;
+    private GetIndirectBusesTask originToTransitPointIndirectBuses;
+    private GetIndirectBusesTask transitPointToDestinationIndirectBuses;
     private ListView routeOptionsListView;
     private RelativeLayout containerRelativeLayout;
-    private int numberOfValidTransitPointsFound = 0;
+    private int numberOfNetworkRequestsMade = 0;
     private int numberOfTransitPointsFound = 0;
     private List<HashMap<String, String>> inDirectRoutesList = new ArrayList<>();
     private HashMap<String, HashMap> inDirectRoutes = new HashMap<>();
+    private ImageView switchBusStopsImageView;
+    private Animation rotateOnce;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -77,6 +84,16 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager
                 searchDestination();
             }
         });
+        rotateOnce = AnimationUtils.loadAnimation(getContext(), R.anim.rotate_once);
+        switchBusStopsImageView = (ImageView) view.findViewById(R.id.switch_bus_stops_image_view);
+        switchBusStopsImageView.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                switchStartAndEndBusStops();
+            }
+        });
         return view;
     }
 
@@ -96,7 +113,6 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager
 
     private void searchOrigin()
     {
-        startBusStop = new BusStop();
         Intent searchActivityIntent = new Intent(getContext(), SearchActivity.class);
         searchActivityIntent.putExtra("Search_Type", Constants.SEARCH_TYPE_BUS_STOP);
         startActivityForResult(searchActivityIntent, Constants.SEARCH_START_BUS_STOP_REQUEST_CODE);
@@ -104,7 +120,6 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager
 
     private void searchDestination()
     {
-        endBusStop = new BusStop();
         Intent searchActivityIntent = new Intent(getContext(), SearchActivity.class);
         searchActivityIntent.putExtra("Search_Type", Constants.SEARCH_TYPE_BUS_STOP);
         startActivityForResult(searchActivityIntent, Constants.SEARCH_END_BUS_STOP_REQUEST_CODE);
@@ -137,6 +152,12 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager
     {
         if (isNetworkAvailable())
         {
+            inDirectRoutes.clear();
+            if (originToTransitPointIndirectBuses != null && transitPointToDestinationIndirectBuses != null)
+            {
+                originToTransitPointIndirectBuses.cancel(true);
+                transitPointToDestinationIndirectBuses.cancel(true);
+            }
             errorMessageTextView.setVisibility(View.GONE);
             routeOptionsListView.setVisibility(View.GONE);
             if (startBusStop == null || endBusStop == null || startBusStop.getBusStopName() == null || endBusStop.getBusStopName() == null || startBusStop.getBusStopName().equals("") || endBusStop.getBusStopName().equals(""))
@@ -146,6 +167,7 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager
             }
             else
             {
+                switchBusStopsImageView.setEnabled(false);
                 originButton.setEnabled(false);
                 destinationButton.setEnabled(false);
                 progressBar.setVisibility(View.VISIBLE);
@@ -160,6 +182,17 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager
         }
     }
 
+    private void switchStartAndEndBusStops()
+    {
+        switchBusStopsImageView.startAnimation(rotateOnce);
+        BusStop backupStartBusStop = startBusStop;
+        startBusStop = endBusStop;
+        originButton.setText(startBusStop.getBusStopName());
+        endBusStop = backupStartBusStop;
+        destinationButton.setText(endBusStop.getBusStopName());
+        getPossibleRoutes();
+    }
+
     @Override
     public void onDirectBusesFound(String errorMessage, Bus[] buses)
     {
@@ -167,6 +200,7 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager
         if (errorMessage.equals(Constants.NETWORK_QUERY_NO_ERROR))
         {
             progressBar.setVisibility(View.GONE);
+            switchBusStopsImageView.setEnabled(true);
             originButton.setEnabled(true);
             destinationButton.setEnabled(true);
             List<HashMap<String, String>> aList = new ArrayList<>();
@@ -174,22 +208,25 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager
 
             for (int i = 0; i < buses.length; i++)
             {
-                if (buses[i].getRouteOrder() == 1)
-                {
-                    break;
-                }
                 numberOfDirectBusesFound++;
                 buses[i].setRouteNumber(buses[i].getRouteNumber().replace("UP", ""));
                 buses[i].setRouteNumber(buses[i].getRouteNumber().replace("DN", ""));
                 HashMap<String, String> hm = new HashMap<>();
                 hm.put("route_number", buses[i].getRouteNumber());
-                if (buses[i].getETA() <= 180)
+                if (buses[i].getRouteOrder() == 1)
                 {
-                    hm.put("bus_eta", "Due");
+                    hm.put("bus_eta", "Trip is yet to begin");
                 }
                 else
                 {
-                    hm.put("bus_eta", Integer.toString(buses[i].getETA() / 60) + " min");
+                    if (buses[i].getETA() <= 180)
+                    {
+                        hm.put("bus_eta", "Due");
+                    }
+                    else
+                    {
+                        hm.put("bus_eta", Integer.toString(buses[i].getETA() / 60) + " min");
+                    }
                 }
                 aList.add(hm);
             }
@@ -207,12 +244,15 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager
             {
                 if (errorMessage.equals(Constants.NETWORK_QUERY_IO_EXCEPTION))
                 {
+                    errorMessageTextView.setText("There aren't any direct routes. Looking for indirect routes...");
+                    errorMessageTextView.setVisibility(View.VISIBLE);
                     getTransitPointsTask = new GetTransitPointsTask(this);
                     getTransitPointsTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, startBusStop, endBusStop);
                 }
                 else if (errorMessage.equals(Constants.NETWORK_QUERY_URL_EXCEPTION))
                 {
                     progressBar.setVisibility(View.GONE);
+                    switchBusStopsImageView.setEnabled(true);
                     originButton.setEnabled(true);
                     destinationButton.setEnabled(true);
                     errorMessageTextView.setText("Something went wrong! Please click try again later.");
@@ -221,6 +261,7 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager
                 else if (errorMessage.equals(Constants.NETWORK_QUERY_REQUEST_TIMEOUT_EXCEPTION))
                 {
                     progressBar.setVisibility(View.GONE);
+                    switchBusStopsImageView.setEnabled(true);
                     originButton.setEnabled(true);
                     destinationButton.setEnabled(true);
                     errorMessageTextView.setText("Connection timed out! Please try again later.");
@@ -228,6 +269,8 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager
                 }
                 else if (errorMessage.equals(Constants.NETWORK_QUERY_JSON_EXCEPTION))
                 {
+                    errorMessageTextView.setText("There aren't any direct routes. Looking for indirect routes...");
+                    errorMessageTextView.setVisibility(View.VISIBLE);
                     getTransitPointsTask = new GetTransitPointsTask(this);
                     getTransitPointsTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, startBusStop, endBusStop);
                 }
@@ -235,6 +278,7 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager
             else
             {
                 progressBar.setVisibility(View.GONE);
+                switchBusStopsImageView.setEnabled(true);
                 originButton.setEnabled(true);
                 destinationButton.setEnabled(true);
                 errorMessageTextView.setText(R.string.error_connecting_to_the_internet_text);
@@ -250,15 +294,30 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager
         {
             if (transitPoints.length != 0)
             {
+                errorMessageTextView.setText("Found transit points. Locating buses...");
+                errorMessageTextView.setVisibility(View.VISIBLE);
                 numberOfTransitPointsFound = transitPoints.length;
+                numberOfNetworkRequestsMade = 0;
                 for (BusStop transitPoint : transitPoints)
                 {
-                    new GetTransitPointBusCountTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, startBusStop, transitPoint, endBusStop);
+                    progressBar.setVisibility(View.VISIBLE);
+                    switchBusStopsImageView.setEnabled(false);
+                    originButton.setEnabled(false);
+                    destinationButton.setEnabled(false);
+                    inDirectRoutes.put(transitPoint.getBusStopName(), new HashMap<String, String>());
+                    numberOfNetworkRequestsMade = numberOfNetworkRequestsMade + 2;
+                    //Toast.makeText(getContext(), "Getting buses to and from " + transitPoint.getBusStopName(), Toast.LENGTH_SHORT).show();
+                    originToTransitPointIndirectBuses = new GetIndirectBusesTask(this, Constants.ROUTE_TYPE_ORIGIN_TO_TRANSIT_POINT);
+                    originToTransitPointIndirectBuses.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, startBusStop, transitPoint, transitPoint);
+                    transitPointToDestinationIndirectBuses = new GetIndirectBusesTask(this, Constants.ROUTE_TYPE_TRANSIT_POINT_TO_DESTINATION);
+                    transitPointToDestinationIndirectBuses.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, transitPoint, endBusStop, transitPoint);
+
                 }
             }
             else
             {
                 progressBar.setVisibility(View.GONE);
+                switchBusStopsImageView.setEnabled(true);
                 originButton.setEnabled(true);
                 destinationButton.setEnabled(true);
                 errorMessageTextView.setText("There aren't any direct or indirect buses from " + startBusStop.getBusStopName() + " to " + endBusStop.getBusStopName() + " right now.");
@@ -268,6 +327,7 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager
         else
         {
             progressBar.setVisibility(View.GONE);
+            switchBusStopsImageView.setEnabled(true);
             originButton.setEnabled(true);
             destinationButton.setEnabled(true);
             if (isNetworkAvailable())
@@ -306,11 +366,25 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager
     {
         if (errorMessage.equals(Constants.NETWORK_QUERY_NO_ERROR))
         {
+            numberOfTransitPointsFound--;
             if (originToTransitPointBusCount != 0 && transitPointToDestinationBusCount != 0)
             {
-                numberOfValidTransitPointsFound++;
-                Toast.makeText(getContext(), "Getting buses to and from " + transitPoint.getBusStopName(), Toast.LENGTH_LONG).show();
-                new GetIndirectBusesTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, startBusStop, transitPoint, endBusStop);
+                inDirectRoutes.put(transitPoint.getBusStopName(), new HashMap<String, String>());
+                numberOfNetworkRequestsMade++;
+                Toast.makeText(getContext(), "Getting buses to and from " + transitPoint.getBusStopName(), Toast.LENGTH_SHORT).show();
+                originToTransitPointIndirectBuses = new GetIndirectBusesTask(this, Constants.ROUTE_TYPE_ORIGIN_TO_TRANSIT_POINT);
+                originToTransitPointIndirectBuses.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, startBusStop, transitPoint, transitPoint);
+                transitPointToDestinationIndirectBuses = new GetIndirectBusesTask(this, Constants.ROUTE_TYPE_TRANSIT_POINT_TO_DESTINATION);
+                transitPointToDestinationIndirectBuses.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, transitPoint, endBusStop, transitPoint);
+            }
+            else if (numberOfTransitPointsFound == 0 && numberOfNetworkRequestsMade == 0)
+            {
+                progressBar.setVisibility(View.GONE);
+                switchBusStopsImageView.setEnabled(true);
+                originButton.setEnabled(true);
+                destinationButton.setEnabled(true);
+                errorMessageTextView.setText("There aren't any direct or indirect buses from " + startBusStop.getBusStopName() + " to " + endBusStop.getBusStopName() + " right now.");
+                errorMessageTextView.setVisibility(View.VISIBLE);
             }
         }
         else
@@ -320,75 +394,96 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager
     }
 
     @Override
-    public void onIndirectBusesFound(String errorMessage, BusStop transitPoint, Bus[] originToTransitPointBuses, Bus[] transitPointToDestinationBuses)
+    public void onIndirectBusesFound(String errorMessage, Bus[] buses, BusStop transitPoint, String routeMessage)
     {
-        numberOfValidTransitPointsFound--;
+        numberOfNetworkRequestsMade--;
         if (errorMessage.equals(Constants.NETWORK_QUERY_NO_ERROR))
         {
-            originToTransitPointBuses[0].setRouteNumber(originToTransitPointBuses[0].getRouteNumber().replace("UP", ""));
-            originToTransitPointBuses[0].setRouteNumber(originToTransitPointBuses[0].getRouteNumber().replace("DN", ""));
-            transitPointToDestinationBuses[0].setRouteNumber(transitPointToDestinationBuses[0].getRouteNumber().replace("UP", ""));
-            transitPointToDestinationBuses[0].setRouteNumber(transitPointToDestinationBuses[0].getRouteNumber().replace("DN", ""));
+            buses[0].setRouteNumber(buses[0].getRouteNumber().replace("UP", ""));
+            buses[0].setRouteNumber(buses[0].getRouteNumber().replace("DN", ""));
+            buses[0].setRouteNumber(buses[0].getRouteNumber().replace("UP", ""));
+            buses[0].setRouteNumber(buses[0].getRouteNumber().replace("DN", ""));
 
-            HashMap<String, String> hashMap = new HashMap<>();
+            HashMap<String, String> hashMap = inDirectRoutes.get(transitPoint.getBusStopName());
 
-            hashMap.put("transit_point_name", "Change at " + transitPoint.getBusStopName());
-
-            hashMap.put("origin_to_transit_point_route_number", originToTransitPointBuses[0].getRouteNumber());
-
-            if (originToTransitPointBuses[0].getRouteOrder() != 1)
+            if (routeMessage.equals(Constants.ROUTE_TYPE_ORIGIN_TO_TRANSIT_POINT))
             {
-                if (originToTransitPointBuses[0].getETA() <= 180)
+                hashMap.put("transit_point_name", "Change at " + transitPoint.getBusStopName());
+
+                hashMap.put("origin_to_transit_point_route_number", buses[0].getRouteNumber());
+
+                if (buses[0].getRouteOrder() != 1)
                 {
-                    hashMap.put("origin_to_transit_point_bus_eta", "Due");
+                    if (buses[0].getETA() <= 180)
+                    {
+                        hashMap.put("origin_to_transit_point_bus_eta", "Due");
+                    }
+                    else
+                    {
+                        hashMap.put("origin_to_transit_point_bus_eta", Integer.toString(buses[0].getETA() / 60) + " min");
+                    }
                 }
                 else
                 {
-                    hashMap.put("origin_to_transit_point_bus_eta", Integer.toString(originToTransitPointBuses[0].getETA() / 60) + " min");
+                    hashMap.put("origin_to_transit_point_bus_eta", "Trip is yet to begin");
                 }
             }
-            else
+            else if (routeMessage.equals(Constants.ROUTE_TYPE_TRANSIT_POINT_TO_DESTINATION))
             {
-                hashMap.put("origin_to_transit_point_bus_eta", "Trip is yet to begin");
-            }
+                hashMap.put("transit_point_to_destination_route_number", buses[0].getRouteNumber());
 
-            hashMap.put("transit_point_to_destination_route_number", transitPointToDestinationBuses[0].getRouteNumber());
-            if (transitPointToDestinationBuses[0].getRouteOrder() != 1)
-            {
-                if (transitPointToDestinationBuses[0].getETA() <= 180)
+                if (buses[0].getRouteOrder() != 1)
                 {
-                    hashMap.put("transit_point_to_destination_bus_eta", "Due");
+                    if (buses[0].getETA() <= 180)
+                    {
+                        hashMap.put("transit_point_to_destination_bus_eta", "Due");
+                    }
+                    else
+                    {
+                        hashMap.put("transit_point_to_destination_bus_eta", Integer.toString(buses[0].getETA() / 60) + " min");
+                    }
                 }
                 else
                 {
-                    hashMap.put("transit_point_to_destination_bus_eta", Integer.toString(transitPointToDestinationBuses[0].getETA() / 60) + " min");
+                    hashMap.put("transit_point_to_destination_bus_eta", "Trip is yet to begin");
                 }
             }
-            else
+
+            if (hashMap.containsKey("transit_point_name") && hashMap.containsKey("origin_to_transit_point_route_number") && hashMap.containsKey("transit_point_to_destination_route_number"))
             {
-                hashMap.put("transit_point_to_destination_bus_eta", "Trip is yet to begin");
-            }
-
-            inDirectRoutesList.add(hashMap);
-
-
-            String[] from = {"transit_point_name", "origin_to_transit_point_route_number", "origin_to_transit_point_bus_eta", "transit_point_to_destination_route_number", "transit_point_to_destination_bus_eta"};
-            int[] to = {R.id.transit_point_text_view, R.id.bus_1_number_text_view, R.id.bus_1_eta_text_view, R.id.bus_2_number_text_view, R.id.bus_2_eta_text_view};
-
-            SimpleAdapter adapter = new SimpleAdapter(getActivity().getBaseContext(), inDirectRoutesList, R.layout.trip_planner_route_option_list_item, from, to);
-            routeOptionsListView.setAdapter(adapter);
-            routeOptionsListView.setVisibility(View.VISIBLE);
-
-            if (numberOfValidTransitPointsFound <= 0)
-            {
-                progressBar.setVisibility(View.GONE);
-                originButton.setEnabled(true);
-                destinationButton.setEnabled(true);
+                inDirectRoutesList.add(hashMap);
+                String[] from = {"transit_point_name", "origin_to_transit_point_route_number", "origin_to_transit_point_bus_eta", "transit_point_to_destination_route_number", "transit_point_to_destination_bus_eta"};
+                int[] to = {R.id.transit_point_text_view, R.id.bus_1_number_text_view, R.id.bus_1_eta_text_view, R.id.bus_2_number_text_view, R.id.bus_2_eta_text_view};
+                SimpleAdapter adapter;
+                if (getActivity() != null)
+                {
+                    adapter = new SimpleAdapter(getActivity().getBaseContext(), inDirectRoutesList, R.layout.trip_planner_route_option_list_item, from, to);
+                    errorMessageTextView.setVisibility(View.GONE);
+                    routeOptionsListView.setAdapter(adapter);
+                    routeOptionsListView.setVisibility(View.VISIBLE);
+                }
+                else
+                {
+                    progressBar.setVisibility(View.GONE);
+                    switchBusStopsImageView.setEnabled(true);
+                    originButton.setEnabled(true);
+                    destinationButton.setEnabled(true);
+                    errorMessageTextView.setText("getActivity() returned null!");
+                    errorMessageTextView.setVisibility(View.VISIBLE);
+                }
             }
         }
         else
         {
             //TODO Handle errors
+        }
+
+        if (numberOfNetworkRequestsMade <= 0)
+        {
+            progressBar.setVisibility(View.GONE);
+            switchBusStopsImageView.setEnabled(true);
+            originButton.setEnabled(true);
+            destinationButton.setEnabled(true);
         }
     }
 

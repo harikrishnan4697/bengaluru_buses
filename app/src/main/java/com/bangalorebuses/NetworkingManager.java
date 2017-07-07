@@ -81,13 +81,11 @@ interface NetworkingManager
     /**
      * This is a callback method called by the GetDirectBusesTask.
      *
-     * @param errorMessage                   This parameter is to convey an error message.
-     * @param originToTransitPointBuses      This parameter is a Bus[] of buses from the origin
-     *                                       bus stop to the transit point bus stop.
-     * @param transitPointToDestinationBuses This parameter is a Bus[] of buses from the transit
-     *                                       point bus stop to the destination bus stop.
+     * @param errorMessage This parameter is to convey an error message.
+     * @param buses        This parameter is a Bus[] of buses from the origin
+     *                     to the destination.
      */
-    void onIndirectBusesFound(String errorMessage, BusStop transitPoint, Bus[] originToTransitPointBuses, Bus[] transitPointToDestinationBuses);
+    void onIndirectBusesFound(String errorMessage, Bus[] buses, BusStop transitPoint, String routeMessage);
 
     /**
      * This is a callback method called by the GetTransitPointsTask.

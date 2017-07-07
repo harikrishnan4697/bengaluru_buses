@@ -304,7 +304,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
     }
 
     @Override
-    public void onIndirectBusesFound(String errorMessage, BusStop transitPoint, Bus[] originToTransitPointBuses, Bus[] transitPointToDestinationBuses)
+    public void onIndirectBusesFound(String errorMessage, Bus[] buses, BusStop transitPoint, String routeMessage)
     {
 
     }

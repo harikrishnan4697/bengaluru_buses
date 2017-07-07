@@ -62,7 +62,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/bus_1_relative_layout"
-        android:background="#B0BEC5"
+        android:background="@drawable/white_rounded_background_borderless"
         android:orientation="horizontal"
         android:padding="5dp">
 
