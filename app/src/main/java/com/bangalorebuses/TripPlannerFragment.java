@@ -24,6 +24,10 @@ import android.widget.Toast;
 
 import org.json.JSONArray;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +44,6 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager
     private TextView errorMessageTextView;
     private GetDirectBusesTask getDirectBusesTask;
     private GetTransitPointsTask getTransitPointsTask;
-    private GetTransitPointBusCountTask getTransitPointBusCountTask;
     private GetIndirectBusesTask originToTransitPointIndirectBuses;
     private GetIndirectBusesTask transitPointToDestinationIndirectBuses;
     private ListView routeOptionsListView;
@@ -167,6 +170,7 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager
             }
             else
             {
+                appendLog("\n\n-- Getting routes from " + startBusStop.getBusStopName() + " to " + endBusStop.getBusStopName() + " --");
                 switchBusStopsImageView.setEnabled(false);
                 originButton.setEnabled(false);
                 destinationButton.setEnabled(false);
@@ -199,6 +203,7 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager
         inDirectRoutesList.clear();
         if (errorMessage.equals(Constants.NETWORK_QUERY_NO_ERROR))
         {
+            appendLog("Found " + buses.length + " direct buses from " + startBusStop.getBusStopName() + " to " + endBusStop.getBusStopName());
             progressBar.setVisibility(View.GONE);
             switchBusStopsImageView.setEnabled(true);
             originButton.setEnabled(true);
@@ -242,6 +247,7 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager
         {
             if (isNetworkAvailable())
             {
+                appendLog("There aren't any direct buses from " + startBusStop.getBusStopName() + " to " + endBusStop.getBusStopName() + ". Checking for indirect routes...");
                 if (errorMessage.equals(Constants.NETWORK_QUERY_IO_EXCEPTION))
                 {
                     errorMessageTextView.setText("There aren't any direct routes. Looking for indirect routes...");
@@ -294,12 +300,14 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager
         {
             if (transitPoints.length != 0)
             {
+                appendLog("\nFound transit points:");
                 errorMessageTextView.setText("Found transit points. Locating buses...");
                 errorMessageTextView.setVisibility(View.VISIBLE);
                 numberOfTransitPointsFound = transitPoints.length;
                 numberOfNetworkRequestsMade = 0;
                 for (BusStop transitPoint : transitPoints)
                 {
+                    appendLog(transitPoint.getBusStopName() + ", ");
                     progressBar.setVisibility(View.VISIBLE);
                     switchBusStopsImageView.setEnabled(false);
                     originButton.setEnabled(false);
@@ -313,6 +321,7 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager
                     transitPointToDestinationIndirectBuses.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, transitPoint, endBusStop, transitPoint);
 
                 }
+                appendLog("\nLocating buses from origin to transit point and transit point to destination...");
             }
             else
             {
@@ -396,6 +405,7 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager
     @Override
     public void onIndirectBusesFound(String errorMessage, Bus[] buses, BusStop transitPoint, String routeMessage)
     {
+        appendLog(numberOfNetworkRequestsMade + " request responses remaining");
         numberOfNetworkRequestsMade--;
         if (errorMessage.equals(Constants.NETWORK_QUERY_NO_ERROR))
         {
@@ -451,6 +461,7 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager
 
             if (hashMap.containsKey("transit_point_name") && hashMap.containsKey("origin_to_transit_point_route_number") && hashMap.containsKey("transit_point_to_destination_route_number"))
             {
+                appendLog("Found a valid indirect route");
                 inDirectRoutesList.add(hashMap);
                 String[] from = {"transit_point_name", "origin_to_transit_point_route_number", "origin_to_transit_point_bus_eta", "transit_point_to_destination_route_number", "transit_point_to_destination_bus_eta"};
                 int[] to = {R.id.transit_point_text_view, R.id.bus_1_number_text_view, R.id.bus_1_eta_text_view, R.id.bus_2_number_text_view, R.id.bus_2_eta_text_view};
@@ -484,6 +495,36 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager
             switchBusStopsImageView.setEnabled(true);
             originButton.setEnabled(true);
             destinationButton.setEnabled(true);
+        }
+    }
+
+    public void appendLog(String text)
+    {
+        File logFile = new File("sdcard/log.file");
+        if (!logFile.exists())
+        {
+            try
+            {
+                logFile.createNewFile();
+            }
+            catch (IOException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        try
+        {
+            //BufferedWriter for performance, true to set append to file flag
+            BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
+            buf.append(text);
+            buf.newLine();
+            buf.close();
+        }
+        catch (IOException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
 

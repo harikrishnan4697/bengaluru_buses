@@ -87,6 +87,14 @@
             android:layout_height="2dp"
             android:background="#000000"/>
 
+        <ProgressBar
+            android:id="@+id/nearby_fragment_progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="16dp"
+            android:visibility="visible"/>
+
         <ScrollView
             android:id="@+id/buses_arriving_at_bus_stop_container_scroll_view"
             android:layout_width="match_parent"
