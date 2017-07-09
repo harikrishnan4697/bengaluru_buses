@@ -11,12 +11,12 @@
     <string name="bus_stops_nearby_label_text">Bus stops nearby</string>
     <string name="track_bus_edit_text_hint">Enter a bus number or choose one below</string>
     <string name="error_could_not_get_buses_at_stop_text">There are no buses arriving at this bus stop anytime soon!</string>
-    <string name="error_no_bus_stops_found_text">Could not find any Bengaluru city bus stops nearby!</string>
+    <string name="error_no_bus_stops_found_text">Could not find any Bengaluru city bus stops nearby! Please click the refresh button below to try again.</string>
 
     <!-- Strings for TrackBusActivity -->
     <string name="direction_label_text">Direction</string>
     <string name="bus_stop_label_text">Bus stop</string>
     <string name="image_content_description_text">Type of bus service</string>
     <string name="error_invalid_route_text">This bus cannot be tracked.</string>
-    <string name="error_getting_stop_details_text">Error getting bus stop details! Please try again later.</string>
+    <string name="error_getting_stop_details_text">Error getting bus stop details! Please click the refresh button below to try again.</string>
 </resources>

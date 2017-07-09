@@ -336,7 +336,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult)
     {
-        errorMessageTextView.setText("Couldn't get current location! Please try again later.");
+        errorMessageTextView.setText("Couldn't get current location! Please click the refresh button below to try again.");
         errorMessageTextView.setVisibility(View.VISIBLE);
     }
 
@@ -351,7 +351,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     {
         if (mRequestingLocationUpdates)
         {
-            errorMessageTextView.setText("Couldn't get current location! Please try again later.");
+            errorMessageTextView.setText("Couldn't get current location! Please click the refresh button below to try again.");
             errorMessageTextView.setVisibility(View.VISIBLE);
         }
     }
@@ -452,7 +452,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         }
         catch (SecurityException e)
         {
-            errorMessageTextView.setText("Please grant the location permission in Settings > Apps > Bengaluru Buses.");
+            errorMessageTextView.setText("Please grant the location permission in Settings > Apps > Bengaluru Buses. Then, click the refresh button below to try again.");
             errorMessageTextView.setVisibility(View.VISIBLE);
         }
     }
@@ -710,7 +710,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     @Override
     public void onNothingSelected(AdapterView<?> parent)
     {
-        Toast.makeText(this, "Please choose a bus stop!", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Please select a bus stop!", Toast.LENGTH_LONG).show();
     }
 
 
@@ -828,7 +828,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
             progressDialog.dismiss();
             refreshFloatingActionButton.clearAnimation();
             refreshFloatingActionButton.setEnabled(true);
-            errorMessageTextView.setText(R.string.error_connecting_to_the_internet_text);
+            errorMessageTextView.setText(R.string.error_connecting_to_the_internet_click_refresh_text);
             errorMessageTextView.setVisibility(View.VISIBLE);
         }
     }
@@ -875,14 +875,14 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                 }
                 else
                 {
-                    errorMessageTextView.setText(R.string.error_connecting_to_the_internet_text);
+                    errorMessageTextView.setText(R.string.error_connecting_to_the_internet_click_refresh_text);
                     errorMessageTextView.setVisibility(View.VISIBLE);
                 }
             }
             catch (JSONException e)
             {
                 progressDialog.dismiss();
-                errorMessageTextView.setText("Could not get buses arriving at selected bus stop!");
+                errorMessageTextView.setText("Could not get buses arriving at selected bus stop! Please click the refresh button below to try again.");
                 errorMessageTextView.setVisibility(View.VISIBLE);
             }
         }
@@ -1077,7 +1077,6 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
 
     protected void onStart()
     {
-        //updateBusList = false;
         if (mGoogleApiClient != null)
         {
             mGoogleApiClient.connect();
