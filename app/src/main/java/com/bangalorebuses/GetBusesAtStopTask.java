@@ -71,7 +71,10 @@ class GetBusesAtStopTask extends AsyncTask<String, Void, JSONArray>
             client.setRequestProperty("Accept", "application/json");
             client.setDoOutput(true);
             client.setConnectTimeout(Constants.NETWORK_QUERY_CONNECT_TIMEOUT);
-            client.setReadTimeout(Constants.NETWORK_QUERY_READ_TIMEOUT);
+
+            //Removed this line because request was timing out at some bus stops like Kempegowda Bus Station where there are lots of buses.
+            //client.setReadTimeout(Constants.NETWORK_QUERY_READ_TIMEOUT);
+
             client.connect();
             BufferedOutputStream writer = new BufferedOutputStream(client.getOutputStream());
             writer.write(busStopIds[0].getBytes());

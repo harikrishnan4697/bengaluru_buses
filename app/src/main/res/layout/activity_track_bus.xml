@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:ads="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -28,7 +27,7 @@
             android:gravity="start"
             android:text="@string/direction_label_text"
             android:textColor="#FFFFFF"
-            android:textSize="16sp"/>
+            android:textSize="15sp"/>
 
         <RadioButton
             android:id="@+id/direction_up_radio_button"
@@ -38,7 +37,7 @@
             android:maxLines="2"
             android:onClick="directionChosen"
             android:padding="8dp"
-            android:textSize="16sp"/>
+            android:textSize="15sp"/>
 
         <RadioButton
             android:id="@+id/direction_down_radio_button"
@@ -49,7 +48,7 @@
             android:maxLines="2"
             android:onClick="directionChosen"
             android:padding="8dp"
-            android:textSize="16sp"/>
+            android:textSize="15sp"/>
     </RadioGroup>
 
     <LinearLayout
@@ -68,7 +67,7 @@
             android:layout_marginBottom="5dp"
             android:text="@string/bus_stop_label_text"
             android:textColor="#FFFFFF"
-            android:textSize="16sp"/>
+            android:textSize="15sp"/>
 
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -83,29 +82,23 @@
                 android:clickable="true"
                 android:spinnerMode="dropdown"
                 android:textAlignment="viewStart"/>
-
-            <View
-                android:layout_width="wrap_content"
-                android:layout_height="1dp"
-                android:layout_below="@id/route_stop_list_spinner"
-                android:background="#000000"/>
         </RelativeLayout>
     </LinearLayout>
 
-    <com.google.android.gms.ads.AdView
+    <!--<com.google.android.gms.ads.AdView
         android:id="@+id/track_bus_activity_footer_ad"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerInParent="true"
         ads:adSize="BANNER"
-        ads:adUnitId="ca-app-pub-4515741125560154/2111234828"/>
+        ads:adUnitId="ca-app-pub-4515741125560154/2111234828"/>-->
 
     <LinearLayout
         android:id="@+id/buses_linear_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/track_bus_activity_footer_ad"
+        android:layout_alignParentBottom="true"
         android:layout_below="@id/bus_stop_selection_linear_layout"
         android:background="#FFFFFF"
         android:orientation="vertical"
@@ -308,7 +301,7 @@
         android:id="@+id/floatingBusTimingsRefreshActionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@id/track_bus_activity_footer_ad"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_margin="10dp"

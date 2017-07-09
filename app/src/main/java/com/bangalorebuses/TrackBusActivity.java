@@ -25,10 +25,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.MobileAds;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -75,7 +71,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
     private Animation rotatingAnimation;
     private FloatingActionButton busTimingsRefreshFloatingActionButton;
     private boolean canRefresh = true;
-    private AdView adView;
+    //private AdView adView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -83,7 +79,6 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
         super.onCreate(savedInstanceState);
         getSupportActionBar().setElevation(0);
         setContentView(R.layout.activity_track_bus);
-        MobileAds.initialize(this, "ca-app-pub-4515741125560154~6681035222");
         directionSelectionRadioGroup = (RadioGroup) findViewById(R.id.direction_selection_radio_group);
         upDirectionRadioButton = (RadioButton) findViewById(R.id.direction_up_radio_button);
         downDirectionRadioButton = (RadioButton) findViewById(R.id.direction_down_radio_button);
@@ -101,9 +96,10 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
         busDetailsLinearLayout2 = (LinearLayout) findViewById(R.id.bus_linear_layout_2);
         busDetailsLinearLayout3 = (LinearLayout) findViewById(R.id.bus_linear_layout_3);
         busDetailsLinearLayout4 = (LinearLayout) findViewById(R.id.bus_linear_layout_4);
+        /*MobileAds.initialize(this, "ca-app-pub-4515741125560154~6681035222");
         adView = (AdView) findViewById(R.id.track_bus_activity_footer_ad);
         AdRequest adRequest = new AdRequest.Builder().build();
-        adView.loadAd(adRequest);
+        adView.loadAd(adRequest);*/
         stopsOnRouteSpinner = (Spinner) findViewById(R.id.route_stop_list_spinner);
         rotatingAnimation = AnimationUtils.loadAnimation(this, R.anim.rotate);
         busTimingsRefreshFloatingActionButton = (FloatingActionButton) findViewById(R.id.floatingBusTimingsRefreshActionButton);
@@ -567,7 +563,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
             else
             {
                 progressDialog.dismiss();
-                errorMessageTextView.setText("There aren't any " + route.getRouteNumber() + " buses arriving at " + busStopList[position].getBusStopName() + " in this direction");
+                errorMessageTextView.setText("There aren't any " + route.getRouteNumber() + " buses arriving at " + busStopList[position].getBusStopName() + " in this direction. Please select another bus stop.");
                 errorMessageTextView.setVisibility(View.VISIBLE);
                 busTimingsRefreshFloatingActionButton.clearAnimation();
                 busTimingsRefreshFloatingActionButton.setEnabled(true);
@@ -586,7 +582,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
             stopsOnRouteSpinner.setEnabled(true);
             if (isNetworkAvailable())
             {
-                errorMessageTextView.setText("There aren't any " + route.getRouteNumber() + " buses arriving at " + busStopList[position].getBusStopName() + " in this direction");
+                errorMessageTextView.setText("There aren't any " + route.getRouteNumber() + " buses arriving at " + busStopList[position].getBusStopName() + " in this direction. Please select another bus stop.");
                 errorMessageTextView.setVisibility(View.VISIBLE);
             }
             else
@@ -784,29 +780,29 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
     protected void onPause()
     {
         super.onPause();
-        if (adView != null)
+        /*if (adView != null)
         {
             adView.pause();
-        }
+        }*/
     }
 
     @Override
     public void onResume()
     {
-        if (adView != null)
+        /*if (adView != null)
         {
             adView.resume();
-        }
+        }*/
         super.onResume();
     }
 
     @Override
     public void onDestroy()
     {
-        if (adView != null)
+        /*if (adView != null)
         {
             adView.destroy();
-        }
+        }*/
         super.onDestroy();
     }
 }

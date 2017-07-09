@@ -14,40 +14,6 @@ import android.view.WindowManager;
 public class MainActivity extends AppCompatActivity
 {
     private ActionBar actionBar;
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener = new BottomNavigationView.OnNavigationItemSelectedListener()
-    {
-
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item)
-        {
-            Fragment selectedFragment = null;
-
-            switch (item.getItemId())
-            {
-                /*case R.id.navigation_favourites:
-                    selectedFragment = favouritesFragment;
-                    actionBar.setTitle("Favourites");
-                    break;*/
-                case R.id.navigation_near_me:
-                    selectedFragment = new NearMeFragment();
-                    actionBar.setTitle("Bus stops nearby");
-                    break;
-                case R.id.navigation_track_bus:
-                    selectedFragment = new BusTrackerFragment();
-                    actionBar.setTitle("Bus tracker");
-                    break;
-                case R.id.navigation_trip_planner:
-                    selectedFragment = new TripPlannerFragment();
-                    actionBar.setTitle("Trip planner");
-                    break;
-            }
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.frame_layout, selectedFragment);
-            transaction.commit();
-            return true;
-        }
-
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -79,16 +45,57 @@ public class MainActivity extends AppCompatActivity
                 {
                     actionBar.show();
                 }
-                BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-                navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+                BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
+                BottomNavigationBarHelper.disableShiftMode(bottomNavigationView);
+
                 //Manually displaying the first fragment - one time only
+                bottomNavigationView.setSelectedItemId(R.id.navigation_near_me);
+                actionBar.setTitle("Nearby");
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                 transaction.replace(R.id.frame_layout, new NearMeFragment());
                 transaction.commit();
 
-                //Used to select an item programmatically
-                navigation.getMenu().getItem(0).setChecked(true);
-                actionBar.setTitle("Nearby");
+                bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener()
+                {
+                    @Override
+                    public boolean onNavigationItemSelected(@NonNull MenuItem item)
+                    {
+                        Fragment selectedFragment = null;
+
+                        switch (item.getItemId())
+                        {
+                            /*case R.id.navigation_favourites:
+                                selectedFragment = new FavouritesFragment();
+                                actionBar.setTitle("Favourites");
+                                break;*/
+                            case R.id.navigation_near_me:
+                                selectedFragment = new NearMeFragment();
+                                actionBar.setTitle("Bus stops nearby");
+                                break;
+                            case R.id.navigation_track_bus:
+                                selectedFragment = new BusTrackerFragment();
+                                actionBar.setTitle("Bus tracker");
+                                break;
+                            case R.id.navigation_trip_planner:
+                                selectedFragment = new TripPlannerFragment();
+                                actionBar.setTitle("Trip planner");
+                                break;
+                        }
+                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                        transaction.replace(R.id.frame_layout, selectedFragment);
+                        transaction.commit();
+                        return true;
+                    }
+                });
+
+                bottomNavigationView.setOnNavigationItemReselectedListener(new BottomNavigationView.OnNavigationItemReselectedListener()
+                {
+                    @Override
+                    public void onNavigationItemReselected(@NonNull MenuItem item)
+                    {
+
+                    }
+                });
             }
         }.start();
     }
