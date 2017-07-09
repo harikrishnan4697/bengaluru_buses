@@ -384,7 +384,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                         if (!mRequestingLocationUpdates)
                         {
                             int permissionCheck = ContextCompat.checkSelfPermission(ChooseRouteActivity.this, Manifest.permission.ACCESS_FINE_LOCATION);
-                            if (permissionCheck == PackageManager.PERMISSION_GRANTED)
+                            if (permissionCheck == PackageManager.PERMISSION_GRANTED && !isFinishing())
                             {
                                 progressDialog = ProgressDialog.show(ChooseRouteActivity.this, "Please wait", "Getting your location...", true);
                                 startLocationUpdates();
@@ -398,7 +398,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                     case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
 
                         int permissionCheck = ContextCompat.checkSelfPermission(ChooseRouteActivity.this, Manifest.permission.ACCESS_FINE_LOCATION);
-                        if (permissionCheck == PackageManager.PERMISSION_GRANTED)
+                        if (permissionCheck == PackageManager.PERMISSION_GRANTED && !isFinishing())
                         {
                             if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
                             {
@@ -524,7 +524,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
             {
                 refreshFloatingActionButton.clearAnimation();
                 refreshFloatingActionButton.setEnabled(true);
-                Toast.makeText(this, "Location access was denied! Couldn't locate bus stops nearby...", Toast.LENGTH_LONG).show();
+                errorMessageTextView.setText("Location access was denied! Couldn't locate bus stops nearby. Please click the refresh button below to try again.");
             }
         }
     }
@@ -538,7 +538,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         {
             if (resultCode == -1)
             {
-                if (!mRequestingLocationUpdates)
+                if (!mRequestingLocationUpdates && !isFinishing())
                 {
                     progressDialog = ProgressDialog.show(this, "Please wait", "Getting your location...", true);
                     startLocationUpdates();
@@ -549,7 +549,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
             {
                 if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
                 {
-                    if (!mRequestingLocationUpdates)
+                    if (!mRequestingLocationUpdates && !isFinishing())
                     {
                         progressDialog = ProgressDialog.show(this, "Please wait", "Getting your location...", true);
                         startLocationUpdates();
