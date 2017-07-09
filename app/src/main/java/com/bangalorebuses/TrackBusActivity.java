@@ -542,7 +542,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
             else
             {
                 progressDialog.dismiss();
-                errorMessageTextView.setText("There aren't any " + route.getRouteNumber() + " buses arriving at " + busStopList[position].getBusStopName() + " in this direction.");
+                errorMessageTextView.setText("There aren't any " + route.getRouteNumber() + " buses arriving at " + busStopList[position].getBusStopName() + " in this direction. Please select another bus stop.");
                 errorMessageTextView.setVisibility(View.VISIBLE);
                 busTimingsRefreshFloatingActionButton.clearAnimation();
                 busTimingsRefreshFloatingActionButton.setEnabled(true);
@@ -561,7 +561,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
             stopsOnRouteSpinner.setEnabled(true);
             if (isNetworkAvailable())
             {
-                errorMessageTextView.setText("There aren't any " + route.getRouteNumber() + " buses arriving at " + busStopList[position].getBusStopName() + " in this direction.");
+                errorMessageTextView.setText("There aren't any " + route.getRouteNumber() + " buses arriving at " + busStopList[position].getBusStopName() + " in this direction. Please select another bus stop.");
                 errorMessageTextView.setVisibility(View.VISIBLE);
             }
             else

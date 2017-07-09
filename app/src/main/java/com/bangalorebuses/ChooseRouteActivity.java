@@ -416,7 +416,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                                 }
                                 catch (IntentSender.SendIntentException e)
                                 {
-                                    errorMessageTextView.setText("Failed to enable location services!");
+                                    errorMessageTextView.setText("Failed to enable location services! Please click the refresh button below to try again.");
                                     errorMessageTextView.setVisibility(View.VISIBLE);
                                 }
                             }
@@ -525,6 +525,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                 refreshFloatingActionButton.clearAnimation();
                 refreshFloatingActionButton.setEnabled(true);
                 errorMessageTextView.setText("Location access was denied! Couldn't locate bus stops nearby. Please click the refresh button below to try again.");
+                errorMessageTextView.setVisibility(View.VISIBLE);
             }
         }
     }
@@ -787,12 +788,9 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                         String busStopName = busStopsArray.getJSONObject(i).getString("StopName");
                         if (!(busStopName.contains("CS-")))
                         {
-                            if (busStopName.contains("("))
+                            if (busStopName.contains("(") && busStopName.charAt(busStopName.indexOf("(") - 1) == ' ')
                             {
-                                if (busStopName.charAt(busStopName.indexOf("(") - 1) == ' ')
-                                {
-                                    busStopName = busStopName.replace(" (", "(");
-                                }
+                                busStopName = busStopName.replace(" (", "(");
                             }
                             if (busStopName.contains("Towards"))
                             {
@@ -1137,6 +1135,8 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         super.onDestroy();
     }
 
+
+    // What to do when the Android back button is pressed
     @Override
     public void onBackPressed()
     {
