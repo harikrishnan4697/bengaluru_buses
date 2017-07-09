@@ -1138,8 +1138,6 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         super.onDestroy();
     }
 
-
-    // What to do when the Android back button is pressed
     @Override
     public void onBackPressed()
     {
