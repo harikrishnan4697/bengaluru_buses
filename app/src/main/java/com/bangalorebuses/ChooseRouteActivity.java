@@ -42,9 +42,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -106,7 +103,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     private Animation rotatingAnimation;
     private int numberOfRefreshIconRotationsRemaining = 0;
     private ListView routeNumberListView;
-    private AdView adView;
+    //private AdView adView;
     private boolean routeListIsVisible = false;
     private LinearLayout nearestBusStopSelectionLinearLayout;
     private boolean busesAtStopListHasTraceableBuses = false;
@@ -146,11 +143,11 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                     actionBar.setDisplayShowCustomEnabled(true);
                 }
 
-                // Start the Google AdMob service
+                /*// Start the Google AdMob service
                 MobileAds.initialize(ChooseRouteActivity.this, "ca-app-pub-4515741125560154~6681035222");
                 adView = (AdView) findViewById(R.id.choose_route_activity_footer_ad);
                 AdRequest adRequest = new AdRequest.Builder().build();
-                adView.loadAd(adRequest);
+                adView.loadAd(adRequest);*/
 
                 // Initialize and setup some instance variables
                 routeNumberEditText = (EditText) findViewById(R.id.action_bar_edit_text);
@@ -274,13 +271,6 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
-                View keyBoardView = ChooseRouteActivity.this.getCurrentFocus();
-                if (keyBoardView != null)
-                {
-                    // Hide the keyboard once the user has selected a bus route
-                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(keyBoardView.getWindowToken(), 0);
-                }
                 routeNumberListView.setVisibility(View.GONE);
                 refreshFloatingActionButton.setVisibility(View.VISIBLE);
                 routeListIsVisible = false;
@@ -751,6 +741,8 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         refreshFloatingActionButton.startAnimation(rotatingAnimation);
         refreshFloatingActionButton.setEnabled(false);
         errorMessageTextView.setVisibility(View.GONE);
+        locationIsToBeUpdated = true;
+        updateBusList = true;
         createLocationRequest();
     }
 
@@ -795,9 +787,12 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                         String busStopName = busStopsArray.getJSONObject(i).getString("StopName");
                         if (!(busStopName.contains("CS-")))
                         {
-                            if (busStopName.charAt(busStopName.indexOf("(") - 1) == ' ')
+                            if (busStopName.contains("("))
                             {
-                                busStopName = busStopName.replace(" (", "(");
+                                if (busStopName.charAt(busStopName.indexOf("(") - 1) == ' ')
+                                {
+                                    busStopName = busStopName.replace(" (", "(");
+                                }
                             }
                             if (busStopName.contains("Towards"))
                             {
@@ -1033,6 +1028,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                     Toast.makeText(this, "This bus cannot be tracked.", Toast.LENGTH_SHORT).show();
                     routeNumberListView.setVisibility(View.VISIBLE);
                     refreshFloatingActionButton.setVisibility(View.GONE);
+                    routeListIsVisible = true;
                 }
             }
             else
@@ -1081,7 +1077,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
 
     protected void onStart()
     {
-        updateBusList = false;
+        //updateBusList = false;
         if (mGoogleApiClient != null)
         {
             mGoogleApiClient.connect();
@@ -1106,10 +1102,10 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         {
             progressDialog.dismiss();
         }
-        if (adView != null)
+        /*if (adView != null)
         {
             adView.pause();
-        }
+        }*/
         stopLocationUpdates();
         mRequestingLocationUpdates = false;
     }
@@ -1117,10 +1113,10 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     @Override
     public void onResume()
     {
-        if (adView != null)
+        /*if (adView != null)
         {
             adView.resume();
-        }
+        }*/
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected() && locationIsToBeUpdated)
         {
             int permissionCheck = ContextCompat.checkSelfPermission(ChooseRouteActivity.this, Manifest.permission.ACCESS_FINE_LOCATION);
@@ -1135,10 +1131,10 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     @Override
     public void onDestroy()
     {
-        if (adView != null)
+        /*if (adView != null)
         {
             adView.destroy();
-        }
+        }*/
         super.onDestroy();
     }
 

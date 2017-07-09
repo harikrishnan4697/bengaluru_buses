@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:ads="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -9,20 +8,20 @@
     android:background="#FFFFFF"
     tools:context="com.bangalorebuses.ChooseRouteActivity">
 
-    <com.google.android.gms.ads.AdView
+    <!--<com.google.android.gms.ads.AdView
         android:id="@+id/choose_route_activity_footer_ad"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerInParent="true"
         ads:adSize="BANNER"
-        ads:adUnitId="ca-app-pub-4515741125560154/9634501623"/>
+        ads:adUnitId="ca-app-pub-4515741125560154/9634501623"/>-->
 
     <ListView
         android:id="@+id/bus_route_list_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@id/choose_route_activity_footer_ad"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentTop="true"
         android:visibility="gone"/>
 
@@ -45,7 +44,7 @@
             android:layout_marginBottom="5dp"
             android:text="@string/bus_stops_nearby_label_text"
             android:textColor="#FFFFFF"
-            android:textSize="16sp"
+            android:textSize="15sp"
             />
 
         <RelativeLayout
@@ -61,12 +60,6 @@
                 android:dropDownSelector="#000000"
                 android:spinnerMode="dropdown"
                 android:textAlignment="viewStart"/>
-
-            <View
-                android:layout_width="wrap_content"
-                android:layout_height="1dp"
-                android:layout_below="@id/stop_list_spinner"
-                android:background="#000000"/>
         </RelativeLayout>
 
         <TextView
@@ -79,14 +72,14 @@
             android:maxLines="1"
             android:textAlignment="viewStart"
             android:textColor="#FFFFFF"
-            android:textSize="16sp"/>
+            android:textSize="15sp"/>
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/bus_stop_and_list_linear_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/choose_route_activity_footer_ad"
+        android:layout_alignParentBottom="true"
         android:layout_below="@id/nearest_bus_stop_selection_linear_layout"
         android:orientation="vertical">
 
@@ -130,7 +123,7 @@
         android:id="@+id/floatingRefreshActionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@id/choose_route_activity_footer_ad"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_margin="10dp"
