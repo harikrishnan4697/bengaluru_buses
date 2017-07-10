@@ -58,7 +58,14 @@ public class MainActivity extends AppCompatActivity
                 actionBar.setTitle("Nearby");
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                 transaction.replace(R.id.frame_layout, new NearMeFragment());
-                transaction.commit();
+                try
+                {
+                    transaction.commit();
+                }
+                catch (IllegalStateException e)
+                {
+                    e.printStackTrace();
+                }
 
                 bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener()
                 {
