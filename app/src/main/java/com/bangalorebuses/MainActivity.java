@@ -1,5 +1,6 @@
 package com.bangalorebuses;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
@@ -10,6 +11,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.WindowManager;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -27,6 +29,9 @@ public class MainActivity extends AppCompatActivity
             actionBar.hide();
         }
         setContentView(R.layout.splash_screen);
+        TextView appTitleTextView = (TextView) findViewById(R.id.appTitleTextView);
+        Typeface typeFace = Typeface.createFromAsset(getAssets(), "fonts/Righteous-Regular.ttf");
+        appTitleTextView.setTypeface(typeFace);
         new CountDownTimer(2000, 2000)
         {
             @Override
