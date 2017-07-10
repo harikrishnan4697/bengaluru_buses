@@ -107,6 +107,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     private boolean routeListIsVisible = false;
     private LinearLayout nearestBusStopSelectionLinearLayout;
     private boolean busesAtStopListHasTraceableBuses = false;
+    private boolean isUpdatingBusesAtStopListCache = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -634,6 +635,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                             progressDialog = ProgressDialog.show(this, "Please wait", "Getting buses...");
                             JSONArray jsonArray = new JSONArray(stringBuilder.toString());
                             onBusesAtStopFound(false, jsonArray);
+                            isUpdatingBusesAtStopListCache = true;
                             nearestStopListSpinner.setEnabled(false);
                             refreshFloatingActionButton.setEnabled(false);
                             refreshFloatingActionButton.startAnimation(rotatingAnimation);
@@ -651,6 +653,10 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                     {
                         if (isNetworkAvailable())
                         {
+                            isUpdatingBusesAtStopListCache = false;
+                            nearestStopListSpinner.setEnabled(false);
+                            refreshFloatingActionButton.setEnabled(false);
+                            refreshFloatingActionButton.startAnimation(rotatingAnimation);
                             progressDialog = ProgressDialog.show(this, "Please wait", "Getting buses...");
                             String requestBody = "stopID=" + Integer.toString(nearestBusStops[position].getBusStopId());
                             busesSet.clear();
@@ -673,6 +679,10 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                 e.printStackTrace();
                 if (isNetworkAvailable())
                 {
+                    isUpdatingBusesAtStopListCache = false;
+                    nearestStopListSpinner.setEnabled(false);
+                    refreshFloatingActionButton.setEnabled(false);
+                    refreshFloatingActionButton.startAnimation(rotatingAnimation);
                     progressDialog = ProgressDialog.show(this, "Please wait", "Getting buses...");
                     String requestBody = "stopID=" + Integer.toString(nearestBusStops[position].getBusStopId());
                     busesSet.clear();
@@ -694,6 +704,10 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         {
             if (isNetworkAvailable())
             {
+                isUpdatingBusesAtStopListCache = false;
+                nearestStopListSpinner.setEnabled(false);
+                refreshFloatingActionButton.setEnabled(false);
+                refreshFloatingActionButton.startAnimation(rotatingAnimation);
                 progressDialog = ProgressDialog.show(this, "Please wait", "Getting buses...");
                 String requestBody = "stopID=" + Integer.toString(nearestBusStops[position].getBusStopId());
                 busesSet.clear();
@@ -851,7 +865,10 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                         fileOutputStream.write((nearestBusStops[position].getBusStopName() + "\n").getBytes());
                         fileOutputStream.write(buses.toString().getBytes());
                         fileOutputStream.close();
-                        nearestStopListSpinner.setEnabled(true);
+                        if (isUpdatingBusesAtStopListCache)
+                        {
+                            isUpdatingBusesAtStopListCache = false;
+                        }
                     }
                     catch (IOException e)
                     {
@@ -879,7 +896,11 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
             }
             catch (JSONException e)
             {
+                isUpdatingBusesAtStopListCache = false;
                 progressDialog.dismiss();
+                refreshFloatingActionButton.clearAnimation();
+                refreshFloatingActionButton.setEnabled(true);
+                nearestStopListSpinner.setEnabled(true);
                 errorMessageTextView.setText("Could not get buses arriving at selected bus stop! Please click the refresh button below to try again.");
                 errorMessageTextView.setVisibility(View.VISIBLE);
             }
@@ -890,6 +911,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
             refreshFloatingActionButton.clearAnimation();
             refreshFloatingActionButton.setEnabled(true);
             nearestStopListSpinner.setEnabled(true);
+            isUpdatingBusesAtStopListCache = false;
             if (isNetworkAvailable())
             {
                 errorMessageTextView.setText(R.string.error_could_not_get_buses_at_stop_text);
@@ -1041,10 +1063,11 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         }
         else
         {
-            if (nearestStopListSpinner.isEnabled())
+            if (!isUpdatingBusesAtStopListCache)
             {
                 refreshFloatingActionButton.clearAnimation();
                 refreshFloatingActionButton.setEnabled(true);
+                nearestStopListSpinner.setEnabled(true);
                 if (!busesAtStopListHasTraceableBuses)
                 {
                     errorMessageTextView.setText("Cannot get buses arriving at this bus stop! Please select another bus stop and try again.");
