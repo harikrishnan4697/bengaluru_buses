@@ -25,6 +25,7 @@ public class SearchActivity extends AppCompatActivity
     private EditText searchEditText;
     private ListView searchResultsListView;
     private ArrayAdapter<String> listAdapter;
+    private BusNumberListCustomAdapter customListAdapter;
     private String searchType;
     private Intent resultIntent = new Intent();
 
@@ -80,6 +81,7 @@ public class SearchActivity extends AppCompatActivity
             // Converts it to a JSON array
             JSONArray jsonArray = new JSONArray(stringBuilder.toString());
             String[] listViewAdapterContent = new String[jsonArray.length()];
+            String[] routeTypes = new String[jsonArray.length()];
 
             // Puts the bus route names into a list
             if (searchType.equals(Constants.SEARCH_TYPE_BUS_ROUTE))
@@ -87,6 +89,7 @@ public class SearchActivity extends AppCompatActivity
                 for (int i = 0; i < jsonArray.length(); i++)
                 {
                     listViewAdapterContent[i] = jsonArray.getJSONObject(i).getString("routename");
+                    routeTypes[i] = jsonArray.getJSONObject(i).getString("service_type_name");
                 }
             }
             else
@@ -97,9 +100,16 @@ public class SearchActivity extends AppCompatActivity
                 }
             }
 
-            listAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, listViewAdapterContent);
-
-            searchResultsListView.setAdapter(listAdapter);
+            if (searchType.equals(Constants.SEARCH_TYPE_BUS_ROUTE))
+            {
+                customListAdapter = new BusNumberListCustomAdapter(this, listViewAdapterContent, routeTypes);
+                searchResultsListView.setAdapter(customListAdapter);
+            }
+            else
+            {
+                listAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, listViewAdapterContent);
+                searchResultsListView.setAdapter(listAdapter);
+            }
         }
         catch (Exception e)
         {
@@ -129,7 +139,15 @@ public class SearchActivity extends AppCompatActivity
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count)
             {
-                listAdapter.getFilter().filter(s);
+                //searchResultsListView.smoothScrollToPosition(0, 0);
+                if (searchType.equals(Constants.SEARCH_TYPE_BUS_ROUTE))
+                {
+                    customListAdapter.getFilter().filter(s);
+                }
+                else
+                {
+                    listAdapter.getFilter().filter(s);
+                }
             }
 
             @Override
