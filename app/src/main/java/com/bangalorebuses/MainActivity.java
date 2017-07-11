@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity
 
                 //Manually displaying the first fragment - one time only
                 bottomNavigationView.setSelectedItemId(R.id.navigation_near_me);
-                actionBar.setTitle("Nearby");
+                actionBar.setTitle("Bus stops nearby");
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                 transaction.replace(R.id.frame_layout, new NearMeFragment());
                 try

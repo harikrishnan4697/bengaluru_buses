@@ -95,21 +95,11 @@
             android:layout_margin="16dp"
             android:visibility="visible"/>
 
-        <ScrollView
-            android:id="@+id/buses_arriving_at_bus_stop_container_scroll_view"
+        <ListView
+            android:id="@+id/busesArrivingAtNearbyBusStopListView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:scrollbars="none">
-
-            <LinearLayout
-                android:id="@+id/buses_arriving_at_bus_stop_linear_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:animateLayoutChanges="true"
-                android:orientation="vertical">
-            </LinearLayout>
-
-        </ScrollView>
+            android:animateLayoutChanges="true"/>
 
     </LinearLayout>
 

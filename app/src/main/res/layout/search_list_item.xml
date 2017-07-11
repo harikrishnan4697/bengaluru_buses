@@ -29,7 +29,8 @@
         android:layout_alignParentTop="true"
         android:layout_toLeftOf="@id/routeTypeTextView"
         android:layout_toStartOf="@id/routeTypeTextView"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:minHeight="50dp">
 
         <ImageView
             android:id="@+id/imageView"
@@ -49,7 +50,7 @@
             android:maxLines="1"
             android:text="500"
             android:textColor="#000000"
-            android:textSize="18sp"/>
+            android:textSize="20sp"/>
 
     </LinearLayout>
 

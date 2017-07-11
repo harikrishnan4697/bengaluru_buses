@@ -20,6 +20,8 @@ class Constants
     static final String NETWORK_QUERY_JSON_EXCEPTION = "ERROR_JSON_EXCEPTION";
     static final String ROUTE_TYPE_ORIGIN_TO_TRANSIT_POINT = "ORIGIN_TO_TRANSIT_POINT";
     static final String ROUTE_TYPE_TRANSIT_POINT_TO_DESTINATION = "TRANSIT_POINT_TO_DESTINATION";
+    static final String DIRECTION_UP = "UP";
+    static final String DIRECTION_DOWN = "DN";
 
     // Constants for fragments
     static final String SEARCH_TYPE_BUS_STOP = "Bus_Stop";

@@ -62,7 +62,7 @@ class BusNumberListCustomAdapter extends BaseAdapter implements Filterable
         if (convertView == null)
         {
             holder = new ViewHolder();
-            convertView = inflater.inflate(R.layout.search_item, null);
+            convertView = inflater.inflate(R.layout.search_list_item, null);
 
             holder.imgViewLogo = (ImageView) convertView.findViewById(R.id.imageView);
             holder.txtViewRouteNumber = (TextView) convertView.findViewById(R.id.routeNumberTextView);

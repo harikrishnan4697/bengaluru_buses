@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
@@ -24,8 +23,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -46,11 +44,8 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -66,7 +61,7 @@ public class NearMeFragment extends Fragment implements NetworkingManager, Adapt
     private BusStop nearestBusStops[] = new BusStop[8];
     private int selectedBusStopPosition = 0;
     private Set<String> busesArrivingAtSelectedStopSet;
-    private LinearLayout busDetailsLinearLayout;
+    private ListView busesArrivingAtNearbyBusStopListView;
     private Intent trackBusIntent;
     private String FILENAME = "buses_at_bus_stop";
     private Spinner nearestBusStopsSpinner;
@@ -83,6 +78,9 @@ public class NearMeFragment extends Fragment implements NetworkingManager, Adapt
     private boolean busesAtStopListHasTraceableBuses = false;
     private TextView busesArrivingAtStopListDescriptionTextView;
     private ProgressBar progressBar;
+    private NearbyBusListCustomAdapter customAdapter;
+    private ArrayList<String> busRoutesArrivingAtSelectedStop = new ArrayList<>();
+    private ArrayList<String> busRouteDestinations = new ArrayList<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -108,7 +106,7 @@ public class NearMeFragment extends Fragment implements NetworkingManager, Adapt
         rotatingAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.rotate);
         locationManager = (LocationManager) getContext().getSystemService(LOCATION_SERVICE);
         busesArrivingAtSelectedStopSet = new HashSet<>();
-        busDetailsLinearLayout = (LinearLayout) view.findViewById(R.id.buses_arriving_at_bus_stop_linear_layout);
+        busesArrivingAtNearbyBusStopListView = (ListView) view.findViewById(R.id.busesArrivingAtNearbyBusStopListView);
         errorMessageTextView = (TextView) view.findViewById(R.id.nearby_fragment_error_message_text_view);
         nearestBusStopsSpinner = (Spinner) view.findViewById(R.id.nearest_bus_stop_list_spinner);
         busesArrivingAtStopListDescriptionTextView = (TextView) view.findViewById(R.id.info_text_view_2);
@@ -123,11 +121,11 @@ public class NearMeFragment extends Fragment implements NetworkingManager, Adapt
     {
         super.onActivityCreated(savedInstanceState);
         // Connect to the Google api client for location services
-        /*if (googleApiClient == null)
+        if (googleApiClient == null)
         {
             googleApiClient = new GoogleApiClient.Builder(getContext()).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
             googleApiClient.connect();
-        }*/
+        }
     }
 
     /**
@@ -192,7 +190,7 @@ public class NearMeFragment extends Fragment implements NetworkingManager, Adapt
      */
     protected void createLocationRequest()
     {
-        busDetailsLinearLayout.setVisibility(View.INVISIBLE);
+        busesArrivingAtNearbyBusStopListView.setVisibility(View.INVISIBLE);
         final int REQUEST_CHECK_SETTINGS = 0x1;
         locationRequest = new LocationRequest();
         locationRequest.setInterval(5000);
@@ -397,102 +395,23 @@ public class NearMeFragment extends Fragment implements NetworkingManager, Adapt
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
     {
         this.selectedBusStopPosition = position;
-        busDetailsLinearLayout.removeAllViews();
         errorMessageTextView.setVisibility(View.GONE);
         busesArrivingAtStopListDescriptionTextView.setText("Buses arriving at " + nearestBusStops[position].getBusStopName());
-        if (position == 0 && !updateBusList)
+        if (isNetworkAvailable())
         {
-            try
-            {
-                FileInputStream fileInputStream = getActivity().openFileInput(FILENAME);
-                InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                StringBuilder stringBuilder = new StringBuilder();
-                String line;
-                if ((line = bufferedReader.readLine()) != null)
-                {
-                    if (line.equals(nearestBusStops[position].getBusStopName()))
-                    {
-                        while ((line = bufferedReader.readLine()) != null)
-                        {
-                            stringBuilder.append(line);
-                        }
-                        if (isNetworkAvailable())
-                        {
-                            progressBar.setVisibility(View.VISIBLE);
-                            JSONArray jsonArray = new JSONArray(stringBuilder.toString());
-                            onBusesAtStopFound(false, jsonArray);
-                            nearestBusStopsSpinner.setEnabled(false);
-                            refreshFloatingActionButton.setEnabled(false);
-                            refreshFloatingActionButton.startAnimation(rotatingAnimation);
-                            String requestBody = "stopID=" + Integer.toString(nearestBusStops[position].getBusStopId());
-                            busesArrivingAtSelectedStopSet.clear();
-                            new GetBusesAtStopTask(this).execute(requestBody);
-                        }
-                        else
-                        {
-                            errorMessageTextView.setText(R.string.error_connecting_to_the_internet_text);
-                            errorMessageTextView.setVisibility(View.VISIBLE);
-                        }
-                    }
-                    else
-                    {
-                        if (isNetworkAvailable())
-                        {
-                            progressBar.setVisibility(View.VISIBLE);
-                            String requestBody = "stopID=" + Integer.toString(nearestBusStops[position].getBusStopId());
-                            busesArrivingAtSelectedStopSet.clear();
-                            new GetBusesAtStopTask(this).execute(requestBody);
-                        }
-                        else
-                        {
-                            errorMessageTextView.setText(R.string.error_connecting_to_the_internet_text);
-                            errorMessageTextView.setVisibility(View.VISIBLE);
-                        }
-                    }
-                }
-                else
-                {
-                    Toast.makeText(getContext(), "Unknown error occurred! Please try again later...", Toast.LENGTH_SHORT).show();
-                }
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-                if (isNetworkAvailable())
-                {
-                    progressBar.setVisibility(View.VISIBLE);
-                    String requestBody = "stopID=" + Integer.toString(nearestBusStops[position].getBusStopId());
-                    busesArrivingAtSelectedStopSet.clear();
-                    new GetBusesAtStopTask(this).execute(requestBody);
-                }
-                else
-                {
-                    errorMessageTextView.setText(R.string.error_connecting_to_the_internet_text);
-                    errorMessageTextView.setVisibility(View.VISIBLE);
-                }
-            }
-            catch (JSONException e)
-            {
-                progressBar.setVisibility(View.GONE);
-                Toast.makeText(getContext(), "Unknown error occurred! Please try again later...", Toast.LENGTH_SHORT).show();
-            }
+            nearestBusStopsSpinner.setEnabled(false);
+            progressBar.setVisibility(View.VISIBLE);
+            refreshFloatingActionButton.setEnabled(false);
+            refreshFloatingActionButton.startAnimation(rotatingAnimation);
+            String requestBody = "stopID=" + Integer.toString(nearestBusStops[position].getBusStopId());
+            busesArrivingAtSelectedStopSet.clear();
+            new GetBusesAtStopTask(this).execute(requestBody);
+            updateBusList = false;
         }
         else
         {
-            if (isNetworkAvailable())
-            {
-                progressBar.setVisibility(View.VISIBLE);
-                String requestBody = "stopID=" + Integer.toString(nearestBusStops[position].getBusStopId());
-                busesArrivingAtSelectedStopSet.clear();
-                new GetBusesAtStopTask(this).execute(requestBody);
-                updateBusList = false;
-            }
-            else
-            {
-                errorMessageTextView.setText(R.string.error_connecting_to_the_internet_text);
-                errorMessageTextView.setVisibility(View.VISIBLE);
-            }
+            errorMessageTextView.setText(R.string.error_connecting_to_the_internet_text);
+            errorMessageTextView.setVisibility(View.VISIBLE);
         }
     }
 
@@ -542,7 +461,6 @@ public class NearMeFragment extends Fragment implements NetworkingManager, Adapt
         progressBar.setVisibility(View.GONE);
         ArrayList<String> stopList = new ArrayList<>();
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), R.layout.spinner_item, stopList);
-        busDetailsLinearLayout.removeAllViews();
 
         if (!isError)
         {
@@ -625,7 +543,6 @@ public class NearMeFragment extends Fragment implements NetworkingManager, Adapt
         if (!isError)
         {
             busesAtStopListHasTraceableBuses = false;
-            busDetailsLinearLayout.removeAllViews();
             busesArrivingAtSelectedStopSet.clear();
             try
             {
@@ -698,70 +615,17 @@ public class NearMeFragment extends Fragment implements NetworkingManager, Adapt
         if (!isError)
         {
             busesAtStopListHasTraceableBuses = true;
-            LinearLayout busRouteDetailsRowLinearLayout = new LinearLayout(getContext());
-            busRouteDetailsRowLinearLayout.removeAllViews();
-            busRouteDetailsRowLinearLayout.setMinimumHeight(100);
-            busRouteDetailsRowLinearLayout.setBackgroundColor(Color.WHITE);
-            TextView routeNumberTextView = new TextView(getContext());
-            TextView routeDirectionTextView = new TextView(getContext());
-            View separatorView = new View(getContext());
-            ImageView imageView = new ImageView(getContext());
-
-            imageView.setAdjustViewBounds(true);
-            imageView.setPadding(10, 20, 0, 0);
-            imageView.setMinimumHeight(80);
-            imageView.setMinimumWidth(80);
-            imageView.setMaxHeight(80);
-            imageView.setMaxWidth(80);
-
-            if (route.getRouteNumber().length() > 5 && route.getRouteNumber().substring(0, 5).equals("KIAS-"))
+            busRoutesArrivingAtSelectedStop.add(route.getRouteNumber());
+            if (routeDirection.equals(Constants.DIRECTION_UP))
             {
-                imageView.setImageResource(R.drawable.ic_flight_black);
-            }
-            else if (route.getRouteNumber().length() > 2 && route.getRouteNumber().substring(0, 2).equals("V-"))
-            {
-                imageView.setImageResource(R.drawable.ic_directions_bus_ac);
-            }
-            else if (route.getRouteNumber().contains("CHAKRA-") || route.getRouteNumber().contains("MF-"))
-            {
-                imageView.setImageResource(R.drawable.ic_directions_bus_special);
+                busRouteDestinations.add(route.getUpRouteName().substring(route.getUpRouteName().indexOf(" To ") + 1, route.getUpRouteName().length()));
             }
             else
             {
-                imageView.setImageResource(R.drawable.ic_directions_bus_ordinary);
+                busRouteDestinations.add(route.getDownRouteName().substring(route.getDownRouteName().indexOf(" To ") + 1, route.getDownRouteName().length()));
             }
 
-            routeNumberTextView.setText(route.getRouteNumber());
-            routeNumberTextView.setTextColor(Color.BLACK);
-            routeNumberTextView.setPadding(20, 20, 20, 20);
-            routeNumberTextView.setMinLines(3);
-            routeNumberTextView.setMinEms(5);
-            routeNumberTextView.setMaxWidth(30);
-            routeNumberTextView.setTextSize(16);
-
-            if (routeDirection.equals("UP"))
-            {
-                routeDirectionTextView.setText(route.getUpRouteName());
-            }
-            else
-            {
-                routeDirectionTextView.setText(route.getDownRouteName());
-            }
-            routeDirectionTextView.setPadding(20, 20, 20, 20);
-            routeDirectionTextView.setMinLines(3);
-            routeDirectionTextView.setTextSize(14);
-
-            separatorView.setMinimumHeight(1);
-            separatorView.setBackgroundColor(Color.BLACK);
-
-            busRouteDetailsRowLinearLayout.setOrientation(LinearLayout.HORIZONTAL);
-            busRouteDetailsRowLinearLayout.setClickable(true);
-            busRouteDetailsRowLinearLayout.addView(imageView);
-            busRouteDetailsRowLinearLayout.addView(routeNumberTextView);
-            busRouteDetailsRowLinearLayout.addView(routeDirectionTextView);
-            busDetailsLinearLayout.addView(busRouteDetailsRowLinearLayout);
-            busDetailsLinearLayout.addView(separatorView);
-            busDetailsLinearLayout.setVisibility(View.VISIBLE);
+            /*busDetailsLinearLayout.setVisibility(View.VISIBLE);
             busRouteDetailsRowLinearLayout.setOnClickListener(new View.OnClickListener()
             {
                 @Override
@@ -782,7 +646,7 @@ public class NearMeFragment extends Fragment implements NetworkingManager, Adapt
                     trackBusIntent.putExtra("DOWN_ROUTE_NAME", route.getDownRouteName());
                     startActivity(trackBusIntent);
                 }
-            });
+            });*/
         }
         else
         {
@@ -800,6 +664,9 @@ public class NearMeFragment extends Fragment implements NetworkingManager, Adapt
         {
             if (nearestBusStopsSpinner.isEnabled())
             {
+                customAdapter = new NearbyBusListCustomAdapter(getActivity(), busRoutesArrivingAtSelectedStop, busRouteDestinations);
+                busesArrivingAtNearbyBusStopListView.setAdapter(customAdapter);
+                busesArrivingAtNearbyBusStopListView.setVisibility(View.VISIBLE);
                 refreshFloatingActionButton.clearAnimation();
                 refreshFloatingActionButton.setEnabled(true);
                 if (!busesAtStopListHasTraceableBuses)
