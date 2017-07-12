@@ -98,7 +98,6 @@ public class BusTrackerFragment extends Fragment implements NetworkingManager
     {
         if (resultCode == RESULT_OK && requestCode == Constants.SEARCH_REQUEST_CODE)
         {
-            busNumberSelectionButton.setText(data.getStringExtra("Selected_Item"));
             startTrackingBus(data.getStringExtra("Selected_Item"));
         }
     }

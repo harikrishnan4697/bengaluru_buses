@@ -59,7 +59,7 @@ public class SearchActivity extends AppCompatActivity
 
         try
         {
-            // Reads the bus route list asset
+            // Reads the asset
             if (searchType.equals(Constants.SEARCH_TYPE_BUS_ROUTE))
             {
                 inputStream = assetManager.open("bangalore_city_bus_routes.txt");
@@ -78,12 +78,12 @@ public class SearchActivity extends AppCompatActivity
                 stringBuilder.append(line);
             }
 
-            // Converts it to a JSON array
+            // Converts the asset to a JSON array
             JSONArray jsonArray = new JSONArray(stringBuilder.toString());
             String[] listViewAdapterContent = new String[jsonArray.length()];
             String[] routeTypes = new String[jsonArray.length()];
 
-            // Puts the bus route names into a list
+            // Puts the bus route or stop names into a list
             if (searchType.equals(Constants.SEARCH_TYPE_BUS_ROUTE))
             {
                 for (int i = 0; i < jsonArray.length(); i++)
@@ -139,7 +139,6 @@ public class SearchActivity extends AppCompatActivity
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count)
             {
-                //searchResultsListView.smoothScrollToPosition(0, 0);
                 if (searchType.equals(Constants.SEARCH_TYPE_BUS_ROUTE))
                 {
                     customListAdapter.getFilter().filter(s);

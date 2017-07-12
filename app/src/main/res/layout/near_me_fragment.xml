@@ -60,6 +60,7 @@
             android:textColor="#FFFFFF"
             android:textSize="16sp"
             android:visibility="gone"/>
+
     </LinearLayout>
 
     <LinearLayout
@@ -87,20 +88,6 @@
             android:layout_height="2dp"
             android:background="#000000"/>
 
-        <ProgressBar
-            android:id="@+id/nearby_fragment_progress_bar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_margin="16dp"
-            android:visibility="visible"/>
-
-        <ListView
-            android:id="@+id/busesArrivingAtNearbyBusStopListView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:animateLayoutChanges="true"/>
-
     </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
@@ -114,5 +101,20 @@
         android:clickable="true"
         android:src="@drawable/ic_refresh_white"
         app:fabSize="mini"/>
+
+    <ListView
+        android:id="@+id/busesArrivingAtNearbyBusStopListView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/buses_at_stop_list_container_linear_layout"/>
+
+    <ProgressBar
+        android:id="@+id/nearby_fragment_progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/buses_at_stop_list_container_linear_layout"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="16dp"
+        android:visibility="visible"/>
 
 </RelativeLayout>

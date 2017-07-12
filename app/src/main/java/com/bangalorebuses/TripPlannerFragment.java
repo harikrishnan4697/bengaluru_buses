@@ -6,6 +6,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -54,6 +55,7 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager
     private HashMap<String, HashMap> inDirectRoutes = new HashMap<>();
     private ImageView switchBusStopsImageView;
     private Animation rotateOnce;
+    private SimpleAdapter adapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -67,9 +69,18 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager
         View view = inflater.inflate(R.layout.trip_planner_fragment, container, false);
         containerRelativeLayout = (RelativeLayout) view.findViewById(R.id.trip_planner_container_relative_layout);
         routeOptionsListView = (ListView) view.findViewById(R.id.route_options_list_view);
+        if (routeOptionsListView != null && adapter != null)
+        {
+            routeOptionsListView.setAdapter(adapter);
+            routeOptionsListView.setVisibility(View.VISIBLE);
+        }
         progressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
         errorMessageTextView = (TextView) view.findViewById(R.id.trip_planner_fragment_error_message_text_view);
         originButton = (Button) view.findViewById(R.id.trip_planner_origin_button);
+        if (originButton != null && startBusStop != null && startBusStop.getBusStopName() != null)
+        {
+            originButton.setText(startBusStop.getBusStopName());
+        }
         originButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -79,6 +90,10 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager
             }
         });
         destinationButton = (Button) view.findViewById(R.id.trip_planner_destination_button);
+        if (destinationButton != null && endBusStop != null && endBusStop.getBusStopName() != null)
+        {
+            destinationButton.setText(endBusStop.getBusStopName());
+        }
         destinationButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -98,6 +113,13 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager
             }
         });
         return view;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState)
+    {
+        super.onActivityCreated(savedInstanceState);
+        setRetainInstance(true);
     }
 
     /**
@@ -238,7 +260,7 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager
 
             String[] from = {"route_number", "bus_eta"};
             int[] to = {R.id.bus_number_text_view, R.id.bus_eta_text_view};
-            SimpleAdapter adapter = new SimpleAdapter(getActivity().getBaseContext(), aList, R.layout.trip_planner_direct_buses_list_item, from, to);
+            adapter = new SimpleAdapter(getActivity().getBaseContext(), aList, R.layout.trip_planner_direct_buses_list_item, from, to);
             routeOptionsListView.setAdapter(adapter);
             routeOptionsListView.setVisibility(View.VISIBLE);
             Snackbar.make(containerRelativeLayout, "Found " + numberOfDirectBusesFound + " direct buses", Snackbar.LENGTH_LONG).show();
@@ -465,7 +487,6 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager
                 inDirectRoutesList.add(hashMap);
                 String[] from = {"transit_point_name", "origin_to_transit_point_route_number", "origin_to_transit_point_bus_eta", "transit_point_to_destination_route_number", "transit_point_to_destination_bus_eta"};
                 int[] to = {R.id.transit_point_text_view, R.id.bus_1_number_text_view, R.id.bus_1_eta_text_view, R.id.bus_2_number_text_view, R.id.bus_2_eta_text_view};
-                SimpleAdapter adapter;
                 if (getActivity() != null)
                 {
                     adapter = new SimpleAdapter(getActivity().getBaseContext(), inDirectRoutesList, R.layout.trip_planner_route_option_list_item, from, to);
