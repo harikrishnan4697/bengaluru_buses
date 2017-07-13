@@ -16,15 +16,16 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,8 +44,6 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -52,10 +51,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static android.content.Context.LOCATION_SERVICE;
-import static android.content.Context.MODE_PRIVATE;
 import static com.bangalorebuses.Constants.LOCATION_PERMISSION_REQUEST_CODE;
 
-public class NearMeFragment extends Fragment implements NetworkingManager, AdapterView.OnItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener
+public class NearbyFragment extends Fragment implements NetworkingManager, AdapterView.OnItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener
 {
     private BusStop nearestBusStops[] = new BusStop[8];
     private int selectedBusStopPosition = 0;
@@ -63,7 +61,7 @@ public class NearMeFragment extends Fragment implements NetworkingManager, Adapt
     private ListView busesArrivingAtSelectedBusStopListView;
     private Intent trackBusIntent;
     private String FILENAME = "buses_at_bus_stop";
-    private Spinner nearestBusStopsSpinner;
+    //private Spinner nearestBusStopsSpinner;
     private GoogleApiClient googleApiClient;
     private LocationRequest locationRequest;
     private boolean isRequestingLocationUpdates = false;
@@ -80,7 +78,7 @@ public class NearMeFragment extends Fragment implements NetworkingManager, Adapt
     private NearbyBusListCustomAdapter customAdapter;
     private ArrayList<String> busRoutesArrivingAtSelectedStop = new ArrayList<>();
     private ArrayList<String> busRouteDestinations = new ArrayList<>();
-    private ArrayAdapter<String> adapter;
+    private NearbyBusStopsListCustomAdapter busStopsNearbyListAdaptor;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -91,7 +89,7 @@ public class NearMeFragment extends Fragment implements NetworkingManager, Adapt
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        View view = inflater.inflate(R.layout.near_me_fragment, container, false);
+        View view = inflater.inflate(R.layout.nearby_fragment, container, false);
         progressBar = (ProgressBar) view.findViewById(R.id.nearby_fragment_progress_bar);
         progressBar.setVisibility(View.GONE);
         refreshFloatingActionButton = (FloatingActionButton) view.findViewById(R.id.floatingRefreshActionButton);
@@ -113,17 +111,17 @@ public class NearMeFragment extends Fragment implements NetworkingManager, Adapt
             busesArrivingAtSelectedBusStopListView.setVisibility(View.VISIBLE);
         }
         errorMessageTextView = (TextView) view.findViewById(R.id.nearby_fragment_error_message_text_view);
-        nearestBusStopsSpinner = (Spinner) view.findViewById(R.id.nearest_bus_stop_list_spinner);
+        /*nearestBusStopsSpinner = (Spinner) view.findViewById(R.id.nearest_bus_stop_list_spinner);
         updateBusList = true;
         if (nearestBusStopsSpinner != null && adapter != null)
         {
+            locationIsToBeUpdated = false;
+            updateBusList = false;
             nearestBusStopsSpinner.setAdapter(adapter);
             nearestBusStopsSpinner.setSelection(selectedBusStopPosition);
             nearestBusStopsSpinner.setOnItemSelectedListener(this);
-            locationIsToBeUpdated = false;
-            updateBusList = false;
         }
-        busesArrivingAtStopListDescriptionTextView = (TextView) view.findViewById(R.id.info_text_view_2);
+        busesArrivingAtStopListDescriptionTextView = (TextView) view.findViewById(R.id.info_text_view_2);*/
         errorMessageTextView.setVisibility(View.GONE);
         return view;
     }
@@ -133,12 +131,36 @@ public class NearMeFragment extends Fragment implements NetworkingManager, Adapt
     {
         super.onActivityCreated(savedInstanceState);
         setRetainInstance(true);
+        setHasOptionsMenu(true);
         // Connect to the Google api client for location services
         if (googleApiClient == null)
         {
             googleApiClient = new GoogleApiClient.Builder(getContext()).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
             googleApiClient.connect();
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        MenuInflater menuInflater = getActivity().getMenuInflater();
+        menuInflater.inflate(R.menu.nearby_fragment_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    // Handle clicks of the menu buttons
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case R.id.nearby_search:
+
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return true;
     }
 
     /**
@@ -414,7 +436,7 @@ public class NearMeFragment extends Fragment implements NetworkingManager, Adapt
             busesArrivingAtStopListDescriptionTextView.setText("Buses arriving at " + nearestBusStops[position].getBusStopName());
             if (isNetworkAvailable())
             {
-                nearestBusStopsSpinner.setEnabled(false);
+                //nearestBusStopsSpinner.setEnabled(false);
                 progressBar.setVisibility(View.VISIBLE);
                 refreshFloatingActionButton.setEnabled(false);
                 refreshFloatingActionButton.startAnimation(rotatingAnimation);
@@ -427,6 +449,10 @@ public class NearMeFragment extends Fragment implements NetworkingManager, Adapt
                 errorMessageTextView.setText(R.string.error_connecting_to_the_internet_text);
                 errorMessageTextView.setVisibility(View.VISIBLE);
             }
+        }
+        else
+        {
+            updateBusList = true;
         }
     }
 
@@ -475,8 +501,9 @@ public class NearMeFragment extends Fragment implements NetworkingManager, Adapt
     public void onBusStopsFound(boolean isError, JSONArray busStopsArray)
     {
         progressBar.setVisibility(View.GONE);
-        ArrayList<String> stopList = new ArrayList<>();
-        adapter = new ArrayAdapter<>(getContext(), R.layout.spinner_item, stopList);
+        ArrayList<String> busStopNames = new ArrayList<>();
+        ArrayList<String> busStopDistances = new ArrayList<>();
+        //adapter = new ArrayAdapter<>(getContext(), R.layout.spinner_item, stopList);
 
         if (!isError)
         {
@@ -498,41 +525,22 @@ public class NearMeFragment extends Fragment implements NetworkingManager, Adapt
             nearestBusStops[5] = new BusStop();
             nearestBusStops[6] = new BusStop();
             nearestBusStops[7] = new BusStop();
-            int i = 0;
 
             try
             {
-                for (int h = 0; h < 8; h++)
+                for (int i = 0; i < busStopsArray.length(); i++)
                 {
-                    for (; i < busStopsArray.length(); i++)
+                    String busStopName = busStopsArray.getJSONObject(i).getString("StopName");
+                    if (!busStopName.contains("CS-"))
                     {
-                        String busStopName = busStopsArray.getJSONObject(i).getString("StopName");
-                        if (!(busStopName.contains("CS-")))
-                        {
-                            if (busStopName.charAt(busStopName.indexOf("(") - 1) == ' ')
-                            {
-                                busStopName = busStopName.replace(" (", "(");
-                            }
-                            if (busStopName.contains("Towards"))
-                            {
-                                busStopName = busStopName.replace("Towards", "-->");
-                            }
-                            else if (busStopName.contains("towards -"))
-                            {
-                                busStopName = busStopName.replace("towards -", "-->");
-                            }
-                            nearestBusStops[h].setBusStopName(busStopName.substring(0, busStopName.indexOf(")") + 1));
-                            nearestBusStops[h].setLatitude(busStopsArray.getJSONObject(i).getString("StopLat"));
-                            nearestBusStops[h].setLongitude(busStopsArray.getJSONObject(i).getString("StopLong"));
-                            nearestBusStops[h].setBusStopId(busStopsArray.getJSONObject(i).getInt("StopId"));
-                            stopList.add(nearestBusStops[h].getBusStopName());
-                            i++;
-                            break;
-                        }
+                        busStopNames.add(busStopName);
+                        busStopDistances.add(busStopsArray.getJSONObject(i).getString("StopDist"));
                     }
                 }
-                nearestBusStopsSpinner.setAdapter(adapter);
-                nearestBusStopsSpinner.setOnItemSelectedListener(this);
+
+                busStopsNearbyListAdaptor = new NearbyBusStopsListCustomAdapter(getActivity(), busStopNames, busStopDistances);
+                busesArrivingAtSelectedBusStopListView.setAdapter(busStopsNearbyListAdaptor);
+                busesArrivingAtSelectedBusStopListView.setVisibility(View.VISIBLE);
             }
             catch (JSONException e)
             {
@@ -560,24 +568,10 @@ public class NearMeFragment extends Fragment implements NetworkingManager, Adapt
         {
             busesAtStopListHasTraceableBuses = false;
             busesArrivingAtSelectedStopSet.clear();
+            busRoutesArrivingAtSelectedStop.clear();
+            busRouteDestinations.clear();
             try
             {
-                if (selectedBusStopPosition == 0)
-                {
-                    try
-                    {
-                        getActivity().deleteFile(FILENAME);
-                        FileOutputStream fileOutputStream = getActivity().openFileOutput(FILENAME, MODE_PRIVATE);
-                        fileOutputStream.write((nearestBusStops[selectedBusStopPosition].getBusStopName() + "\n").getBytes());
-                        fileOutputStream.write(buses.toString().getBytes());
-                        fileOutputStream.close();
-                        nearestBusStopsSpinner.setEnabled(true);
-                    }
-                    catch (IOException e)
-                    {
-                        e.printStackTrace();
-                    }
-                }
                 for (int i = 0; i < buses.length(); i++)
                 {
                     busesArrivingAtSelectedStopSet.add(buses.getJSONArray(i).get(3).toString().substring(buses.getJSONArray(i).get(3).toString().indexOf(":") + 1, buses.getJSONArray(i).get(3).toString().length()));
@@ -609,7 +603,7 @@ public class NearMeFragment extends Fragment implements NetworkingManager, Adapt
             progressBar.setVisibility(View.GONE);
             refreshFloatingActionButton.clearAnimation();
             refreshFloatingActionButton.setEnabled(true);
-            nearestBusStopsSpinner.setEnabled(true);
+            //nearestBusStopsSpinner.setEnabled(true);
             if (isNetworkAvailable())
             {
                 errorMessageTextView.setText(R.string.error_could_not_get_buses_at_stop_text);
@@ -627,7 +621,6 @@ public class NearMeFragment extends Fragment implements NetworkingManager, Adapt
     @Override
     public void onBusRouteDetailsFound(boolean isError, final Route route, boolean isForList, final String routeDirection)
     {
-        progressBar.setVisibility(View.GONE);
         if (!isError)
         {
             busesAtStopListHasTraceableBuses = true;
@@ -678,18 +671,18 @@ public class NearMeFragment extends Fragment implements NetworkingManager, Adapt
         }
         else
         {
-            if (nearestBusStopsSpinner.isEnabled())
+            customAdapter = new NearbyBusListCustomAdapter(getActivity(), busRoutesArrivingAtSelectedStop, busRouteDestinations);
+            customAdapter.notifyDataSetChanged();
+            busesArrivingAtSelectedBusStopListView.setAdapter(customAdapter);
+            busesArrivingAtSelectedBusStopListView.setVisibility(View.VISIBLE);
+            refreshFloatingActionButton.clearAnimation();
+            refreshFloatingActionButton.setEnabled(true);
+            progressBar.setVisibility(View.GONE);
+            //nearestBusStopsSpinner.setEnabled(true);
+            if (!busesAtStopListHasTraceableBuses)
             {
-                customAdapter = new NearbyBusListCustomAdapter(getActivity(), busRoutesArrivingAtSelectedStop, busRouteDestinations);
-                busesArrivingAtSelectedBusStopListView.setAdapter(customAdapter);
-                busesArrivingAtSelectedBusStopListView.setVisibility(View.VISIBLE);
-                refreshFloatingActionButton.clearAnimation();
-                refreshFloatingActionButton.setEnabled(true);
-                if (!busesAtStopListHasTraceableBuses)
-                {
-                    errorMessageTextView.setText("Cannot get buses arriving at this bus stop! Please select another bus stop and try again.");
-                    errorMessageTextView.setVisibility(View.VISIBLE);
-                }
+                errorMessageTextView.setText("Cannot get buses arriving at this bus stop! Please select another bus stop and try again.");
+                errorMessageTextView.setVisibility(View.VISIBLE);
             }
         }
     }

@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity
                 BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
                 BottomNavigationBarHelper.disableShiftMode(bottomNavigationView);
 
-                final NearMeFragment nearMeFragment = new NearMeFragment();
+                final NearbyFragment nearbyFragment = new NearbyFragment();
                 final BusTrackerFragment busTrackerFragment = new BusTrackerFragment();
                 final TripPlannerFragment tripPlannerFragment = new TripPlannerFragment();
 
@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity
                                 actionBar.setTitle("Favourites");
                                 break;*/
                             case R.id.navigation_near_me:
-                                selectedFragment = nearMeFragment;
+                                selectedFragment = nearbyFragment;
                                 actionBar.setTitle("Bus stops nearby");
                                 break;
                             case R.id.navigation_track_bus:

@@ -56,8 +56,6 @@ class BusNumberListCustomAdapter extends BaseAdapter implements Filterable
     @Override
     public View getView(int position, View convertView, ViewGroup parent)
     {
-        // TODO Auto-generated method stub
-
         ViewHolder holder;
         if (convertView == null)
         {
