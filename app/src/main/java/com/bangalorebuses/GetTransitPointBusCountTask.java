@@ -15,12 +15,12 @@ import java.net.URL;
 class GetTransitPointBusCountTask extends AsyncTask<BusStop, Void, Void>
 {
     private String errorMessage = Constants.NETWORK_QUERY_NO_ERROR;
-    private NetworkingManager caller;
+    private TripPlannerHelper caller;
     private int originToTransitPointBusCount;
     private int transitPointToDestinationBusCount;
     private BusStop transitPoint;
 
-    GetTransitPointBusCountTask(NetworkingManager caller)
+    GetTransitPointBusCountTask(TripPlannerHelper caller)
     {
         this.caller = caller;
     }

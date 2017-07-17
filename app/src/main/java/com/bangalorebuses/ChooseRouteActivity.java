@@ -632,13 +632,13 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                         {
                             progressDialog = ProgressDialog.show(this, "Please wait", "Getting buses...");
                             JSONArray jsonArray = new JSONArray(stringBuilder.toString());
-                            onBusesAtStopFound(false, jsonArray);
+                            onBusesAtStopFound(Constants.NETWORK_QUERY_NO_ERROR, jsonArray);
                             nearestStopListSpinner.setEnabled(false);
                             refreshFloatingActionButton.setEnabled(false);
                             refreshFloatingActionButton.startAnimation(rotatingAnimation);
                             String requestBody = "stopID=" + Integer.toString(nearestBusStops[position].getBusStopId());
                             busesSet.clear();
-                            new GetBusesAtStopTask(this).execute(requestBody);
+                            new GetBusesArrivingAtStopTask(this).execute(requestBody);
                         }
                         else
                         {
@@ -653,7 +653,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                             progressDialog = ProgressDialog.show(this, "Please wait", "Getting buses...");
                             String requestBody = "stopID=" + Integer.toString(nearestBusStops[position].getBusStopId());
                             busesSet.clear();
-                            new GetBusesAtStopTask(this).execute(requestBody);
+                            new GetBusesArrivingAtStopTask(this).execute(requestBody);
                         }
                         else
                         {
@@ -675,7 +675,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                     progressDialog = ProgressDialog.show(this, "Please wait", "Getting buses...");
                     String requestBody = "stopID=" + Integer.toString(nearestBusStops[position].getBusStopId());
                     busesSet.clear();
-                    new GetBusesAtStopTask(this).execute(requestBody);
+                    new GetBusesArrivingAtStopTask(this).execute(requestBody);
                 }
                 else
                 {
@@ -696,7 +696,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                 progressDialog = ProgressDialog.show(this, "Please wait", "Getting buses...");
                 String requestBody = "stopID=" + Integer.toString(nearestBusStops[position].getBusStopId());
                 busesSet.clear();
-                new GetBusesAtStopTask(this).execute(requestBody);
+                new GetBusesArrivingAtStopTask(this).execute(requestBody);
                 updateBusList = false;
             }
             else
@@ -744,30 +744,6 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         updateBusList = true;
         locationIsToBeUpdated = true;
         createLocationRequest();
-    }
-
-    @Override
-    public void onDirectBusesFound(String errorMessage, Bus[] buses)
-    {
-
-    }
-
-    @Override
-    public void onTransitPointsFound(String errorMessage, BusStop[] transitPoints)
-    {
-
-    }
-
-    @Override
-    public void onTransitPointBusCountFound(String errorMessage, int originToTransitPointBusCount, int transitPointToDestinationBusCount, BusStop transitPoint)
-    {
-
-    }
-
-    @Override
-    public void onIndirectBusesFound(String errorMessage, Bus[] buses, BusStop transitPoint, String routeMessage)
-    {
-
     }
 
     // What to do once bus stops nearby have been found
@@ -855,9 +831,9 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
 
     // What to do once buses arriving at the selected stop have been found
     @Override
-    public void onBusesAtStopFound(boolean isError, JSONArray buses)
+    public void onBusesAtStopFound(String isError, JSONArray buses)
     {
-        if (!isError)
+        if (isError.equals(Constants.NETWORK_QUERY_NO_ERROR))
         {
             busesAtStopListHasTraceableBuses = false;
             busDetailsLinearLayout.removeAllViews();

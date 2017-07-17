@@ -74,7 +74,7 @@ class NearbyBusStopsListCustomAdapter extends BaseAdapter
         {
             holder.busStopNameTextView.setText(busStopNames.get(position));
         }
-        holder.busStopDistanceTextView.setText((int)(Float.parseFloat(busStopDistances.get(position)) * 1000) + " metres away");
+        holder.busStopDistanceTextView.setText((int) (Float.parseFloat(busStopDistances.get(position)) * 1000) + " metres away");
         return convertView;
     }
 

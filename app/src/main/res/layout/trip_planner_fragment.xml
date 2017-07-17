@@ -103,6 +103,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/separator_view"
+        android:background="#FFFFFF"
         android:divider="#FAFAFA"
         android:dividerHeight="5dp"
         android:paddingLeft="5dp"

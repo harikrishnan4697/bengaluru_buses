@@ -26,9 +26,9 @@ import java.net.URL;
 class GetDirectBusesTask extends AsyncTask<BusStop, Void, Bus[]>
 {
     private String errorMessage = Constants.NETWORK_QUERY_NO_ERROR;
-    private NetworkingManager caller;
+    private TripPlannerHelper caller;
 
-    GetDirectBusesTask(NetworkingManager caller)
+    GetDirectBusesTask(TripPlannerHelper caller)
     {
         this.caller = caller;
     }

@@ -30,4 +30,5 @@ class Constants
     static final int SEARCH_END_BUS_STOP_REQUEST_CODE = 47;
     static final int SEARCH_REQUEST_CODE = 13;
     static final int LOCATION_PERMISSION_REQUEST_CODE = 36;
+    static final String ROUTE_SEARCH_HISTORY_FILENAME = "route_search_history";
 }

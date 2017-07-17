@@ -45,12 +45,13 @@
         app:fabSize="mini"/>
 
     <ListView
-        android:id="@+id/busesArrivingAtNearbyBusStopListView"
+        android:id="@+id/busStopsNearbyListView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/buses_at_stop_list_container_linear_layout"
         android:divider="#FAFAFA"
         android:dividerHeight="10dp"
+        android:paddingBottom="10dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
         android:paddingTop="10dp"

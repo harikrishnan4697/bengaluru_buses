@@ -21,10 +21,10 @@ import java.net.URL;
  * @since 18-6-2017
  */
 
-class GetBusesAtStopTask extends AsyncTask<String, Void, JSONArray>
+class GetBusesArrivingAtStopTask extends AsyncTask<String, Void, JSONArray>
 {
     private NetworkingManager caller;
-    private boolean errorOccurred = false;
+    private String errorMessage = Constants.NETWORK_QUERY_NO_ERROR;
 
     /**
      * This method is the constructor.
@@ -32,7 +32,7 @@ class GetBusesAtStopTask extends AsyncTask<String, Void, JSONArray>
      * @param aCaller This parameter is an instance of a class that
      *                implements the NetworkingManager interface.
      */
-    GetBusesAtStopTask(NetworkingManager aCaller)
+    GetBusesArrivingAtStopTask(NetworkingManager aCaller)
     {
         caller = aCaller;
     }
@@ -56,7 +56,7 @@ class GetBusesAtStopTask extends AsyncTask<String, Void, JSONArray>
         }
         catch (java.net.MalformedURLException e)
         {
-            errorOccurred = true;
+            errorMessage = Constants.NETWORK_QUERY_URL_EXCEPTION;
             return null;
         }
 
@@ -90,12 +90,12 @@ class GetBusesAtStopTask extends AsyncTask<String, Void, JSONArray>
         }
         catch (java.net.SocketTimeoutException e)
         {
-            errorOccurred = true;
+            errorMessage = Constants.NETWORK_QUERY_REQUEST_TIMEOUT_EXCEPTION;
             return null;
         }
         catch (java.io.IOException e)
         {
-            errorOccurred = true;
+            errorMessage = Constants.NETWORK_QUERY_IO_EXCEPTION;
             return null;
         }
 
@@ -106,7 +106,7 @@ class GetBusesAtStopTask extends AsyncTask<String, Void, JSONArray>
         }
         catch (JSONException e)
         {
-            errorOccurred = true;
+            errorMessage = Constants.NETWORK_QUERY_JSON_EXCEPTION;
         }
         return null;
     }
@@ -126,6 +126,6 @@ class GetBusesAtStopTask extends AsyncTask<String, Void, JSONArray>
          Calls the onBusesAtStopFound() callback method defined in the
          NetworkingManager interface
         */
-        caller.onBusesAtStopFound(errorOccurred, jsonArray);
+        caller.onBusesAtStopFound(errorMessage, jsonArray);
     }
 }

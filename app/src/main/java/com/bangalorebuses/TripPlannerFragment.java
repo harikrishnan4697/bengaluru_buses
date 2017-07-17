@@ -35,7 +35,7 @@ import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
-public class TripPlannerFragment extends Fragment implements NetworkingManager
+public class TripPlannerFragment extends Fragment implements NetworkingManager, TripPlannerHelper
 {
     private BusStop startBusStop = new BusStop();
     private BusStop endBusStop = new BusStop();
@@ -614,12 +614,13 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager
     }
 
     /**
-     * This is a callback method called by the GetBusesAtStopTask.
+     * This is a callback method called by the GetBusesArrivingAtStopTask.
      *
      * @param isError This parameter is to convey if the task encountered an error.
      * @param buses   This parameter is a JSONArray of arriving at a bus stop.
      */
-    public void onBusesAtStopFound(boolean isError, JSONArray buses)
+    @Override
+    public void onBusesAtStopFound(String errorMessage, JSONArray buses)
     {
 
     }

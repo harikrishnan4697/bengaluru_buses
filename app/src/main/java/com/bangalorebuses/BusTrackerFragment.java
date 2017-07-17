@@ -12,17 +12,28 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+
 import static android.app.Activity.RESULT_OK;
+import static android.content.Context.MODE_PRIVATE;
 
 public class BusTrackerFragment extends Fragment implements NetworkingManager
 {
     private ProgressDialog progressDialog;
     private Button busNumberSelectionButton;
+    private ListView recentSearchesListView;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -43,6 +54,25 @@ public class BusTrackerFragment extends Fragment implements NetworkingManager
                 searchBusNumber();
             }
         });
+        recentSearchesListView = (ListView) view.findViewById(R.id.recentSearchesListView);
+        try
+        {
+            FileInputStream fileInputStream = getActivity().openFileInput(Constants.ROUTE_SEARCH_HISTORY_FILENAME);
+            InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+            ArrayList<String> arrayList = new ArrayList<>();
+            String line;
+            while ((line = bufferedReader.readLine()) != null)
+            {
+                arrayList.add(line);
+            }
+            ArrayAdapter<String> listAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, arrayList);
+            recentSearchesListView.setAdapter(listAdapter);
+        }
+        catch (IOException e)
+        {
+            // TODO handle exception
+        }
         return view;
     }
 
@@ -102,30 +132,6 @@ public class BusTrackerFragment extends Fragment implements NetworkingManager
         }
     }
 
-    @Override
-    public void onDirectBusesFound(String errorMessage, Bus[] buses)
-    {
-
-    }
-
-    @Override
-    public void onTransitPointsFound(String errorMessage, BusStop[] transitPoints)
-    {
-
-    }
-
-    @Override
-    public void onTransitPointBusCountFound(String errorMessage, int originToTransitPointBusCount, int transitPointToDestinationBusCount, BusStop transitPoint)
-    {
-
-    }
-
-    @Override
-    public void onIndirectBusesFound(String errorMessage, Bus[] buses, BusStop transitPoint, String routeMessage)
-    {
-
-    }
-
     /**
      * This is a callback method called by the GetNearestBusStopsTask.
      *
@@ -155,8 +161,17 @@ public class BusTrackerFragment extends Fragment implements NetworkingManager
         progressDialog.dismiss();
         if (!isError)
         {
+            try
+            {
+                FileOutputStream fileOutputStream = getActivity().openFileOutput(Constants.ROUTE_SEARCH_HISTORY_FILENAME, MODE_PRIVATE);
+                fileOutputStream.write((route.getRouteNumber() + "\n").getBytes());
+                fileOutputStream.close();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
             Intent trackBusIntent;
-            //trackBusNumberEditText.setText("");
             trackBusIntent = new Intent(getContext(), TrackBusActivity.class);
             trackBusIntent.putExtra("ROUTE_NUMBER", route.getRouteNumber());
             trackBusIntent.putExtra("ROUTE_DIRECTION", "UP");
@@ -219,12 +234,12 @@ public class BusTrackerFragment extends Fragment implements NetworkingManager
     }
 
     /**
-     * This is a callback method called by the GetBusesAtStopTask.
+     * This is a callback method called by the GetBusesArrivingAtStopTask.
      *
-     * @param isError This parameter is to convey if the task encountered an error.
-     * @param buses   This parameter is a JSONArray of arriving at a bus stop.
+     * @param errorMessage This parameter is to convey if the task encountered an error.
+     * @param buses        This parameter is a JSONArray of arriving at a bus stop.
      */
-    public void onBusesAtStopFound(boolean isError, JSONArray buses)
+    public void onBusesAtStopFound(String errorMessage, JSONArray buses)
     {
 
     }

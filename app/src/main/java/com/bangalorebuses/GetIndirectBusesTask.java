@@ -16,12 +16,12 @@ import java.net.URL;
 class GetIndirectBusesTask extends AsyncTask<BusStop, Void, Void>
 {
     private String errorMessage = Constants.NETWORK_QUERY_NO_ERROR;
-    private NetworkingManager caller;
+    private TripPlannerHelper caller;
     private Bus[] buses;
     private BusStop transitPoint;
     private String routeMessage;
 
-    GetIndirectBusesTask(NetworkingManager caller, String routeMessage)
+    GetIndirectBusesTask(TripPlannerHelper caller, String routeMessage)
     {
         this.caller = caller;
         this.routeMessage = routeMessage;
