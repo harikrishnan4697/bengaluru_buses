@@ -12,19 +12,21 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-class NearbyBusListCustomAdapter extends BaseAdapter
+class BusesArrivingAtStopListCustomAdapter extends BaseAdapter
 {
     public Activity context;
     private List<String> destinations = null;
     private LayoutInflater inflater;
     private List<String> routeNumbers = null;
+    private List<String> busETAs = null;
 
-    NearbyBusListCustomAdapter(Activity context, ArrayList<String> routeNumbers, ArrayList<String> destinations)
+    BusesArrivingAtStopListCustomAdapter(Activity context, ArrayList<String> routeNumbers, ArrayList<String> destinations, ArrayList<String> busETAs)
     {
         super();
         this.context = context;
         this.routeNumbers = routeNumbers;
         this.destinations = destinations;
+        this.busETAs = busETAs;
         this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
@@ -51,11 +53,12 @@ class NearbyBusListCustomAdapter extends BaseAdapter
         if (convertView == null)
         {
             holder = new ViewHolder();
-            convertView = inflater.inflate(R.layout.nearby_bus_list_item, null);
+            convertView = inflater.inflate(R.layout.buses_arriving_at_stop_list_item, null);
 
             holder.imgViewLogo = (ImageView) convertView.findViewById(R.id.imageView);
             holder.txtViewRouteNumber = (TextView) convertView.findViewById(R.id.routeNumberTextView);
             holder.txtViewDestination = (TextView) convertView.findViewById(R.id.routeDestinationTextView);
+            holder.txtViewETA = (TextView) convertView.findViewById(R.id.busETATextView);
 
             convertView.setTag(holder);
         }
@@ -83,6 +86,7 @@ class NearbyBusListCustomAdapter extends BaseAdapter
 
         holder.txtViewRouteNumber.setText(routeNumbers.get(position));
         holder.txtViewDestination.setText(destinations.get(position));
+        holder.txtViewETA.setText(busETAs.get(position));
         return convertView;
     }
 
@@ -91,5 +95,6 @@ class NearbyBusListCustomAdapter extends BaseAdapter
         ImageView imgViewLogo;
         TextView txtViewRouteNumber;
         TextView txtViewDestination;
+        TextView txtViewETA;
     }
 }

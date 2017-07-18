@@ -7,11 +7,14 @@
     <string name="error_connecting_to_the_internet_text">Cannot connect to the Internet!</string>
     <string name="error_connecting_to_the_internet_click_refresh_text">Cannot connect to the Internet! Please click the refresh button below to try again.</string>
 
+    <!-- Strings for GetBusesAtBusStopActivity -->
+    <string name="error_getting_buses_at_stop">Could not get buses arriving at this bus stop. Please try again later.</string>
+
     <!-- Strings for menus -->
     <string name="refresh_action_title">Refresh</string>
     <string name="track_entered_bus_action_title">Track entered bus number</string>
 
-    <!-- Strings for ChooseActivity -->+
+    <!-- Strings for ChooseActivity -->
     <string name="bus_stops_nearby_label_text">Bus stops nearby</string>
     <string name="track_bus_edit_text_hint">Enter a bus number or choose one below</string>
     <string name="error_could_not_get_buses_at_stop_text">There are no buses arriving at this bus stop anytime soon!</string>

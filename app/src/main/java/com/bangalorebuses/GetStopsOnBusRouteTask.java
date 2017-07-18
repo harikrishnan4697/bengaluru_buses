@@ -12,31 +12,38 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-class GetStopsOnBusRouteTask extends AsyncTask<Void, Void, JSONArray>
+import static com.bangalorebuses.Constants.NETWORK_QUERY_NO_ERROR;
+import static com.bangalorebuses.Constants.NETWORK_QUERY_URL_EXCEPTION;
+
+class GetStopsOnBusRouteTask extends AsyncTask<Void, Void, Void>
 {
     private NetworkingManager caller;
-    private URL stopsOnRouteURL;
     private String routeId;
-    private boolean errorOccurred = false;
+    private String errorMessage = NETWORK_QUERY_NO_ERROR;
+    private BusStop[] busStops;
+    private Route route;
 
-    GetStopsOnBusRouteTask(NetworkingManager aCaller, String inputRouteId)
+    GetStopsOnBusRouteTask(NetworkingManager aCaller, String routeId, Route route)
     {
         caller = aCaller;
-        routeId = inputRouteId;
+        this.routeId = routeId;
+        this.route = route;
     }
 
     @Override
-    protected JSONArray doInBackground(Void... params)
+    protected Void doInBackground(Void... params)
     {
+        URL stopsOnRouteURL;
         try
         {
             stopsOnRouteURL = new URL("http://bmtcmob.hostg.in/api/tripdetails/routestop/routeid/" + routeId);
         }
         catch (MalformedURLException e)
         {
-            errorOccurred = true;
+            errorMessage = NETWORK_QUERY_URL_EXCEPTION;
             return null;
         }
+
         StringBuilder result = new StringBuilder();
         JSONArray jsonArray;
         try
@@ -53,24 +60,37 @@ class GetStopsOnBusRouteTask extends AsyncTask<Void, Void, JSONArray>
                 result.append(line);
             }
             reader.close();
+
             jsonArray = new JSONArray(result.toString());
-            return jsonArray;
+            busStops = new BusStop[jsonArray.length()];
+            for (int i = 0; i < jsonArray.length(); i++)
+            {
+                busStops[i] = new BusStop();
+                busStops[i].setBusStopName(jsonArray.getJSONObject(i).getString("busStopName"));
+                busStops[i].setLatitude(jsonArray.getJSONObject(i).getString("lat"));
+                busStops[i].setLongitude(jsonArray.getJSONObject(i).getString("lng"));
+                busStops[i].setRouteOrder(jsonArray.getJSONObject(i).getInt("routeorder"));
+            }
+
+            route.setBusStopsEnRoute(busStops);
+
+            return null;
         }
         catch (IOException e)
         {
-            errorOccurred = true;
+            errorMessage = NETWORK_QUERY_URL_EXCEPTION;
             return null;
         }
         catch (JSONException e)
         {
-            errorOccurred = true;
+            errorMessage = NETWORK_QUERY_URL_EXCEPTION;
         }
         return null;
     }
 
     @Override
-    protected void onPostExecute(JSONArray jsonArray)
+    protected void onPostExecute(Void params)
     {
-        caller.onStopsOnBusRouteFound(errorOccurred, jsonArray);
+        caller.onStopsOnBusRouteFound(errorMessage, busStops, route);
     }
 }

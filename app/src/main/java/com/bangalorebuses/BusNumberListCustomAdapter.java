@@ -39,7 +39,6 @@ class BusNumberListCustomAdapter extends BaseAdapter implements Filterable
     @Override
     public int getCount()
     {
-        // TODO Auto-generated method stub
         return filteredRouteNumbers.size();
     }
 

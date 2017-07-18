@@ -22,6 +22,7 @@ class Bus
     private String nameOfStopBusIsAt;
     private boolean tripIsYetToBegin;
     private int ETA;
+    private BusStop[] busStopsEnRoute;
 
     String getLatitude()
     {
@@ -131,5 +132,15 @@ class Bus
     void setNameOfStopBusIsAt(String inputNameOfStopBusIsAt)
     {
         nameOfStopBusIsAt = inputNameOfStopBusIsAt;
+    }
+
+    public BusStop[] getBusStopsEnRoute()
+    {
+        return busStopsEnRoute;
+    }
+
+    public void setBusStopsEnRoute(BusStop[] busStopsEnRoute)
+    {
+        this.busStopsEnRoute = busStopsEnRoute;
     }
 }

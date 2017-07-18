@@ -1053,13 +1053,13 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
     }
 
     @Override
-    public void onStopsOnBusRouteFound(boolean isError, final JSONArray stopListArray)
+    public void onStopsOnBusRouteFound(String errorMessage, BusStop[] busStops, Route route)
     {
 
     }
 
     @Override
-    public void onBusesEnRouteFound(boolean isError, Bus[] buses, int numberOfBusesFound)
+    public void onBusesEnRouteFound(String errorMessage, Bus[] buses, int numberOfBusesFound, Route route, BusStop selectedBusStop)
     {
 
     }

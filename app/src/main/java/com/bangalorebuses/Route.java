@@ -16,6 +16,7 @@ class Route
     private String direction;
     private String upRouteName;
     private String downRouteName;
+    private BusStop[] busStopsEnRoute;
 
     String getRouteNumber()
     {
@@ -80,5 +81,15 @@ class Route
     void setDownRouteName(String inputDownRouteName)
     {
         downRouteName = inputDownRouteName;
+    }
+
+    public BusStop[] getBusStopsEnRoute()
+    {
+        return busStopsEnRoute;
+    }
+
+    public void setBusStopsEnRoute(BusStop[] busStopsEnRoute)
+    {
+        this.busStopsEnRoute = busStopsEnRoute;
     }
 }

@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="#FFFFFF"
+    android:minHeight="65dp"
     android:padding="10dp">
 
     <ImageView
@@ -16,15 +17,17 @@
         android:layout_centerVertical="true"
         android:layout_marginEnd="10dp"
         android:layout_marginRight="10dp"
-        app:srcCompat="@drawable/ic_directions_bus_ordinary"/>
+        app:srcCompat="@drawable/ic_flight_black"/>
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
         android:layout_toEndOf="@id/imageView"
         android:layout_toRightOf="@id/imageView"
         android:gravity="center_vertical"
-        android:minHeight="50dp"
         android:orientation="horizontal">
 
         <TextView
@@ -35,7 +38,7 @@
             android:ellipsize="end"
             android:gravity="center"
             android:maxLines="1"
-            android:text="300-E"
+            android:text="KIAS-8"
             android:textColor="#000000"
             android:textSize="18sp"/>
 
@@ -43,15 +46,34 @@
             android:id="@+id/routeDestinationTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
+            android:layout_marginEnd="5dp"
             android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginRight="5dp"
             android:layout_marginStart="10dp"
+            android:layout_weight="1"
             android:ellipsize="end"
             android:maxLines="2"
-            android:text="To Shivaji Nagara Bus Station"
+            android:text="To Kempegowda International Airport"
             android:textSize="14sp"
             />
+
+        <ImageView
+            android:id="@+id/realTimeImageView"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
+            app:srcCompat="@drawable/ic_rss_feed_orange"/>
+
+        <TextView
+            android:id="@+id/busETATextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:maxLines="1"
+            android:text="29 min"
+            android:textColor="#000000"
+            android:textSize="16sp"/>
 
     </LinearLayout>
 

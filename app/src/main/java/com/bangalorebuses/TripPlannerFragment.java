@@ -585,7 +585,8 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager, 
      * @param stopListArray This parameter is a JSONArray of all the bus stops
      *                      for a particular route id.
      */
-    public void onStopsOnBusRouteFound(boolean isError, JSONArray stopListArray)
+    @Override
+    public void onStopsOnBusRouteFound(String errorMessage, BusStop[] busStops, Route route)
     {
 
     }
@@ -597,7 +598,8 @@ public class TripPlannerFragment extends Fragment implements NetworkingManager, 
      * @param buses              This parameter is an array of buses en-route that the task found.
      * @param numberOfBusesFound This parameter is the number of en-route buses the task found.
      */
-    public void onBusesEnRouteFound(boolean isError, Bus[] buses, int numberOfBusesFound)
+    @Override
+    public void onBusesEnRouteFound(String errorMessage, Bus[] buses, int numberOfBusesFound, Route route, BusStop selectedBusStop)
     {
 
     }

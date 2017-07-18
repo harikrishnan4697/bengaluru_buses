@@ -31,6 +31,8 @@ import org.json.JSONException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import static com.bangalorebuses.Constants.NETWORK_QUERY_NO_ERROR;
+
 /**
  * This activity allows the user to track a bus route
  * selected or entered on the ChooseRouteActivity.
@@ -207,11 +209,11 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
                     busTimingsRefreshFloatingActionButton.startAnimation(rotatingAnimation);
                     if (route.getDirection().equals(DIRECTION_UP))
                     {
-                        new GetStopsOnBusRouteTask(this, route.getUpRouteId()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                        new GetStopsOnBusRouteTask(this, route.getUpRouteId(), route).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                     }
                     else
                     {
-                        new GetStopsOnBusRouteTask(this, route.getDownRouteId()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                        new GetStopsOnBusRouteTask(this, route.getDownRouteId(), route).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                     }
                 }
                 else
@@ -256,7 +258,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
             if (isNetworkAvailable())
             {
                 progressDialog = ProgressDialog.show(this, "Please wait", "Locating buses...");
-                new GetStopsOnBusRouteTask(this, route.getUpRouteId()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                new GetStopsOnBusRouteTask(this, route.getUpRouteId(), route).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             }
             else
             {
@@ -271,7 +273,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
             if (isNetworkAvailable())
             {
                 progressDialog = ProgressDialog.show(this, "Please wait", "Locating buses...");
-                new GetStopsOnBusRouteTask(this, route.getDownRouteId()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                new GetStopsOnBusRouteTask(this, route.getDownRouteId(), route).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             }
             else
             {
@@ -300,9 +302,9 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
     }
 
     @Override
-    public void onStopsOnBusRouteFound(boolean isError, JSONArray stopListArray)
+    public void onStopsOnBusRouteFound(String errorMessage, BusStop[] busStops, Route route)
     {
-        if (isError)
+        if (!errorMessage.equals(NETWORK_QUERY_NO_ERROR))
         {
             progressDialog.dismiss();
             if (isNetworkAvailable())
@@ -318,60 +320,50 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
         }
         else
         {
-            routeBusStopList = stopListArray;
             ArrayList<String> stopList = new ArrayList<>();
             ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item, stopList);
             int nearestBusStopIndex = 0;
-            busStopList = new BusStop[stopListArray.length()];
 
-            try
+            String selectedBusStopName = "";
+            if (selectedBusStop != null && selectedBusStop.getBusStopName() != null)
             {
-                String selectedBusStopName = "";
-                if (selectedBusStop != null && selectedBusStop.getBusStopName() != null)
+                selectedBusStopName = selectedBusStop.getBusStopName();
+
+                if (selectedBusStopName.contains("("))
                 {
-                    selectedBusStopName = selectedBusStop.getBusStopName();
-
-                    if (selectedBusStopName.contains("("))
-                    {
-                        selectedBusStopName = selectedBusStopName.substring(0, selectedBusStopName.indexOf("("));
-                    }
+                    selectedBusStopName = selectedBusStopName.substring(0, selectedBusStopName.indexOf("("));
                 }
-
-                for (int i = 0; i < stopListArray.length(); i++)
-                {
-                    String busStopName = stopListArray.getJSONObject(i).getString("busStopName");
-                    // Check if the bus stop name has a parenthesis character in it. If yes, remove it and the direction that precedes.
-                    if (busStopName.contains("("))
-                    {
-                        busStopName = busStopName.substring(0, busStopName.indexOf("(") - 1);
-                    }
-                    // Check if the bus stop name has a space character at the end. If yes, remove it.
-                    if (busStopName.substring(busStopName.length() - 1, busStopName.length()).equals(" "))
-                    {
-                        busStopName = busStopName.substring(0, busStopName.length() - 1);
-                    }
-                    if (busStopName.equals(selectedBusStopName))
-                    {
-                        nearestBusStopIndex = i;
-                    }
-                    stopList.add(busStopName);
-                    busStopList[i] = new BusStop();
-                    busStopList[i].setBusStopName(busStopName);
-                    busStopList[i].setLatitude(stopListArray.getJSONObject(i).getString("lat"));
-                    busStopList[i].setLongitude(stopListArray.getJSONObject(i).getString("lng"));
-                    busStopList[i].setRouteOrder(stopListArray.getJSONObject(i).getInt("routeorder"));
-                }
-
-                stopsOnRouteSpinner.setAdapter(adapter);
-                stopsOnRouteSpinner.setOnItemSelectedListener(this);
-                stopsOnRouteSpinner.setSelection(nearestBusStopIndex);
-                busStopSelectionLinearLayout.setVisibility(View.VISIBLE);
             }
-            catch (JSONException e)
+
+            for (int i = 0; i < busStops.length; i++)
             {
-                progressDialog.dismiss();
-                Toast.makeText(this, "Unknown error occurred!", Toast.LENGTH_LONG).show();
+                String busStopName = busStops[i].getBusStopName();
+                // Check if the bus stop name has a parenthesis character in it. If yes, remove it and the direction that precedes.
+                if (busStopName.contains("("))
+                {
+                    busStopName = busStopName.substring(0, busStopName.indexOf("(") - 1);
+                }
+                // Check if the bus stop name has a space character at the end. If yes, remove it.
+                if (busStopName.substring(busStopName.length() - 1, busStopName.length()).equals(" "))
+                {
+                    busStopName = busStopName.substring(0, busStopName.length() - 1);
+                }
+                if (busStopName.equals(selectedBusStopName))
+                {
+                    nearestBusStopIndex = i;
+                }
+                stopList.add(busStopName);
+                busStopList[i] = new BusStop();
+                busStopList[i].setBusStopName(busStopName);
+                busStopList[i].setLatitude(busStops[i].getLatitude());
+                busStopList[i].setLongitude(busStops[i].getLongitude());
+                busStopList[i].setRouteOrder(busStops[i].getRouteOrder());
             }
+
+            stopsOnRouteSpinner.setAdapter(adapter);
+            stopsOnRouteSpinner.setOnItemSelectedListener(this);
+            stopsOnRouteSpinner.setSelection(nearestBusStopIndex);
+            busStopSelectionLinearLayout.setVisibility(View.VISIBLE);
         }
     }
 
@@ -393,7 +385,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
             busDetailsLinearLayout3.setVisibility(View.GONE);
             busDetailsLinearLayout4.setVisibility(View.GONE);
             String requestBody = "routeNO=" + route.getRouteNumber() + "&" + "direction=" + route.getDirection();
-            new GetBusesEnRouteTask(this, busStopList[position]).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, requestBody);
+            new GetBusesEnRouteTask(this, busStopList[position], route).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, requestBody);
         }
         else
         {
@@ -409,9 +401,9 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
     }
 
     @Override
-    public void onBusesEnRouteFound(boolean isError, Bus[] buses, int numberOfBusesFound)
+    public void onBusesEnRouteFound(String errorMessage, Bus[] buses, int numberOfBusesFound, Route route, BusStop selectedBusStop)
     {
-        if (!isError)
+        if (errorMessage.equals(NETWORK_QUERY_NO_ERROR))
         {
             if (!(numberOfBusesFound == 0))
             {

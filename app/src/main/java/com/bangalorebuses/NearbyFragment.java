@@ -58,7 +58,7 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
     private LocationRequest locationRequest;
     private boolean isRequestingLocationUpdates = false;
     private TextView errorMessageTextView;
-    private boolean locationIsToBeUpdated = true;
+    private boolean locationIsToBeUpdated = false;
     private LocationManager locationManager;
     private FloatingActionButton refreshFloatingActionButton;
     private Animation rotatingAnimation;
@@ -66,6 +66,7 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
     private NearbyBusStopsListCustomAdapter busStopsNearbyListAdaptor;
     private ArrayList<BusStop> busStops = new ArrayList<>();
     private GetNearestBusStopsTask getNearestBusStopsTask;
+    private boolean wasLocatingBusStopsNearby = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -123,6 +124,7 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
         // Connect to the Google api client for location services
         if (googleApiClient == null)
         {
+            locationIsToBeUpdated = true;
             googleApiClient = new GoogleApiClient.Builder(getContext()).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
             googleApiClient.connect();
         }
@@ -340,6 +342,7 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
         {
             if (isNetworkAvailable())
             {
+                wasLocatingBusStopsNearby = true;
                 progressBar.setVisibility(View.VISIBLE);
                 URL nearestBusStopURL = new URL("http://bmtcmob.hostg.in/api/busstops/stopnearby/lat/" + String.valueOf(location.getLatitude()) + "/lon/" + String.valueOf(location.getLongitude()) + "/rad/1.0");
                 getNearestBusStopsTask = new GetNearestBusStopsTask(this);
@@ -433,6 +436,7 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
     public void onBusStopsFound(boolean isError, JSONArray busStopsArray)
     {
         progressBar.setVisibility(View.GONE);
+        wasLocatingBusStopsNearby = false;
         ArrayList<String> busStopNames = new ArrayList<>();
         ArrayList<String> busStopDistances = new ArrayList<>();
 
@@ -512,13 +516,13 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
     }
 
     @Override
-    public void onStopsOnBusRouteFound(boolean isError, final JSONArray stopListArray)
+    public void onStopsOnBusRouteFound(String errorMessage, BusStop[] busStops, Route route)
     {
 
     }
 
     @Override
-    public void onBusesEnRouteFound(boolean isError, Bus[] buses, int numberOfBusesFound)
+    public void onBusesEnRouteFound(String errorMessage, Bus[] buses, int numberOfBusesFound, Route route, BusStop selectedBusStop)
     {
 
     }
@@ -528,17 +532,6 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
     {
 
     }
-
-
-    /*public void onStart()
-    {
-        updateBusList = false;
-        if (googleApiClient != null)
-        {
-            googleApiClient.connect();
-        }
-        super.onStart();
-    }*/
 
     public void onStop()
     {
@@ -557,7 +550,7 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
         {
             progressBar.setVisibility(View.GONE);
         }
-        if(getNearestBusStopsTask != null)
+        if (getNearestBusStopsTask != null)
         {
             getNearestBusStopsTask.cancel(true);
         }
@@ -567,13 +560,14 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
     @Override
     public void onResume()
     {
-        if (googleApiClient != null && googleApiClient.isConnected() && locationIsToBeUpdated)
+        if ((googleApiClient != null && googleApiClient.isConnected() && locationIsToBeUpdated) || wasLocatingBusStopsNearby)
         {
-            int permissionCheck = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION);
-            if (permissionCheck == PackageManager.PERMISSION_GRANTED)
-            {
-                createLocationRequest();
-            }
+            locationIsToBeUpdated = true;
+            errorMessageTextView.setVisibility(View.GONE);
+            refreshFloatingActionButton.startAnimation(rotatingAnimation);
+            refreshFloatingActionButton.setEnabled(false);
+            progressBar.setVisibility(View.VISIBLE);
+            createLocationRequest();
         }
         super.onResume();
     }

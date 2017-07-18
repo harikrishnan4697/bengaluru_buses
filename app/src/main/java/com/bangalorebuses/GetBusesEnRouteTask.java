@@ -10,38 +10,43 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import static com.bangalorebuses.Constants.NETWORK_QUERY_IO_EXCEPTION;
+import static com.bangalorebuses.Constants.NETWORK_QUERY_JSON_EXCEPTION;
+import static com.bangalorebuses.Constants.NETWORK_QUERY_NO_ERROR;
+import static com.bangalorebuses.Constants.NETWORK_QUERY_REQUEST_TIMEOUT_EXCEPTION;
+import static com.bangalorebuses.Constants.NETWORK_QUERY_URL_EXCEPTION;
+
 class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
 {
     private NetworkingManager caller;
-    private URL busesEnRouteURL;
-    private boolean errorOccurred = false;
-    private BusStop nearestBusStop;
+    private String errorMessage = NETWORK_QUERY_NO_ERROR;
+    private BusStop selectedBusStop;
     private int numberOfBusesFound;
     private Bus[] buses = new Bus[4];
+    private Route route;
 
-    GetBusesEnRouteTask(NetworkingManager aCaller, BusStop aBusStop)
+
+    GetBusesEnRouteTask(NetworkingManager caller, BusStop busStop, Route route)
     {
-        caller = aCaller;
-        nearestBusStop = aBusStop;
+        this.caller = caller;
+        this.selectedBusStop = busStop;
+        this.route = route;
     }
 
     @Override
-    protected void onPreExecute()
+    protected Void doInBackground(String... requestBody)
     {
+        URL busesEnRouteURL;
         try
         {
             busesEnRouteURL = new URL("http://bmtcmob.hostg.in/api/itsroutewise/details");
         }
         catch (java.net.MalformedURLException e)
         {
-            errorOccurred = true;
-            cancel(true);
+            errorMessage = NETWORK_QUERY_URL_EXCEPTION;
+            return null;
         }
-    }
 
-    @Override
-    protected Void doInBackground(String... requestBody)
-    {
         buses[0] = new Bus();
         buses[1] = new Bus();
         buses[2] = new Bus();
@@ -72,12 +77,12 @@ class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
         }
         catch (java.net.SocketTimeoutException e)
         {
-            errorOccurred = true;
+            errorMessage = NETWORK_QUERY_REQUEST_TIMEOUT_EXCEPTION;
             return null;
         }
         catch (java.io.IOException e)
         {
-            errorOccurred = true;
+            errorMessage = NETWORK_QUERY_IO_EXCEPTION;
             return null;
         }
 
@@ -86,13 +91,13 @@ class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
             JSONArray jsonArray = new JSONArray(busesEnRouteResult.toString());
             for (int i = 0; i < jsonArray.length(); i++)
             {
-                if (Integer.parseInt(jsonArray.getJSONArray(i).getString(12).replace("routeorder:", "")) <= nearestBusStop.getRouteOrder())
+                if (Integer.parseInt(jsonArray.getJSONArray(i).getString(12).replace("routeorder:", "")) <= selectedBusStop.getRouteOrder())
                 {
                     for (int j = 0; j < 4; j++)
                     {
                         if ((i + j) < jsonArray.length())
                         {
-                            if (Integer.parseInt(jsonArray.getJSONArray(i + j).getString(12).replace("routeorder:", "")) == nearestBusStop.getRouteOrder())
+                            if (Integer.parseInt(jsonArray.getJSONArray(i + j).getString(12).replace("routeorder:", "")) == selectedBusStop.getRouteOrder())
                             {
                                 buses[j].setIsDue(true);
                             }
@@ -114,7 +119,7 @@ class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
         }
         catch (org.json.JSONException e)
         {
-            errorOccurred = true;
+            errorMessage = NETWORK_QUERY_JSON_EXCEPTION;
         }
         return null;
     }
@@ -122,6 +127,6 @@ class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
     @Override
     protected void onPostExecute(Void aVoid)
     {
-        caller.onBusesEnRouteFound(errorOccurred, buses, numberOfBusesFound);
+        caller.onBusesEnRouteFound(errorMessage, buses, numberOfBusesFound, route, selectedBusStop);
     }
 }
