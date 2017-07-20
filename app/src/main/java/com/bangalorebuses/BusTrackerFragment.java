@@ -28,6 +28,7 @@ import java.util.ArrayList;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
+import static com.bangalorebuses.Constants.NETWORK_QUERY_NO_ERROR;
 
 public class BusTrackerFragment extends Fragment implements NetworkingManager
 {
@@ -147,7 +148,7 @@ public class BusTrackerFragment extends Fragment implements NetworkingManager
     /**
      * This is a callback method called by the GetBusRouteDetailsTask.
      *
-     * @param isError        This parameter is to convey if the task encountered an error.
+     * @param errorMessage        This parameter is to convey if the task encountered an error.
      * @param route          This parameter is a Route object with all the details set.
      * @param isForBusList   This parameter is returned back as it was passed to the
      *                       constructor. If true, the bus route details are for
@@ -156,10 +157,10 @@ public class BusTrackerFragment extends Fragment implements NetworkingManager
      * @param routeDirection This parameter is to convey if the route number that was passed
      *                       to the task had a direction of UP or DN.
      */
-    public void onBusRouteDetailsFound(boolean isError, Route route, boolean isForBusList, String routeDirection)
+    public void onBusRouteDetailsFound(String errorMessage, Route route, boolean isForBusList, String routeDirection)
     {
         progressDialog.dismiss();
-        if (!isError)
+        if (errorMessage.equals(NETWORK_QUERY_NO_ERROR))
         {
             try
             {

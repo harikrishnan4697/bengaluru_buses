@@ -69,6 +69,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import static com.bangalorebuses.Constants.NETWORK_QUERY_NO_ERROR;
+
 /**
  * This is the main activity of the application.
  * This activity allows the user to select a bus route number
@@ -831,9 +833,9 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
 
     // What to do once buses arriving at the selected stop have been found
     @Override
-    public void onBusesAtStopFound(String isError, JSONArray buses)
+    public void onBusesAtStopFound(String errorMessage, JSONArray buses)
     {
-        if (isError.equals(Constants.NETWORK_QUERY_NO_ERROR))
+        if (errorMessage.equals(Constants.NETWORK_QUERY_NO_ERROR))
         {
             busesAtStopListHasTraceableBuses = false;
             busDetailsLinearLayout.removeAllViews();
@@ -890,7 +892,7 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
             nearestStopListSpinner.setEnabled(true);
             if (isNetworkAvailable())
             {
-                errorMessageTextView.setText(R.string.error_could_not_get_buses_at_stop_text);
+                errorMessageTextView.setText(R.string.error_getting_buses_at_stop);
                 errorMessageTextView.setVisibility(View.VISIBLE);
             }
             else
@@ -903,10 +905,10 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
 
     // What to do once bus route details have been found
     @Override
-    public void onBusRouteDetailsFound(boolean isError, final Route route, boolean isForList, final String routeDirection)
+    public void onBusRouteDetailsFound(String errorMessage, final Route route, boolean isForList, final String routeDirection)
     {
         progressDialog.dismiss();
-        if (!isError)
+        if (errorMessage.equals(NETWORK_QUERY_NO_ERROR))
         {
             if (isForList)
             {

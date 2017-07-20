@@ -296,7 +296,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
     }
 
     @Override
-    public void onBusRouteDetailsFound(boolean isError, Route inputRoute, boolean isForList, String routeDirection)
+    public void onBusRouteDetailsFound(String errorMessage, Route inputRoute, boolean isForList, String routeDirection)
     {
 
     }

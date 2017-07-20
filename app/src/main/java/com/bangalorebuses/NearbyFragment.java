@@ -9,10 +9,11 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
@@ -48,6 +49,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
+import static android.app.Activity.RESULT_OK;
 import static android.content.Context.LOCATION_SERVICE;
 import static com.bangalorebuses.Constants.LOCATION_PERMISSION_REQUEST_CODE;
 
@@ -60,13 +62,14 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
     private TextView errorMessageTextView;
     private boolean locationIsToBeUpdated = false;
     private LocationManager locationManager;
-    private FloatingActionButton refreshFloatingActionButton;
+    //private FloatingActionButton refreshFloatingActionButton;
     private Animation rotatingAnimation;
     private ProgressBar progressBar;
     private NearbyBusStopsListCustomAdapter busStopsNearbyListAdaptor;
     private ArrayList<BusStop> busStops = new ArrayList<>();
     private GetNearestBusStopsTask getNearestBusStopsTask;
     private boolean wasLocatingBusStopsNearby = false;
+    private CountDownTimer countDownTimer;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -80,7 +83,8 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
         View view = inflater.inflate(R.layout.nearby_fragment, container, false);
         progressBar = (ProgressBar) view.findViewById(R.id.nearby_fragment_progress_bar);
         progressBar.setVisibility(View.GONE);
-        refreshFloatingActionButton = (FloatingActionButton) view.findViewById(R.id.floatingRefreshActionButton);
+        countDownTimer = null;
+        /*refreshFloatingActionButton = (FloatingActionButton) view.findViewById(R.id.floatingRefreshActionButton);
         refreshFloatingActionButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -88,7 +92,7 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
             {
                 refresh();
             }
-        });
+        });*/
         rotatingAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.rotate);
         locationManager = (LocationManager) getContext().getSystemService(LOCATION_SERVICE);
 
@@ -124,6 +128,9 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
         // Connect to the Google api client for location services
         if (googleApiClient == null)
         {
+            /*refreshFloatingActionButton.setAnimation(rotatingAnimation);
+            refreshFloatingActionButton.setEnabled(false);*/
+            progressBar.setVisibility(View.VISIBLE);
             locationIsToBeUpdated = true;
             googleApiClient = new GoogleApiClient.Builder(getContext()).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
             googleApiClient.connect();
@@ -144,13 +151,15 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
     {
         switch (item.getItemId())
         {
-            case R.id.nearby_search:
-
-                break;
+            /*case R.id.nearby_search:
+                Intent searchActivityIntent = new Intent(getContext(), SearchActivity.class);
+                searchActivityIntent.putExtra("Search_Type", Constants.SEARCH_TYPE_BUS_STOP);
+                startActivityForResult(searchActivityIntent, Constants.SEARCH_NEARBY_BUS_STOP_REQUEST_CODE);
+                break;*/
             default:
                 return super.onOptionsItemSelected(item);
         }
-        return true;
+        //return true;
     }
 
     /**
@@ -215,7 +224,6 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
      */
     protected void createLocationRequest()
     {
-        busStopsNearbyListView.setVisibility(View.INVISIBLE);
         final int REQUEST_CHECK_SETTINGS = 0x1;
         locationRequest = new LocationRequest();
         locationRequest.setInterval(5000);
@@ -238,7 +246,6 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
                             int permissionCheck = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION);
                             if (permissionCheck == PackageManager.PERMISSION_GRANTED)
                             {
-                                progressBar.setVisibility(View.VISIBLE);
                                 startLocationUpdates();
                             }
                             else
@@ -334,26 +341,21 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
     {
         isRequestingLocationUpdates = false;
         locationIsToBeUpdated = false;
-        if (progressBar != null)
-        {
-            progressBar.setVisibility(View.GONE);
-        }
         try
         {
             if (isNetworkAvailable())
             {
                 wasLocatingBusStopsNearby = true;
-                progressBar.setVisibility(View.VISIBLE);
                 URL nearestBusStopURL = new URL("http://bmtcmob.hostg.in/api/busstops/stopnearby/lat/" + String.valueOf(location.getLatitude()) + "/lon/" + String.valueOf(location.getLongitude()) + "/rad/1.0");
                 getNearestBusStopsTask = new GetNearestBusStopsTask(this);
-                getNearestBusStopsTask.execute(nearestBusStopURL);
+                getNearestBusStopsTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, nearestBusStopURL);
             }
             else
             {
                 errorMessageTextView.setText(R.string.error_connecting_to_the_internet_click_refresh_text);
                 errorMessageTextView.setVisibility(View.VISIBLE);
-                refreshFloatingActionButton.clearAnimation();
-                refreshFloatingActionButton.setEnabled(true);
+                /*refreshFloatingActionButton.clearAnimation();
+                refreshFloatingActionButton.setEnabled(true);*/
 
             }
         }
@@ -376,21 +378,30 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
             }
             else
             {
-                refreshFloatingActionButton.clearAnimation();
-                refreshFloatingActionButton.setEnabled(true);
+                /*refreshFloatingActionButton.clearAnimation();
+                refreshFloatingActionButton.setEnabled(true);*/
                 Toast.makeText(getContext(), "Location access was denied! Couldn't locate bus stops nearby...", Toast.LENGTH_LONG).show();
             }
         }
     }
 
-
     // What to do after the user has allowed or denied location services to be turned on
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        if (requestCode == 1)
+        if (requestCode == Constants.SEARCH_NEARBY_BUS_STOP_REQUEST_CODE)
         {
-            if (resultCode == -1)
+            if (resultCode == RESULT_OK)
+            {
+                Intent getBusesArrivingAtBusStopIntent = new Intent(getContext(), BusesArrivingAtBusStopActivity.class);
+                getBusesArrivingAtBusStopIntent.putExtra("BUS_STOP_NAME", data.getStringExtra("BUS_STOP_NAME"));
+                getBusesArrivingAtBusStopIntent.putExtra("BUS_STOP_ID", data.getStringExtra("BUS_STOP_ID"));
+                startActivity(getBusesArrivingAtBusStopIntent);
+            }
+        }
+        else if (requestCode == 1)
+        {
+            if (resultCode == RESULT_OK)
             {
                 if (!isRequestingLocationUpdates)
                 {
@@ -420,14 +431,30 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
     // What to do when the floating refresh button has been clicked
     public void refresh()
     {
-        if (!isRequestingLocationUpdates)
+        if(isNetworkAvailable())
         {
             locationIsToBeUpdated = true;
             errorMessageTextView.setVisibility(View.GONE);
-            refreshFloatingActionButton.startAnimation(rotatingAnimation);
-            refreshFloatingActionButton.setEnabled(false);
-            progressBar.setVisibility(View.VISIBLE);
+        /*refreshFloatingActionButton.startAnimation(rotatingAnimation);
+        refreshFloatingActionButton.setEnabled(false);*/
             createLocationRequest();
+        }
+        else
+        {
+            countDownTimer = new CountDownTimer(45000, 45000)
+            {
+                @Override
+                public void onTick(long millisUntilFinished)
+                {
+
+                }
+
+                @Override
+                public void onFinish()
+                {
+                    refresh();
+                }
+            }.start();
         }
     }
 
@@ -436,19 +463,20 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
     public void onBusStopsFound(boolean isError, JSONArray busStopsArray)
     {
         progressBar.setVisibility(View.GONE);
+        /*refreshFloatingActionButton.clearAnimation();
+        refreshFloatingActionButton.setEnabled(true);*/
         wasLocatingBusStopsNearby = false;
         ArrayList<String> busStopNames = new ArrayList<>();
         ArrayList<String> busStopDistances = new ArrayList<>();
+        busStops.clear();
 
         if (!isError)
         {
             if (busStopsArray == null || busStopsArray.length() == 0)
             {
-                progressBar.setVisibility(View.GONE);
+                busStopsNearbyListView.setVisibility(View.INVISIBLE);
                 errorMessageTextView.setText(R.string.error_no_bus_stops_found_text);
                 errorMessageTextView.setVisibility(View.VISIBLE);
-                refreshFloatingActionButton.clearAnimation();
-                refreshFloatingActionButton.setEnabled(true);
                 return;
             }
 
@@ -470,6 +498,7 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
 
                 busStopsNearbyListAdaptor = new NearbyBusStopsListCustomAdapter(getActivity(), busStopNames, busStopDistances);
                 busStopsNearbyListView.setAdapter(busStopsNearbyListAdaptor);
+                busStopsNearbyListAdaptor.notifyDataSetChanged();
                 busStopsNearbyListView.setVisibility(View.VISIBLE);
                 busStopsNearbyListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
                 {
@@ -482,20 +511,32 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
                         startActivity(getBusesArrivingAtBusStopIntent);
                     }
                 });
+
+                countDownTimer = new CountDownTimer(45000, 45000)
+                {
+                    @Override
+                    public void onTick(long millisUntilFinished)
+                    {
+
+                    }
+
+                    @Override
+                    public void onFinish()
+                    {
+                        refresh();
+                    }
+                }.start();
             }
             catch (JSONException e)
             {
-                e.printStackTrace();
-                progressBar.setVisibility(View.GONE);
+                busStopsNearbyListView.setVisibility(View.INVISIBLE);
                 errorMessageTextView.setText(R.string.error_no_bus_stops_found_text);
                 errorMessageTextView.setVisibility(View.VISIBLE);
             }
         }
         else
         {
-            progressBar.setVisibility(View.GONE);
-            refreshFloatingActionButton.clearAnimation();
-            refreshFloatingActionButton.setEnabled(true);
+            busStopsNearbyListView.setVisibility(View.INVISIBLE);
             errorMessageTextView.setText(R.string.error_connecting_to_the_internet_click_refresh_text);
             errorMessageTextView.setVisibility(View.VISIBLE);
         }
@@ -510,7 +551,7 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
 
     // What to do once bus route details have been found
     @Override
-    public void onBusRouteDetailsFound(boolean isError, final Route route, boolean isForList, final String routeDirection)
+    public void onBusRouteDetailsFound(String errorMessage, final Route route, boolean isForList, final String routeDirection)
     {
 
     }
@@ -545,7 +586,6 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
     @Override
     public void onPause()
     {
-        super.onPause();
         if (progressBar != null && isRequestingLocationUpdates)
         {
             progressBar.setVisibility(View.GONE);
@@ -555,6 +595,11 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
             getNearestBusStopsTask.cancel(true);
         }
         stopLocationUpdates();
+        if(countDownTimer != null)
+        {
+            countDownTimer.cancel();
+        }
+        super.onPause();
     }
 
     @Override
@@ -564,11 +609,27 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
         {
             locationIsToBeUpdated = true;
             errorMessageTextView.setVisibility(View.GONE);
-            refreshFloatingActionButton.startAnimation(rotatingAnimation);
-            refreshFloatingActionButton.setEnabled(false);
+            /*refreshFloatingActionButton.startAnimation(rotatingAnimation);
+            refreshFloatingActionButton.setEnabled(false);*/
             progressBar.setVisibility(View.VISIBLE);
             createLocationRequest();
         }
+        refresh();
         super.onResume();
+    }
+
+    @Override
+    public void onStart()
+    {
+        if (googleApiClient != null)
+        {
+            googleApiClient.connect();
+        }
+        else
+        {
+            googleApiClient = new GoogleApiClient.Builder(getContext()).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
+            googleApiClient.connect();
+        }
+        super.onStart();
     }
 }

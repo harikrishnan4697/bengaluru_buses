@@ -10,10 +10,16 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import static com.bangalorebuses.Constants.NETWORK_QUERY_IO_EXCEPTION;
+import static com.bangalorebuses.Constants.NETWORK_QUERY_JSON_EXCEPTION;
+import static com.bangalorebuses.Constants.NETWORK_QUERY_NO_ERROR;
+import static com.bangalorebuses.Constants.NETWORK_QUERY_REQUEST_TIMEOUT_EXCEPTION;
+import static com.bangalorebuses.Constants.NETWORK_QUERY_URL_EXCEPTION;
+
 class GetBusRouteDetailsTask extends AsyncTask<String, Void, Void>
 {
     private NetworkingManager caller;
-    private boolean errorOccurred = false;
+    private String errorMessage = NETWORK_QUERY_NO_ERROR;
     private Route route;
     private boolean isForBusList = false;
     private String routeDirection;
@@ -47,9 +53,10 @@ class GetBusRouteDetailsTask extends AsyncTask<String, Void, Void>
         }
         catch (java.net.MalformedURLException e)
         {
-            errorOccurred = true;
+            errorMessage = NETWORK_QUERY_URL_EXCEPTION;
             return null;
         }
+
         StringBuilder result = new StringBuilder();
         try
         {
@@ -68,12 +75,12 @@ class GetBusRouteDetailsTask extends AsyncTask<String, Void, Void>
         }
         catch (java.net.SocketTimeoutException e)
         {
-            errorOccurred = true;
+            errorMessage = NETWORK_QUERY_REQUEST_TIMEOUT_EXCEPTION;
             return null;
         }
         catch (IOException e)
         {
-            errorOccurred = true;
+            errorMessage = NETWORK_QUERY_IO_EXCEPTION;
             return null;
         }
 
@@ -95,7 +102,7 @@ class GetBusRouteDetailsTask extends AsyncTask<String, Void, Void>
         }
         catch (org.json.JSONException e)
         {
-            errorOccurred = true;
+            errorMessage = NETWORK_QUERY_JSON_EXCEPTION;
         }
         return null;
     }
@@ -103,6 +110,6 @@ class GetBusRouteDetailsTask extends AsyncTask<String, Void, Void>
     @Override
     protected void onPostExecute(Void params)
     {
-        caller.onBusRouteDetailsFound(errorOccurred, route, isForBusList, routeDirection);
+        caller.onBusRouteDetailsFound(errorMessage, route, isForBusList, routeDirection);
     }
 }

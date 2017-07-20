@@ -123,7 +123,14 @@ public class SearchActivity extends AppCompatActivity
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
-                resultIntent.putExtra("Selected_Item", parent.getItemAtPosition(position).toString());
+                if(searchType.equals(Constants.SEARCH_TYPE_BUS_STOP))
+                {
+                    resultIntent.putExtra("Selected_Item", parent.getItemAtPosition(position).toString());
+                }
+                else
+                {
+                    resultIntent.putExtra("Selected_Item", parent.getItemAtPosition(position).toString());
+                }
                 setResult(RESULT_OK, resultIntent);
                 finish();
             }

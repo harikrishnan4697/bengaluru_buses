@@ -106,6 +106,7 @@ class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
                             buses[j].setLongitude(nearestLatLong.substring(nearestLatLong.indexOf(",") + 1, nearestLatLong.length() - 1));
                             buses[j].setRegistrationNumber(jsonArray.getJSONArray(i + j).getString(0).replace("vehicleno:", ""));
                             buses[j].setRouteOrder(Integer.parseInt(jsonArray.getJSONArray(i + j).getString(12).replace("routeorder:", "")));
+                            buses[j].setServiceID(Integer.parseInt(jsonArray.getJSONArray(i + j).getString(5).replace("serviceid:", "")));
                             numberOfBusesFound++;
                         }
                         else
