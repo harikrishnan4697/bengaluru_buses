@@ -26,7 +26,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -69,7 +68,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
     private ProgressDialog progressDialog;
     private BusStop[] busStopList;
     private int position;
-    private JSONArray routeBusStopList;
+    private BusStop[] routeBusStopList;
     private Animation rotatingAnimation;
     private FloatingActionButton busTimingsRefreshFloatingActionButton;
     private boolean canRefresh = true;
@@ -304,25 +303,13 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
     @Override
     public void onStopsOnBusRouteFound(String errorMessage, BusStop[] busStops, Route route)
     {
-        if (!errorMessage.equals(NETWORK_QUERY_NO_ERROR))
+        if (errorMessage.equals(NETWORK_QUERY_NO_ERROR))
         {
-            progressDialog.dismiss();
-            if (isNetworkAvailable())
-            {
-                errorMessageTextView.setText(R.string.error_getting_stop_details_text);
-                errorMessageTextView.setVisibility(View.VISIBLE);
-            }
-            else
-            {
-                errorMessageTextView.setText(R.string.error_connecting_to_the_internet_click_refresh_text);
-                errorMessageTextView.setVisibility(View.VISIBLE);
-            }
-        }
-        else
-        {
+            routeBusStopList = busStops;
             ArrayList<String> stopList = new ArrayList<>();
             ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item, stopList);
             int nearestBusStopIndex = 0;
+            busStopList = busStops;
 
             String selectedBusStopName = "";
             if (selectedBusStop != null && selectedBusStop.getBusStopName() != null)
@@ -364,6 +351,20 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
             stopsOnRouteSpinner.setOnItemSelectedListener(this);
             stopsOnRouteSpinner.setSelection(nearestBusStopIndex);
             busStopSelectionLinearLayout.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            progressDialog.dismiss();
+            if (isNetworkAvailable())
+            {
+                errorMessageTextView.setText(R.string.error_getting_stop_details_text);
+                errorMessageTextView.setVisibility(View.VISIBLE);
+            }
+            else
+            {
+                errorMessageTextView.setText(R.string.error_connecting_to_the_internet_click_refresh_text);
+                errorMessageTextView.setVisibility(View.VISIBLE);
+            }
         }
     }
 
@@ -419,104 +420,90 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
                         bus.setTripIsYetToBegin(false);
                     }
                     bus.setNameOfStopBusIsAt("bus stop unknown");
-                    for (int j = 0; j < routeBusStopList.length(); j++)
+                    for (int j = 0; j < routeBusStopList.length; j++)
                     {
-                        try
+                        if (bus.getRouteOrder() == routeBusStopList[j].getRouteOrder())
                         {
-                            if (bus.getRouteOrder() == routeBusStopList.getJSONObject(j).getInt("routeorder"))
+                            String stopName = routeBusStopList[j].getBusStopName();
+                            if (routeBusStopList[j].getBusStopName().contains("("))
                             {
-                                String stopName = routeBusStopList.getJSONObject(j).getString("busStopName");
-                                if (routeBusStopList.getJSONObject(j).getString("busStopName").contains("("))
-                                {
-                                    stopName = routeBusStopList.getJSONObject(j).getString("busStopName").substring(0, routeBusStopList.getJSONObject(j).getString("busStopName").indexOf("("));
-                                }
-                                bus.setNameOfStopBusIsAt(stopName);
+                                stopName = routeBusStopList[j].getBusStopName().substring(0, routeBusStopList[j].getBusStopName().indexOf("("));
                             }
-                        }
-                        catch (JSONException e)
-                        {
-                            bus.setNameOfStopBusIsAt("bus stop unknown");
+                            bus.setNameOfStopBusIsAt(stopName);
                         }
                     }
                 }
 
                 // Compute the arrival time of each bus
-                try
+                for (int i = 0; i < numberOfBusesFound; i++)
                 {
-                    for (int i = 0; i < numberOfBusesFound; i++)
+                    buses[i].setTimeToBus("UNAVAILABLE");
+                    for (int j = 0; j < routeBusStopList.length; j++)
                     {
-                        buses[i].setTimeToBus("UNAVAILABLE");
-                        for (int j = 0; j < routeBusStopList.length(); j++)
+                        if (buses[i].getRouteOrder() == routeBusStopList[j].getRouteOrder())
                         {
-                            if (buses[i].getRouteOrder() == routeBusStopList.getJSONObject(j).getInt("routeorder"))
+                            for (int k = j; k < routeBusStopList.length; k++)
                             {
-                                for (int k = j; k < routeBusStopList.length(); k++)
+                                if (busStopList[position].getRouteOrder() == routeBusStopList[k].getRouteOrder())
                                 {
-                                    if (busStopList[position].getRouteOrder() == routeBusStopList.getJSONObject(k).getInt("routeorder"))
-                                    {
-                                        Calendar calendar = Calendar.getInstance();
-                                        int timeToBus;
+                                    Calendar calendar = Calendar.getInstance();
+                                    int timeToBus;
 
-                                        if ((calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) || (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY))
+                                    if ((calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) || (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY))
+                                    {
+                                        if (route.getRouteNumber().contains("KIAS-"))
                                         {
-                                            if (route.getRouteNumber().contains("KIAS-"))
-                                            {
-                                                timeToBus = (k - j) * 4;
-                                            }
-                                            else
-                                            {
-                                                timeToBus = (k - j) * 2;
-                                            }
-                                        }
-                                        else if ((calendar.get(Calendar.HOUR_OF_DAY) > 7 && calendar.get(Calendar.HOUR_OF_DAY) < 11) || (calendar.get(Calendar.HOUR_OF_DAY) > 16 && calendar.get(Calendar.HOUR_OF_DAY) < 21))
-                                        {
-                                            if (route.getRouteNumber().contains("KIAS-"))
-                                            {
-                                                timeToBus = (k - j) * 5;
-                                            }
-                                            else
-                                            {
-                                                timeToBus = (k - j) * 3;
-                                            }
+                                            timeToBus = (k - j) * 4;
                                         }
                                         else
                                         {
-                                            if (route.getRouteNumber().contains("KIAS-"))
-                                            {
-                                                timeToBus = (k - j) * 4;
-                                            }
-                                            else
-                                            {
-                                                timeToBus = (int) ((k - j) * 2.5);
-                                            }
+                                            timeToBus = (k - j) * 2;
                                         }
-                                        int hours = timeToBus / 60;
-                                        if (timeToBus >= 60)
+                                    }
+                                    else if ((calendar.get(Calendar.HOUR_OF_DAY) > 7 && calendar.get(Calendar.HOUR_OF_DAY) < 11) || (calendar.get(Calendar.HOUR_OF_DAY) > 16 && calendar.get(Calendar.HOUR_OF_DAY) < 21))
+                                    {
+                                        if (route.getRouteNumber().contains("KIAS-"))
                                         {
-                                            if (hours == 1)
-                                            {
-                                                buses[i].setTimeToBus(hours + " hour " + timeToBus % 60 + " mins");
-                                            }
-                                            else
-                                            {
-                                                buses[i].setTimeToBus(hours + " hours " + timeToBus % 60 + " mins");
-                                            }
+                                            timeToBus = (k - j) * 5;
                                         }
                                         else
                                         {
-                                            buses[i].setTimeToBus(timeToBus + " mins");
+                                            timeToBus = (k - j) * 3;
                                         }
+                                    }
+                                    else
+                                    {
+                                        if (route.getRouteNumber().contains("KIAS-"))
+                                        {
+                                            timeToBus = (k - j) * 4;
+                                        }
+                                        else
+                                        {
+                                            timeToBus = (int) ((k - j) * 2.5);
+                                        }
+                                    }
+                                    int hours = timeToBus / 60;
+                                    if (timeToBus >= 60)
+                                    {
+                                        if (hours == 1)
+                                        {
+                                            buses[i].setTimeToBus(hours + " hour " + timeToBus % 60 + " mins");
+                                        }
+                                        else
+                                        {
+                                            buses[i].setTimeToBus(hours + " hours " + timeToBus % 60 + " mins");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        buses[i].setTimeToBus(timeToBus + " mins");
                                     }
                                 }
                             }
                         }
                     }
-                    onTimeToBusesFound(false, buses);
                 }
-                catch (JSONException e)
-                {
-                    onTimeToBusesFound(true, buses);
-                }
+                onTimeToBusesFound(false, buses);
 
                 /*if (isNetworkAvailable())
                 {

@@ -32,11 +32,38 @@
         android:textSize="16sp"
         android:visibility="gone"/>
 
+    <LinearLayout
+        android:id="@+id/updatingBusesArrivingAtStopProgressBarLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/busesArrivingAtBusStopErrorMessageTextView"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="10dp"
+
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Updating..."
+            android:textSize="14sp"/>
+
+        <ProgressBar
+            android:id="@+id/updatingBusStopsProgressBar"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:visibility="visible"/>
+
+    </LinearLayout>
+
     <View
         android:id="@+id/divider1"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_below="@id/busesArrivingAtBusStopErrorMessageTextView"
+        android:layout_below="@id/updatingBusesArrivingAtStopProgressBarLinearLayout"
         android:background="#000000"/>
 
     <ListView

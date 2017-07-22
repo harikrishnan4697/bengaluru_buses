@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -25,9 +26,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Stack;
 
 import static android.app.Activity.RESULT_OK;
-import static android.content.Context.MODE_PRIVATE;
+import static android.content.Context.MODE_APPEND;
 import static com.bangalorebuses.Constants.NETWORK_QUERY_NO_ERROR;
 
 public class BusTrackerFragment extends Fragment implements NetworkingManager
@@ -56,24 +58,7 @@ public class BusTrackerFragment extends Fragment implements NetworkingManager
             }
         });
         recentSearchesListView = (ListView) view.findViewById(R.id.recentSearchesListView);
-        try
-        {
-            FileInputStream fileInputStream = getActivity().openFileInput(Constants.ROUTE_SEARCH_HISTORY_FILENAME);
-            InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            ArrayList<String> arrayList = new ArrayList<>();
-            String line;
-            while ((line = bufferedReader.readLine()) != null)
-            {
-                arrayList.add(line);
-            }
-            ArrayAdapter<String> listAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, arrayList);
-            recentSearchesListView.setAdapter(listAdapter);
-        }
-        catch (IOException e)
-        {
-            // TODO handle exception
-        }
+        initialiseRecentSearches();
         return view;
     }
 
@@ -124,6 +109,51 @@ public class BusTrackerFragment extends Fragment implements NetworkingManager
         startActivityForResult(searchActivityIntent, Constants.SEARCH_REQUEST_CODE);
     }
 
+    private void initialiseRecentSearches()
+    {
+        try
+        {
+            FileInputStream fileInputStream = getActivity().openFileInput(Constants.ROUTE_SEARCH_HISTORY_FILENAME);
+            InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+            ArrayList<String> arrayList = new ArrayList<>();
+            Stack<String> stack = new Stack<>();
+            String line;
+
+            while ((line = bufferedReader.readLine()) != null)
+            {
+                stack.push(line);
+            }
+
+            for (int i = 0; i < 10; i++)
+            {
+                if (!stack.isEmpty())
+                {
+                    arrayList.add(stack.pop());
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            ArrayAdapter<String> listAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, arrayList);
+            recentSearchesListView.setAdapter(listAdapter);
+            recentSearchesListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+            {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+                {
+                    startTrackingBus(parent.getItemAtPosition(position).toString());
+                }
+            });
+        }
+        catch (IOException e)
+        {
+            // TODO handle exception
+        }
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
@@ -148,7 +178,7 @@ public class BusTrackerFragment extends Fragment implements NetworkingManager
     /**
      * This is a callback method called by the GetBusRouteDetailsTask.
      *
-     * @param errorMessage        This parameter is to convey if the task encountered an error.
+     * @param errorMessage   This parameter is to convey if the task encountered an error.
      * @param route          This parameter is a Route object with all the details set.
      * @param isForBusList   This parameter is returned back as it was passed to the
      *                       constructor. If true, the bus route details are for
@@ -164,7 +194,7 @@ public class BusTrackerFragment extends Fragment implements NetworkingManager
         {
             try
             {
-                FileOutputStream fileOutputStream = getActivity().openFileOutput(Constants.ROUTE_SEARCH_HISTORY_FILENAME, MODE_PRIVATE);
+                FileOutputStream fileOutputStream = getActivity().openFileOutput(Constants.ROUTE_SEARCH_HISTORY_FILENAME, MODE_APPEND);
                 fileOutputStream.write((route.getRouteNumber() + "\n").getBytes());
                 fileOutputStream.close();
             }
@@ -202,9 +232,9 @@ public class BusTrackerFragment extends Fragment implements NetworkingManager
     /**
      * This is a callback method called by the GetStopsOnBusRouteTask.
      *
-     * @param errorMessage       This parameter is to convey if the task encountered an error.
-     * @param busStops This parameter is a JSONArray of all the bus stops
-     *                      for a particular route id.
+     * @param errorMessage This parameter is to convey if the task encountered an error.
+     * @param busStops     This parameter is a JSONArray of all the bus stops
+     *                     for a particular route id.
      */
     @Override
     public void onStopsOnBusRouteFound(String errorMessage, BusStop[] busStops, Route route)
@@ -215,7 +245,7 @@ public class BusTrackerFragment extends Fragment implements NetworkingManager
     /**
      * This is a callback method called by the GetBusesEnRouteTask.
      *
-     * @param errorMessage            This parameter is to convey if the task encountered an error.
+     * @param errorMessage       This parameter is to convey if the task encountered an error.
      * @param buses              This parameter is an array of buses en-route that the task found.
      * @param numberOfBusesFound This parameter is the number of en-route buses the task found.
      */
@@ -245,5 +275,12 @@ public class BusTrackerFragment extends Fragment implements NetworkingManager
     public void onBusesAtStopFound(String errorMessage, JSONArray buses)
     {
 
+    }
+
+    @Override
+    public void onResume()
+    {
+        initialiseRecentSearches();
+        super.onResume();
     }
 }

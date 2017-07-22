@@ -132,6 +132,7 @@ public class SearchActivity extends AppCompatActivity
                     resultIntent.putExtra("Selected_Item", parent.getItemAtPosition(position).toString());
                 }
                 setResult(RESULT_OK, resultIntent);
+                getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
                 finish();
             }
         });

@@ -25,6 +25,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -62,8 +63,8 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
     private TextView errorMessageTextView;
     private boolean locationIsToBeUpdated = false;
     private LocationManager locationManager;
-    //private FloatingActionButton refreshFloatingActionButton;
     private Animation rotatingAnimation;
+    private LinearLayout updatingBusStopsProgressBarLinearLayout;
     private ProgressBar progressBar;
     private NearbyBusStopsListCustomAdapter busStopsNearbyListAdaptor;
     private ArrayList<BusStop> busStops = new ArrayList<>();
@@ -81,6 +82,10 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         View view = inflater.inflate(R.layout.nearby_fragment, container, false);
+        updatingBusStopsProgressBarLinearLayout = (LinearLayout) view.findViewById(R.id.updatingBusStopsProgressBarLinearLayout);
+        updatingBusStopsProgressBarLinearLayout.setVisibility(View.GONE);
+        //networkingInProgressImageView = (ImageView) view.findViewById(R.id.networkingInProgressImageView);
+        //networkingInProgressImageView.setVisibility(View.GONE);
         progressBar = (ProgressBar) view.findViewById(R.id.nearby_fragment_progress_bar);
         progressBar.setVisibility(View.GONE);
         countDownTimer = null;
@@ -151,15 +156,15 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
     {
         switch (item.getItemId())
         {
-            /*case R.id.nearby_search:
+            case R.id.nearby_search:
                 Intent searchActivityIntent = new Intent(getContext(), SearchActivity.class);
                 searchActivityIntent.putExtra("Search_Type", Constants.SEARCH_TYPE_BUS_STOP);
                 startActivityForResult(searchActivityIntent, Constants.SEARCH_NEARBY_BUS_STOP_REQUEST_CODE);
-                break;*/
+                break;
             default:
                 return super.onOptionsItemSelected(item);
         }
-        //return true;
+        return true;
     }
 
     /**
@@ -431,12 +436,14 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
     // What to do when the floating refresh button has been clicked
     public void refresh()
     {
-        if(isNetworkAvailable())
+        if (isNetworkAvailable())
         {
+            //animateNetworkingProgressImageView();
+            updatingBusStopsProgressBarLinearLayout.setVisibility(View.VISIBLE);
             locationIsToBeUpdated = true;
             errorMessageTextView.setVisibility(View.GONE);
-        /*refreshFloatingActionButton.startAnimation(rotatingAnimation);
-        refreshFloatingActionButton.setEnabled(false);*/
+            /*refreshFloatingActionButton.startAnimation(rotatingAnimation);
+            refreshFloatingActionButton.setEnabled(false);*/
             createLocationRequest();
         }
         else
@@ -460,8 +467,9 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
 
     // What to do once bus stops nearby have been found
     @Override
-    public void onBusStopsFound(boolean isError, JSONArray busStopsArray)
+    public void onBusStopsFound(final boolean isError, JSONArray busStopsArray)
     {
+        updatingBusStopsProgressBarLinearLayout.setVisibility(View.GONE);
         progressBar.setVisibility(View.GONE);
         /*refreshFloatingActionButton.clearAnimation();
         refreshFloatingActionButton.setEnabled(true);*/
@@ -477,41 +485,6 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
                 busStopsNearbyListView.setVisibility(View.INVISIBLE);
                 errorMessageTextView.setText(R.string.error_no_bus_stops_found_text);
                 errorMessageTextView.setVisibility(View.VISIBLE);
-                return;
-            }
-
-            try
-            {
-                for (int i = 0; i < busStopsArray.length(); i++)
-                {
-                    String busStopName = busStopsArray.getJSONObject(i).getString("StopName");
-                    if (!busStopName.contains("CS-"))
-                    {
-                        BusStop busStop = new BusStop();
-                        busStop.setBusStopName(busStopName);
-                        busStop.setBusStopId(busStopsArray.getJSONObject(i).getInt("StopId"));
-                        busStopNames.add(busStopName);
-                        busStopDistances.add(busStopsArray.getJSONObject(i).getString("StopDist"));
-                        busStops.add(busStop);
-                    }
-                }
-
-                busStopsNearbyListAdaptor = new NearbyBusStopsListCustomAdapter(getActivity(), busStopNames, busStopDistances);
-                busStopsNearbyListView.setAdapter(busStopsNearbyListAdaptor);
-                busStopsNearbyListAdaptor.notifyDataSetChanged();
-                busStopsNearbyListView.setVisibility(View.VISIBLE);
-                busStopsNearbyListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
-                {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-                    {
-                        Intent getBusesArrivingAtBusStopIntent = new Intent(getContext(), BusesArrivingAtBusStopActivity.class);
-                        getBusesArrivingAtBusStopIntent.putExtra("BUS_STOP_NAME", busStops.get(position).getBusStopName());
-                        getBusesArrivingAtBusStopIntent.putExtra("BUS_STOP_ID", busStops.get(position).getBusStopId());
-                        startActivity(getBusesArrivingAtBusStopIntent);
-                    }
-                });
-
                 countDownTimer = new CountDownTimer(45000, 45000)
                 {
                     @Override
@@ -527,18 +500,97 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
                     }
                 }.start();
             }
-            catch (JSONException e)
+            else
             {
-                busStopsNearbyListView.setVisibility(View.INVISIBLE);
-                errorMessageTextView.setText(R.string.error_no_bus_stops_found_text);
-                errorMessageTextView.setVisibility(View.VISIBLE);
+
+                try
+                {
+                    for (int i = 0; i < busStopsArray.length(); i++)
+                    {
+                        String busStopName = busStopsArray.getJSONObject(i).getString("StopName");
+                        if (!busStopName.contains("CS-"))
+                        {
+                            BusStop busStop = new BusStop();
+                            busStop.setBusStopName(busStopName);
+                            busStop.setBusStopId(busStopsArray.getJSONObject(i).getInt("StopId"));
+                            busStopNames.add(busStopName);
+                            busStopDistances.add(busStopsArray.getJSONObject(i).getString("StopDist"));
+                            busStops.add(busStop);
+                        }
+                    }
+
+                    busStopsNearbyListAdaptor = new NearbyBusStopsListCustomAdapter(getActivity(), busStopNames, busStopDistances);
+                    busStopsNearbyListView.setAdapter(busStopsNearbyListAdaptor);
+                    busStopsNearbyListAdaptor.notifyDataSetChanged();
+                    busStopsNearbyListView.setVisibility(View.VISIBLE);
+                    busStopsNearbyListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+                    {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+                        {
+                            Intent getBusesArrivingAtBusStopIntent = new Intent(getContext(), BusesArrivingAtBusStopActivity.class);
+                            getBusesArrivingAtBusStopIntent.putExtra("BUS_STOP_NAME", busStops.get(position).getBusStopName());
+                            getBusesArrivingAtBusStopIntent.putExtra("BUS_STOP_ID", busStops.get(position).getBusStopId());
+                            startActivity(getBusesArrivingAtBusStopIntent);
+                        }
+                    });
+
+                    countDownTimer = new CountDownTimer(45000, 45000)
+                    {
+                        @Override
+                        public void onTick(long millisUntilFinished)
+                        {
+
+                        }
+
+                        @Override
+                        public void onFinish()
+                        {
+                            refresh();
+                        }
+                    }.start();
+                }
+                catch (JSONException e)
+                {
+                    busStopsNearbyListView.setVisibility(View.INVISIBLE);
+                    errorMessageTextView.setText(R.string.error_no_bus_stops_found_text);
+                    errorMessageTextView.setVisibility(View.VISIBLE);
+                    countDownTimer = new CountDownTimer(45000, 45000)
+                    {
+                        @Override
+                        public void onTick(long millisUntilFinished)
+                        {
+
+                        }
+
+                        @Override
+                        public void onFinish()
+                        {
+                            refresh();
+                        }
+                    }.start();
+                }
             }
         }
         else
         {
             busStopsNearbyListView.setVisibility(View.INVISIBLE);
-            errorMessageTextView.setText(R.string.error_connecting_to_the_internet_click_refresh_text);
+            errorMessageTextView.setText(R.string.error_connecting_to_the_internet_text);
             errorMessageTextView.setVisibility(View.VISIBLE);
+            countDownTimer = new CountDownTimer(45000, 45000)
+            {
+                @Override
+                public void onTick(long millisUntilFinished)
+                {
+
+                }
+
+                @Override
+                public void onFinish()
+                {
+                    refresh();
+                }
+            }.start();
         }
     }
 
@@ -574,6 +626,95 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
 
     }
 
+    /*private void animateNetworkingProgressImageView()
+    {
+        countDownTimer = new CountDownTimer(1000, 1000)
+        {
+            @Override
+            public void onTick(long millisUntilFinished)
+            {
+
+            }
+
+            @Override
+            public void onFinish()
+            {
+                networkingInProgressImageView.setImageResource(R.drawable.ic_rss_feed_orange_24dp_1_bar);
+                networkingInProgressImageView.setVisibility(View.VISIBLE);
+                new CountDownTimer(1000, 1000)
+                {
+                    @Override
+                    public void onTick(long millisUntilFinished)
+                    {
+
+                    }
+
+                    @Override
+                    public void onFinish()
+                    {
+                        //networkingInProgressImageView.setImageResource(R.drawable.ic_rss_feed_orange_24dp_2_bars);
+                        new CountDownTimer(1000, 1000)
+                        {
+                            @Override
+                            public void onTick(long millisUntilFinished)
+                            {
+
+                            }
+
+                            @Override
+                            public void onFinish()
+                            {
+                                //networkingInProgressImageView.setImageResource(R.drawable.ic_rss_feed_orange_24dp_3_bars);
+                                new CountDownTimer(2000, 2000)
+                                {
+                                    @Override
+                                    public void onTick(long millisUntilFinished)
+                                    {
+
+                                    }
+
+                                    @Override
+                                    public void onFinish()
+                                    {
+                                        networkingInProgressImageView.setImageResource(R.drawable.ic_rss_feed_orange_24dp_2_bars);
+                                        new CountDownTimer(1000, 1000)
+                                        {
+                                            @Override
+                                            public void onTick(long millisUntilFinished)
+                                            {
+
+                                            }
+
+                                            @Override
+                                            public void onFinish()
+                                            {
+                                                networkingInProgressImageView.setImageResource(R.drawable.ic_rss_feed_orange_24dp_1_bar);
+                                                new CountDownTimer(1000, 1000)
+                                                {
+                                                    @Override
+                                                    public void onTick(long millisUntilFinished)
+                                                    {
+
+                                                    }
+
+                                                    @Override
+                                                    public void onFinish()
+                                                    {
+                                                        networkingInProgressImageView.setVisibility(View.GONE);
+                                                    }
+                                                }.start();
+                                            }
+                                        }.start();
+                                    }
+                                }.start();
+                            }
+                        }.start();
+                    }
+                }.start();
+            }
+        }.start();
+    }*/
+
     public void onStop()
     {
         if (googleApiClient != null)
@@ -595,7 +736,7 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
             getNearestBusStopsTask.cancel(true);
         }
         stopLocationUpdates();
-        if(countDownTimer != null)
+        if (countDownTimer != null)
         {
             countDownTimer.cancel();
         }
@@ -614,7 +755,10 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
             progressBar.setVisibility(View.VISIBLE);
             createLocationRequest();
         }
-        refresh();
+        if (progressBar.getVisibility() != View.VISIBLE)
+        {
+            refresh();
+        }
         super.onResume();
     }
 

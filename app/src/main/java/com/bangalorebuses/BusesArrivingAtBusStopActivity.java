@@ -10,6 +10,7 @@ import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -43,6 +44,8 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
     private ListView listView;
     private TextView errorMessageTextView;
     private boolean busStopHasTraceableBuses = false;
+    private LinearLayout updatingBusesArrivingAtBusStopProgressBarLinearLayout;
+    private CountDownTimer countDownTimer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -51,6 +54,9 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_buses_arriving_at_bus_stop);
 
         // Initialize some variables
+        countDownTimer = null;
+        updatingBusesArrivingAtBusStopProgressBarLinearLayout = (LinearLayout) findViewById(R.id.updatingBusesArrivingAtStopProgressBarLinearLayout);
+        updatingBusesArrivingAtBusStopProgressBarLinearLayout.setVisibility(View.GONE);
         listView = (ListView) findViewById(R.id.busesArrivingAtBusStopListView);
         TextView busStopDirectionInfoTextView = (TextView) findViewById(R.id.busStopNameInfoTextView);
         errorMessageTextView = (TextView) findViewById(R.id.busesArrivingAtBusStopErrorMessageTextView);
@@ -127,6 +133,11 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
     public void onBusesAtStopFound(String errorMessage, JSONArray buses)
     {
         Set<String> busNumbersSet = new HashSet<>();
+        numberOfBusRoutesFound = 0;
+        numberOfBusRouteTimingsFound = 0;
+        busNumbers.clear();
+        busDestinations.clear();
+        busETAs.clear();
 
         if (errorMessage.equals(NETWORK_QUERY_NO_ERROR))
         {
@@ -277,6 +288,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
         // Check if all the bus timings have been calculated
         if (numberOfBusRouteTimingsFound == numberOfBusRoutesFound)
         {
+            updatingBusesArrivingAtBusStopProgressBarLinearLayout.setVisibility(View.GONE);
             if (!busStopHasTraceableBuses)
             {
                 errorMessageTextView.setText(R.string.error_no_buses_arriving_at_stop_text);
@@ -284,7 +296,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
             }
             else
             {
-                new CountDownTimer(30000, 30000)
+                countDownTimer = new CountDownTimer(45000, 45000)
                 {
                     @Override
                     public void onTick(long millisUntilFinished)
@@ -295,11 +307,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
                     @Override
                     public void onFinish()
                     {
-                        numberOfBusRoutesFound = 0;
-                        numberOfBusRouteTimingsFound = 0;
-                        busNumbers.clear();
-                        busDestinations.clear();
-                        busETAs.clear();
+                        updatingBusesArrivingAtBusStopProgressBarLinearLayout.setVisibility(View.VISIBLE);
                         String requestBody = "stopID=" + Integer.toString(BusesArrivingAtBusStopActivity.this.selectedBusStop.getBusStopId());
                         getBusesArrivingAtStopTask = new GetBusesArrivingAtStopTask(BusesArrivingAtBusStopActivity.this);
                         getBusesArrivingAtStopTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, requestBody);
@@ -428,6 +436,16 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+
+    @Override
+    protected void onPause()
+    {
+        if(countDownTimer != null)
+        {
+            countDownTimer.cancel();
+        }
+        super.onPause();
     }
 
     @Override

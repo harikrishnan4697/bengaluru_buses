@@ -67,7 +67,7 @@ class BusesArrivingAtStopListCustomAdapter extends BaseAdapter
             holder = (ViewHolder) convertView.getTag();
         }
 
-        if (routeNumbers.get(position).contains("KIAS-"))
+        if (routeNumbers.get(position).length() > 5 && routeNumbers.get(position).contains("KIAS-"))
         {
             holder.imgViewLogo.setImageResource(R.drawable.ic_flight_black);
         }

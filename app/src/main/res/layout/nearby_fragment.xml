@@ -2,13 +2,16 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
 
     <LinearLayout
         android:id="@+id/buses_at_stop_list_container_linear_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
+        android:animateLayoutChanges="true"
+        android:background="#FFFFFF"
         android:orientation="vertical">
 
         <TextView
@@ -24,6 +27,30 @@
             android:textSize="16sp"
             android:visibility="gone"/>
 
+        <LinearLayout
+            android:id="@+id/updatingBusStopsProgressBarLinearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Updating..."
+                android:textSize="14sp"/>
+
+            <ProgressBar
+                android:id="@+id/updatingBusStopsProgressBar"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
+                android:visibility="visible"/>
+
+        </LinearLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -35,6 +62,8 @@
         android:id="@+id/busStopsNearbyListView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/buses_at_stop_list_container_linear_layout"
+        android:background="#FFFFFF"
         android:divider="#FAFAFA"
         android:dividerHeight="10dp"
         android:paddingBottom="10dp"
