@@ -81,7 +81,7 @@ import static com.bangalorebuses.Constants.NETWORK_QUERY_NO_ERROR;
  * @since 18-6-2017
  */
 
-public class ChooseRouteActivity extends AppCompatActivity implements NetworkingManager, AdapterView.OnItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener
+public class ChooseRouteActivity extends AppCompatActivity implements NetworkingHelper, AdapterView.OnItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener
 {
     private final int LOCATION_PERMISSION_REQUEST_CODE = 36;
     private BusStop nearestBusStops[] = new BusStop[8];

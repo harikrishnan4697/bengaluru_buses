@@ -18,7 +18,7 @@ import static com.bangalorebuses.Constants.NETWORK_QUERY_URL_EXCEPTION;
 
 class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
 {
-    private NetworkingManager caller;
+    private NetworkingHelper caller;
     private String errorMessage = NETWORK_QUERY_NO_ERROR;
     private BusStop selectedBusStop;
     private int numberOfBusesFound;
@@ -26,7 +26,7 @@ class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
     private Route route;
 
 
-    GetBusesEnRouteTask(NetworkingManager caller, BusStop busStop, Route route)
+    GetBusesEnRouteTask(NetworkingHelper caller, BusStop busStop, Route route)
     {
         this.caller = caller;
         this.selectedBusStop = busStop;

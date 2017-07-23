@@ -35,7 +35,7 @@ import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
-public class TripPlannerFragment extends Fragment implements NetworkingManager, TripPlannerHelper
+public class TripPlannerFragment extends Fragment implements NetworkingHelper, TripPlannerHelper
 {
     private BusStop startBusStop = new BusStop();
     private BusStop endBusStop = new BusStop();

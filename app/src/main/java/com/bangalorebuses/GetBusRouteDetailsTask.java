@@ -18,13 +18,13 @@ import static com.bangalorebuses.Constants.NETWORK_QUERY_URL_EXCEPTION;
 
 class GetBusRouteDetailsTask extends AsyncTask<String, Void, Void>
 {
-    private NetworkingManager caller;
+    private NetworkingHelper caller;
     private String errorMessage = NETWORK_QUERY_NO_ERROR;
     private Route route;
     private boolean isForBusList = false;
     private String routeDirection;
 
-    GetBusRouteDetailsTask(NetworkingManager caller, boolean isForBusList)
+    GetBusRouteDetailsTask(NetworkingHelper caller, boolean isForBusList)
     {
         this.caller = caller;
         this.isForBusList = isForBusList;

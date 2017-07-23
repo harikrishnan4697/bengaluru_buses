@@ -15,6 +15,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -28,6 +29,7 @@ public class SearchActivity extends AppCompatActivity
     private BusNumberListCustomAdapter customListAdapter;
     private String searchType;
     private Intent resultIntent = new Intent();
+    private JSONArray jsonArray;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -79,7 +81,7 @@ public class SearchActivity extends AppCompatActivity
             }
 
             // Converts the asset to a JSON array
-            JSONArray jsonArray = new JSONArray(stringBuilder.toString());
+           jsonArray = new JSONArray(stringBuilder.toString());
             String[] listViewAdapterContent = new String[jsonArray.length()];
             String[] routeTypes = new String[jsonArray.length()];
 
@@ -125,7 +127,21 @@ public class SearchActivity extends AppCompatActivity
             {
                 if(searchType.equals(Constants.SEARCH_TYPE_BUS_STOP))
                 {
-                    resultIntent.putExtra("Selected_Item", parent.getItemAtPosition(position).toString());
+                    resultIntent.putExtra("BUS_STOP_NAME", parent.getItemAtPosition(position).toString());
+                    try
+                    {
+                        for (int i = 0; i < jsonArray.length(); i++)
+                        {
+                            if(jsonArray.getJSONObject(i).getString("StopName").equals(parent.getItemAtPosition(position).toString()))
+                            {
+                                resultIntent.putExtra("BUS_STOP_ID", jsonArray.getJSONObject(i).getInt("StopId"));
+                            }
+                        }
+                    }
+                    catch (JSONException e)
+                    {
+                        //TODO Handle exception
+                    }
                 }
                 else
                 {

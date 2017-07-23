@@ -31,7 +31,7 @@ import static com.bangalorebuses.Constants.DIRECTION_UP;
 import static com.bangalorebuses.Constants.NETWORK_QUERY_IO_EXCEPTION;
 import static com.bangalorebuses.Constants.NETWORK_QUERY_NO_ERROR;
 
-public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements NetworkingManager
+public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements NetworkingHelper
 {
     private BusStop selectedBusStop = new BusStop();
     private ProgressDialog progressDialog;

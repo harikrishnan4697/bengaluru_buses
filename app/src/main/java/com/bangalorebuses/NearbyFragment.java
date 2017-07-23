@@ -54,7 +54,7 @@ import static android.app.Activity.RESULT_OK;
 import static android.content.Context.LOCATION_SERVICE;
 import static com.bangalorebuses.Constants.LOCATION_PERMISSION_REQUEST_CODE;
 
-public class NearbyFragment extends Fragment implements NetworkingManager, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener
+public class NearbyFragment extends Fragment implements NetworkingHelper, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener
 {
     private ListView busStopsNearbyListView;
     private GoogleApiClient googleApiClient;
@@ -69,7 +69,6 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
     private NearbyBusStopsListCustomAdapter busStopsNearbyListAdaptor;
     private ArrayList<BusStop> busStops = new ArrayList<>();
     private GetNearestBusStopsTask getNearestBusStopsTask;
-    private boolean wasLocatingBusStopsNearby = false;
     private CountDownTimer countDownTimer;
 
     @Override
@@ -350,7 +349,6 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
         {
             if (isNetworkAvailable())
             {
-                wasLocatingBusStopsNearby = true;
                 URL nearestBusStopURL = new URL("http://bmtcmob.hostg.in/api/busstops/stopnearby/lat/" + String.valueOf(location.getLatitude()) + "/lon/" + String.valueOf(location.getLongitude()) + "/rad/1.0");
                 getNearestBusStopsTask = new GetNearestBusStopsTask(this);
                 getNearestBusStopsTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, nearestBusStopURL);
@@ -471,12 +469,10 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
     {
         updatingBusStopsProgressBarLinearLayout.setVisibility(View.GONE);
         progressBar.setVisibility(View.GONE);
-        /*refreshFloatingActionButton.clearAnimation();
-        refreshFloatingActionButton.setEnabled(true);*/
-        wasLocatingBusStopsNearby = false;
         ArrayList<String> busStopNames = new ArrayList<>();
         ArrayList<String> busStopDistances = new ArrayList<>();
         busStops.clear();
+        boolean hasSetNearestBusStop = false;
 
         if (!isError)
         {
@@ -516,6 +512,11 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
                             busStopNames.add(busStopName);
                             busStopDistances.add(busStopsArray.getJSONObject(i).getString("StopDist"));
                             busStops.add(busStop);
+                            if (!hasSetNearestBusStop)
+                            {
+                                Constants.nearestBusStop = busStop;
+                                hasSetNearestBusStop = true;
+                            }
                         }
                     }
 
@@ -746,15 +747,6 @@ public class NearbyFragment extends Fragment implements NetworkingManager, Googl
     @Override
     public void onResume()
     {
-        if ((googleApiClient != null && googleApiClient.isConnected() && locationIsToBeUpdated) || wasLocatingBusStopsNearby)
-        {
-            locationIsToBeUpdated = true;
-            errorMessageTextView.setVisibility(View.GONE);
-            /*refreshFloatingActionButton.startAnimation(rotatingAnimation);
-            refreshFloatingActionButton.setEnabled(false);*/
-            progressBar.setVisibility(View.VISIBLE);
-            createLocationRequest();
-        }
         if (progressBar.getVisibility() != View.VISIBLE)
         {
             refresh();

@@ -32,11 +32,12 @@ import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_APPEND;
 import static com.bangalorebuses.Constants.NETWORK_QUERY_NO_ERROR;
 
-public class BusTrackerFragment extends Fragment implements NetworkingManager
+public class BusTrackerFragment extends Fragment implements NetworkingHelper
 {
     private ProgressDialog progressDialog;
     private Button busNumberSelectionButton;
     private ListView recentSearchesListView;
+    private ArrayList<String> recentSearches = new ArrayList<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -113,15 +114,17 @@ public class BusTrackerFragment extends Fragment implements NetworkingManager
     {
         try
         {
+            recentSearches.clear();
             FileInputStream fileInputStream = getActivity().openFileInput(Constants.ROUTE_SEARCH_HISTORY_FILENAME);
             InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            ArrayList<String> arrayList = new ArrayList<>();
             Stack<String> stack = new Stack<>();
+            ArrayList<String> arrayList = new ArrayList<>();
             String line;
 
             while ((line = bufferedReader.readLine()) != null)
             {
+                recentSearches.add(line);
                 stack.push(line);
             }
 
@@ -194,8 +197,25 @@ public class BusTrackerFragment extends Fragment implements NetworkingManager
         {
             try
             {
+                for(int i = 0; i < recentSearches.size(); i++)
+                {
+                    if(recentSearches.get(i).equals(route.getRouteNumber()))
+                    {
+                        recentSearches.remove(i);
+                        break;
+                    }
+                }
+
+                recentSearches.add(route.getRouteNumber());
+
+                getActivity().deleteFile(Constants.ROUTE_SEARCH_HISTORY_FILENAME);
                 FileOutputStream fileOutputStream = getActivity().openFileOutput(Constants.ROUTE_SEARCH_HISTORY_FILENAME, MODE_APPEND);
-                fileOutputStream.write((route.getRouteNumber() + "\n").getBytes());
+
+                for(int i = 0; i < recentSearches.size(); i++)
+                {
+                    fileOutputStream.write((recentSearches.get(i) + "\n").getBytes());
+                }
+
                 fileOutputStream.close();
             }
             catch (IOException e)

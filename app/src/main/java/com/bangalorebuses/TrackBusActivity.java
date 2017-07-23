@@ -41,7 +41,7 @@ import static com.bangalorebuses.Constants.NETWORK_QUERY_NO_ERROR;
  * @since 18-6-2017
  */
 
-public class TrackBusActivity extends AppCompatActivity implements NetworkingManager, AdapterView.OnItemSelectedListener
+public class TrackBusActivity extends AppCompatActivity implements NetworkingHelper, AdapterView.OnItemSelectedListener
 {
     private final String DIRECTION_UP = "UP";
     private final String DIRECTION_DOWN = "DN";
@@ -66,9 +66,8 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
     private BusStop selectedBusStop;
     private Route route;
     private ProgressDialog progressDialog;
-    private BusStop[] busStopList;
     private int position;
-    private BusStop[] routeBusStopList;
+    private BusStop[] busStopList;
     private Animation rotatingAnimation;
     private FloatingActionButton busTimingsRefreshFloatingActionButton;
     private boolean canRefresh = true;
@@ -305,11 +304,10 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
     {
         if (errorMessage.equals(NETWORK_QUERY_NO_ERROR))
         {
-            routeBusStopList = busStops;
+            busStopList = busStops;
             ArrayList<String> stopList = new ArrayList<>();
             ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item, stopList);
             int nearestBusStopIndex = 0;
-            busStopList = busStops;
 
             String selectedBusStopName = "";
             if (selectedBusStop != null && selectedBusStop.getBusStopName() != null)
@@ -330,21 +328,12 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
                 {
                     busStopName = busStopName.substring(0, busStopName.indexOf("(") - 1);
                 }
-                // Check if the bus stop name has a space character at the end. If yes, remove it.
-                if (busStopName.substring(busStopName.length() - 1, busStopName.length()).equals(" "))
-                {
-                    busStopName = busStopName.substring(0, busStopName.length() - 1);
-                }
                 if (busStopName.equals(selectedBusStopName))
                 {
                     nearestBusStopIndex = i;
                 }
                 stopList.add(busStopName);
-                busStopList[i] = new BusStop();
                 busStopList[i].setBusStopName(busStopName);
-                busStopList[i].setLatitude(busStops[i].getLatitude());
-                busStopList[i].setLongitude(busStops[i].getLongitude());
-                busStopList[i].setRouteOrder(busStops[i].getRouteOrder());
             }
 
             stopsOnRouteSpinner.setAdapter(adapter);
@@ -420,14 +409,14 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
                         bus.setTripIsYetToBegin(false);
                     }
                     bus.setNameOfStopBusIsAt("bus stop unknown");
-                    for (int j = 0; j < routeBusStopList.length; j++)
+                    for (int j = 0; j < busStopList.length; j++)
                     {
-                        if (bus.getRouteOrder() == routeBusStopList[j].getRouteOrder())
+                        if (bus.getRouteOrder() == busStopList[j].getRouteOrder())
                         {
-                            String stopName = routeBusStopList[j].getBusStopName();
-                            if (routeBusStopList[j].getBusStopName().contains("("))
+                            String stopName = busStopList[j].getBusStopName();
+                            if (busStopList[j].getBusStopName().contains("("))
                             {
-                                stopName = routeBusStopList[j].getBusStopName().substring(0, routeBusStopList[j].getBusStopName().indexOf("("));
+                                stopName = busStopList[j].getBusStopName().substring(0, busStopList[j].getBusStopName().indexOf("("));
                             }
                             bus.setNameOfStopBusIsAt(stopName);
                         }
@@ -438,13 +427,13 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingMan
                 for (int i = 0; i < numberOfBusesFound; i++)
                 {
                     buses[i].setTimeToBus("UNAVAILABLE");
-                    for (int j = 0; j < routeBusStopList.length; j++)
+                    for (int j = 0; j < busStopList.length; j++)
                     {
-                        if (buses[i].getRouteOrder() == routeBusStopList[j].getRouteOrder())
+                        if (buses[i].getRouteOrder() == busStopList[j].getRouteOrder())
                         {
-                            for (int k = j; k < routeBusStopList.length; k++)
+                            for (int k = j; k < busStopList.length; k++)
                             {
-                                if (busStopList[position].getRouteOrder() == routeBusStopList[k].getRouteOrder())
+                                if (busStopList[position].getRouteOrder() == busStopList[k].getRouteOrder())
                                 {
                                     Calendar calendar = Calendar.getInstance();
                                     int timeToBus;

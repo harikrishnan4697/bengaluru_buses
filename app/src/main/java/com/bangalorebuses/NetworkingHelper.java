@@ -10,7 +10,7 @@ import org.json.JSONArray;
  * @since 18-6-2017
  */
 
-interface NetworkingManager
+interface NetworkingHelper
 {
     /**
      * This is a callback method called by the GetNearestBusStopsTask.

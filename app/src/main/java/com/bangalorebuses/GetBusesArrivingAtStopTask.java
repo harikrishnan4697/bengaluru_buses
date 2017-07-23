@@ -23,16 +23,16 @@ import java.net.URL;
 
 class GetBusesArrivingAtStopTask extends AsyncTask<String, Void, JSONArray>
 {
-    private NetworkingManager caller;
+    private NetworkingHelper caller;
     private String errorMessage = Constants.NETWORK_QUERY_NO_ERROR;
 
     /**
      * This method is the constructor.
      *
      * @param aCaller This parameter is an instance of a class that
-     *                implements the NetworkingManager interface.
+     *                implements the NetworkingHelper interface.
      */
-    GetBusesArrivingAtStopTask(NetworkingManager aCaller)
+    GetBusesArrivingAtStopTask(NetworkingHelper aCaller)
     {
         caller = aCaller;
     }
@@ -124,7 +124,7 @@ class GetBusesArrivingAtStopTask extends AsyncTask<String, Void, JSONArray>
     {
         /*
          Calls the onBusesAtStopFound() callback method defined in the
-         NetworkingManager interface
+         NetworkingHelper interface
         */
         caller.onBusesAtStopFound(errorMessage, jsonArray);
     }

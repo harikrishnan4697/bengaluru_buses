@@ -12,10 +12,10 @@ import java.net.URL;
 
 class GetNearestBusStopsTask extends AsyncTask<URL, Void, JSONArray>
 {
-    private NetworkingManager caller;
+    private NetworkingHelper caller;
     private boolean errorOccurred = false;
 
-    GetNearestBusStopsTask(NetworkingManager aCaller)
+    GetNearestBusStopsTask(NetworkingHelper aCaller)
     {
         caller = aCaller;
     }

@@ -22,12 +22,12 @@ import java.net.URL;
 
 class GetTimeToBusesTask extends AsyncTask<Bus, Void, Bus[]>
 {
-    private NetworkingManager caller;
+    private NetworkingHelper caller;
     private boolean errorOccurred = false;
     private BusStop selectedBusStop;
     private int numberOfBusesFound;
 
-    GetTimeToBusesTask(NetworkingManager aCaller, BusStop aBusStop, int aNumberOfBusesFound)
+    GetTimeToBusesTask(NetworkingHelper aCaller, BusStop aBusStop, int aNumberOfBusesFound)
     {
         caller = aCaller;
         selectedBusStop = aBusStop;
