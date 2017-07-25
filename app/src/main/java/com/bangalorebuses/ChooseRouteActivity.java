@@ -728,7 +728,9 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
         if (isNetworkAvailable())
         {
             progressDialog = ProgressDialog.show(this, "Please wait", "Getting bus details...");
-            new GetBusRouteDetailsTask(this, false).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, busNumberToTrack);
+            Route route = new Route();
+            route.setRouteNumber(busNumberToTrack);
+            new GetBusRouteDetailsTask(this, false).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, route);
         }
         else
         {
@@ -868,7 +870,9 @@ public class ChooseRouteActivity extends AppCompatActivity implements Networking
                     for (String bus : busesSet)
                     {
                         numberOfRefreshIconRotationsRemaining++;
-                        new GetBusRouteDetailsTask(this, true).execute(bus);
+                        Route route = new Route();
+                        route.setRouteNumber(bus);
+                        new GetBusRouteDetailsTask(this, true).execute(route);
                     }
                 }
                 else

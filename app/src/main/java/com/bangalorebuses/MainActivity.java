@@ -58,13 +58,14 @@ public class MainActivity extends AppCompatActivity
                 final BusTrackerFragment busTrackerFragment = new BusTrackerFragment();
                 final TripPlannerFragment tripPlannerFragment = new TripPlannerFragment();
 
-                //Manually displaying the first fragment - one time only
+                // Manually displaying the first fragment - one time only
                 bottomNavigationView.setSelectedItemId(R.id.navigation_track_bus);
                 actionBar.setTitle("Bus tracker");
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                 transaction.replace(R.id.frame_layout, busTrackerFragment);
                 transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-                transaction.commitNowAllowingStateLoss();
+                transaction.commitNow();
+                createDb();
 
                 bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener()
                 {
@@ -109,6 +110,12 @@ public class MainActivity extends AppCompatActivity
                 });
             }
         }.start();
+    }
+
+    private void createDb()
+    {
+        BengaluruBusesDbHelper bengaluruBusesDbHelper = new BengaluruBusesDbHelper(MainActivity.this);
+        bengaluruBusesDbHelper.getWritableDatabase();
     }
 
     /*// What to do after the user has allowed or denied location services to be turned on

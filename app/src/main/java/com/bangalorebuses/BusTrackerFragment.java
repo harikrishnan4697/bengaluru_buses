@@ -93,7 +93,9 @@ public class BusTrackerFragment extends Fragment implements NetworkingHelper
         if (isNetworkAvailable())
         {
             progressDialog = ProgressDialog.show(getContext(), "Please wait", "Getting bus details...");
-            new GetBusRouteDetailsTask(this, false).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, busNumberToTrack);
+            Route route = new Route();
+            route.setRouteNumber(busNumberToTrack);
+            new GetBusRouteDetailsTask(this, false).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, route);
         }
         else
         {

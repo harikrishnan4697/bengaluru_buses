@@ -11,7 +11,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -61,7 +60,6 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
     private LocationRequest locationRequest;
     private boolean isRequestingLocationUpdates = false;
     private TextView errorMessageTextView;
-    private boolean locationIsToBeUpdated = false;
     private LocationManager locationManager;
     private Animation rotatingAnimation;
     private LinearLayout updatingBusStopsProgressBarLinearLayout;
@@ -69,7 +67,6 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
     private NearbyBusStopsListCustomAdapter busStopsNearbyListAdaptor;
     private ArrayList<BusStop> busStops = new ArrayList<>();
     private GetNearestBusStopsTask getNearestBusStopsTask;
-    private CountDownTimer countDownTimer;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -83,20 +80,8 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
         View view = inflater.inflate(R.layout.nearby_fragment, container, false);
         updatingBusStopsProgressBarLinearLayout = (LinearLayout) view.findViewById(R.id.updatingBusStopsProgressBarLinearLayout);
         updatingBusStopsProgressBarLinearLayout.setVisibility(View.GONE);
-        //networkingInProgressImageView = (ImageView) view.findViewById(R.id.networkingInProgressImageView);
-        //networkingInProgressImageView.setVisibility(View.GONE);
         progressBar = (ProgressBar) view.findViewById(R.id.nearby_fragment_progress_bar);
         progressBar.setVisibility(View.GONE);
-        countDownTimer = null;
-        /*refreshFloatingActionButton = (FloatingActionButton) view.findViewById(R.id.floatingRefreshActionButton);
-        refreshFloatingActionButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                refresh();
-            }
-        });*/
         rotatingAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.rotate);
         locationManager = (LocationManager) getContext().getSystemService(LOCATION_SERVICE);
 
@@ -132,10 +117,7 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
         // Connect to the Google api client for location services
         if (googleApiClient == null)
         {
-            /*refreshFloatingActionButton.setAnimation(rotatingAnimation);
-            refreshFloatingActionButton.setEnabled(false);*/
             progressBar.setVisibility(View.VISIBLE);
-            locationIsToBeUpdated = true;
             googleApiClient = new GoogleApiClient.Builder(getContext()).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
             googleApiClient.connect();
         }
@@ -188,10 +170,7 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
     @Override
     public void onConnected(Bundle connectionHint)
     {
-        if (locationIsToBeUpdated)
-        {
-            createLocationRequest();
-        }
+        createLocationRequest();
     }
 
     /**
@@ -230,8 +209,8 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
     {
         final int REQUEST_CHECK_SETTINGS = 0x1;
         locationRequest = new LocationRequest();
-        locationRequest.setInterval(5000);
-        locationRequest.setFastestInterval(5000);
+        locationRequest.setInterval(60000);
+        locationRequest.setFastestInterval(45000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
         PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build());
@@ -309,8 +288,8 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
         {
             if (googleApiClient.isConnected())
             {
-                isRequestingLocationUpdates = true;
                 LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
+                isRequestingLocationUpdates = true;
             }
         }
         catch (SecurityException e)
@@ -328,8 +307,8 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
     {
         if (googleApiClient != null && googleApiClient.isConnected())
         {
-            isRequestingLocationUpdates = false;
             LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
+            isRequestingLocationUpdates = false;
         }
     }
 
@@ -343,12 +322,11 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
     @Override
     public void onLocationChanged(Location location)
     {
-        isRequestingLocationUpdates = false;
-        locationIsToBeUpdated = false;
         try
         {
             if (isNetworkAvailable())
             {
+                updatingBusStopsProgressBarLinearLayout.setVisibility(View.VISIBLE);
                 URL nearestBusStopURL = new URL("http://bmtcmob.hostg.in/api/busstops/stopnearby/lat/" + String.valueOf(location.getLatitude()) + "/lon/" + String.valueOf(location.getLongitude()) + "/rad/1.0");
                 getNearestBusStopsTask = new GetNearestBusStopsTask(this);
                 getNearestBusStopsTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, nearestBusStopURL);
@@ -357,8 +335,6 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
             {
                 errorMessageTextView.setText(R.string.error_connecting_to_the_internet_click_refresh_text);
                 errorMessageTextView.setVisibility(View.VISIBLE);
-                /*refreshFloatingActionButton.clearAnimation();
-                refreshFloatingActionButton.setEnabled(true);*/
 
             }
         }
@@ -366,7 +342,6 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
         {
             Toast.makeText(getContext(), "Couldn't find bus stops nearby! Please try again later.", Toast.LENGTH_SHORT).show();
         }
-        stopLocationUpdates();
     }
 
     // What to do after the user has granted or denied permission to use their device's location service
@@ -438,34 +413,16 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
         {
             //animateNetworkingProgressImageView();
             updatingBusStopsProgressBarLinearLayout.setVisibility(View.VISIBLE);
-            locationIsToBeUpdated = true;
             errorMessageTextView.setVisibility(View.GONE);
             /*refreshFloatingActionButton.startAnimation(rotatingAnimation);
             refreshFloatingActionButton.setEnabled(false);*/
             createLocationRequest();
         }
-        else
-        {
-            countDownTimer = new CountDownTimer(45000, 45000)
-            {
-                @Override
-                public void onTick(long millisUntilFinished)
-                {
-
-                }
-
-                @Override
-                public void onFinish()
-                {
-                    refresh();
-                }
-            }.start();
-        }
     }
 
     // What to do once bus stops nearby have been found
     @Override
-    public void onBusStopsFound(final boolean isError, JSONArray busStopsArray)
+    public void onBusStopsFound(boolean isError, JSONArray busStopsArray)
     {
         updatingBusStopsProgressBarLinearLayout.setVisibility(View.GONE);
         progressBar.setVisibility(View.GONE);
@@ -481,20 +438,6 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
                 busStopsNearbyListView.setVisibility(View.INVISIBLE);
                 errorMessageTextView.setText(R.string.error_no_bus_stops_found_text);
                 errorMessageTextView.setVisibility(View.VISIBLE);
-                countDownTimer = new CountDownTimer(45000, 45000)
-                {
-                    @Override
-                    public void onTick(long millisUntilFinished)
-                    {
-
-                    }
-
-                    @Override
-                    public void onFinish()
-                    {
-                        refresh();
-                    }
-                }.start();
             }
             else
             {
@@ -535,41 +478,12 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
                             startActivity(getBusesArrivingAtBusStopIntent);
                         }
                     });
-
-                    countDownTimer = new CountDownTimer(45000, 45000)
-                    {
-                        @Override
-                        public void onTick(long millisUntilFinished)
-                        {
-
-                        }
-
-                        @Override
-                        public void onFinish()
-                        {
-                            refresh();
-                        }
-                    }.start();
                 }
                 catch (JSONException e)
                 {
                     busStopsNearbyListView.setVisibility(View.INVISIBLE);
                     errorMessageTextView.setText(R.string.error_no_bus_stops_found_text);
                     errorMessageTextView.setVisibility(View.VISIBLE);
-                    countDownTimer = new CountDownTimer(45000, 45000)
-                    {
-                        @Override
-                        public void onTick(long millisUntilFinished)
-                        {
-
-                        }
-
-                        @Override
-                        public void onFinish()
-                        {
-                            refresh();
-                        }
-                    }.start();
                 }
             }
         }
@@ -578,20 +492,6 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
             busStopsNearbyListView.setVisibility(View.INVISIBLE);
             errorMessageTextView.setText(R.string.error_connecting_to_the_internet_text);
             errorMessageTextView.setVisibility(View.VISIBLE);
-            countDownTimer = new CountDownTimer(45000, 45000)
-            {
-                @Override
-                public void onTick(long millisUntilFinished)
-                {
-
-                }
-
-                @Override
-                public void onFinish()
-                {
-                    refresh();
-                }
-            }.start();
         }
     }
 
@@ -627,95 +527,6 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
 
     }
 
-    /*private void animateNetworkingProgressImageView()
-    {
-        countDownTimer = new CountDownTimer(1000, 1000)
-        {
-            @Override
-            public void onTick(long millisUntilFinished)
-            {
-
-            }
-
-            @Override
-            public void onFinish()
-            {
-                networkingInProgressImageView.setImageResource(R.drawable.ic_rss_feed_orange_24dp_1_bar);
-                networkingInProgressImageView.setVisibility(View.VISIBLE);
-                new CountDownTimer(1000, 1000)
-                {
-                    @Override
-                    public void onTick(long millisUntilFinished)
-                    {
-
-                    }
-
-                    @Override
-                    public void onFinish()
-                    {
-                        //networkingInProgressImageView.setImageResource(R.drawable.ic_rss_feed_orange_24dp_2_bars);
-                        new CountDownTimer(1000, 1000)
-                        {
-                            @Override
-                            public void onTick(long millisUntilFinished)
-                            {
-
-                            }
-
-                            @Override
-                            public void onFinish()
-                            {
-                                //networkingInProgressImageView.setImageResource(R.drawable.ic_rss_feed_orange_24dp_3_bars);
-                                new CountDownTimer(2000, 2000)
-                                {
-                                    @Override
-                                    public void onTick(long millisUntilFinished)
-                                    {
-
-                                    }
-
-                                    @Override
-                                    public void onFinish()
-                                    {
-                                        networkingInProgressImageView.setImageResource(R.drawable.ic_rss_feed_orange_24dp_2_bars);
-                                        new CountDownTimer(1000, 1000)
-                                        {
-                                            @Override
-                                            public void onTick(long millisUntilFinished)
-                                            {
-
-                                            }
-
-                                            @Override
-                                            public void onFinish()
-                                            {
-                                                networkingInProgressImageView.setImageResource(R.drawable.ic_rss_feed_orange_24dp_1_bar);
-                                                new CountDownTimer(1000, 1000)
-                                                {
-                                                    @Override
-                                                    public void onTick(long millisUntilFinished)
-                                                    {
-
-                                                    }
-
-                                                    @Override
-                                                    public void onFinish()
-                                                    {
-                                                        networkingInProgressImageView.setVisibility(View.GONE);
-                                                    }
-                                                }.start();
-                                            }
-                                        }.start();
-                                    }
-                                }.start();
-                            }
-                        }.start();
-                    }
-                }.start();
-            }
-        }.start();
-    }*/
-
     public void onStop()
     {
         if (googleApiClient != null)
@@ -728,30 +539,12 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
     @Override
     public void onPause()
     {
-        if (progressBar != null && isRequestingLocationUpdates)
-        {
-            progressBar.setVisibility(View.GONE);
-        }
         if (getNearestBusStopsTask != null)
         {
             getNearestBusStopsTask.cancel(true);
         }
         stopLocationUpdates();
-        if (countDownTimer != null)
-        {
-            countDownTimer.cancel();
-        }
         super.onPause();
-    }
-
-    @Override
-    public void onResume()
-    {
-        if (progressBar.getVisibility() != View.VISIBLE)
-        {
-            refresh();
-        }
-        super.onResume();
     }
 
     @Override

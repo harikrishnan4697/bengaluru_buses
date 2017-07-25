@@ -17,6 +17,7 @@ class Route
     private String upRouteName;
     private String downRouteName;
     private BusStop[] busStopsEnRoute;
+    private String serviceType;
 
     String getRouteNumber()
     {
@@ -91,5 +92,15 @@ class Route
     public void setBusStopsEnRoute(BusStop[] busStopsEnRoute)
     {
         this.busStopsEnRoute = busStopsEnRoute;
+    }
+
+    public String getServiceType()
+    {
+        return serviceType;
+    }
+
+    public void setServiceType(String serviceType)
+    {
+        this.serviceType = serviceType;
     }
 }

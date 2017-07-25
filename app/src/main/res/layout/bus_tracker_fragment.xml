@@ -86,7 +86,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginStart="10dp"
-                android:text="Ordinary, Non A/C bus. Painted Green."
+                android:text="Non A/C bus. Painted Green."
                 android:textColor="#000000"
                 android:textSize="12sp"/>
 
@@ -109,7 +109,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginStart="10dp"
-                android:text="Ordinary, A/C bus. Painted Blue."
+                android:text="A/C bus. Painted Blue."
                 android:textColor="#000000"
                 android:textSize="12sp"/>
 
@@ -132,7 +132,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginStart="10dp"
-                android:text="Special Service, Non A/C bus. Painted Orange."
+                android:text="Metro Feeder bus. Painted Orange."
                 android:textColor="#000000"
                 android:textSize="12sp"/>
 
@@ -155,7 +155,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginStart="10dp"
-                android:text="Airport Shuttle, A/C bus. Painted Blue."
+                android:text="Airport Shuttle bus. Painted Blue."
                 android:textColor="#000000"
                 android:textSize="12sp"/>
 

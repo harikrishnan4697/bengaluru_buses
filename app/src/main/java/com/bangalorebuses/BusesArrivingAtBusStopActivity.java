@@ -1,6 +1,5 @@
 package com.bangalorebuses;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -12,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -34,7 +34,7 @@ import static com.bangalorebuses.Constants.NETWORK_QUERY_NO_ERROR;
 public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements NetworkingHelper
 {
     private BusStop selectedBusStop = new BusStop();
-    private ProgressDialog progressDialog;
+    private ProgressBar progressBar;
     private GetBusesArrivingAtStopTask getBusesArrivingAtStopTask;
     private ArrayList<String> busNumbers = new ArrayList<>();
     private ArrayList<String> busDestinations = new ArrayList<>();
@@ -60,6 +60,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
         listView = (ListView) findViewById(R.id.busesArrivingAtBusStopListView);
         TextView busStopDirectionInfoTextView = (TextView) findViewById(R.id.busStopNameInfoTextView);
         errorMessageTextView = (TextView) findViewById(R.id.busesArrivingAtBusStopErrorMessageTextView);
+        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
 
         selectedBusStop.setBusStopName(getIntent().getStringExtra("BUS_STOP_NAME"));
         if (getSupportActionBar() != null)
@@ -82,7 +83,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
         {
             busStopHasTraceableBuses = false;
             errorMessageTextView.setVisibility(View.GONE);
-            progressDialog = ProgressDialog.show(this, "Please wait", "Getting buses...");
+            progressBar.setVisibility(View.VISIBLE);
             String requestBody = "stopID=" + Integer.toString(selectedBusStop.getBusStopId());
             getBusesArrivingAtStopTask = new GetBusesArrivingAtStopTask(this);
             getBusesArrivingAtStopTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, requestBody);
@@ -158,7 +159,9 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
                     for (String busNumber : busNumbersSet)
                     {
                         appendLog(busNumber);
-                        new GetBusRouteDetailsTask(this, true).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, busNumber);
+                        Route route = new Route();
+                        route.setRouteNumber(busNumber);
+                        new GetBusRouteDetailsTask(this, true).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, route);
                     }
                 }
             }
@@ -170,13 +173,13 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
         }
         else if (errorMessage.equals(NETWORK_QUERY_IO_EXCEPTION))
         {
-            progressDialog.dismiss();
+            progressBar.setVisibility(View.GONE);
             errorMessageTextView.setText(R.string.error_no_buses_arriving_at_stop_text);
             errorMessageTextView.setVisibility(View.VISIBLE);
         }
         else
         {
-            progressDialog.dismiss();
+            progressBar.setVisibility(View.GONE);
             if (isNetworkAvailable())
             {
                 errorMessageTextView.setText(R.string.error_getting_buses_at_stop);
@@ -249,7 +252,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
 
         if (errorMessage.equals(NETWORK_QUERY_NO_ERROR))
         {
-            progressDialog.dismiss();
+            progressBar.setVisibility(View.GONE);
             if (numberOfBusesFound != 0)
             {
                 busStopHasTraceableBuses = true;
@@ -296,7 +299,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
             }
             else
             {
-                countDownTimer = new CountDownTimer(45000, 45000)
+                countDownTimer = new CountDownTimer(60000, 60000)
                 {
                     @Override
                     public void onTick(long millisUntilFinished)
@@ -441,7 +444,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
     @Override
     protected void onPause()
     {
-        if(countDownTimer != null)
+        if (countDownTimer != null)
         {
             countDownTimer.cancel();
         }

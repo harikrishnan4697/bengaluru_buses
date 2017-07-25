@@ -1,6 +1,7 @@
 package com.bangalorebuses;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.json.JSONArray;
 
@@ -16,7 +17,7 @@ import static com.bangalorebuses.Constants.NETWORK_QUERY_NO_ERROR;
 import static com.bangalorebuses.Constants.NETWORK_QUERY_REQUEST_TIMEOUT_EXCEPTION;
 import static com.bangalorebuses.Constants.NETWORK_QUERY_URL_EXCEPTION;
 
-class GetBusRouteDetailsTask extends AsyncTask<String, Void, Void>
+class GetBusRouteDetailsTask extends AsyncTask<Route, Void, Void>
 {
     private NetworkingHelper caller;
     private String errorMessage = NETWORK_QUERY_NO_ERROR;
@@ -31,25 +32,26 @@ class GetBusRouteDetailsTask extends AsyncTask<String, Void, Void>
     }
 
     @Override
-    protected Void doInBackground(String... routeNumber)
+    protected Void doInBackground(Route... routes)
     {
         URL busRouteTimetableURL;
         route = new Route();
         try
         {
-            if (routeNumber[0].contains("UP") || routeNumber[0].contains("DN"))
+            if (routes[0].getRouteNumber().contains("UP") || routes[0].getRouteNumber().contains("DN"))
             {
-                if (routeNumber[0].substring(routeNumber[0].length() - 2, routeNumber[0].length()).equals("UP"))
+                if (routes[0].getRouteNumber().substring(routes[0].getRouteNumber().length() - 2, routes[0].getRouteNumber().length()).equals("UP"))
                 {
                     routeDirection = "UP";
+                    routes[0].setRouteNumber(routes[0].getRouteNumber().replace("UP", ""));
                 }
                 else
                 {
                     routeDirection = "DN";
+                    routes[0].setRouteNumber(routes[0].getRouteNumber().replace("DN", ""));
                 }
             }
-            routeNumber[0] = routeNumber[0].replace("UP", "").replace("DN", "");
-            busRouteTimetableURL = new URL("http://bmtcmob.hostg.in/index.php/api/routetiming/timedetails/service/ord/routeno/" + routeNumber[0]);
+            busRouteTimetableURL = new URL("http://bmtcmob.hostg.in/index.php/api/routetiming/timedetails/service/ord/routeno/" + routes[0].getRouteNumber());
         }
         catch (java.net.MalformedURLException e)
         {
@@ -60,6 +62,7 @@ class GetBusRouteDetailsTask extends AsyncTask<String, Void, Void>
         StringBuilder result = new StringBuilder();
         try
         {
+            Log.e("GetBusRouteDetailsTask", "Getting details for route: " + routes[0].getRouteNumber());
             HttpURLConnection httpURLConnection = (HttpURLConnection) busRouteTimetableURL.openConnection();
             httpURLConnection.setRequestMethod("GET");
             httpURLConnection.setRequestProperty("Accept", "application/json");
@@ -87,7 +90,8 @@ class GetBusRouteDetailsTask extends AsyncTask<String, Void, Void>
         try
         {
             JSONArray jsonArray = new JSONArray(result.toString());
-            route.setRouteNumber(routeNumber[0]);
+            route.setRouteNumber(routes[0].getRouteNumber());
+            route.setServiceType(routes[0].getServiceType());
             route.setUpRouteName(jsonArray.getJSONObject(0).getString("upRouteName"));
             route.setDownRouteName((jsonArray.getJSONObject(0).getString("downRouteName")));
             route.setUpRouteId(jsonArray.getJSONArray(1).getJSONObject(0).getString("busRouteDetailId"));

@@ -32,7 +32,34 @@ class Constants
     static final int SEARCH_REQUEST_CODE = 13;
     static final int LOCATION_PERMISSION_REQUEST_CODE = 36;
     static final String ROUTE_SEARCH_HISTORY_FILENAME = "route_search_history";
+    static final String SQL_CREATE_ROUTES_ENTRIES =
+            "CREATE TABLE IF NOT EXISTS " + BengaluruBusesContract.Routes.TABLE_NAME + " (" +
+                    BengaluruBusesContract.Routes.COLUMN_ROUTE_ID + " INTEGER PRIMARY KEY," +
+                    BengaluruBusesContract.Routes.COLUMN_ROUTE_NUMBER + " TEXT," +
+                    BengaluruBusesContract.Routes.COLUMN_ROUTE_SERVICE_TYPE + " TEXT," +
+                    BengaluruBusesContract.Routes.COLUMN_ROUTE_DIRECTION + " TEXT," +
+                    BengaluruBusesContract.Routes.COLUMN_ROUTE_DIRECTION_NAME + " TEXT)";
 
+
+    // Db table creation commands
+    static final String SQL_CREATE_ROUTE_STOPS_ENTRIES =
+            "CREATE TABLE IF NOT EXISTS " + BengaluruBusesContract.RouteStops.TABLE_NAME + " (" +
+                    BengaluruBusesContract.RouteStops._ID + " INTEGER PRIMARY KEY," +
+                    BengaluruBusesContract.RouteStops.COLUMN_ROUTE_ORDER + " INTEGER," +
+                    BengaluruBusesContract.RouteStops.COLUMN_STOP_ID + " INTEGER REFERENCES " + BengaluruBusesContract.BusStops.TABLE_NAME + "(" + BengaluruBusesContract.BusStops.COLUMN_STOP_ID + ")," +
+                    BengaluruBusesContract.RouteStops.COLUMN_ROUTE_ID + " INTEGER REFERENCES " + BengaluruBusesContract.Routes.TABLE_NAME + "(" + BengaluruBusesContract.Routes.COLUMN_ROUTE_ID + "))";
+    static final String SQL_CREATE_ROUTE_TIMINGS_ENTRIES =
+            "CREATE TABLE IF NOT EXISTS " + BengaluruBusesContract.RouteTimings.TABLE_NAME + " (" +
+                    BengaluruBusesContract.RouteTimings._ID + " INTEGER PRIMARY KEY," +
+                    BengaluruBusesContract.RouteTimings.COLUMN_ROUTE_DEPARTURE_TIME + " TEXT," +
+                    BengaluruBusesContract.RouteTimings.COLUMN_ROUTE_ID + " INTEGER REFERENCES " + BengaluruBusesContract.Routes.TABLE_NAME + "(" + BengaluruBusesContract.Routes.COLUMN_ROUTE_ID + "))";
+    static final String SQL_CREATE_BUS_STOPS_ENTRIES =
+            "CREATE TABLE IF NOT EXISTS " + BengaluruBusesContract.BusStops.TABLE_NAME + " (" +
+                    BengaluruBusesContract.BusStops.COLUMN_STOP_ID + " INTEGER PRIMARY KEY," +
+                    BengaluruBusesContract.BusStops.COLUMN_STOP_NAME + " TEXT," +
+                    BengaluruBusesContract.BusStops.COLUMN_STOP_LAT + " REAL," +
+                    BengaluruBusesContract.BusStops.COLUMN_STOP_LONG + " REAL," +
+                    BengaluruBusesContract.BusStops.COLUMN_STOP_DIRECTION_NAME + " TEXT)";
     // Nearest bus stop
     static BusStop nearestBusStop;
 }
