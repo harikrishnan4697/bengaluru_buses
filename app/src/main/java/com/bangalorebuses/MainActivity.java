@@ -17,12 +17,23 @@ public class MainActivity extends AppCompatActivity
 {
     private ActionBar actionBar;
     private Fragment selectedFragment = null;
+    private CountDownTimer countDownTimer;
+    private boolean wasDisplayingSplashScreen = false;
+    private boolean activityWasPaused = false;
+    private NearbyFragment nearbyFragment = new NearbyFragment();
+    private BusTrackerFragment busTrackerFragment = new BusTrackerFragment();
+    private TripPlannerFragment tripPlannerFragment = new TripPlannerFragment();
+    private BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        initializeActivity();
+    }
+
+    private void initializeActivity()
+    {
         actionBar = getSupportActionBar();
         if (actionBar != null)
         {
@@ -33,7 +44,8 @@ public class MainActivity extends AppCompatActivity
         TextView appTitleTextView = (TextView) findViewById(R.id.appTitleTextView);
         Typeface typeFace = Typeface.createFromAsset(getAssets(), "fonts/Righteous-Regular.ttf");
         appTitleTextView.setTypeface(typeFace);
-        new CountDownTimer(2000, 2000)
+        wasDisplayingSplashScreen = true;
+        countDownTimer = new CountDownTimer(2000, 2000)
         {
             @Override
             public void onTick(long millisUntilFinished)
@@ -51,12 +63,8 @@ public class MainActivity extends AppCompatActivity
                 {
                     actionBar.show();
                 }
-                BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
+                bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
                 BottomNavigationBarHelper.disableShiftMode(bottomNavigationView);
-
-                final NearbyFragment nearbyFragment = new NearbyFragment();
-                final BusTrackerFragment busTrackerFragment = new BusTrackerFragment();
-                final TripPlannerFragment tripPlannerFragment = new TripPlannerFragment();
 
                 // Manually displaying the first fragment - one time only
                 bottomNavigationView.setSelectedItemId(R.id.navigation_track_bus);
@@ -66,7 +74,7 @@ public class MainActivity extends AppCompatActivity
                 transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
                 transaction.commitNow();
                 createDb();
-
+                wasDisplayingSplashScreen = false;
                 bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener()
                 {
                     @Override
@@ -95,7 +103,7 @@ public class MainActivity extends AppCompatActivity
                         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                         transaction.replace(R.id.frame_layout, selectedFragment);
                         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-                        transaction.commitNowAllowingStateLoss();
+                        transaction.commitNow();
                         return true;
                     }
                 });
@@ -116,6 +124,53 @@ public class MainActivity extends AppCompatActivity
     {
         BengaluruBusesDbHelper bengaluruBusesDbHelper = new BengaluruBusesDbHelper(MainActivity.this);
         bengaluruBusesDbHelper.getWritableDatabase();
+    }
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        countDownTimer.cancel();
+        activityWasPaused = true;
+
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+
+        if (wasDisplayingSplashScreen && activityWasPaused)
+        {
+            initializeActivity();
+        }
+        /*else if (activityWasPaused)
+        {
+            switch (bottomNavigationView.getSelectedItemId())
+            {
+                            case R.id.navigation_favourites:
+                                selectedFragment = new FavouritesFragment();
+                                actionBar.setTitle("Favourites");
+                                break;
+                case R.id.navigation_near_me:
+                    selectedFragment = nearbyFragment;
+                    actionBar.setTitle("Bus stops nearby");
+                    break;
+                case R.id.navigation_track_bus:
+                    selectedFragment = busTrackerFragment;
+                    actionBar.setTitle("Bus tracker");
+                    break;
+                case R.id.navigation_trip_planner:
+                    selectedFragment = tripPlannerFragment;
+                    actionBar.setTitle("Trip planner");
+                    break;
+            }
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.frame_layout, selectedFragment);
+            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+            transaction.commitNow();
+        }*/
+        activityWasPaused = false;
     }
 
     /*// What to do after the user has allowed or denied location services to be turned on

@@ -119,7 +119,7 @@ public class TripPlannerFragment extends Fragment implements NetworkingHelper, T
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
-        setRetainInstance(true);
+        //setRetainInstance(true);
     }
 
     /**
@@ -667,5 +667,11 @@ public class TripPlannerFragment extends Fragment implements NetworkingHelper, T
         {
             getTransitPointsTask.cancel(true);
         }
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
     }
 }

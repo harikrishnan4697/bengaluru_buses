@@ -7,6 +7,7 @@ class BusStop
     private String longitude;
     private int busStopId;
     private int routeOrder;
+    private String busStopDirectionName;
 
     String getBusStopName()
     {
@@ -56,5 +57,15 @@ class BusStop
     void setRouteOrder(int inputRouteOrder)
     {
         routeOrder = inputRouteOrder;
+    }
+
+    public String getBusStopDirectionName()
+    {
+        return busStopDirectionName;
+    }
+
+    public void setBusStopDirectionName(String busStopDirectionName)
+    {
+        this.busStopDirectionName = busStopDirectionName;
     }
 }

@@ -1,5 +1,7 @@
 package com.bangalorebuses;
 
+import java.util.ArrayList;
+
 /**
  * This class is used to keep all details about a bus route together.
  *
@@ -18,6 +20,8 @@ class Route
     private String downRouteName;
     private BusStop[] busStopsEnRoute;
     private String serviceType;
+    private ArrayList<String> upTimings;
+    private ArrayList<String> downTimings;
 
     String getRouteNumber()
     {
@@ -84,23 +88,43 @@ class Route
         downRouteName = inputDownRouteName;
     }
 
-    public BusStop[] getBusStopsEnRoute()
+    BusStop[] getBusStopsEnRoute()
     {
         return busStopsEnRoute;
     }
 
-    public void setBusStopsEnRoute(BusStop[] busStopsEnRoute)
+    void setBusStopsEnRoute(BusStop[] busStopsEnRoute)
     {
         this.busStopsEnRoute = busStopsEnRoute;
     }
 
-    public String getServiceType()
+    String getServiceType()
     {
         return serviceType;
     }
 
-    public void setServiceType(String serviceType)
+    void setServiceType(String serviceType)
     {
         this.serviceType = serviceType;
+    }
+
+    public ArrayList<String> getUpTimings()
+    {
+        return upTimings;
+    }
+
+    public void setUpTimings(ArrayList<String> upTimings)
+    {
+        this.upTimings = upTimings;
+    }
+
+    public ArrayList<String> getDownTimings()
+    {
+        return downTimings;
+    }
+
+    public void setDownTimings(ArrayList<String> downTimings)
+    {
+        this.downTimings = downTimings;
     }
 }
