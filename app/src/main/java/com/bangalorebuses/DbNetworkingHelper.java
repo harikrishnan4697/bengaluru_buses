@@ -10,11 +10,11 @@ package com.bangalorebuses;
 
 interface DbNetworkingHelper
 {
-    void onStopsWithNameDbTaskComplete(String errorMessage, String busStopNameToSearchFor, BusStop[] busStops);
+    void onStopsWithNameDbTaskComplete(String errorMessage, BusStop busStopToSearchFor, BusStop[] busStops);
 
     void onBusRouteDetailsDbTaskComplete(String errorMessage, Route route);
 
-    void onStopsOnBusRouteDbTaskComplete(String errorMessage, Route route, BusStop[] busStops);
+    void onStopsOnBusRouteDbTaskComplete(String errorMessage, int routeId, BusStop[] busStops);
 
     void onBusesEnRouteDbTaskComplete(String errorMessage, Route route);
 }

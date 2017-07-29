@@ -25,8 +25,10 @@ public class BengaluruBusesContract
     {
         public static final String  TABLE_NAME = "RouteStops";
         public static final String  COLUMN_ROUTE_ID = "RouteId";
-        public static final String  COLUMN_STOP_ID = "StopId";
-        public static final String  COLUMN_ROUTE_ORDER = "RouteOrder";
+        public static final String  COLUMN_STOP_NAME = "StopName";
+        public static final String  COLUMN_STOP_LAT = "StopLat";
+        public static final String  COLUMN_STOP_LONG = "StopLong";
+        public static final String  COLUMN_STOP_ROUTE_ORDER = "StopRouteOrder";
     }
 
     public static class BusStops

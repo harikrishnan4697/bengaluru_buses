@@ -22,13 +22,13 @@ class GetStopsWithNameDbTask extends AsyncTask<Void, Void, Void>
 {
     private DbNetworkingHelper caller;
     private String errorMessage = NETWORK_QUERY_NO_ERROR;
-    private String busStopNameToSearchFor;
+    private BusStop busStopToSearchFor;
     private BusStop[] busStops;
 
-    GetStopsWithNameDbTask(DbNetworkingHelper caller, String busStopNameToSearchFor)
+    GetStopsWithNameDbTask(DbNetworkingHelper caller, BusStop busStopToSearchFor)
     {
         this.caller = caller;
-        this.busStopNameToSearchFor = busStopNameToSearchFor;
+        this.busStopToSearchFor = busStopToSearchFor;
     }
 
     @Override
@@ -37,7 +37,8 @@ class GetStopsWithNameDbTask extends AsyncTask<Void, Void, Void>
         URL stopsWithNameURL;
         try
         {
-            stopsWithNameURL = new URL("http://bmtcmob.hostg.in/api/busstops/stopsearch/name/" + busStopNameToSearchFor);
+            stopsWithNameURL = new URL("http://bmtcmob.hostg.in/api/busstops/stopsearch/name/" + busStopToSearchFor.getBusStopName().replace(" ", "%20"));
+
         }
         catch (MalformedURLException e)
         {
@@ -77,32 +78,39 @@ class GetStopsWithNameDbTask extends AsyncTask<Void, Void, Void>
             JSONArray jsonArray = new JSONArray(result.toString());
             busStops = new BusStop[jsonArray.length()];
 
-            for (int i = 0; i < jsonArray.length(); i++)
+            if (jsonArray.length() == 0)
             {
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                String busStopName = jsonObject.getString("StopName");
-                busStops[i] = new BusStop();
-                if (busStopName.contains("("))
+                errorMessage = NETWORK_QUERY_JSON_EXCEPTION;
+            }
+            else
+            {
+                for (int i = 0; i < jsonArray.length(); i++)
                 {
-                    busStops[i].setBusStopName(busStopName.substring(0, busStopName.indexOf("(")));
-                    if (busStops[i].getBusStopName().substring(busStops[i].getBusStopName().length(), busStops[i].getBusStopName().length() - 1).equals(" "))
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    String busStopName = jsonObject.getString("StopName");
+                    busStops[i] = new BusStop();
+                    if (busStopName.contains("("))
                     {
-                        busStops[i].setBusStopName(busStopName.substring(0, busStops[i].getBusStopName().length() - 1));
+                        busStops[i].setBusStopName(busStopName.substring(0, busStopName.indexOf("(")));
+                        if (!busStops[i].getBusStopName().equals("") && busStops[i].getBusStopName().substring(busStops[i].getBusStopName().length() - 1, busStops[i].getBusStopName().length()).equals(" "))
+                        {
+                            busStops[i].setBusStopName(busStopName.substring(0, busStops[i].getBusStopName().length() - 1));
+                        }
+                        busStops[i].setBusStopDirectionName(busStopName.substring(busStopName.indexOf("("), busStopName.length()));
                     }
-                    busStops[i].setBusStopDirectionName(busStopName.substring(busStopName.indexOf("("), busStopName.length()));
-                }
-                else
-                {
-                    busStops[i].setBusStopName(busStopName);
-                    if (busStops[i].getBusStopName().substring(busStops[i].getBusStopName().length(), busStops[i].getBusStopName().length() - 1).equals(" "))
+                    else
                     {
-                        busStops[i].setBusStopName(busStopName.substring(0, busStops[i].getBusStopName().length() - 1));
+                        busStops[i].setBusStopName(busStopName);
+                        if (!busStops[i].getBusStopName().equals("") && busStops[i].getBusStopName().substring(busStops[i].getBusStopName().length() - 1, busStops[i].getBusStopName().length()).equals(" "))
+                        {
+                            busStops[i].setBusStopName(busStopName.substring(0, busStops[i].getBusStopName().length() - 1));
+                        }
+                        busStops[i].setBusStopDirectionName("Unknown");
                     }
-                    busStops[i].setBusStopDirectionName("Unknown");
+                    busStops[i].setBusStopId(jsonObject.getInt("StopId"));
+                    busStops[i].setLatitude(jsonObject.getString("StopLat"));
+                    busStops[i].setLongitude(jsonObject.getString("StopLong"));
                 }
-                busStops[i].setBusStopId(jsonObject.getInt("StopId"));
-                busStops[i].setLatitude(jsonObject.getString("StopLat"));
-                busStops[i].setLongitude(jsonObject.getString("StopLong"));
             }
         }
         catch (org.json.JSONException e)
@@ -115,6 +123,6 @@ class GetStopsWithNameDbTask extends AsyncTask<Void, Void, Void>
     @Override
     protected void onPostExecute(Void aVoid)
     {
-        caller.onStopsWithNameDbTaskComplete(errorMessage, busStopNameToSearchFor, busStops);
+        caller.onStopsWithNameDbTaskComplete(errorMessage, busStopToSearchFor, busStops);
     }
 }

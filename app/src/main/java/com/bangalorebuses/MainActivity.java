@@ -1,5 +1,6 @@
 package com.bangalorebuses;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -24,6 +25,7 @@ public class MainActivity extends AppCompatActivity
     private BusTrackerFragment busTrackerFragment = new BusTrackerFragment();
     private TripPlannerFragment tripPlannerFragment = new TripPlannerFragment();
     private BottomNavigationView bottomNavigationView;
+    private SQLiteDatabase database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -123,7 +125,7 @@ public class MainActivity extends AppCompatActivity
     private void createDb()
     {
         BengaluruBusesDbHelper bengaluruBusesDbHelper = new BengaluruBusesDbHelper(MainActivity.this);
-        bengaluruBusesDbHelper.getWritableDatabase();
+        database = bengaluruBusesDbHelper.getWritableDatabase();
     }
 
     @Override
@@ -179,4 +181,11 @@ public class MainActivity extends AppCompatActivity
     {
         selectedFragment.onActivityResult(requestCode, resultCode, data);
     }*/
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        database.close();
+    }
 }
