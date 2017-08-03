@@ -1,6 +1,8 @@
 package com.bangalorebuses;
 
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -13,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -75,14 +78,12 @@ public class MainActivity extends AppCompatActivity
                 transaction.replace(R.id.frame_layout, busTrackerFragment);
                 transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
                 transaction.commitNow();
-                createDb();
                 wasDisplayingSplashScreen = false;
                 bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener()
                 {
                     @Override
                     public boolean onNavigationItemSelected(@NonNull MenuItem item)
                     {
-
                         switch (item.getItemId())
                         {
                             /*case R.id.navigation_favourites:
@@ -122,10 +123,37 @@ public class MainActivity extends AppCompatActivity
         }.start();
     }
 
-    private void createDb()
+    private void getDatabase()
     {
         BengaluruBusesDbHelper bengaluruBusesDbHelper = new BengaluruBusesDbHelper(MainActivity.this);
-        database = bengaluruBusesDbHelper.getWritableDatabase();
+        try
+        {
+            database = bengaluruBusesDbHelper.getReadableDatabase();
+        }
+        catch (SQLiteException e)
+        {
+            e.printStackTrace();
+            Toast.makeText(this, "Something went wrong! Error code: 1", Toast.LENGTH_LONG).show();
+            finish();
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        nearbyFragment.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        if (wasDisplayingSplashScreen && activityWasPaused)
+        {
+            initializeActivity();
+        }
+        activityWasPaused = false;
+        getDatabase();
     }
 
     @Override
@@ -134,58 +162,6 @@ public class MainActivity extends AppCompatActivity
         super.onPause();
         countDownTimer.cancel();
         activityWasPaused = true;
-
-    }
-
-    @Override
-    protected void onResume()
-    {
-        super.onResume();
-
-        if (wasDisplayingSplashScreen && activityWasPaused)
-        {
-            initializeActivity();
-        }
-        /*else if (activityWasPaused)
-        {
-            switch (bottomNavigationView.getSelectedItemId())
-            {
-                            case R.id.navigation_favourites:
-                                selectedFragment = new FavouritesFragment();
-                                actionBar.setTitle("Favourites");
-                                break;
-                case R.id.navigation_near_me:
-                    selectedFragment = nearbyFragment;
-                    actionBar.setTitle("Bus stops nearby");
-                    break;
-                case R.id.navigation_track_bus:
-                    selectedFragment = busTrackerFragment;
-                    actionBar.setTitle("Bus tracker");
-                    break;
-                case R.id.navigation_trip_planner:
-                    selectedFragment = tripPlannerFragment;
-                    actionBar.setTitle("Trip planner");
-                    break;
-            }
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.frame_layout, selectedFragment);
-            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-            transaction.commitNow();
-        }*/
-        activityWasPaused = false;
-    }
-
-    /*// What to do after the user has allowed or denied location services to be turned on
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
-        selectedFragment.onActivityResult(requestCode, resultCode, data);
-    }*/
-
-    @Override
-    protected void onDestroy()
-    {
-        super.onDestroy();
         database.close();
     }
 }

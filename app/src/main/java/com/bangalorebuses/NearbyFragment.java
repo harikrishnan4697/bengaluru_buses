@@ -1,6 +1,7 @@
 package com.bangalorebuses;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -13,6 +14,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
@@ -21,12 +23,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,24 +50,25 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
-import static android.app.Activity.RESULT_OK;
 import static android.content.Context.LOCATION_SERVICE;
 import static com.bangalorebuses.Constants.LOCATION_PERMISSION_REQUEST_CODE;
 
-public class NearbyFragment extends Fragment implements NetworkingHelper, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener
+public class NearbyFragment extends Fragment implements NetworkingHelper, GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener, LocationListener
 {
     private ListView busStopsNearbyListView;
-    private GoogleApiClient googleApiClient;
-    private LocationRequest locationRequest;
-    private boolean isRequestingLocationUpdates = false;
-    private TextView errorMessageTextView;
-    private LocationManager locationManager;
-    private Animation rotatingAnimation;
     private LinearLayout updatingBusStopsProgressBarLinearLayout;
-    private ProgressBar progressBar;
     private NearbyBusStopsListCustomAdapter busStopsNearbyListAdaptor;
     private ArrayList<BusStop> busStops = new ArrayList<>();
     private GetNearestBusStopsTask getNearestBusStopsTask;
+    private GoogleApiClient googleApiClient;
+    private LocationRequest locationRequest;
+    private LocationManager locationManager;
+    private boolean isRequestingLocationUpdates;
+    private LinearLayout errorLinearLayout;
+    private ImageView errorImageView;
+    private TextView errorTextView;
+    private Button errorResolutionButton;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -80,10 +82,20 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
         View view = inflater.inflate(R.layout.nearby_fragment, container, false);
         updatingBusStopsProgressBarLinearLayout = (LinearLayout) view.findViewById(R.id.updatingBusStopsProgressBarLinearLayout);
         updatingBusStopsProgressBarLinearLayout.setVisibility(View.GONE);
-        progressBar = (ProgressBar) view.findViewById(R.id.nearby_fragment_progress_bar);
-        progressBar.setVisibility(View.GONE);
-        rotatingAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.rotate);
-        locationManager = (LocationManager) getContext().getSystemService(LOCATION_SERVICE);
+
+        errorLinearLayout = (LinearLayout) view.findViewById(R.id.errorLinearLayout);
+        errorImageView = (ImageView) view.findViewById(R.id.errorImageView);
+        errorTextView = (TextView) view.findViewById(R.id.errorTextView);
+        errorResolutionButton = (Button) view.findViewById(R.id.errorResolutionButton);
+        errorResolutionButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                fixLocationError();
+            }
+        });
+        errorLinearLayout.setVisibility(View.GONE);
 
         busStopsNearbyListView = (ListView) view.findViewById(R.id.busStopsNearbyListView);
         if (busStopsNearbyListView != null && busStopsNearbyListAdaptor != null)
@@ -102,9 +114,6 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
                 }
             });
         }
-
-        errorMessageTextView = (TextView) view.findViewById(R.id.nearby_fragment_error_message_text_view);
-        errorMessageTextView.setVisibility(View.GONE);
         return view;
     }
 
@@ -114,11 +123,12 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
         super.onActivityCreated(savedInstanceState);
         setRetainInstance(true);
         setHasOptionsMenu(true);
+
+        locationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
         // Connect to the Google api client for location services
         if (googleApiClient == null)
         {
-            progressBar.setVisibility(View.VISIBLE);
-            googleApiClient = new GoogleApiClient.Builder(getContext()).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
+            googleApiClient = new GoogleApiClient.Builder(getActivity()).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
             googleApiClient.connect();
         }
     }
@@ -131,7 +141,6 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
         super.onCreateOptionsMenu(menu, inflater);
     }
 
-    // Handle clicks of the menu buttons
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
@@ -181,8 +190,7 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult)
     {
-        errorMessageTextView.setText("Couldn't get current location! Please try again later.");
-        errorMessageTextView.setVisibility(View.VISIBLE);
+        Toast.makeText(getActivity(), "Couldn't get current location! Please try again later...", Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -194,11 +202,7 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
     @Override
     public void onConnectionSuspended(int i)
     {
-        if (isRequestingLocationUpdates)
-        {
-            errorMessageTextView.setText("Couldn't get current location! Please try again later.");
-            errorMessageTextView.setVisibility(View.VISIBLE);
-        }
+        Toast.makeText(getActivity(), "Couldn't get current location! Please try again later...", Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -207,6 +211,7 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
      */
     protected void createLocationRequest()
     {
+        updatingBusStopsProgressBarLinearLayout.setVisibility(View.VISIBLE);
         final int REQUEST_CHECK_SETTINGS = 0x1;
         locationRequest = new LocationRequest();
         locationRequest.setInterval(60000);
@@ -226,27 +231,26 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
                     case LocationSettingsStatusCodes.SUCCESS:
                         if (!isRequestingLocationUpdates)
                         {
-                            int permissionCheck = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION);
+                            int permissionCheck = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION);
                             if (permissionCheck == PackageManager.PERMISSION_GRANTED)
                             {
                                 startLocationUpdates();
                             }
                             else
                             {
-                                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+                                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
                             }
                         }
                         break;
                     case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
 
-                        int permissionCheck = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION);
+                        int permissionCheck = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION);
                         if (permissionCheck == PackageManager.PERMISSION_GRANTED)
                         {
                             if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
                             {
                                 if (!isRequestingLocationUpdates)
                                 {
-                                    progressBar.setVisibility(View.VISIBLE);
                                     startLocationUpdates();
                                 }
                             }
@@ -258,18 +262,17 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
                                 }
                                 catch (IntentSender.SendIntentException e)
                                 {
-                                    errorMessageTextView.setText("Failed to enable location services!");
-                                    errorMessageTextView.setVisibility(View.VISIBLE);
+                                    Toast.makeText(getActivity(), "Failed to enable location services!", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         }
                         else
                         {
-                            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+                            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
                         }
                         break;
                     case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                        Toast.makeText(getContext(), "Device doesn't have a GPS! Can't get bus stops nearby...", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), "Device doesn't have a GPS! Can't locate bus stops nearby...", Toast.LENGTH_LONG).show();
                         break;
                 }
             }
@@ -294,8 +297,7 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
         }
         catch (SecurityException e)
         {
-            errorMessageTextView.setText("Please grant the location permission in Settings > Apps > Bengaluru Buses.");
-            errorMessageTextView.setVisibility(View.VISIBLE);
+            e.printStackTrace();
         }
     }
 
@@ -305,6 +307,7 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
      */
     protected void stopLocationUpdates()
     {
+        updatingBusStopsProgressBarLinearLayout.setVisibility(View.GONE);
         if (googleApiClient != null && googleApiClient.isConnected())
         {
             LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
@@ -326,25 +329,27 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
         {
             if (isNetworkAvailable())
             {
-                updatingBusStopsProgressBarLinearLayout.setVisibility(View.VISIBLE);
-                URL nearestBusStopURL = new URL("http://bmtcmob.hostg.in/api/busstops/stopnearby/lat/" + String.valueOf(location.getLatitude()) + "/lon/" + String.valueOf(location.getLongitude()) + "/rad/1.0");
+                URL nearestBusStopURL = new URL("http://bmtcmob.hostg.in/api/busstops/stopnearby/lat/" + location.getLatitude() + "/lon/" + location.getLongitude() + "/rad/1.0");
                 getNearestBusStopsTask = new GetNearestBusStopsTask(this);
                 getNearestBusStopsTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, nearestBusStopURL);
             }
             else
             {
-                errorMessageTextView.setText(R.string.error_connecting_to_the_internet_click_refresh_text);
-                errorMessageTextView.setVisibility(View.VISIBLE);
-
+                updatingBusStopsProgressBarLinearLayout.setVisibility(View.GONE);
+                errorImageView.setImageResource(R.drawable.ic_cloud_off_black);
+                errorTextView.setText("Uh oh! No data connection.");
+                errorResolutionButton.setText("Try again");
+                errorLinearLayout.setVisibility(View.VISIBLE);
+                busStopsNearbyListView.setVisibility(View.GONE);
             }
         }
         catch (MalformedURLException e)
         {
+            updatingBusStopsProgressBarLinearLayout.setVisibility(View.GONE);
             Toast.makeText(getContext(), "Couldn't find bus stops nearby! Please try again later.", Toast.LENGTH_SHORT).show();
         }
     }
 
-    // What to do after the user has granted or denied permission to use their device's location service
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults)
     {
@@ -353,79 +358,58 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
             {
                 createLocationRequest();
+                errorLinearLayout.setVisibility(View.GONE);
             }
             else
             {
-                /*refreshFloatingActionButton.clearAnimation();
-                refreshFloatingActionButton.setEnabled(true);*/
-                Toast.makeText(getContext(), "Location access was denied! Couldn't locate bus stops nearby...", Toast.LENGTH_LONG).show();
+                updatingBusStopsProgressBarLinearLayout.setVisibility(View.GONE);
+                errorImageView.setImageResource(R.drawable.ic_location_disabled_black);
+                errorTextView.setText("Can't find bus stops nearby without access to GPS.");
+                errorResolutionButton.setText("Allow GPS access");
+                errorLinearLayout.setVisibility(View.VISIBLE);
+                busStopsNearbyListView.setVisibility(View.GONE);
             }
         }
     }
 
-    // What to do after the user has allowed or denied location services to be turned on
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        if (requestCode == Constants.SEARCH_NEARBY_BUS_STOP_REQUEST_CODE)
+        if (requestCode == 1)
         {
-            if (resultCode == RESULT_OK)
-            {
-                Intent getBusesArrivingAtBusStopIntent = new Intent(getContext(), BusesArrivingAtBusStopActivity.class);
-                getBusesArrivingAtBusStopIntent.putExtra("BUS_STOP_NAME", data.getStringExtra("BUS_STOP_NAME"));
-                getBusesArrivingAtBusStopIntent.putExtra("BUS_STOP_ID", data.getStringExtra("BUS_STOP_ID"));
-                startActivity(getBusesArrivingAtBusStopIntent);
-            }
-        }
-        else if (requestCode == 1)
-        {
-            if (resultCode == RESULT_OK)
-            {
-                if (!isRequestingLocationUpdates)
-                {
-                    progressBar.setVisibility(View.VISIBLE);
-                    startLocationUpdates();
-
-                }
-            }
-            else if (resultCode == 0)
+            if (resultCode == Activity.RESULT_OK)
             {
                 if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
                 {
-                    if (!isRequestingLocationUpdates)
-                    {
-                        progressBar.setVisibility(View.VISIBLE);
-                        startLocationUpdates();
-                    }
+                    createLocationRequest();
+                    errorLinearLayout.setVisibility(View.GONE);
                 }
-                else
-                {
-                    Toast.makeText(getContext(), "Can't find bus stops nearby without location...", Toast.LENGTH_LONG).show();
-                }
+            }
+            else
+            {
+                updatingBusStopsProgressBarLinearLayout.setVisibility(View.GONE);
+                errorImageView.setImageResource(R.drawable.ic_location_off_black);
+                errorTextView.setText("Can't find bus stops nearby because GPS is turned off.");
+                errorResolutionButton.setText("Turn GPS on");
+                errorLinearLayout.setVisibility(View.VISIBLE);
+                busStopsNearbyListView.setVisibility(View.GONE);
             }
         }
     }
 
-    // What to do when the floating refresh button has been clicked
-    public void refresh()
+    public void fixLocationError()
     {
-        if (isNetworkAvailable())
-        {
-            //animateNetworkingProgressImageView();
-            updatingBusStopsProgressBarLinearLayout.setVisibility(View.VISIBLE);
-            errorMessageTextView.setVisibility(View.GONE);
-            /*refreshFloatingActionButton.startAnimation(rotatingAnimation);
-            refreshFloatingActionButton.setEnabled(false);*/
-            createLocationRequest();
-        }
+        errorLinearLayout.setVisibility(View.GONE);
+        stopLocationUpdates();
+        createLocationRequest();
     }
 
     // What to do once bus stops nearby have been found
     @Override
     public void onBusStopsFound(boolean isError, JSONArray busStopsArray)
     {
+        errorLinearLayout.setVisibility(View.GONE);
         updatingBusStopsProgressBarLinearLayout.setVisibility(View.GONE);
-        progressBar.setVisibility(View.GONE);
         ArrayList<String> busStopNames = new ArrayList<>();
         ArrayList<String> busStopDistances = new ArrayList<>();
         busStops.clear();
@@ -435,9 +419,11 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
         {
             if (busStopsArray == null || busStopsArray.length() == 0)
             {
-                busStopsNearbyListView.setVisibility(View.INVISIBLE);
-                errorMessageTextView.setText(R.string.error_no_bus_stops_found_text);
-                errorMessageTextView.setVisibility(View.VISIBLE);
+                errorImageView.setImageResource(R.drawable.ic_person_pin_circle_black);
+                errorTextView.setText("Uh oh! There aren't any Bengaluru City bus stops nearby.");
+                errorResolutionButton.setText("Check again");
+                errorLinearLayout.setVisibility(View.VISIBLE);
+                busStopsNearbyListView.setVisibility(View.GONE);
             }
             else
             {
@@ -481,17 +467,21 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
                 }
                 catch (JSONException e)
                 {
-                    busStopsNearbyListView.setVisibility(View.INVISIBLE);
-                    errorMessageTextView.setText(R.string.error_no_bus_stops_found_text);
-                    errorMessageTextView.setVisibility(View.VISIBLE);
+                    errorImageView.setImageResource(R.drawable.ic_person_pin_circle_black);
+                    errorTextView.setText("Uh oh! There aren't any Bengaluru City bus stops nearby.");
+                    errorResolutionButton.setText("Check again");
+                    errorLinearLayout.setVisibility(View.VISIBLE);
+                    busStopsNearbyListView.setVisibility(View.GONE);
                 }
             }
         }
         else
         {
-            busStopsNearbyListView.setVisibility(View.INVISIBLE);
-            errorMessageTextView.setText(R.string.error_connecting_to_the_internet_text);
-            errorMessageTextView.setVisibility(View.VISIBLE);
+            errorImageView.setImageResource(R.drawable.ic_cloud_off_black);
+            errorTextView.setText("Uh oh! No data connection.");
+            errorResolutionButton.setText("Try again");
+            errorLinearLayout.setVisibility(View.VISIBLE);
+            busStopsNearbyListView.setVisibility(View.GONE);
         }
     }
 
@@ -527,38 +517,45 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
 
     }
 
-    public void onStop()
+    @Override
+    public void onStart()
     {
+        super.onStart();
         if (googleApiClient != null)
         {
-            googleApiClient.disconnect();
+            googleApiClient.connect();
         }
-        super.onStop();
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        if (googleApiClient != null && googleApiClient.isConnected() && !isRequestingLocationUpdates)
+        {
+            startLocationUpdates();
+        }
     }
 
     @Override
     public void onPause()
     {
+        super.onPause();
         if (getNearestBusStopsTask != null)
         {
             getNearestBusStopsTask.cancel(true);
         }
         stopLocationUpdates();
-        super.onPause();
+        isRequestingLocationUpdates = false;
     }
 
     @Override
-    public void onStart()
+    public void onStop()
     {
+        super.onStop();
         if (googleApiClient != null)
         {
-            googleApiClient.connect();
+            googleApiClient.disconnect();
         }
-        else
-        {
-            googleApiClient = new GoogleApiClient.Builder(getContext()).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
-            googleApiClient.connect();
-        }
-        super.onStart();
     }
 }
