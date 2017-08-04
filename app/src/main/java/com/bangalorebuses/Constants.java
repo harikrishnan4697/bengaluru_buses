@@ -1,5 +1,7 @@
 package com.bangalorebuses;
 
+import android.database.sqlite.SQLiteDatabase;
+
 /**
  * This class is used to store all the constant values in the app.
  *
@@ -63,4 +65,6 @@ class Constants
                     BengaluruBusesContract.BusStops.COLUMN_STOP_DIRECTION_NAME + " TEXT)";
     // Nearest bus stop
     static BusStop nearestBusStop;
+
+    static SQLiteDatabase db;
 }

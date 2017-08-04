@@ -564,7 +564,7 @@ public class TripPlannerFragment extends Fragment implements NetworkingHelper, T
     /**
      * This is a callback method called by the GetBusRouteDetailsTask.
      *
-     * @param errorMessage        This parameter is to convey if the task encountered an error.
+     * @param errorMessage   This parameter is to convey if the task encountered an error.
      * @param route          This parameter is a Route object with all the details set.
      * @param isForBusList   This parameter is returned back as it was passed to the
      *                       constructor. If true, the bus route details are for
@@ -581,9 +581,9 @@ public class TripPlannerFragment extends Fragment implements NetworkingHelper, T
     /**
      * This is a callback method called by the GetStopsOnBusRouteTask.
      *
-     * @param errorMessage       This parameter is to convey if the task encountered an error.
-     * @param busStops This parameter is a JSONArray of all the bus stops
-     *                      for a particular route id.
+     * @param errorMessage This parameter is to convey if the task encountered an error.
+     * @param busStops     This parameter is a JSONArray of all the bus stops
+     *                     for a particular route id.
      */
     @Override
     public void onStopsOnBusRouteFound(String errorMessage, BusStop[] busStops, Route route)
@@ -594,7 +594,7 @@ public class TripPlannerFragment extends Fragment implements NetworkingHelper, T
     /**
      * This is a callback method called by the GetBusesEnRouteTask.
      *
-     * @param errorMessage            This parameter is to convey if the task encountered an error.
+     * @param errorMessage       This parameter is to convey if the task encountered an error.
      * @param buses              This parameter is an array of buses en-route that the task found.
      * @param numberOfBusesFound This parameter is the number of en-route buses the task found.
      */
@@ -619,7 +619,7 @@ public class TripPlannerFragment extends Fragment implements NetworkingHelper, T
      * This is a callback method called by the GetBusesArrivingAtStopTask.
      *
      * @param errorMessage This parameter is to convey if the task encountered an error.
-     * @param buses   This parameter is a JSONArray of arriving at a bus stop.
+     * @param buses        This parameter is a JSONArray of arriving at a bus stop.
      */
     @Override
     public void onBusesAtStopFound(String errorMessage, JSONArray buses)

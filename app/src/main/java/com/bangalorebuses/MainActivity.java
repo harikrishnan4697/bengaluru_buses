@@ -1,7 +1,6 @@
 package com.bangalorebuses;
 
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -28,7 +27,6 @@ public class MainActivity extends AppCompatActivity
     private BusTrackerFragment busTrackerFragment = new BusTrackerFragment();
     private TripPlannerFragment tripPlannerFragment = new TripPlannerFragment();
     private BottomNavigationView bottomNavigationView;
-    private SQLiteDatabase database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -128,7 +126,7 @@ public class MainActivity extends AppCompatActivity
         BengaluruBusesDbHelper bengaluruBusesDbHelper = new BengaluruBusesDbHelper(MainActivity.this);
         try
         {
-            database = bengaluruBusesDbHelper.getReadableDatabase();
+            Constants.db = bengaluruBusesDbHelper.getReadableDatabase();
         }
         catch (SQLiteException e)
         {
@@ -162,6 +160,6 @@ public class MainActivity extends AppCompatActivity
         super.onPause();
         countDownTimer.cancel();
         activityWasPaused = true;
-        database.close();
+        Constants.db.close();
     }
 }

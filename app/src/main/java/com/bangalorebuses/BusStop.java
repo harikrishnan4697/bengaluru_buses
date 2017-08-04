@@ -8,6 +8,7 @@ class BusStop
     private int busStopId;
     private int routeOrder;
     private String busStopDirectionName;
+    private String distance;
 
     String getBusStopName()
     {
@@ -59,13 +60,23 @@ class BusStop
         routeOrder = inputRouteOrder;
     }
 
-    public String getBusStopDirectionName()
+    String getBusStopDirectionName()
     {
         return busStopDirectionName;
     }
 
-    public void setBusStopDirectionName(String busStopDirectionName)
+    void setBusStopDirectionName(String busStopDirectionName)
     {
         this.busStopDirectionName = busStopDirectionName;
+    }
+
+    String getDistance()
+    {
+        return distance;
+    }
+
+    void setDistance(String distance)
+    {
+        this.distance = distance;
     }
 }

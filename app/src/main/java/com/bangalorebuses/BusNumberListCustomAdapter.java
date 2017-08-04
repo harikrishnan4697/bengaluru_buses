@@ -18,19 +18,19 @@ import java.util.List;
 class BusNumberListCustomAdapter extends BaseAdapter implements Filterable
 {
     public Activity context;
-    private List<String> routeTypes = null;
-    private List<String> filteredRouteTypes = null;
+    private List<String> routeDirectionNames = null;
+    private List<String> filteredRouteDirectionNames = null;
     private LayoutInflater inflater;
     private ItemFilter mFilter = new ItemFilter();
     private List<String> routeNumbers = null;
     private List<String> filteredRouteNumbers = null;
 
-    BusNumberListCustomAdapter(Activity context, String[] routeNumbers, String[] routeTypes)
+    BusNumberListCustomAdapter(Activity context, String[] routeNumbers, String[] routeDirectionNames)
     {
         super();
         this.context = context;
-        this.routeTypes = Arrays.asList(routeTypes);
-        this.filteredRouteTypes = Arrays.asList(routeTypes);
+        this.routeDirectionNames = Arrays.asList(routeDirectionNames);
+        this.filteredRouteDirectionNames = Arrays.asList(routeDirectionNames);
         this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.routeNumbers = Arrays.asList(routeNumbers);
         this.filteredRouteNumbers = Arrays.asList(routeNumbers);
@@ -61,9 +61,10 @@ class BusNumberListCustomAdapter extends BaseAdapter implements Filterable
             holder = new ViewHolder();
             convertView = inflater.inflate(R.layout.search_list_item, null);
 
-            holder.imgViewLogo = (ImageView) convertView.findViewById(R.id.imageView);
-            holder.txtViewRouteNumber = (TextView) convertView.findViewById(R.id.routeNumberTextView);
-            holder.txtViewRouteType = (TextView) convertView.findViewById(R.id.routeTypeTextView);
+            holder.imageView = (ImageView) convertView.findViewById(R.id.imageView);
+            holder.routeNumberTextView = (TextView) convertView.findViewById(R.id.routeNumberTextView);
+            holder.routeServiceTypeNameTextView = (TextView) convertView.findViewById(R.id.routeServiceTypeTextView);
+            holder.routeDirectionNameTextView = (TextView) convertView.findViewById(R.id.routeDirectionNameTextView);
 
             convertView.setTag(holder);
         }
@@ -72,31 +73,29 @@ class BusNumberListCustomAdapter extends BaseAdapter implements Filterable
             holder = (ViewHolder) convertView.getTag();
         }
 
-        if (filteredRouteTypes.get(position).equals("Vayu Vajra"))
+        if (filteredRouteNumbers.get(position).contains("KIAS-"))
         {
-            holder.imgViewLogo.setImageResource(R.drawable.ic_flight_black);
+            holder.imageView.setImageResource(R.drawable.ic_flight_black);
+            holder.routeServiceTypeNameTextView.setText("Airport Shuttle");
         }
-        else if (filteredRouteTypes.get(position).equals("Vajra"))
+        else if (filteredRouteNumbers.get(position).length() > 2 && filteredRouteNumbers.get(position).substring(0, 2).equals("V-"))
         {
-            holder.imgViewLogo.setImageResource(R.drawable.ic_directions_bus_ac);
+            holder.imageView.setImageResource(R.drawable.ic_directions_bus_ac);
+            holder.routeServiceTypeNameTextView.setText("A/C");
         }
-        else if (filteredRouteTypes.get(position).equals("Ordinary"))
+        else if (filteredRouteNumbers.get(position).contains("MF-"))
         {
-            if (filteredRouteNumbers.get(position).contains("CHAKRA-") || filteredRouteNumbers.get(position).contains("MF-"))
-            {
-                holder.imgViewLogo.setImageResource(R.drawable.ic_directions_bus_special);
-            }
-            else
-            {
-                holder.imgViewLogo.setImageResource(R.drawable.ic_directions_bus_ordinary);
-            }
+            holder.imageView.setImageResource(R.drawable.ic_directions_bus_special);
+            holder.routeServiceTypeNameTextView.setText("Metro Feeder");
         }
         else
         {
-            holder.imgViewLogo.setImageResource(R.drawable.ic_directions_bus_special);
+            holder.imageView.setImageResource(R.drawable.ic_directions_bus_ordinary);
+            holder.routeServiceTypeNameTextView.setText("Non A/C");
         }
-        holder.txtViewRouteNumber.setText(filteredRouteNumbers.get(position));
-        holder.txtViewRouteType.setText(filteredRouteTypes.get(position));
+
+        holder.routeNumberTextView.setText(filteredRouteNumbers.get(position));
+        holder.routeDirectionNameTextView.setText(filteredRouteDirectionNames.get(position));
 
         return convertView;
     }
@@ -108,9 +107,10 @@ class BusNumberListCustomAdapter extends BaseAdapter implements Filterable
 
     private static class ViewHolder
     {
-        ImageView imgViewLogo;
-        TextView txtViewRouteNumber;
-        TextView txtViewRouteType;
+        ImageView imageView;
+        TextView routeNumberTextView;
+        TextView routeServiceTypeNameTextView;
+        TextView routeDirectionNameTextView;
     }
 
     private class ItemFilter extends Filter
@@ -133,7 +133,7 @@ class BusNumberListCustomAdapter extends BaseAdapter implements Filterable
             for (int i = 0; i < count; i++)
             {
                 routeNumber = routeNumbers.get(i);
-                routeType = routeTypes.get(i);
+                routeType = routeDirectionNames.get(i);
                 if (routeNumber.toLowerCase().contains(filterString))
                 {
                     filtered_route_numbers.add(routeNumber);
@@ -141,7 +141,7 @@ class BusNumberListCustomAdapter extends BaseAdapter implements Filterable
                 }
             }
 
-            filteredRouteTypes = filtered_route_types;
+            filteredRouteDirectionNames = filtered_route_types;
             results.values = filtered_route_numbers;
             results.count = filtered_route_numbers.size();
 
