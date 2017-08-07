@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
+import static com.bangalorebuses.Constants.db;
 
 public class TripPlannerFragment extends Fragment implements NetworkingHelper, TripPlannerHelper
 {
@@ -140,14 +141,14 @@ public class TripPlannerFragment extends Fragment implements NetworkingHelper, T
     {
         Intent searchActivityIntent = new Intent(getContext(), SearchActivity.class);
         searchActivityIntent.putExtra("Search_Type", Constants.SEARCH_TYPE_BUS_STOP);
-        startActivityForResult(searchActivityIntent, Constants.SEARCH_START_BUS_STOP_REQUEST_CODE);
+        getActivity().startActivityForResult(searchActivityIntent, Constants.SEARCH_START_BUS_STOP_REQUEST_CODE);
     }
 
     private void searchDestination()
     {
         Intent searchActivityIntent = new Intent(getContext(), SearchActivity.class);
         searchActivityIntent.putExtra("Search_Type", Constants.SEARCH_TYPE_BUS_STOP);
-        startActivityForResult(searchActivityIntent, Constants.SEARCH_END_BUS_STOP_REQUEST_CODE);
+        getActivity().startActivityForResult(searchActivityIntent, Constants.SEARCH_END_BUS_STOP_REQUEST_CODE);
     }
 
     @Override
@@ -157,13 +158,13 @@ public class TripPlannerFragment extends Fragment implements NetworkingHelper, T
         {
             if (requestCode == Constants.SEARCH_START_BUS_STOP_REQUEST_CODE)
             {
-                startBusStop.setBusStopName(data.getStringExtra("Selected_Item"));
-                originButton.setText(data.getStringExtra("Selected_Item"));
+                startBusStop.setBusStopName(data.getStringExtra("BUS_STOP_NAME"));
+                originButton.setText(data.getStringExtra("BUS_STOP_NAME"));
             }
             else if (requestCode == Constants.SEARCH_END_BUS_STOP_REQUEST_CODE)
             {
-                endBusStop.setBusStopName(data.getStringExtra("Selected_Item"));
-                destinationButton.setText(data.getStringExtra("Selected_Item"));
+                endBusStop.setBusStopName(data.getStringExtra("BUS_STOP_NAME"));
+                destinationButton.setText(data.getStringExtra("BUS_STOP_NAME"));
             }
 
             if (originButton != null && !originButton.getText().equals("") && destinationButton != null && !destinationButton.getText().equals(""))
@@ -193,12 +194,10 @@ public class TripPlannerFragment extends Fragment implements NetworkingHelper, T
             else
             {
                 appendLog("\n\n-- Getting routes from " + startBusStop.getBusStopName() + " to " + endBusStop.getBusStopName() + " --");
-                switchBusStopsImageView.setEnabled(false);
+                /*switchBusStopsImageView.setEnabled(false);
                 originButton.setEnabled(false);
-                destinationButton.setEnabled(false);
-                progressBar.setVisibility(View.VISIBLE);
-                getDirectBusesTask = new GetDirectBusesTask(this);
-                getDirectBusesTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, startBusStop, endBusStop);
+                destinationButton.setEnabled(false);*/
+                new GetDirectRoutesBetweenStops().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             }
         }
         else
@@ -673,5 +672,23 @@ public class TripPlannerFragment extends Fragment implements NetworkingHelper, T
     public void onResume()
     {
         super.onResume();
+    }
+
+    class GetDirectRoutesBetweenStops extends AsyncTask<Void, Void, Void>
+    {
+        @Override
+        protected Void doInBackground(Void... params)
+        {
+            DbQueries.getDirectRoutesBetweenStops(db, startBusStop.getBusStopName(), endBusStop.getBusStopName());
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid)
+        {
+            errorMessageTextView.setText("Found direct routes");
+            errorMessageTextView.setVisibility(View.VISIBLE);
+            super.onPostExecute(aVoid);
+        }
     }
 }

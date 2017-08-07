@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        nearbyFragment.onActivityResult(requestCode, resultCode, data);
+        selectedFragment.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -160,6 +160,6 @@ public class MainActivity extends AppCompatActivity
         super.onPause();
         countDownTimer.cancel();
         activityWasPaused = true;
-        Constants.db.close();
+        //Constants.db.close();
     }
 }

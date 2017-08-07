@@ -238,7 +238,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
                 route.setDirection(DIRECTION_UP);
                 if (Constants.db.isOpen())
                 {
-                    db.rawQuery("", null)
+                    db.rawQuery("", null);
                 }
                 new GetStopsOnBusRouteTask(this, route.getUpRouteId(), route).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             }
