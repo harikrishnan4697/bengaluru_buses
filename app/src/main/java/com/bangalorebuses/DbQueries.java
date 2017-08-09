@@ -5,30 +5,38 @@ import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
 
-import static com.bangalorebuses.Constants.DIRECTION_UP;
-
 class DbQueries
 {
-    public static Route getRouteDetails(SQLiteDatabase db, int routeId)
+    public static ArrayList<BusRoute> getAllRoutes(SQLiteDatabase db)
     {
-        Route route = new Route();
+        Cursor cursor = db.rawQuery("select Routes.* from Routes", null);
+        ArrayList<BusRoute> routes = new ArrayList<>();
+        while (cursor.moveToNext())
+        {
+            BusRoute route = new BusRoute();
+            route.setBusRouteId(cursor.getInt(0));
+            route.setBusRouteNumber(cursor.getString(1));
+            route.setBusRouteServiceType(cursor.getString(2));
+            route.setBusRouteDirection(cursor.getString(3));
+            route.setBusRouteDirectionName(cursor.getString(4));
+            routes.add(route);
+        }
+        cursor.close();
+        return routes;
+    }
+
+    public static BusRoute getRouteDetails(SQLiteDatabase db, int routeId)
+    {
+        BusRoute route = new BusRoute();
         Cursor cursor = db.rawQuery("select Routes.RouteId, Routes.RouteNumber, Routes.RouteServiceType, Routes.RouteDirection," +
                 " Routes.RouteDirectionName from Routes where Routes.RouteId = " + routeId, null);
         if (cursor.moveToNext())
         {
-            route.setRouteNumber(cursor.getString(cursor.getColumnIndex(BengaluruBusesContract.Routes.COLUMN_ROUTE_NUMBER)));
-            route.setServiceType(cursor.getString(cursor.getColumnIndex(BengaluruBusesContract.Routes.COLUMN_ROUTE_SERVICE_TYPE)));
-            route.setDirection(cursor.getString(cursor.getColumnIndex(BengaluruBusesContract.Routes.COLUMN_ROUTE_DIRECTION)));
-            if (cursor.getString(cursor.getColumnIndex(BengaluruBusesContract.Routes.COLUMN_ROUTE_DIRECTION)).equals(DIRECTION_UP))
-            {
-                route.setUpRouteId(cursor.getString(cursor.getColumnIndex(BengaluruBusesContract.Routes.COLUMN_ROUTE_ID)));
-                route.setUpRouteName(cursor.getString(cursor.getColumnIndex(BengaluruBusesContract.Routes.COLUMN_ROUTE_DIRECTION_NAME)));
-            }
-            else
-            {
-                route.setDownRouteId(cursor.getString(cursor.getColumnIndex(BengaluruBusesContract.Routes.COLUMN_ROUTE_ID)));
-                route.setDownRouteName(cursor.getString(cursor.getColumnIndex(BengaluruBusesContract.Routes.COLUMN_ROUTE_DIRECTION_NAME)));
-            }
+            route.setBusRouteId(cursor.getInt(0));
+            route.setBusRouteNumber(cursor.getString(1));
+            route.setBusRouteServiceType(cursor.getString(2));
+            route.setBusRouteDirection(cursor.getString(3));
+            route.setBusRouteDirectionName(cursor.getString(3));
             cursor.close();
             return route;
         }
@@ -39,25 +47,65 @@ class DbQueries
         }
     }
 
+    public static ArrayList<BusRoute> getRoutesWithNumber(SQLiteDatabase db, String routeNumber)
+    {
+        Cursor cursor = db.rawQuery("select Routes.RouteId, Routes.RouteNumber, Routes.RouteServiceType," +
+                " Routes.RouteDirection, Routes.RouteDirectionName from Routes where Routes.RouteNumber =" +
+                " '" + routeNumber + "'", null);
+        ArrayList<BusRoute> busRoutes = new ArrayList<>();
+        while (cursor.moveToNext())
+        {
+            BusRoute route = new BusRoute();
+            route.setBusRouteId(cursor.getInt(0));
+            route.setBusRouteNumber(cursor.getString(1));
+            route.setBusRouteServiceType(cursor.getString(2));
+            route.setBusRouteDirection(cursor.getString(3));
+            route.setBusRouteDirectionName(cursor.getString(4));
+            busRoutes.add(route);
+        }
+        cursor.close();
+        return busRoutes;
+    }
+
     public static ArrayList<BusStop> getStopsOnRoute(SQLiteDatabase db, int routeId)
     {
         Cursor cursor = db.rawQuery("select RouteStops.StopId, Stops.StopName,Stops.StopLat," +
                 " Stops.StopLong, Stops.StopDirectionName, RouteStops.StopRouteOrder from RouteStops " +
                 "join Stops where RouteStops.RouteId = " + routeId + " and RouteStops.StopId  = Stops.StopId", null);
         ArrayList<BusStop> stopsOnRoute = new ArrayList<>();
-        while(cursor.moveToNext())
+        while (cursor.moveToNext())
         {
             BusStop busStop = new BusStop();
             busStop.setBusStopId(cursor.getInt(0));
             busStop.setBusStopName(cursor.getString(1));
-            busStop.setLatitude(cursor.getString(2));
-            busStop.setLongitude(cursor.getString(3));
+            busStop.setBusStopLat(cursor.getString(2));
+            busStop.setBusStopLong(cursor.getString(3));
             busStop.setBusStopDirectionName(cursor.getString(4));
-            busStop.setRouteOrder(cursor.getInt(5));
+            busStop.setBusStopRouteOrder(cursor.getInt(5));
             stopsOnRoute.add(busStop);
         }
         cursor.close();
         return stopsOnRoute;
+    }
+
+    public static ArrayList<BusRoute> getRoutesArrivingAtStop(SQLiteDatabase db, int stopId)
+    {
+        Cursor cursor = db.rawQuery("select Routes.RouteId, Routes.RouteNumber, Routes.RouteServiceType," +
+                " Routes.RouteDirection, Routes.RouteDirectionName from RouteStops join" +
+                " Routes where RouteStops.RouteId = Routes.RouteId and RouteStops.StopId = " + stopId, null);
+        ArrayList<BusRoute> routes = new ArrayList<>();
+        while (cursor.moveToNext())
+        {
+            BusRoute route = new BusRoute();
+            route.setBusRouteId(cursor.getInt(0));
+            route.setBusRouteNumber(cursor.getString(1));
+            route.setBusRouteServiceType(cursor.getString(2));
+            route.setBusRouteDirection(cursor.getString(3));
+            route.setBusRouteDirectionName(cursor.getString(4));
+            routes.add(route);
+        }
+        cursor.close();
+        return routes;
     }
 
     public static ArrayList<String> getRouteDepartureTimings(SQLiteDatabase db, int routeId)
@@ -65,9 +113,9 @@ class DbQueries
         Cursor cursor = db.rawQuery("select RouteTimings.RouteDepartureTime from RouteTimings" +
                 " where RouteTimings.RouteId = " + routeId, null);
         ArrayList<String> departureTimings = new ArrayList<>();
-        while(cursor.moveToNext())
+        while (cursor.moveToNext())
         {
-            departureTimings.add(cursor.getString(cursor.getColumnIndex(BengaluruBusesContract.RouteTimings.COLUMN_ROUTE_DEPARTURE_TIME)));
+            departureTimings.add(cursor.getString(0));
         }
         cursor.close();
         return departureTimings;
@@ -87,8 +135,8 @@ class DbQueries
             DirectTrip directTrip = new DirectTrip();
             BusStop originStop = new BusStop();
             BusStop destinationStop = new BusStop();
-            Route route = new Route();
-            route.setUpRouteId(cursor.getString(0));
+            BusRoute route = new BusRoute();
+            route.setBusRouteId(cursor.getInt(0));
             originStop.setBusStopId(cursor.getInt(1));
             destinationStop.setBusStopId(cursor.getInt(2));
             directTrips.add(directTrip);
@@ -104,11 +152,11 @@ class DbQueries
                 " Stops.StopDirectionName from Stops where Stops.StopId = " + stopId, null);
         if (cursor.moveToNext())
         {
-            busStop.setBusStopId(cursor.getInt(cursor.getColumnIndex(BengaluruBusesContract.BusStops.COLUMN_STOP_ID)));
-            busStop.setBusStopName(cursor.getString(cursor.getColumnIndex(BengaluruBusesContract.BusStops.COLUMN_STOP_NAME)));
-            busStop.setLatitude(cursor.getString(cursor.getColumnIndex(BengaluruBusesContract.BusStops.COLUMN_STOP_LAT)));
-            busStop.setLongitude(cursor.getString(cursor.getColumnIndex(BengaluruBusesContract.BusStops.COLUMN_STOP_LONG)));
-            busStop.setBusStopDirectionName(cursor.getString(cursor.getColumnIndex(BengaluruBusesContract.BusStops.COLUMN_STOP_DIRECTION_NAME)));
+            busStop.setBusStopId(cursor.getInt(0));
+            busStop.setBusStopName(cursor.getString(1));
+            busStop.setBusStopLat(cursor.getString(2));
+            busStop.setBusStopLong(cursor.getString(3));
+            busStop.setBusStopDirectionName(cursor.getString(4));
             return busStop;
         }
         else
@@ -126,11 +174,29 @@ class DbQueries
         while (cursor.moveToNext())
         {
             BusStop busStop = new BusStop();
-            busStop.setBusStopId(cursor.getInt(cursor.getColumnIndex(BengaluruBusesContract.BusStops.COLUMN_STOP_ID)));
-            busStop.setBusStopName(cursor.getString(cursor.getColumnIndex(BengaluruBusesContract.BusStops.COLUMN_STOP_NAME)));
-            busStop.setLatitude(cursor.getString(cursor.getColumnIndex(BengaluruBusesContract.BusStops.COLUMN_STOP_LAT)));
-            busStop.setLongitude(cursor.getString(cursor.getColumnIndex(BengaluruBusesContract.BusStops.COLUMN_STOP_LONG)));
-            busStop.setBusStopDirectionName(cursor.getString(cursor.getColumnIndex(BengaluruBusesContract.BusStops.COLUMN_STOP_DIRECTION_NAME)));
+            busStop.setBusStopId(cursor.getInt(0));
+            busStop.setBusStopName(cursor.getString(1));
+            busStop.setBusStopLat(cursor.getString(2));
+            busStop.setBusStopLong(cursor.getString(3));
+            busStop.setBusStopDirectionName(cursor.getString(4));
+            busStops.add(busStop);
+        }
+        cursor.close();
+        return busStops;
+    }
+
+    public static ArrayList<BusStop> getAllStops(SQLiteDatabase db)
+    {
+        Cursor cursor = db.rawQuery("select Stops.* from Stops", null);
+        ArrayList<BusStop> busStops = new ArrayList<>();
+        while (cursor.moveToNext())
+        {
+            BusStop busStop = new BusStop();
+            busStop.setBusStopId(cursor.getInt(0));
+            busStop.setBusStopName(cursor.getString(1));
+            busStop.setBusStopLat(cursor.getString(2));
+            busStop.setBusStopLong(cursor.getString(3));
+            busStop.setBusStopDirectionName(cursor.getString(4));
             busStops.add(busStop);
         }
         cursor.close();

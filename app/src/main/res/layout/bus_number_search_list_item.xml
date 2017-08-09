@@ -10,8 +10,8 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
@@ -41,7 +41,7 @@
             android:maxLines="1"
             android:text="Metro Feeder"
             android:textColor="#000000"
-            android:textSize="14sp"/>
+            android:textSize="12sp"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -62,7 +62,7 @@
                 android:maxLines="1"
                 android:text="MF-1"
                 android:textColor="#000000"
-                android:textSize="18sp"/>
+                android:textSize="14sp"/>
 
         </LinearLayout>
 
@@ -79,6 +79,6 @@
         android:ellipsize="end"
         android:maxLines="2"
         android:text="SV Road Metro Station To SV Road Metro Station"
-        android:textSize="14sp"/>
+        android:textSize="12sp"/>
 
 </RelativeLayout>

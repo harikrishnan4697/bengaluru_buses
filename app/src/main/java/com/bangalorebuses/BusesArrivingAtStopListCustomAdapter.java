@@ -69,7 +69,7 @@ class BusesArrivingAtStopListCustomAdapter extends BaseAdapter
 
         if (routeNumbers.get(position).length() > 5 && routeNumbers.get(position).contains("KIAS-"))
         {
-            holder.imgViewLogo.setImageResource(R.drawable.ic_flight_black);
+            holder.imgViewLogo.setImageResource(R.drawable.ic_flight_blue);
         }
         else if (routeNumbers.get(position).length() > 1 && routeNumbers.get(position).substring(0, 2).equals("V-"))
         {

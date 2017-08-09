@@ -51,6 +51,7 @@ import java.util.ArrayList;
 
 import static android.content.Context.LOCATION_SERVICE;
 import static com.bangalorebuses.Constants.LOCATION_PERMISSION_REQUEST_CODE;
+import static com.bangalorebuses.Constants.db;
 
 public class NearbyFragment extends Fragment implements NetworkingHelper, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener, NearbyBusStopsRecyclerViewAdapter.ItemClickListener
@@ -58,6 +59,7 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
     private LinearLayout updatingBusStopsProgressBarLinearLayout;
     private ArrayList<BusStop> busStops = new ArrayList<>();
     private GetNearestBusStopsTask getNearestBusStopsTask;
+    private GetRoutesArrivingAtStopTask getRoutesArrivingAtStopTask;
     private GoogleApiClient googleApiClient;
     private LocationRequest locationRequest;
     private LocationManager locationManager;
@@ -67,6 +69,7 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
     private TextView errorTextView;
     private TextView errorResolutionTextView;
     private RecyclerView nearbyBusStopsRecyclerView;
+    private boolean locationHasToBeUpdated = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -109,6 +112,7 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
         // Connect to the Google api client for location services
         if (googleApiClient == null)
         {
+            locationHasToBeUpdated = true;
             googleApiClient = new GoogleApiClient.Builder(getActivity()).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
             googleApiClient.connect();
         }
@@ -131,6 +135,9 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
                 Intent searchActivityIntent = new Intent(getContext(), SearchActivity.class);
                 searchActivityIntent.putExtra("Search_Type", Constants.SEARCH_TYPE_BUS_STOP);
                 startActivityForResult(searchActivityIntent, Constants.SEARCH_NEARBY_BUS_STOP_REQUEST_CODE);
+                break;
+            case R.id.nearby_refresh:
+                createLocationRequest();
                 break;
             default:
                 return super.onOptionsItemSelected(item);
@@ -160,7 +167,11 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
     @Override
     public void onConnected(Bundle connectionHint)
     {
-        createLocationRequest();
+        if (locationHasToBeUpdated)
+        {
+            createLocationRequest();
+            locationHasToBeUpdated = false;
+        }
     }
 
     /**
@@ -195,8 +206,8 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
         updatingBusStopsProgressBarLinearLayout.setVisibility(View.VISIBLE);
         final int REQUEST_CHECK_SETTINGS = 0x1;
         locationRequest = new LocationRequest();
-        locationRequest.setInterval(60000);
-        locationRequest.setFastestInterval(45000);
+        locationRequest.setInterval(5000);
+        locationRequest.setFastestInterval(3000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
         PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build());
@@ -306,6 +317,8 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
     @Override
     public void onLocationChanged(Location location)
     {
+        stopLocationUpdates();
+        isRequestingLocationUpdates = false;
         try
         {
             if (isNetworkAvailable())
@@ -398,8 +411,6 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
     @Override
     public void onBusStopsFound(boolean isError, JSONArray busStopsArray)
     {
-        errorLinearLayout.setVisibility(View.GONE);
-        updatingBusStopsProgressBarLinearLayout.setVisibility(View.GONE);
         busStops.clear();
 
         if (!isError)
@@ -430,18 +441,17 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
                             {
                                 busStop.setBusStopName(busStopName);
                             }
+                            if (busStop.getBusStopName().substring(busStop.getBusStopName().length() - 1, busStop.getBusStopName().length()).equals(" "))
+                            {
+                                busStop.setBusStopName(busStop.getBusStopName().substring(0, busStop.getBusStopName().length() - 1));
+                            }
                             busStop.setBusStopId(busStopsArray.getJSONObject(i).getInt("StopId"));
-                            busStop.setDistance(((int) (Float.parseFloat(busStopsArray.getJSONObject(i).getString("StopDist")) * 1000)) + " metres away");
+                            busStop.setBusStopDistance(((int) (Float.parseFloat(busStopsArray.getJSONObject(i).getString("StopDist")) * 1000)) + " metres away");
                             busStops.add(busStop);
                         }
                     }
-
-                    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
-                    nearbyBusStopsRecyclerView.setLayoutManager(linearLayoutManager);
-                    NearbyBusStopsRecyclerViewAdapter adaptor = new NearbyBusStopsRecyclerViewAdapter(busStops);
-                    nearbyBusStopsRecyclerView.setAdapter(adaptor);
-                    adaptor.setClickListener(this);
-                    nearbyBusStopsRecyclerView.setVisibility(View.VISIBLE);
+                    getRoutesArrivingAtStopTask = new GetRoutesArrivingAtStopTask();
+                    getRoutesArrivingAtStopTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, busStops);
                 }
                 catch (JSONException e)
                 {
@@ -468,19 +478,19 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
 
     // What to do once bus route details have been found
     @Override
-    public void onBusRouteDetailsFound(String errorMessage, final Route route, boolean isForList, final String routeDirection)
+    public void onBusRouteDetailsFound(String errorMessage, final BusRoute route, boolean isForList, final String routeDirection)
     {
 
     }
 
     @Override
-    public void onStopsOnBusRouteFound(String errorMessage, BusStop[] busStops, Route route)
+    public void onStopsOnBusRouteFound(String errorMessage, BusStop[] busStops, BusRoute route)
     {
 
     }
 
     @Override
-    public void onBusesEnRouteFound(String errorMessage, Bus[] buses, int numberOfBusesFound, Route route, BusStop selectedBusStop)
+    public void onBusesEnRouteFound(String errorMessage, Bus[] buses, int numberOfBusesFound, BusRoute route, BusStop selectedBusStop)
     {
 
     }
@@ -509,16 +519,6 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
     }
 
     @Override
-    public void onResume()
-    {
-        super.onResume();
-        if (googleApiClient != null && googleApiClient.isConnected() && !isRequestingLocationUpdates)
-        {
-            startLocationUpdates();
-        }
-    }
-
-    @Override
     public void onPause()
     {
         super.onPause();
@@ -526,8 +526,11 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
         {
             getNearestBusStopsTask.cancel(true);
         }
-        stopLocationUpdates();
-        isRequestingLocationUpdates = false;
+        if (isRequestingLocationUpdates)
+        {
+            locationHasToBeUpdated = true;
+            stopLocationUpdates();
+        }
     }
 
     @Override
@@ -537,6 +540,45 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
         if (googleApiClient != null)
         {
             googleApiClient.disconnect();
+        }
+    }
+
+    private class GetRoutesArrivingAtStopTask extends AsyncTask<ArrayList<BusStop>, Void, ArrayList<BusStop>>
+    {
+
+        @Override
+        protected ArrayList<BusStop> doInBackground(ArrayList<BusStop>... busStops)
+        {
+            for (BusStop busStop : busStops[0])
+            {
+                ArrayList<BusRoute> busRoutes = DbQueries.getRoutesArrivingAtStop(db, busStop.getBusStopId());
+                for (BusRoute busRoute : busRoutes)
+                {
+                    if (busRoute.getBusRouteNumber().contains("KIAS-"))
+                    {
+                        busStop.setAirportShuttleStop(true);
+                    }
+                    else if (busRoute.getBusRouteNumber().contains("MF-"))
+                    {
+                        busStop.setMetroFeederStop(true);
+                    }
+                }
+            }
+            return busStops[0];
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<BusStop> busStops)
+        {
+            super.onPostExecute(busStops);
+            errorLinearLayout.setVisibility(View.GONE);
+            updatingBusStopsProgressBarLinearLayout.setVisibility(View.GONE);
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+            nearbyBusStopsRecyclerView.setLayoutManager(linearLayoutManager);
+            NearbyBusStopsRecyclerViewAdapter adaptor = new NearbyBusStopsRecyclerViewAdapter(busStops);
+            nearbyBusStopsRecyclerView.setAdapter(adaptor);
+            adaptor.setClickListener(NearbyFragment.this);
+            nearbyBusStopsRecyclerView.setVisibility(View.VISIBLE);
         }
     }
 }

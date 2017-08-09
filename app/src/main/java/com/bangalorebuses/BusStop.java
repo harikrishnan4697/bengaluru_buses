@@ -3,80 +3,102 @@ package com.bangalorebuses;
 class BusStop
 {
     private String busStopName;
-    private String latitude;
-    private String longitude;
+    private String busStopLat;
+    private String busStopLong;
     private int busStopId;
-    private int routeOrder;
+    private int busStopRouteOrder;
     private String busStopDirectionName;
-    private String distance;
+    private String busStopDistance;
+    private boolean isAirportShuttleStop = false;
+    private boolean isMetroFeederStop = false;
 
-    String getBusStopName()
-    {
-        return busStopName;
-    }
-
-    void setBusStopName(String inputBusStopName)
-    {
-        busStopName = inputBusStopName;
-    }
-
-    String getLatitude()
-    {
-        return latitude;
-    }
-
-    void setLatitude(String inputLatitude)
-    {
-        latitude = inputLatitude;
-    }
-
-    String getLongitude()
-    {
-        return longitude;
-    }
-
-    void setLongitude(String inputLongitude)
-    {
-        longitude = inputLongitude;
-    }
-
-    int getBusStopId()
+    public int getBusStopId()
     {
         return busStopId;
     }
 
-    void setBusStopId(int inputBusStopId)
+    public void setBusStopId(int busStopId)
     {
-        busStopId = inputBusStopId;
+        this.busStopId = busStopId;
     }
 
-    int getRouteOrder()
+    public String getBusStopName()
     {
-        return routeOrder;
+        return busStopName;
     }
 
-    void setRouteOrder(int inputRouteOrder)
+    public void setBusStopName(String busStopName)
     {
-        routeOrder = inputRouteOrder;
+        this.busStopName = busStopName;
     }
 
-    String getBusStopDirectionName()
+    public String getBusStopLat()
+    {
+        return busStopLat;
+    }
+
+    public void setBusStopLat(String busStopLat)
+    {
+        this.busStopLat = busStopLat;
+    }
+
+    public String getBusStopLong()
+    {
+        return busStopLong;
+    }
+
+    public void setBusStopLong(String busStopLong)
+    {
+        this.busStopLong = busStopLong;
+    }
+
+    public int getBusStopRouteOrder()
+    {
+        return busStopRouteOrder;
+    }
+
+    public void setBusStopRouteOrder(int busStopRouteOrder)
+    {
+        this.busStopRouteOrder = busStopRouteOrder;
+    }
+
+    public String getBusStopDirectionName()
     {
         return busStopDirectionName;
     }
 
-    void setBusStopDirectionName(String busStopDirectionName)
+    public void setBusStopDirectionName(String busStopDirectionName)
     {
         this.busStopDirectionName = busStopDirectionName;
     }
 
-    String getDistance()
+    public String getBusStopDistance()
     {
-        return distance;
+        return busStopDistance;
     }
 
-    void setDistance(String distance)
+    public void setBusStopDistance(String busStopDistance)
     {
-        this.distance = distance;
+        this.busStopDistance = busStopDistance;
+    }
+
+    public boolean isAirportShuttleStop()
+    {
+        return isAirportShuttleStop;
+    }
+
+    public void setAirportShuttleStop(boolean airportShuttleStop)
+    {
+        isAirportShuttleStop = airportShuttleStop;
+    }
+
+    public boolean isMetroFeederStop()
+    {
+        return isMetroFeederStop;
+    }
+
+    public void setMetroFeederStop(boolean metroFeederStop)
+    {
+        isMetroFeederStop = metroFeederStop;
     }
 }

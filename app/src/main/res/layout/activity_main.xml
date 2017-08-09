@@ -13,8 +13,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="#CFD8DC"
-        app:menu="@menu/navigation"/>
+        android:background="@color/colorBottomNavBar"
+        app:menu="@menu/bottom_navigation_bar_menu"/>
 
     <FrameLayout
         android:id="@+id/frame_layout"

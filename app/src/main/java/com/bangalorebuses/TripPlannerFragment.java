@@ -76,7 +76,7 @@ public class TripPlannerFragment extends Fragment implements NetworkingHelper, T
             routeOptionsListView.setVisibility(View.VISIBLE);
         }
         progressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
-        errorMessageTextView = (TextView) view.findViewById(R.id.trip_planner_fragment_error_message_text_view);
+        //errorMessageTextView = (TextView) view.findViewById(R.id.trip_planner_fragment_error_message_text_view);
         originButton = (Button) view.findViewById(R.id.trip_planner_origin_button);
         if (originButton != null && startBusStop != null && startBusStop.getBusStopName() != null)
         {
@@ -235,31 +235,31 @@ public class TripPlannerFragment extends Fragment implements NetworkingHelper, T
             for (int i = 0; i < buses.length; i++)
             {
                 numberOfDirectBusesFound++;
-                buses[i].setRouteNumber(buses[i].getRouteNumber().replace("UP", ""));
-                buses[i].setRouteNumber(buses[i].getRouteNumber().replace("DN", ""));
+                buses[i].setBusRouteNumber(buses[i].getBusRouteNumber().replace("UP", ""));
+                buses[i].setBusRouteNumber(buses[i].getBusRouteNumber().replace("DN", ""));
                 HashMap<String, String> hm = new HashMap<>();
-                hm.put("route_number", buses[i].getRouteNumber());
-                if (buses[i].getRouteOrder() == 1)
+                hm.put("route_number", buses[i].getBusRouteNumber());
+                if (buses[i].getBusRouteOrder() == 1)
                 {
                     hm.put("bus_eta", "Trip is yet to begin");
                 }
                 else
                 {
-                    if (buses[i].getETA() <= 180)
+                    if (buses[i].getBusETA() <= 180)
                     {
                         hm.put("bus_eta", "Due");
                     }
                     else
                     {
-                        hm.put("bus_eta", Integer.toString(buses[i].getETA() / 60) + " min");
+                        hm.put("bus_eta", Integer.toString(buses[i].getBusETA() / 60) + " min");
                     }
                 }
                 aList.add(hm);
             }
 
             String[] from = {"route_number", "bus_eta"};
-            int[] to = {R.id.bus_number_text_view, R.id.bus_eta_text_view};
-            adapter = new SimpleAdapter(getActivity().getBaseContext(), aList, R.layout.trip_planner_direct_buses_list_item, from, to);
+            //int[] to = {R.id.bus_number_text_view, R.id.bus_eta_text_view};
+            //adapter = new SimpleAdapter(getActivity().getBaseContext(), aList, R.layout.trip_planner_direct_buses_list_item, from, to);
             routeOptionsListView.setAdapter(adapter);
             routeOptionsListView.setVisibility(View.VISIBLE);
             Snackbar.make(containerRelativeLayout, "Found " + numberOfDirectBusesFound + " direct buses", Snackbar.LENGTH_LONG).show();
@@ -430,10 +430,10 @@ public class TripPlannerFragment extends Fragment implements NetworkingHelper, T
         numberOfNetworkRequestsMade--;
         if (errorMessage.equals(Constants.NETWORK_QUERY_NO_ERROR))
         {
-            buses[0].setRouteNumber(buses[0].getRouteNumber().replace("UP", ""));
-            buses[0].setRouteNumber(buses[0].getRouteNumber().replace("DN", ""));
-            buses[0].setRouteNumber(buses[0].getRouteNumber().replace("UP", ""));
-            buses[0].setRouteNumber(buses[0].getRouteNumber().replace("DN", ""));
+            buses[0].setBusRouteNumber(buses[0].getBusRouteNumber().replace("UP", ""));
+            buses[0].setBusRouteNumber(buses[0].getBusRouteNumber().replace("DN", ""));
+            buses[0].setBusRouteNumber(buses[0].getBusRouteNumber().replace("UP", ""));
+            buses[0].setBusRouteNumber(buses[0].getBusRouteNumber().replace("DN", ""));
 
             HashMap<String, String> hashMap = inDirectRoutes.get(transitPoint.getBusStopName());
 
@@ -441,17 +441,17 @@ public class TripPlannerFragment extends Fragment implements NetworkingHelper, T
             {
                 hashMap.put("transit_point_name", "Change at " + transitPoint.getBusStopName());
 
-                hashMap.put("origin_to_transit_point_route_number", buses[0].getRouteNumber());
+                hashMap.put("origin_to_transit_point_route_number", buses[0].getBusRouteNumber());
 
-                if (buses[0].getRouteOrder() != 1)
+                if (buses[0].getBusRouteOrder() != 1)
                 {
-                    if (buses[0].getETA() <= 180)
+                    if (buses[0].getBusETA() <= 180)
                     {
                         hashMap.put("origin_to_transit_point_bus_eta", "Due");
                     }
                     else
                     {
-                        hashMap.put("origin_to_transit_point_bus_eta", Integer.toString(buses[0].getETA() / 60) + " min");
+                        hashMap.put("origin_to_transit_point_bus_eta", Integer.toString(buses[0].getBusETA() / 60) + " min");
                     }
                 }
                 else
@@ -461,17 +461,17 @@ public class TripPlannerFragment extends Fragment implements NetworkingHelper, T
             }
             else if (routeMessage.equals(Constants.ROUTE_TYPE_TRANSIT_POINT_TO_DESTINATION))
             {
-                hashMap.put("transit_point_to_destination_route_number", buses[0].getRouteNumber());
+                hashMap.put("transit_point_to_destination_route_number", buses[0].getBusRouteNumber());
 
-                if (buses[0].getRouteOrder() != 1)
+                if (buses[0].getBusRouteOrder() != 1)
                 {
-                    if (buses[0].getETA() <= 180)
+                    if (buses[0].getBusETA() <= 180)
                     {
                         hashMap.put("transit_point_to_destination_bus_eta", "Due");
                     }
                     else
                     {
-                        hashMap.put("transit_point_to_destination_bus_eta", Integer.toString(buses[0].getETA() / 60) + " min");
+                        hashMap.put("transit_point_to_destination_bus_eta", Integer.toString(buses[0].getBusETA() / 60) + " min");
                     }
                 }
                 else
@@ -485,10 +485,10 @@ public class TripPlannerFragment extends Fragment implements NetworkingHelper, T
                 appendLog("Found a valid indirect route");
                 inDirectRoutesList.add(hashMap);
                 String[] from = {"transit_point_name", "origin_to_transit_point_route_number", "origin_to_transit_point_bus_eta", "transit_point_to_destination_route_number", "transit_point_to_destination_bus_eta"};
-                int[] to = {R.id.transit_point_text_view, R.id.bus_1_number_text_view, R.id.bus_1_eta_text_view, R.id.bus_2_number_text_view, R.id.bus_2_eta_text_view};
+                //int[] to = {R.id.transit_point_text_view, R.id.bus_1_number_text_view, R.id.bus_1_eta_text_view, R.id.bus_2_number_text_view, R.id.bus_2_eta_text_view};
                 if (getActivity() != null)
                 {
-                    adapter = new SimpleAdapter(getActivity().getBaseContext(), inDirectRoutesList, R.layout.trip_planner_route_option_list_item, from, to);
+                    //adapter = new SimpleAdapter(getActivity().getBaseContext(), inDirectRoutesList, R.layout.trip_planner_route_option_list_item, from, to);
                     errorMessageTextView.setVisibility(View.GONE);
                     routeOptionsListView.setAdapter(adapter);
                     routeOptionsListView.setVisibility(View.VISIBLE);
@@ -572,7 +572,7 @@ public class TripPlannerFragment extends Fragment implements NetworkingHelper, T
      * @param routeDirection This parameter is to convey if the route number that was passed
      *                       to the task had a direction of UP or DN.
      */
-    public void onBusRouteDetailsFound(String errorMessage, Route route, boolean isForBusList, String routeDirection)
+    public void onBusRouteDetailsFound(String errorMessage, BusRoute route, boolean isForBusList, String routeDirection)
     {
 
     }
@@ -585,7 +585,7 @@ public class TripPlannerFragment extends Fragment implements NetworkingHelper, T
      *                     for a particular route id.
      */
     @Override
-    public void onStopsOnBusRouteFound(String errorMessage, BusStop[] busStops, Route route)
+    public void onStopsOnBusRouteFound(String errorMessage, BusStop[] busStops, BusRoute route)
     {
 
     }
@@ -598,7 +598,7 @@ public class TripPlannerFragment extends Fragment implements NetworkingHelper, T
      * @param numberOfBusesFound This parameter is the number of en-route buses the task found.
      */
     @Override
-    public void onBusesEnRouteFound(String errorMessage, Bus[] buses, int numberOfBusesFound, Route route, BusStop selectedBusStop)
+    public void onBusesEnRouteFound(String errorMessage, Bus[] buses, int numberOfBusesFound, BusRoute route, BusStop selectedBusStop)
     {
 
     }

@@ -17,7 +17,7 @@ import java.lang.reflect.Field;
 
 class BottomNavigationBarHelper
 {
-    public static void disableShiftMode(BottomNavigationView view)
+    static void disableShiftMode(BottomNavigationView view)
     {
         BottomNavigationMenuView menuView = (BottomNavigationMenuView) view.getChildAt(0);
         try

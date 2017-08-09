@@ -85,11 +85,11 @@ class GetIndirectBusesTask extends AsyncTask<BusStop, Void, Void>
             {
                 JSONObject bus = jsonArray.getJSONObject(i);
                 buses[i] = new Bus();
-                buses[i].setRegistrationNumber(bus.getString("vehicleno"));
-                buses[i].setRouteNumber(bus.getString("routeno"));
-                buses[i].setServiceID(bus.getInt("serviceid"));
-                buses[i].setETA(bus.getInt("ETA"));
-                buses[i].setRouteOrder(bus.getInt("routeorder"));
+                buses[i].setBusRegistrationNumber(bus.getString("vehicleno"));
+                buses[i].setBusRouteNumber(bus.getString("routeno"));
+                buses[i].setBusRouteServiceType(bus.getString("serviceid"));
+                buses[i].setBusETA(bus.getInt("ETA"));
+                buses[i].setBusRouteOrder(bus.getInt("routeorder"));
             }
         }
         catch (JSONException e)

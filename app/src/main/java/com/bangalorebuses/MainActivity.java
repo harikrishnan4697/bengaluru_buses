@@ -84,10 +84,6 @@ public class MainActivity extends AppCompatActivity
                     {
                         switch (item.getItemId())
                         {
-                            /*case R.id.navigation_favourites:
-                                selectedFragment = new FavouritesFragment();
-                                actionBar.setTitle("Favourites");
-                                break;*/
                             case R.id.navigation_near_me:
                                 selectedFragment = nearbyFragment;
                                 actionBar.setTitle("Bus stops nearby");

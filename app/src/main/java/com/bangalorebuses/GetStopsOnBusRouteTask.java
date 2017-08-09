@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 
 import static com.bangalorebuses.Constants.NETWORK_QUERY_NO_ERROR;
 import static com.bangalorebuses.Constants.NETWORK_QUERY_URL_EXCEPTION;
@@ -20,10 +21,10 @@ class GetStopsOnBusRouteTask extends AsyncTask<Void, Void, Void>
     private NetworkingHelper caller;
     private String routeId;
     private String errorMessage = NETWORK_QUERY_NO_ERROR;
-    private BusStop[] busStops;
-    private Route route;
+    private ArrayList<BusStop> busStops;
+    private BusRoute route;
 
-    GetStopsOnBusRouteTask(NetworkingHelper aCaller, String routeId, Route route)
+    GetStopsOnBusRouteTask(NetworkingHelper aCaller, String routeId, BusRoute route)
     {
         caller = aCaller;
         this.routeId = routeId;
@@ -62,17 +63,18 @@ class GetStopsOnBusRouteTask extends AsyncTask<Void, Void, Void>
             reader.close();
 
             jsonArray = new JSONArray(result.toString());
-            busStops = new BusStop[jsonArray.length()];
+            busStops = new ArrayList<>();
             for (int i = 0; i < jsonArray.length(); i++)
             {
-                busStops[i] = new BusStop();
-                busStops[i].setBusStopName(jsonArray.getJSONObject(i).getString("busStopName"));
-                busStops[i].setLatitude(jsonArray.getJSONObject(i).getString("lat"));
-                busStops[i].setLongitude(jsonArray.getJSONObject(i).getString("lng"));
-                busStops[i].setRouteOrder(jsonArray.getJSONObject(i).getInt("routeorder"));
+                BusStop busStop = new BusStop();
+                busStop.setBusStopName(jsonArray.getJSONObject(i).getString("busStopName"));
+                busStop.setBusStopLat(jsonArray.getJSONObject(i).getString("lat"));
+                busStop.setBusStopLong(jsonArray.getJSONObject(i).getString("lng"));
+                busStop.setBusStopRouteOrder(jsonArray.getJSONObject(i).getInt("routeorder"));
+                busStops.add(busStop);
             }
 
-            route.setBusStopsEnRoute(busStops);
+            route.setBusRouteStops(busStops);
 
             return null;
         }
@@ -91,6 +93,7 @@ class GetStopsOnBusRouteTask extends AsyncTask<Void, Void, Void>
     @Override
     protected void onPostExecute(Void params)
     {
-        caller.onStopsOnBusRouteFound(errorMessage, busStops, route);
+        BusStop[] busStops1 = new BusStop[0]; // Fake array to make the error go away
+        caller.onStopsOnBusRouteFound(errorMessage, busStops1, route);
     }
 }

@@ -4,7 +4,7 @@ class DirectTrip
 {
     private BusStop originStop = new BusStop();
     private BusStop destinationStop = new BusStop();
-    private Route route = new Route();
+    private BusRoute route = new BusRoute();
 
     public BusStop getOriginStop()
     {
@@ -26,12 +26,12 @@ class DirectTrip
         this.destinationStop = destinationStop;
     }
 
-    public Route getRoute()
+    public BusRoute getRoute()
     {
         return route;
     }
 
-    public void setRoute(Route route)
+    public void setRoute(BusRoute route)
     {
         this.route = route;
     }

@@ -1,35 +1,33 @@
 package com.bangalorebuses;
 
 import android.content.Intent;
-import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.ProgressBar;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.util.HashSet;
+import java.util.Set;
 
 public class SearchActivity extends AppCompatActivity
 {
     private EditText searchEditText;
     private ListView searchResultsListView;
+    private ProgressBar progressBar;
     private ArrayAdapter<String> listAdapter;
     private BusNumberListCustomAdapter customListAdapter;
     private String searchType;
     private Intent resultIntent = new Intent();
     private JSONArray jsonArray;
+/*    private GetAllStops getAllStops;
+    private GetAllRoutes getAllRoutes;*/
+    private Set<String> busStopNames = new HashSet<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -43,45 +41,35 @@ public class SearchActivity extends AppCompatActivity
         }
         // Show the soft keyboard by default when the activity is started
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+
+        // Initialise some variables
         searchEditText = (EditText) findViewById(R.id.search_edit_text);
         searchResultsListView = (ListView) findViewById(R.id.search_results_list_view);
-        searchType = getIntent().getStringExtra("Search_Type");
-        initialiseSearchResultsList();
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        searchType = getIntent().getStringExtra("SEARCH_TYPE");
+
+        /*if (searchType.equals(SEARCH_TYPE_BUS_STOP))
+        {
+            getAllStops = new GetAllStops();
+            getAllStops.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }
+        else if (searchType.equals(SEARCH_TYPE_BUS_ROUTE))
+        {
+            getAllRoutes = new GetAllRoutes();
+            getAllRoutes.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }*/
     }
 
     /**
      * This method is used to Handle the route number list and
      * filter bus routes as the user starts typing in the search box.
      */
-    private void initialiseSearchResultsList()
+    /*private void initialiseSearchResultsList()
     {
-        AssetManager assetManager = getAssets();
-        InputStream inputStream;
-        InputStreamReader inputStreamReader;
 
-        try
-        {
-            // Reads the asset
-            if (searchType.equals(Constants.SEARCH_TYPE_BUS_ROUTE))
-            {
-                inputStream = assetManager.open("bangalore_city_bus_routes.txt");
-            }
-            else
-            {
-                inputStream = assetManager.open("bangalore_city_bus_stops.txt");
-            }
-            inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            StringBuilder stringBuilder = new StringBuilder();
-            String line;
-
-            while ((line = bufferedReader.readLine()) != null)
-            {
-                stringBuilder.append(line);
-            }
 
             // Converts the asset to a JSON array
-           jsonArray = new JSONArray(stringBuilder.toString());
+            jsonArray = new JSONArray(stringBuilder.toString());
             String[] listViewAdapterContent = new String[jsonArray.length()];
             String[] routeTypes = new String[jsonArray.length()];
 
@@ -125,14 +113,14 @@ public class SearchActivity extends AppCompatActivity
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
-                if(searchType.equals(Constants.SEARCH_TYPE_BUS_STOP))
+                if (searchType.equals(Constants.SEARCH_TYPE_BUS_STOP))
                 {
                     resultIntent.putExtra("BUS_STOP_NAME", parent.getItemAtPosition(position).toString());
                     try
                     {
                         for (int i = 0; i < jsonArray.length(); i++)
                         {
-                            if(jsonArray.getJSONObject(i).getString("StopName").equals(parent.getItemAtPosition(position).toString()))
+                            if (jsonArray.getJSONObject(i).getString("StopName").equals(parent.getItemAtPosition(position).toString()))
                             {
                                 resultIntent.putExtra("BUS_STOP_ID", jsonArray.getJSONObject(i).getInt("StopId"));
                             }
@@ -179,6 +167,60 @@ public class SearchActivity extends AppCompatActivity
             }
         });
     }
+
+    private class GetAllRoutes extends AsyncTask<Void, Void, ArrayList<BusRoute>>
+    {
+        @Override
+        protected void onPreExecute()
+        {
+            super.onPreExecute();
+            progressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected ArrayList<BusRoute> doInBackground(Void... params)
+        {
+            return DbQueries.getAllRoutes(db);
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<BusRoute> busRoutes)
+        {
+            super.onPostExecute(busRoutes);
+            for (BusRoute busRoute: busRoutes)
+            {
+
+            }
+            progressBar.setVisibility(View.GONE);
+        }
+    }
+
+    private class GetAllStops extends AsyncTask<Void, Void, ArrayList<BusStop>>
+    {
+        @Override
+        protected void onPreExecute()
+        {
+            super.onPreExecute();
+            progressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected ArrayList<BusStop> doInBackground(Void... params)
+        {
+            return DbQueries.getAllStops(db);
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<BusStop> busStops)
+        {
+            super.onPostExecute(busStops);
+            for (BusStop busStop: busStops)
+            {
+                busStopNames.add(busStop.getBusStopName());
+            }
+            progressBar.setVisibility(View.GONE);
+        }
+    }*/
 
     /**
      * This method is called by the on screen back button.

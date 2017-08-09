@@ -10,4 +10,11 @@
         android:title="Search for a bus stop"
         app:showAsAction="always"/>
 
+    <item
+        android:id="@+id/nearby_refresh"
+        android:icon="@drawable/ic_refresh_white"
+        android:orderInCategory="2"
+        android:title="Refresh"
+        app:showAsAction="ifRoom"/>
+
 </menu>

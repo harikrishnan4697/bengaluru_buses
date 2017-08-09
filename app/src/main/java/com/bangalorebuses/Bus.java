@@ -9,138 +9,72 @@ package com.bangalorebuses;
  * @since 23-6-2017
  */
 
-class Bus
+class Bus extends BusRoute
 {
-    private String routeNumber;
-    private int serviceID;
-    private String latitude;
-    private String longitude;
-    private int routeOrder;
-    private String registrationNumber;
-    private String timeToBus;
-    private boolean isDue = false;
-    private String nameOfStopBusIsAt;
-    private boolean tripIsYetToBegin;
-    private int ETA;
-    private BusStop[] busStopsEnRoute;
+    private String busRegistrationNumber;
+    private String busLat;
+    private String busLong;
+    private int busETA;
+    private int busRouteOrder;
+    private boolean isDue;
 
-    String getLatitude()
+    public String getBusRegistrationNumber()
     {
-        return latitude;
+        return busRegistrationNumber;
     }
 
-    void setLatitude(String inputLatitude)
+    public void setBusRegistrationNumber(String busRegistrationNumber)
     {
-        latitude = inputLatitude;
+        this.busRegistrationNumber = busRegistrationNumber;
     }
 
-    String getLongitude()
+    public String getBusLat()
     {
-        return longitude;
+        return busLat;
     }
 
-    void setLongitude(String inputLongitude)
+    public void setBusLat(String busLat)
     {
-        longitude = inputLongitude;
+        this.busLat = busLat;
     }
 
-    int getRouteOrder()
+    public String getBusLong()
     {
-        return routeOrder;
+        return busLong;
     }
 
-    void setRouteOrder(int inputRouteOrder)
+    public void setBusLong(String busLong)
     {
-        routeOrder = inputRouteOrder;
+        this.busLong = busLong;
     }
 
-    public String getRouteNumber()
+    public int getBusETA()
     {
-        return routeNumber;
+        return busETA;
     }
 
-    public void setRouteNumber(String routeNumber)
+    public void setBusETA(int busETA)
     {
-        this.routeNumber = routeNumber;
+        this.busETA = busETA;
     }
 
-    public int getServiceID()
+    public int getBusRouteOrder()
     {
-        return serviceID;
+        return busRouteOrder;
     }
 
-    public void setServiceID(int serviceID)
+    public void setBusRouteOrder(int busRouteOrder)
     {
-        this.serviceID = serviceID;
+        this.busRouteOrder = busRouteOrder;
     }
 
-    int getETA()
-    {
-        return ETA;
-    }
-
-    public void setETA(int ETA)
-    {
-        this.ETA = ETA;
-    }
-
-    boolean getIsDue()
+    public boolean isDue()
     {
         return isDue;
     }
 
-    void setIsDue(boolean isDue)
+    public void setDue(boolean due)
     {
-        this.isDue = isDue;
-    }
-
-    boolean getTripIsYetToBegin()
-    {
-        return tripIsYetToBegin;
-    }
-
-    void setTripIsYetToBegin(boolean tripIsYetToBegin)
-    {
-        this.tripIsYetToBegin = tripIsYetToBegin;
-    }
-
-    String getRegistrationNumber()
-    {
-        return registrationNumber;
-    }
-
-    void setRegistrationNumber(String inputRegistrationNumber)
-    {
-        registrationNumber = inputRegistrationNumber;
-    }
-
-    String getTimeToBus()
-    {
-        return timeToBus;
-    }
-
-    void setTimeToBus(String inputTimeToBus)
-    {
-        timeToBus = inputTimeToBus;
-    }
-
-    String getNameOfStopBusIsAt()
-    {
-        return nameOfStopBusIsAt;
-    }
-
-    void setNameOfStopBusIsAt(String inputNameOfStopBusIsAt)
-    {
-        nameOfStopBusIsAt = inputNameOfStopBusIsAt;
-    }
-
-    public BusStop[] getBusStopsEnRoute()
-    {
-        return busStopsEnRoute;
-    }
-
-    public void setBusStopsEnRoute(BusStop[] busStopsEnRoute)
-    {
-        this.busStopsEnRoute = busStopsEnRoute;
+        isDue = due;
     }
 }

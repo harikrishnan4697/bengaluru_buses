@@ -75,7 +75,7 @@ class BusNumberListCustomAdapter extends BaseAdapter implements Filterable
 
         if (filteredRouteNumbers.get(position).contains("KIAS-"))
         {
-            holder.imageView.setImageResource(R.drawable.ic_flight_black);
+            holder.imageView.setImageResource(R.drawable.ic_flight_blue);
             holder.routeServiceTypeNameTextView.setText("Airport Shuttle");
         }
         else if (filteredRouteNumbers.get(position).length() > 2 && filteredRouteNumbers.get(position).substring(0, 2).equals("V-"))

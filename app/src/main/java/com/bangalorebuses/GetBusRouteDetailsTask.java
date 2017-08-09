@@ -17,11 +17,11 @@ import static com.bangalorebuses.Constants.NETWORK_QUERY_NO_ERROR;
 import static com.bangalorebuses.Constants.NETWORK_QUERY_REQUEST_TIMEOUT_EXCEPTION;
 import static com.bangalorebuses.Constants.NETWORK_QUERY_URL_EXCEPTION;
 
-class GetBusRouteDetailsTask extends AsyncTask<Route, Void, Void>
+class GetBusRouteDetailsTask extends AsyncTask<BusRoute, Void, Void>
 {
     private NetworkingHelper caller;
     private String errorMessage = NETWORK_QUERY_NO_ERROR;
-    private Route route;
+    private BusRoute route;
     private boolean isForBusList = false;
     private String routeDirection;
 
@@ -32,26 +32,26 @@ class GetBusRouteDetailsTask extends AsyncTask<Route, Void, Void>
     }
 
     @Override
-    protected Void doInBackground(Route... routes)
+    protected Void doInBackground(BusRoute... routes)
     {
         URL busRouteTimetableURL;
-        route = new Route();
+        route = new BusRoute();
         try
         {
-            if (routes[0].getRouteNumber().contains("UP") || routes[0].getRouteNumber().contains("DN"))
+            if (routes[0].getBusRouteNumber().contains("UP") || routes[0].getBusRouteNumber().contains("DN"))
             {
-                if (routes[0].getRouteNumber().substring(routes[0].getRouteNumber().length() - 2, routes[0].getRouteNumber().length()).equals("UP"))
+                if (routes[0].getBusRouteNumber().substring(routes[0].getBusRouteNumber().length() - 2, routes[0].getBusRouteNumber().length()).equals("UP"))
                 {
                     routeDirection = "UP";
-                    routes[0].setRouteNumber(routes[0].getRouteNumber().replace("UP", ""));
+                    routes[0].setBusRouteNumber(routes[0].getBusRouteNumber().replace("UP", ""));
                 }
                 else
                 {
                     routeDirection = "DN";
-                    routes[0].setRouteNumber(routes[0].getRouteNumber().replace("DN", ""));
+                    routes[0].setBusRouteNumber(routes[0].getBusRouteNumber().replace("DN", ""));
                 }
             }
-            busRouteTimetableURL = new URL("http://bmtcmob.hostg.in/index.php/api/routetiming/timedetails/service/ord/routeno/" + routes[0].getRouteNumber());
+            busRouteTimetableURL = new URL("http://bmtcmob.hostg.in/index.php/api/routetiming/timedetails/service/ord/routeno/" + routes[0].getBusRouteNumber());
         }
         catch (java.net.MalformedURLException e)
         {
@@ -62,7 +62,7 @@ class GetBusRouteDetailsTask extends AsyncTask<Route, Void, Void>
         StringBuilder result = new StringBuilder();
         try
         {
-            Log.e("GetBusRouteDetailsTask", "Getting details for route: " + routes[0].getRouteNumber());
+            Log.e("GetBusRouteDetailsTask", "Getting details for route: " + routes[0].getBusRouteNumber());
             HttpURLConnection httpURLConnection = (HttpURLConnection) busRouteTimetableURL.openConnection();
             httpURLConnection.setRequestMethod("GET");
             httpURLConnection.setRequestProperty("Accept", "application/json");
@@ -90,19 +90,19 @@ class GetBusRouteDetailsTask extends AsyncTask<Route, Void, Void>
         try
         {
             JSONArray jsonArray = new JSONArray(result.toString());
-            route.setRouteNumber(routes[0].getRouteNumber());
-            route.setServiceType(routes[0].getServiceType());
-            route.setUpRouteName(jsonArray.getJSONObject(0).getString("upRouteName"));
-            route.setDownRouteName((jsonArray.getJSONObject(0).getString("downRouteName")));
-            route.setUpRouteId(jsonArray.getJSONArray(1).getJSONObject(0).getString("busRouteDetailId"));
-            if (jsonArray.getJSONArray(2).length() == 0)
+            route.setBusRouteNumber(routes[0].getBusRouteNumber());
+            route.setBusRouteServiceType(routes[0].getBusRouteServiceType());
+            route.setBusRouteDirectionName(jsonArray.getJSONObject(0).getString("upRouteName"));
+            //route.set((jsonArray.getJSONObject(0).getString("downRouteName")));
+            route.setBusRouteId(jsonArray.getJSONArray(1).getJSONObject(0).getInt("busRouteDetailId"));
+            /*if (jsonArray.getJSONArray(2).length() == 0)
             {
                 route.setDownRouteId("");
             }
             else
             {
                 route.setDownRouteId(jsonArray.getJSONArray(2).getJSONObject(0).getString("busRouteDetailId"));
-            }
+            }*/
         }
         catch (org.json.JSONException e)
         {

@@ -1,36 +1,16 @@
 package com.bangalorebuses;
 
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import org.json.JSONArray;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-
-import static com.bangalorebuses.Constants.NETWORK_QUERY_NO_ERROR;
 
 /**
  * This activity allows the user to track a bus route
@@ -41,7 +21,7 @@ import static com.bangalorebuses.Constants.NETWORK_QUERY_NO_ERROR;
  * @since 18-6-2017
  */
 
-public class TrackBusActivity extends AppCompatActivity implements NetworkingHelper, AdapterView.OnItemSelectedListener
+public class TrackBusActivity extends AppCompatActivity// implements NetworkingHelper, AdapterView.OnItemSelectedListener
 {
     private final String DIRECTION_UP = "UP";
     private final String DIRECTION_DOWN = "DN";
@@ -64,7 +44,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
     private TextView busTimingTextView4;
     private TextView busIsAtTextView4;
     private BusStop selectedBusStop;
-    private Route route;
+    private BusRoute route;
     private ProgressDialog progressDialog;
     private int position;
     private BusStop[] busStopList;
@@ -103,8 +83,8 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         stopsOnRouteSpinner = (Spinner) findViewById(R.id.route_stop_list_spinner);
         rotatingAnimation = AnimationUtils.loadAnimation(this, R.anim.rotate);
         busTimingsRefreshFloatingActionButton = (FloatingActionButton) findViewById(R.id.floatingBusTimingsRefreshActionButton);
-        route = new Route();
-        route.setRouteNumber(getIntent().getStringExtra("ROUTE_NUMBER"));
+        route = new BusRoute();
+        /*route.setBusRouteNumber(getIntent().getStringExtra("ROUTE_NUMBER"));
         route.setUpRouteId(getIntent().getStringExtra("UP_ROUTE_ID"));
         route.setDownRouteId(getIntent().getStringExtra("DOWN_ROUTE_ID"));
         route.setUpRouteName(getIntent().getStringExtra("UP_ROUTE_NAME"));
@@ -114,15 +94,15 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         selectedBusStop.setBusStopName(getIntent().getStringExtra("STOP_NAME"));
         selectedBusStop.setLatitude(getIntent().getStringExtra("STOP_LAT"));
         selectedBusStop.setLongitude(getIntent().getStringExtra("STOP_LONG"));
-        setTitle("Tracking " + route.getRouteNumber());
-        trackBus();
+        setTitle("Tracking " + route.getRouteNumber());TODO
+        trackBus();*/
     }
 
-    @Override
+    /*@Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
         MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.track_bus_menu, menu);
+        //menuInflater.inflate(R.menu.track_bus_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -294,13 +274,13 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
     }
 
     @Override
-    public void onBusRouteDetailsFound(String errorMessage, Route inputRoute, boolean isForList, String routeDirection)
+    public void onBusRouteDetailsFound(String errorMessage, BusRoute inputRoute, boolean isForList, String routeDirection)
     {
 
     }
 
     @Override
-    public void onStopsOnBusRouteFound(String errorMessage, BusStop[] busStops, Route route)
+    public void onStopsOnBusRouteFound(String errorMessage, BusStop[] busStops, BusRoute route)
     {
         if (errorMessage.equals(NETWORK_QUERY_NO_ERROR))
         {
@@ -391,7 +371,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
     }
 
     @Override
-    public void onBusesEnRouteFound(String errorMessage, Bus[] buses, int numberOfBusesFound, Route route, BusStop selectedBusStop)
+    public void onBusesEnRouteFound(String errorMessage, Bus[] buses, int numberOfBusesFound, BusRoute route, BusStop selectedBusStop)
     {
         if (errorMessage.equals(NETWORK_QUERY_NO_ERROR))
         {
@@ -502,7 +482,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
                 {
                     errorMessageTextView.setText(R.string.error_connecting_to_the_internet_click_refresh_text);
                     errorMessageTextView.setVisibility(View.VISIBLE);
-                }*/
+                }
             }
             else
             {
@@ -724,29 +704,29 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
     protected void onPause()
     {
         super.onPause();
-        /*if (adView != null)
+        if (adView != null)
         {
             adView.pause();
-        }*/
+        }
     }
 
     @Override
     public void onResume()
     {
-        /*if (adView != null)
+        if (adView != null)
         {
             adView.resume();
-        }*/
+        }
         super.onResume();
     }
 
     @Override
     public void onDestroy()
     {
-        /*if (adView != null)
+        if (adView != null)
         {
             adView.destroy();
-        }*/
+        }
         super.onDestroy();
-    }
+    }*/
 }

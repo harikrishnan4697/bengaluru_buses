@@ -17,7 +17,7 @@
         android:layout_centerVertical="true"
         android:layout_marginEnd="10dp"
         android:layout_marginRight="10dp"
-        app:srcCompat="@drawable/ic_flight_black"/>
+        app:srcCompat="@drawable/ic_flight_blue"/>
 
     <RelativeLayout
         android:layout_width="wrap_content"

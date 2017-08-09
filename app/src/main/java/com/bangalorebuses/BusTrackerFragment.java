@@ -93,8 +93,8 @@ public class BusTrackerFragment extends Fragment implements NetworkingHelper
         if (isNetworkAvailable())
         {
             progressDialog = ProgressDialog.show(getContext(), "Please wait", "Getting bus details...");
-            Route route = new Route();
-            route.setRouteNumber(busNumberToTrack);
+            BusRoute route = new BusRoute();
+            route.setBusRouteNumber(busNumberToTrack);
             new GetBusRouteDetailsTask(this, false).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, route);
         }
         else
@@ -192,7 +192,7 @@ public class BusTrackerFragment extends Fragment implements NetworkingHelper
      * @param routeDirection This parameter is to convey if the route number that was passed
      *                       to the task had a direction of UP or DN.
      */
-    public void onBusRouteDetailsFound(String errorMessage, Route route, boolean isForBusList, String routeDirection)
+    public void onBusRouteDetailsFound(String errorMessage, BusRoute route, boolean isForBusList, String routeDirection)
     {
         progressDialog.dismiss();
         if (errorMessage.equals(NETWORK_QUERY_NO_ERROR))
@@ -201,14 +201,14 @@ public class BusTrackerFragment extends Fragment implements NetworkingHelper
             {
                 for(int i = 0; i < recentSearches.size(); i++)
                 {
-                    if(recentSearches.get(i).equals(route.getRouteNumber()))
+                    if(recentSearches.get(i).equals(route.getBusRouteNumber()))
                     {
                         recentSearches.remove(i);
                         break;
                     }
                 }
 
-                recentSearches.add(route.getRouteNumber());
+                recentSearches.add(route.getBusRouteNumber());
 
                 getActivity().deleteFile(Constants.ROUTE_SEARCH_HISTORY_FILENAME);
                 FileOutputStream fileOutputStream = getActivity().openFileOutput(Constants.ROUTE_SEARCH_HISTORY_FILENAME, MODE_APPEND);
@@ -226,12 +226,12 @@ public class BusTrackerFragment extends Fragment implements NetworkingHelper
             }
             Intent trackBusIntent;
             trackBusIntent = new Intent(getContext(), TrackBusActivity.class);
-            trackBusIntent.putExtra("ROUTE_NUMBER", route.getRouteNumber());
+            trackBusIntent.putExtra("ROUTE_NUMBER", route.getBusRouteNumber());
             trackBusIntent.putExtra("ROUTE_DIRECTION", "UP");
-            trackBusIntent.putExtra("UP_ROUTE_ID", route.getUpRouteId());
-            trackBusIntent.putExtra("UP_ROUTE_NAME", route.getUpRouteName());
-            trackBusIntent.putExtra("DOWN_ROUTE_ID", route.getDownRouteId());
-            trackBusIntent.putExtra("DOWN_ROUTE_NAME", route.getDownRouteName());
+            trackBusIntent.putExtra("UP_ROUTE_ID", route.getBusRouteId());
+            trackBusIntent.putExtra("UP_ROUTE_NAME", route.getBusRouteDirectionName());
+            trackBusIntent.putExtra("DOWN_ROUTE_ID", route.getBusRouteId());
+            trackBusIntent.putExtra("DOWN_ROUTE_NAME", route.getBusRouteDirectionName());
             startActivity(trackBusIntent);
         }
         else
@@ -259,7 +259,7 @@ public class BusTrackerFragment extends Fragment implements NetworkingHelper
      *                     for a particular route id.
      */
     @Override
-    public void onStopsOnBusRouteFound(String errorMessage, BusStop[] busStops, Route route)
+    public void onStopsOnBusRouteFound(String errorMessage, BusStop[] busStops, BusRoute route)
     {
 
     }
@@ -272,7 +272,7 @@ public class BusTrackerFragment extends Fragment implements NetworkingHelper
      * @param numberOfBusesFound This parameter is the number of en-route buses the task found.
      */
     @Override
-    public void onBusesEnRouteFound(String errorMessage, Bus[] buses, int numberOfBusesFound, Route route, BusStop selectedBusStop)
+    public void onBusesEnRouteFound(String errorMessage, Bus[] buses, int numberOfBusesFound, BusRoute route, BusStop selectedBusStop)
     {
 
     }

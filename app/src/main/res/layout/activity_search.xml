@@ -29,6 +29,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/white_rounded_background_borderless"
+            android:enabled="false"
             android:hint="Search"
             android:maxLines="1"
             android:minHeight="40dp"
@@ -48,4 +49,12 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/search_and_back_linear_layout"
         android:visibility="visible"/>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="visible"/>
+
 </RelativeLayout>

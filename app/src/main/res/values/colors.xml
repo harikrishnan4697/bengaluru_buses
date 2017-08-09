@@ -7,4 +7,6 @@
     <color name="colorOrdinaryServiceBus">#4CAF50</color>
     <color name="colorACServiceBus">#03A9F4</color>
     <color name="colorSpecialServiceBus">#FF9800</color>
+    <color name="colorDefaultBackground">#ECEFF1</color>
+    <color name="colorBottomNavBar">#CFD8DC</color>
 </resources>

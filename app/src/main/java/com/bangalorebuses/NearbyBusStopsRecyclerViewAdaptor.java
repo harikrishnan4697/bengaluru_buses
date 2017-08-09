@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -37,7 +38,25 @@ class NearbyBusStopsRecyclerViewAdapter extends RecyclerView.Adapter<NearbyBusSt
     {
         nearbyBusStopsViewHolder.busStopNameTextView.setText(nearbyBusStops.get(i).getBusStopName());
         nearbyBusStopsViewHolder.busStopDirectionNameTextView.setText(nearbyBusStops.get(i).getBusStopDirectionName());
-        nearbyBusStopsViewHolder.busStopDistanceTextView.setText(nearbyBusStops.get(i).getDistance());
+        nearbyBusStopsViewHolder.busStopDistanceTextView.setText(nearbyBusStops.get(i).getBusStopDistance());
+
+        if (nearbyBusStops.get(i).isAirportShuttleStop())
+        {
+            nearbyBusStopsViewHolder.airportShuttleImageView.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            nearbyBusStopsViewHolder.airportShuttleImageView.setVisibility(View.GONE);
+        }
+
+        if (nearbyBusStops.get(i).isMetroFeederStop())
+        {
+            nearbyBusStopsViewHolder.metroFeederImageView.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            nearbyBusStopsViewHolder.metroFeederImageView.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -63,6 +82,8 @@ class NearbyBusStopsRecyclerViewAdapter extends RecyclerView.Adapter<NearbyBusSt
         TextView busStopNameTextView;
         TextView busStopDirectionNameTextView;
         TextView busStopDistanceTextView;
+        ImageView airportShuttleImageView;
+        ImageView metroFeederImageView;
 
         NearbyBusStopViewHolder(View itemView)
         {
@@ -71,6 +92,8 @@ class NearbyBusStopsRecyclerViewAdapter extends RecyclerView.Adapter<NearbyBusSt
             busStopNameTextView = (TextView) itemView.findViewById(R.id.busStopNameTextView);
             busStopDirectionNameTextView = (TextView) itemView.findViewById(R.id.busStopDirectionTextView);
             busStopDistanceTextView = (TextView) itemView.findViewById(R.id.busStopDistanceTextView);
+            airportShuttleImageView = (ImageView) itemView.findViewById(R.id.airportShuttleImageView);
+            metroFeederImageView = (ImageView) itemView.findViewById(R.id.metroFeederImageView);
             itemView.setOnClickListener(this);
         }
 
