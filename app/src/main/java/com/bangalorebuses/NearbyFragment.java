@@ -70,6 +70,7 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
     private TextView errorResolutionTextView;
     private RecyclerView nearbyBusStopsRecyclerView;
     private boolean locationHasToBeUpdated = false;
+    private NearbyBusStopsRecyclerViewAdapter adaptor;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -98,6 +99,16 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
         });
         errorLinearLayout.setVisibility(View.GONE);
         nearbyBusStopsRecyclerView.setVisibility(View.GONE);
+        if (adaptor != null)
+        {
+            errorLinearLayout.setVisibility(View.GONE);
+            updatingBusStopsProgressBarLinearLayout.setVisibility(View.GONE);
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+            nearbyBusStopsRecyclerView.setLayoutManager(linearLayoutManager);
+            nearbyBusStopsRecyclerView.setAdapter(adaptor);
+            adaptor.setClickListener(NearbyFragment.this);
+            nearbyBusStopsRecyclerView.setVisibility(View.VISIBLE);
+        }
         return view;
     }
 
@@ -182,7 +193,12 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult)
     {
-        Toast.makeText(getActivity(), "Couldn't get current location! Please try again later...", Toast.LENGTH_SHORT).show();
+        updatingBusStopsProgressBarLinearLayout.setVisibility(View.GONE);
+        errorImageView.setImageResource(R.drawable.ic_location_off_black);
+        errorTextView.setText("Couldn't get current location! Please make sure you have the latest version of the Google Play Services...");
+        errorResolutionTextView.setText("Retry");
+        errorLinearLayout.setVisibility(View.VISIBLE);
+        nearbyBusStopsRecyclerView.setVisibility(View.GONE);
     }
 
     /**
@@ -194,7 +210,12 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
     @Override
     public void onConnectionSuspended(int i)
     {
-        Toast.makeText(getActivity(), "Couldn't get current location! Please try again later...", Toast.LENGTH_SHORT).show();
+        updatingBusStopsProgressBarLinearLayout.setVisibility(View.GONE);
+        errorImageView.setImageResource(R.drawable.ic_location_off_black);
+        errorTextView.setText("Something went wrong! Couldn't get current location...");
+        errorResolutionTextView.setText("Retry");
+        errorLinearLayout.setVisibility(View.VISIBLE);
+        nearbyBusStopsRecyclerView.setVisibility(View.GONE);
     }
 
     /**
@@ -490,7 +511,7 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
     }
 
     @Override
-    public void onBusesEnRouteFound(String errorMessage, Bus[] buses, int numberOfBusesFound, BusRoute route, BusStop selectedBusStop)
+    public void onBusesEnRouteFound(String errorMessage, ArrayList<Bus> buses, int numberOfBusesFound, BusRoute route, BusStop selectedBusStop)
     {
 
     }
@@ -522,10 +543,6 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
     public void onPause()
     {
         super.onPause();
-        if (getNearestBusStopsTask != null)
-        {
-            getNearestBusStopsTask.cancel(true);
-        }
         if (isRequestingLocationUpdates)
         {
             locationHasToBeUpdated = true;
@@ -537,6 +554,14 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
     public void onStop()
     {
         super.onStop();
+        if (getRoutesArrivingAtStopTask != null)
+        {
+            getRoutesArrivingAtStopTask.cancel(true);
+        }
+        if (getNearestBusStopsTask != null)
+        {
+            getNearestBusStopsTask.cancel(true);
+        }
         if (googleApiClient != null)
         {
             googleApiClient.disconnect();
@@ -575,7 +600,7 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
             updatingBusStopsProgressBarLinearLayout.setVisibility(View.GONE);
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
             nearbyBusStopsRecyclerView.setLayoutManager(linearLayoutManager);
-            NearbyBusStopsRecyclerViewAdapter adaptor = new NearbyBusStopsRecyclerViewAdapter(busStops);
+            adaptor = new NearbyBusStopsRecyclerViewAdapter(busStops);
             nearbyBusStopsRecyclerView.setAdapter(adaptor);
             adaptor.setClickListener(NearbyFragment.this);
             nearbyBusStopsRecyclerView.setVisibility(View.VISIBLE);

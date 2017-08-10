@@ -9,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
 import static com.bangalorebuses.Constants.NETWORK_QUERY_IO_EXCEPTION;
 import static com.bangalorebuses.Constants.NETWORK_QUERY_JSON_EXCEPTION;
@@ -22,7 +23,7 @@ class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
     private String errorMessage = NETWORK_QUERY_NO_ERROR;
     private BusStop selectedBusStop;
     private int numberOfBusesFound;
-    private Bus[] buses = new Bus[4];
+    private ArrayList<Bus> buses = new ArrayList<>();
     private BusRoute route;
 
 
@@ -46,11 +47,6 @@ class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
             errorMessage = NETWORK_QUERY_URL_EXCEPTION;
             return null;
         }
-
-        buses[0] = new Bus();
-        buses[1] = new Bus();
-        buses[2] = new Bus();
-        buses[3] = new Bus();
         numberOfBusesFound = 0;
         HttpURLConnection client;
         String line;
@@ -93,19 +89,21 @@ class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
             {
                 if (Integer.parseInt(jsonArray.getJSONArray(i).getString(12).replace("routeorder:", "")) <= selectedBusStop.getBusStopRouteOrder())
                 {
-                    for (int j = 0; j < 4; j++)
+                    for (int j = 0; j < jsonArray.length(); j++)
                     {
                         if ((i + j) < jsonArray.length())
                         {
+                            Bus bus = new Bus();
                             if (Integer.parseInt(jsonArray.getJSONArray(i + j).getString(12).replace("routeorder:", "")) == selectedBusStop.getBusStopRouteOrder())
                             {
-                                buses[j].setDue(true);
+                                bus.setDue(true);
                             }
                             String nearestLatLong = jsonArray.getJSONArray(i + j).getString(6).replace("nearestlatlng:", "");
-                            buses[j].setBusLat(nearestLatLong.substring(0, nearestLatLong.indexOf(",")));
-                            buses[j].setBusLong(nearestLatLong.substring(nearestLatLong.indexOf(",") + 1, nearestLatLong.length() - 1));
-                            buses[j].setBusRegistrationNumber(jsonArray.getJSONArray(i + j).getString(0).replace("vehicleno:", ""));
-                            buses[j].setBusRouteOrder(Integer.parseInt(jsonArray.getJSONArray(i + j).getString(12).replace("routeorder:", "")));
+                            bus.setBusLat(nearestLatLong.substring(0, nearestLatLong.indexOf(",")));
+                            bus.setBusLong(nearestLatLong.substring(nearestLatLong.indexOf(",") + 1, nearestLatLong.length() - 1));
+                            bus.setBusRegistrationNumber(jsonArray.getJSONArray(i + j).getString(0).replace("vehicleno:", ""));
+                            bus.setBusRouteOrder(Integer.parseInt(jsonArray.getJSONArray(i + j).getString(12).replace("routeorder:", "")));
+                            buses.add(bus);
                             numberOfBusesFound++;
                         }
                         else

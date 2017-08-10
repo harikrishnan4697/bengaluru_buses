@@ -272,7 +272,7 @@ public class BusTrackerFragment extends Fragment implements NetworkingHelper
      * @param numberOfBusesFound This parameter is the number of en-route buses the task found.
      */
     @Override
-    public void onBusesEnRouteFound(String errorMessage, Bus[] buses, int numberOfBusesFound, BusRoute route, BusStop selectedBusStop)
+    public void onBusesEnRouteFound(String errorMessage, ArrayList<Bus> buses, int numberOfBusesFound, BusRoute route, BusStop selectedBusStop)
     {
 
     }

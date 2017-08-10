@@ -19,6 +19,8 @@ class BusRoute
     private String busRouteDirectionName;
     private ArrayList<BusStop> busRouteStops;
     private ArrayList<String> busRouteDepartureTimings;
+    private ArrayList<Bus> busRouteBuses;
+    private int selectedBusStopRouteOrder;
 
     public int getBusRouteId()
     {
@@ -88,5 +90,25 @@ class BusRoute
     public void setBusRouteStops(ArrayList<BusStop> busRouteStops)
     {
         this.busRouteStops = busRouteStops;
+    }
+
+    public ArrayList<Bus> getBusRouteBuses()
+    {
+        return busRouteBuses;
+    }
+
+    public void setBusRouteBuses(ArrayList<Bus> busRouteBuses)
+    {
+        this.busRouteBuses = busRouteBuses;
+    }
+
+    public int getSelectedBusStopRouteOrder()
+    {
+        return selectedBusStopRouteOrder;
+    }
+
+    public void setSelectedBusStopRouteOrder(int selectedBusStopRouteOrder)
+    {
+        this.selectedBusStopRouteOrder = selectedBusStopRouteOrder;
     }
 }

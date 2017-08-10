@@ -10,35 +10,30 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 class BusesArrivingAtStopListCustomAdapter extends BaseAdapter
 {
     public Activity context;
-    private List<String> destinations = null;
+    private ArrayList<BusRoute> busRoutes = null;
     private LayoutInflater inflater;
-    private List<String> routeNumbers = null;
-    private List<String> busETAs = null;
 
-    BusesArrivingAtStopListCustomAdapter(Activity context, ArrayList<String> routeNumbers, ArrayList<String> destinations, ArrayList<String> busETAs)
+    BusesArrivingAtStopListCustomAdapter(Activity context, ArrayList<BusRoute> busRoutes)
     {
         super();
         this.context = context;
-        this.routeNumbers = routeNumbers;
-        this.destinations = destinations;
-        this.busETAs = busETAs;
+        this.busRoutes = busRoutes;
         this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
     public int getCount()
     {
-        return routeNumbers.size();
+        return busRoutes.size();
     }
 
     public Object getItem(int position)
     {
-        return routeNumbers.get(position);
+        return busRoutes.get(position);
     }
 
     public long getItemId(int position)
@@ -67,15 +62,17 @@ class BusesArrivingAtStopListCustomAdapter extends BaseAdapter
             holder = (ViewHolder) convertView.getTag();
         }
 
-        if (routeNumbers.get(position).length() > 5 && routeNumbers.get(position).contains("KIAS-"))
+        if (busRoutes.get(position).getBusRouteNumber().length() > 5 &&
+                busRoutes.get(position).getBusRouteNumber().contains("KIAS-"))
         {
             holder.imgViewLogo.setImageResource(R.drawable.ic_flight_blue);
         }
-        else if (routeNumbers.get(position).length() > 1 && routeNumbers.get(position).substring(0, 2).equals("V-"))
+        else if (busRoutes.get(position).getBusRouteNumber().length() > 1 &&
+                busRoutes.get(position).getBusRouteNumber().substring(0, 2).equals("V-"))
         {
             holder.imgViewLogo.setImageResource(R.drawable.ic_directions_bus_ac);
         }
-        else if (routeNumbers.get(position).contains("MF-") || routeNumbers.get(position).contains("CHAKRA-"))
+        else if (busRoutes.get(position).getBusRouteNumber().contains("MF-"))
         {
             holder.imgViewLogo.setImageResource(R.drawable.ic_directions_bus_special);
         }
@@ -84,9 +81,46 @@ class BusesArrivingAtStopListCustomAdapter extends BaseAdapter
             holder.imgViewLogo.setImageResource(R.drawable.ic_directions_bus_ordinary);
         }
 
-        holder.txtViewRouteNumber.setText(routeNumbers.get(position));
-        holder.txtViewDestination.setText(destinations.get(position));
-        holder.txtViewETA.setText(busETAs.get(position));
+        holder.txtViewRouteNumber.setText(busRoutes.get(position).getBusRouteNumber());
+        String busRouteDestinationName = busRoutes.get(position).getBusRouteDirectionName();
+        if (busRouteDestinationName.contains(" To "))
+        {
+            busRouteDestinationName = busRouteDestinationName.substring(busRouteDestinationName.indexOf("To "), busRouteDestinationName.length());
+        }
+        else if (busRouteDestinationName.contains(" to "))
+        {
+            busRouteDestinationName = busRouteDestinationName.substring(busRouteDestinationName.indexOf("to "), busRouteDestinationName.length());
+        }
+        holder.txtViewDestination.setText(busRouteDestinationName);
+
+        String busETAs = "";
+        for (Bus bus : busRoutes.get(position).getBusRouteBuses())
+        {
+            if (!busETAs.equals(""))
+            {
+                busETAs = busETAs + ", ";
+            }
+            String travelTimeAsText;
+
+            if (!bus.isDue())
+            {
+                if (bus.getBusETA() >= 60)
+                {
+                    int hours = bus.getBusETA() / 60;
+                    travelTimeAsText = hours + " hr " + bus.getBusETA() % 60 + " min";
+                }
+                else
+                {
+                    travelTimeAsText = bus.getBusETA() + " min";
+                }
+                busETAs = busETAs + travelTimeAsText;
+            }
+            else
+            {
+                busETAs = busETAs + "due";
+            }
+        }
+        holder.txtViewETA.setText(busETAs);
         return convertView;
     }
 

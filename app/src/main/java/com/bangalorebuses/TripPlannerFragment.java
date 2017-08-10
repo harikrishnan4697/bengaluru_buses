@@ -235,24 +235,24 @@ public class TripPlannerFragment extends Fragment implements NetworkingHelper, T
             for (int i = 0; i < buses.length; i++)
             {
                 numberOfDirectBusesFound++;
-                buses[i].setBusRouteNumber(buses[i].getBusRouteNumber().replace("UP", ""));
-                buses[i].setBusRouteNumber(buses[i].getBusRouteNumber().replace("DN", ""));
+                /*buses[i].setBusRouteNumber(buses[i].getBusRouteNumber().replace("UP", ""));
+                buses[i].setBusRouteNumber(buses[i].getBusRouteNumber().replace("DN", ""));TODO*/
                 HashMap<String, String> hm = new HashMap<>();
-                hm.put("route_number", buses[i].getBusRouteNumber());
+                //hm.put("route_number", buses[i].getBusRouteNumber());TODO
                 if (buses[i].getBusRouteOrder() == 1)
                 {
                     hm.put("bus_eta", "Trip is yet to begin");
                 }
                 else
                 {
-                    if (buses[i].getBusETA() <= 180)
+                    /*if (buses[i].getBusETA() <= 180)
                     {
                         hm.put("bus_eta", "Due");
                     }
                     else
                     {
                         hm.put("bus_eta", Integer.toString(buses[i].getBusETA() / 60) + " min");
-                    }
+                    }TODO*/
                 }
                 aList.add(hm);
             }
@@ -430,10 +430,10 @@ public class TripPlannerFragment extends Fragment implements NetworkingHelper, T
         numberOfNetworkRequestsMade--;
         if (errorMessage.equals(Constants.NETWORK_QUERY_NO_ERROR))
         {
-            buses[0].setBusRouteNumber(buses[0].getBusRouteNumber().replace("UP", ""));
+            /*buses[0].setBusRouteNumber(buses[0].getBusRouteNumber().replace("UP", ""));
             buses[0].setBusRouteNumber(buses[0].getBusRouteNumber().replace("DN", ""));
             buses[0].setBusRouteNumber(buses[0].getBusRouteNumber().replace("UP", ""));
-            buses[0].setBusRouteNumber(buses[0].getBusRouteNumber().replace("DN", ""));
+            buses[0].setBusRouteNumber(buses[0].getBusRouteNumber().replace("DN", ""));TODO*/
 
             HashMap<String, String> hashMap = inDirectRoutes.get(transitPoint.getBusStopName());
 
@@ -441,18 +441,18 @@ public class TripPlannerFragment extends Fragment implements NetworkingHelper, T
             {
                 hashMap.put("transit_point_name", "Change at " + transitPoint.getBusStopName());
 
-                hashMap.put("origin_to_transit_point_route_number", buses[0].getBusRouteNumber());
+                //hashMap.put("origin_to_transit_point_route_number", buses[0].getBusRouteNumber());TODO
 
                 if (buses[0].getBusRouteOrder() != 1)
                 {
-                    if (buses[0].getBusETA() <= 180)
+                    /*if (buses[0].getBusETA() <= 180)
                     {
                         hashMap.put("origin_to_transit_point_bus_eta", "Due");
                     }
                     else
                     {
                         hashMap.put("origin_to_transit_point_bus_eta", Integer.toString(buses[0].getBusETA() / 60) + " min");
-                    }
+                    }TODO*/
                 }
                 else
                 {
@@ -461,18 +461,18 @@ public class TripPlannerFragment extends Fragment implements NetworkingHelper, T
             }
             else if (routeMessage.equals(Constants.ROUTE_TYPE_TRANSIT_POINT_TO_DESTINATION))
             {
-                hashMap.put("transit_point_to_destination_route_number", buses[0].getBusRouteNumber());
+                //hashMap.put("transit_point_to_destination_route_number", buses[0].getBusRouteNumber());TODO
 
                 if (buses[0].getBusRouteOrder() != 1)
                 {
-                    if (buses[0].getBusETA() <= 180)
+                    /*if (buses[0].getBusETA() <= 180)
                     {
                         hashMap.put("transit_point_to_destination_bus_eta", "Due");
                     }
                     else
                     {
                         hashMap.put("transit_point_to_destination_bus_eta", Integer.toString(buses[0].getBusETA() / 60) + " min");
-                    }
+                    }TODO*/
                 }
                 else
                 {
@@ -598,7 +598,7 @@ public class TripPlannerFragment extends Fragment implements NetworkingHelper, T
      * @param numberOfBusesFound This parameter is the number of en-route buses the task found.
      */
     @Override
-    public void onBusesEnRouteFound(String errorMessage, Bus[] buses, int numberOfBusesFound, BusRoute route, BusStop selectedBusStop)
+    public void onBusesEnRouteFound(String errorMessage, ArrayList<Bus> buses, int numberOfBusesFound, BusRoute route, BusStop selectedBusStop)
     {
 
     }

@@ -13,7 +13,7 @@
         android:layout_alignParentTop="true"
         android:background="@color/colorPrimary"
         android:orientation="horizontal"
-        android:padding="10dp">
+        android:padding="16dp">
 
         <ImageView
             android:layout_width="30dp"
@@ -31,6 +31,7 @@
             android:background="@drawable/white_rounded_background_borderless"
             android:enabled="false"
             android:hint="Search"
+            android:inputType="text"
             android:maxLines="1"
             android:minHeight="40dp"
             android:paddingBottom="5dp"

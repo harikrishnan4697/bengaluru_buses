@@ -9,7 +9,7 @@ package com.bangalorebuses;
  * @since 23-6-2017
  */
 
-class Bus extends BusRoute
+class Bus
 {
     private String busRegistrationNumber;
     private String busLat;
@@ -17,6 +17,7 @@ class Bus extends BusRoute
     private int busETA;
     private int busRouteOrder;
     private boolean isDue;
+    private BusRoute busRoute;
 
     public String getBusRegistrationNumber()
     {
@@ -76,5 +77,15 @@ class Bus extends BusRoute
     public void setDue(boolean due)
     {
         isDue = due;
+    }
+
+    public BusRoute getBusRoute()
+    {
+        return busRoute;
+    }
+
+    public void setBusRoute(BusRoute busRoute)
+    {
+        this.busRoute = busRoute;
     }
 }

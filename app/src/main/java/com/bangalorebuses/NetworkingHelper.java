@@ -2,6 +2,8 @@ package com.bangalorebuses;
 
 import org.json.JSONArray;
 
+import java.util.ArrayList;
+
 /**
  * This is an interface used for callback methods.
  *
@@ -51,7 +53,7 @@ interface NetworkingHelper
      * @param buses              This parameter is an array of buses en-route that the task found.
      * @param numberOfBusesFound This parameter is the number of en-route buses the task found.
      */
-    void onBusesEnRouteFound(String errorMessage, Bus[] buses, int numberOfBusesFound, BusRoute route, BusStop selectedBusStop);
+    void onBusesEnRouteFound(String errorMessage, ArrayList<Bus> buses, int numberOfBusesFound, BusRoute route, BusStop selectedBusStop);
 
     /**
      * This is a callback method called by the GetTimeToBusesTask.

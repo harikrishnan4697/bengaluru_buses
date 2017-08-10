@@ -92,7 +92,7 @@ class GetDirectBusesTask extends AsyncTask<BusStop, Void, Bus[]>
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                 buses[i] = new Bus();
                 buses[i].setBusRegistrationNumber(jsonObject.getString("vehicleno"));
-                buses[i].setBusRouteNumber(jsonObject.getString("routeno"));
+                //buses[i].setBusRouteNumber(jsonObject.getString("routeno")); TODO
                 buses[i].setBusLat(jsonObject.getString("vehiclelat"));
                 buses[i].setBusLong(jsonObject.getString("vehiclelng"));
                 buses[i].setBusRouteOrder(jsonObject.getInt("routeorder"));
