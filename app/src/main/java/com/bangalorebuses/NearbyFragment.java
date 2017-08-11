@@ -1,7 +1,6 @@
 package com.bangalorebuses;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -49,8 +48,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
+import static android.app.Activity.RESULT_OK;
 import static android.content.Context.LOCATION_SERVICE;
 import static com.bangalorebuses.Constants.LOCATION_PERMISSION_REQUEST_CODE;
+import static com.bangalorebuses.Constants.SEARCH_NEARBY_BUS_STOP_REQUEST_CODE;
 import static com.bangalorebuses.Constants.db;
 
 public class NearbyFragment extends Fragment implements NetworkingHelper, GoogleApiClient.ConnectionCallbacks,
@@ -144,8 +145,8 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
         {
             case R.id.nearby_search:
                 Intent searchActivityIntent = new Intent(getContext(), SearchActivity.class);
-                searchActivityIntent.putExtra("Search_Type", Constants.SEARCH_TYPE_BUS_STOP);
-                startActivityForResult(searchActivityIntent, Constants.SEARCH_NEARBY_BUS_STOP_REQUEST_CODE);
+                searchActivityIntent.putExtra("SEARCH_TYPE", Constants.SEARCH_TYPE_BUS_STOP_WITH_DIRECTION);
+                getActivity().startActivityForResult(searchActivityIntent, Constants.SEARCH_NEARBY_BUS_STOP_REQUEST_CODE);
                 break;
             case R.id.nearby_refresh:
                 createLocationRequest();
@@ -391,7 +392,7 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
     {
         if (requestCode == 1)
         {
-            if (resultCode == Activity.RESULT_OK)
+            if (resultCode == RESULT_OK)
             {
                 if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
                 {
@@ -408,6 +409,14 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
                 errorLinearLayout.setVisibility(View.VISIBLE);
                 nearbyBusStopsRecyclerView.setVisibility(View.GONE);
             }
+        }
+        else if (resultCode == RESULT_OK && requestCode == SEARCH_NEARBY_BUS_STOP_REQUEST_CODE)
+        {
+            Intent getBusesArrivingAtBusStopIntent = new Intent(getContext(), BusesArrivingAtBusStopActivity.class);
+            getBusesArrivingAtBusStopIntent.putExtra("BUS_STOP_NAME", data.getStringExtra("BUS_STOP_NAME"));
+            getBusesArrivingAtBusStopIntent.putExtra("BUS_STOP_DIRECTION_NAME", data.getStringExtra("BUS_STOP_DIRECTION_NAME"));
+            getBusesArrivingAtBusStopIntent.putExtra("BUS_STOP_ID", data.getIntExtra("BUS_STOP_ID", 0));
+            startActivity(getBusesArrivingAtBusStopIntent);
         }
     }
 
@@ -438,6 +447,7 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
         {
             if (busStopsArray == null || busStopsArray.length() == 0)
             {
+                updatingBusStopsProgressBarLinearLayout.setVisibility(View.GONE);
                 setErrorLayoutContent(R.drawable.ic_person_pin_circle_black, "Uh oh! There aren't any Bengaluru City bus stops nearby.", "Retry");
                 errorLinearLayout.setVisibility(View.VISIBLE);
                 nearbyBusStopsRecyclerView.setVisibility(View.GONE);
@@ -476,6 +486,7 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
                 }
                 catch (JSONException e)
                 {
+                    updatingBusStopsProgressBarLinearLayout.setVisibility(View.GONE);
                     setErrorLayoutContent(R.drawable.ic_person_pin_circle_black, "Uh oh! There aren't any Bengaluru City bus stops nearby.", "Retry");
                     errorLinearLayout.setVisibility(View.VISIBLE);
                     nearbyBusStopsRecyclerView.setVisibility(View.GONE);
@@ -484,6 +495,7 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
         }
         else
         {
+            updatingBusStopsProgressBarLinearLayout.setVisibility(View.GONE);
             setErrorLayoutContent(R.drawable.ic_cloud_off_black, "Uh oh! No data connection.", "Retry");
             errorLinearLayout.setVisibility(View.VISIBLE);
             nearbyBusStopsRecyclerView.setVisibility(View.GONE);
@@ -554,7 +566,7 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
     public void onStop()
     {
         super.onStop();
-        if (getRoutesArrivingAtStopTask != null)
+        /*if (getRoutesArrivingAtStopTask != null)
         {
             getRoutesArrivingAtStopTask.cancel(true);
         }
@@ -565,7 +577,7 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
         if (googleApiClient != null)
         {
             googleApiClient.disconnect();
-        }
+        }*/
     }
 
     private class GetRoutesArrivingAtStopTask extends AsyncTask<ArrayList<BusStop>, Void, ArrayList<BusStop>>

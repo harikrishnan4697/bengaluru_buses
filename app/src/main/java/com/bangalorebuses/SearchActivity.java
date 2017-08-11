@@ -1,33 +1,36 @@
 package com.bangalorebuses;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
-import org.json.JSONArray;
+import java.util.ArrayList;
 
-import java.util.HashSet;
-import java.util.Set;
+import static com.bangalorebuses.Constants.SEARCH_TYPE_BUS_ROUTE;
+import static com.bangalorebuses.Constants.SEARCH_TYPE_BUS_STOP;
+import static com.bangalorebuses.Constants.SEARCH_TYPE_BUS_STOP_WITH_DIRECTION;
+import static com.bangalorebuses.Constants.db;
 
 public class SearchActivity extends AppCompatActivity
 {
+    ProgressBar progressBar;
     private EditText searchEditText;
     private ListView searchResultsListView;
-    private ProgressBar progressBar;
-    private ArrayAdapter<String> listAdapter;
     private BusNumberListCustomAdapter customListAdapter;
     private String searchType;
     private Intent resultIntent = new Intent();
-    private JSONArray jsonArray;
-/*    private GetAllStops getAllStops;
-    private GetAllRoutes getAllRoutes;*/
-    private Set<String> busStopNames = new HashSet<>();
+    private GetAllStops getAllStops;
+    private GetAllRoutes getAllRoutes;
+    private GetAllDistinctStopNames getAllDistinctStopNames;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -39,8 +42,8 @@ public class SearchActivity extends AppCompatActivity
         {
             getSupportActionBar().hide();
         }
-        // Show the soft keyboard by default when the activity is started
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        // Hide the soft keyboard by default when the activity is started
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         // Initialise some variables
         searchEditText = (EditText) findViewById(R.id.search_edit_text);
@@ -48,7 +51,13 @@ public class SearchActivity extends AppCompatActivity
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         searchType = getIntent().getStringExtra("SEARCH_TYPE");
 
-        /*if (searchType.equals(SEARCH_TYPE_BUS_STOP))
+        progressBar.setVisibility(View.VISIBLE);
+        if (searchType.equals(SEARCH_TYPE_BUS_STOP))
+        {
+            getAllDistinctStopNames = new GetAllDistinctStopNames();
+            getAllDistinctStopNames.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }
+        else if (searchType.equals(SEARCH_TYPE_BUS_STOP_WITH_DIRECTION))
         {
             getAllStops = new GetAllStops();
             getAllStops.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -57,7 +66,90 @@ public class SearchActivity extends AppCompatActivity
         {
             getAllRoutes = new GetAllRoutes();
             getAllRoutes.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        }*/
+        }
+    }
+
+    private void onAllDistinctStopNamesFound(ArrayList<String> busStopNames)
+    {
+
+    }
+
+    private void onAllStopsFound(final ArrayList<BusStop> busStops)
+    {
+        final AllBusStopSearchListAdaptor listAdapter = new AllBusStopSearchListAdaptor(this, busStops);
+        searchResultsListView.setAdapter(listAdapter);
+        progressBar.setVisibility(View.GONE);
+        searchEditText.setEnabled(true);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        searchResultsListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                resultIntent.putExtra("BUS_STOP_NAME", ((BusStop) parent.getItemAtPosition(position)).getBusStopName());
+                resultIntent.putExtra("BUS_STOP_DIRECTION_NAME", ((BusStop) parent.getItemAtPosition(position)).getBusStopDirectionName());
+                resultIntent.putExtra("BUS_STOP_ID", ((BusStop) parent.getItemAtPosition(position)).getBusStopId());
+                setResult(RESULT_OK, resultIntent);
+                getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+                finish();
+            }
+        });
+
+        searchEditText.addTextChangedListener(new TextWatcher()
+        {
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count)
+            {
+                listAdapter.getFilter().filter(s);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s)
+            {
+
+            }
+        });
+    }
+
+    private void onAllRoutesFound(ArrayList<BusRoute> busRoutes)
+    {
+
+    }
+
+    /**
+     * This method is called by the on screen back button.
+     *
+     * @param view Not used.
+     */
+    public void exit(View view)
+    {
+        finish();
+    }
+
+    @Override
+    protected void onStop()
+    {
+        super.onStop();
+        if (getAllRoutes != null)
+        {
+            getAllRoutes.cancel(true);
+        }
+        if (getAllStops != null)
+        {
+            getAllStops.cancel(true);
+        }
+        if (getAllDistinctStopNames != null)
+        {
+            getAllDistinctStopNames.cancel(true);
+        }
     }
 
     /**
@@ -166,17 +258,10 @@ public class SearchActivity extends AppCompatActivity
             {
             }
         });
-    }
+    }*/
 
     private class GetAllRoutes extends AsyncTask<Void, Void, ArrayList<BusRoute>>
     {
-        @Override
-        protected void onPreExecute()
-        {
-            super.onPreExecute();
-            progressBar.setVisibility(View.VISIBLE);
-        }
-
         @Override
         protected ArrayList<BusRoute> doInBackground(Void... params)
         {
@@ -187,23 +272,12 @@ public class SearchActivity extends AppCompatActivity
         protected void onPostExecute(ArrayList<BusRoute> busRoutes)
         {
             super.onPostExecute(busRoutes);
-            for (BusRoute busRoute: busRoutes)
-            {
-
-            }
-            progressBar.setVisibility(View.GONE);
+            onAllRoutesFound(busRoutes);
         }
     }
 
     private class GetAllStops extends AsyncTask<Void, Void, ArrayList<BusStop>>
     {
-        @Override
-        protected void onPreExecute()
-        {
-            super.onPreExecute();
-            progressBar.setVisibility(View.VISIBLE);
-        }
-
         @Override
         protected ArrayList<BusStop> doInBackground(Void... params)
         {
@@ -214,21 +288,24 @@ public class SearchActivity extends AppCompatActivity
         protected void onPostExecute(ArrayList<BusStop> busStops)
         {
             super.onPostExecute(busStops);
-            for (BusStop busStop: busStops)
-            {
-                busStopNames.add(busStop.getBusStopName());
-            }
-            progressBar.setVisibility(View.GONE);
+            onAllStopsFound(busStops);
         }
-    }*/
+    }
 
-    /**
-     * This method is called by the on screen back button.
-     *
-     * @param view Not used.
-     */
-    public void exit(View view)
+    private class GetAllDistinctStopNames extends AsyncTask<Void, Void, ArrayList<String>>
     {
-        finish();
+        @Override
+        protected ArrayList<String> doInBackground(Void... params)
+        {
+            return DbQueries.getAllDistinctStopNames(db);
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<String> busStopNames)
+        {
+            super.onPostExecute(busStopNames);
+            onAllDistinctStopNamesFound(busStopNames);
+        }
+
     }
 }

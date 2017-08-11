@@ -19,79 +19,73 @@
         android:layout_marginRight="10dp"
         app:srcCompat="@drawable/ic_flight_blue"/>
 
-    <RelativeLayout
+    <LinearLayout
+        android:id="@+id/busETAsLinearLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:layout_toEndOf="@id/imageView"
-        android:layout_toRightOf="@id/imageView"
-        android:gravity="center_vertical"
+        android:layout_gravity="end"
+        android:gravity="center"
         android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/realTimeImageView"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginStart="5dp"
+            app:srcCompat="@drawable/ic_rss_feed_orange"/>
 
         <TextView
             android:id="@+id/busETATextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:gravity="center"
             android:maxLines="1"
-            android:text="29 min"
+            android:text="29 min, 47 min, 1 hr 7 min"
             android:textColor="#000000"
-            android:textSize="16sp"/>
+            android:textSize="14sp"/>
 
-        <ImageView
-            android:id="@+id/realTimeImageView"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="5dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_marginStart="5dp"
-            android:layout_toLeftOf="@id/busETATextView"
-            android:layout_toStartOf="@id/busETATextView"
-            app:srcCompat="@drawable/ic_rss_feed_orange"/>
+    </LinearLayout>
 
-        <LinearLayout
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/imageView"
+        android:layout_toLeftOf="@id/busETAsLinearLayout"
+        android:layout_toRightOf="@id/imageView"
+        android:layout_toStartOf="@id/busETAsLinearLayout"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/routeNumberTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_toLeftOf="@id/realTimeImageView"
-            android:layout_toStartOf="@id/realTimeImageView"
-            android:orientation="horizontal">
+            android:background="@drawable/grey_rounded_background_borderless"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:text="KIAS-8"
+            android:textColor="#000000"
+            android:textSize="14sp"/>
 
-            <TextView
-                android:id="@+id/routeNumberTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/grey_rounded_background_borderless"
-                android:ellipsize="end"
-                android:gravity="center"
-                android:maxLines="1"
-                android:text="KIAS-8"
-                android:textColor="#000000"
-                android:textSize="16sp"/>
-
-        </LinearLayout>
-
-    </RelativeLayout>
+    </LinearLayout>
 
     <TextView
         android:id="@+id/routeDestinationTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/imageView"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="5dp"
         android:layout_toEndOf="@+id/imageView"
         android:layout_toRightOf="@+id/imageView"
         android:ellipsize="end"
         android:maxLines="1"
         android:text="To Kempegowda International Airport"
+        android:textColor="#000000"
         android:textSize="14sp"/>
 
 </RelativeLayout>

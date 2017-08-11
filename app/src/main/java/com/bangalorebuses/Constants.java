@@ -26,8 +26,9 @@ class Constants
     static final String DIRECTION_DOWN = "DN";
 
     // Constants for fragments
-    static final String SEARCH_TYPE_BUS_STOP = "Bus_Stop";
-    static final String SEARCH_TYPE_BUS_ROUTE = "Bus_Route";
+    static final String SEARCH_TYPE_BUS_STOP_WITH_DIRECTION = "BUS_STOP_WITH_DIRECTION";
+    static final String SEARCH_TYPE_BUS_STOP = "BUS_STOP";
+    static final String SEARCH_TYPE_BUS_ROUTE = "BUS_ROUTE";
     static final int SEARCH_NEARBY_BUS_STOP_REQUEST_CODE = 7;
     static final int SEARCH_START_BUS_STOP_REQUEST_CODE = 20;
     static final int SEARCH_END_BUS_STOP_REQUEST_CODE = 47;

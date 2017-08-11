@@ -204,6 +204,18 @@ class DbQueries
         return busStops;
     }
 
+    public static ArrayList<String> getAllDistinctStopNames(SQLiteDatabase db)
+    {
+        Cursor cursor = db.rawQuery("select distinct Stops.StopName from Stops", null);
+        ArrayList<String> stopNames = new ArrayList<>();
+        while (cursor.moveToNext())
+        {
+            stopNames.add(cursor.getString(0));
+        }
+        cursor.close();
+        return stopNames;
+    }
+
     public static int getNumberOfStopsBetweenRouteOrders(SQLiteDatabase db, int routeId, int routeOrder1, int routeOrder2)
     {
         Cursor cursor = db.rawQuery("select count(*) from RouteStops where RouteStops.RouteId = " + routeId +
