@@ -35,7 +35,7 @@ interface NetworkingHelper
      * @param routeDirection This parameter is to convey if the route number that was passed
      *                       to the task had a direction of UP or DN.
      */
-    void onBusRouteDetailsFound(String errorMessage, BusRoute route, boolean isForBusList, String routeDirection);
+    //void onBusRouteDetailsFound(String errorMessage, BusRoute route, boolean isForBusList, String routeDirection);
 
     /**
      * This is a callback method called by the GetStopsOnBusRouteTask.
@@ -44,7 +44,7 @@ interface NetworkingHelper
      * @param busStops This parameter is a JSONArray of all the bus stops
      *                      for a particular route id.
      */
-    void onStopsOnBusRouteFound(String errorMessage, BusStop[] busStops, BusRoute route);
+    //void onStopsOnBusRouteFound(String errorMessage, BusStop[] busStops, BusRoute route);
 
     /**
      * This is a callback method called by the GetBusesEnRouteTask.
@@ -61,7 +61,7 @@ interface NetworkingHelper
      * @param isError This parameter is to convey if the task encountered an error.
      * @param buses   This parameter is an array of buses with their time to bus stop set.
      */
-    void onTimeToBusesFound(boolean isError, Bus[] buses);
+    //void onTimeToBusesFound(boolean isError, Bus[] buses);
 
     /**
      * This is a callback method called by the GetBusesArrivingAtStopTask.
@@ -69,5 +69,5 @@ interface NetworkingHelper
      * @param errorMessage This parameter is to convey if the task encountered an error.
      * @param buses   This parameter is a JSONArray of arriving at a bus stop.
      */
-    void onBusesAtStopFound(String errorMessage, JSONArray buses);
+    //void onBusesAtStopFound(String errorMessage, JSONArray buses);
 }

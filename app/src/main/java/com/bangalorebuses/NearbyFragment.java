@@ -103,7 +103,6 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
         if (adaptor != null)
         {
             errorLinearLayout.setVisibility(View.GONE);
-            updatingBusStopsProgressBarLinearLayout.setVisibility(View.GONE);
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
             nearbyBusStopsRecyclerView.setLayoutManager(linearLayoutManager);
             nearbyBusStopsRecyclerView.setAdapter(adaptor);
@@ -321,7 +320,6 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
      */
     protected void stopLocationUpdates()
     {
-        updatingBusStopsProgressBarLinearLayout.setVisibility(View.GONE);
         if (googleApiClient != null && googleApiClient.isConnected())
         {
             LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
@@ -361,7 +359,9 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
         catch (MalformedURLException e)
         {
             updatingBusStopsProgressBarLinearLayout.setVisibility(View.GONE);
-            Toast.makeText(getContext(), "Couldn't find bus stops nearby! Please try again later.", Toast.LENGTH_SHORT).show();
+            setErrorLayoutContent(R.drawable.ic_person_pin_circle_black, "Couldn't find bus stops nearby! Please try again later.", "Retry");
+            errorLinearLayout.setVisibility(View.VISIBLE);
+            nearbyBusStopsRecyclerView.setVisibility(View.GONE);
         }
     }
 
@@ -502,34 +502,8 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
         }
     }
 
-    // What to do once buses arriving at the selected stop have been found
-    @Override
-    public void onBusesAtStopFound(String errorMessage, JSONArray buses)
-    {
-
-    }
-
-    // What to do once bus route details have been found
-    @Override
-    public void onBusRouteDetailsFound(String errorMessage, final BusRoute route, boolean isForList, final String routeDirection)
-    {
-
-    }
-
-    @Override
-    public void onStopsOnBusRouteFound(String errorMessage, BusStop[] busStops, BusRoute route)
-    {
-
-    }
-
     @Override
     public void onBusesEnRouteFound(String errorMessage, ArrayList<Bus> buses, int numberOfBusesFound, BusRoute route, BusStop selectedBusStop)
-    {
-
-    }
-
-    @Override
-    public void onTimeToBusesFound(boolean isError, Bus[] buses)
     {
 
     }
@@ -563,10 +537,10 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
     }
 
     @Override
-    public void onStop()
+    public void onDestroy()
     {
-        super.onStop();
-        /*if (getRoutesArrivingAtStopTask != null)
+        super.onDestroy();
+        if (getRoutesArrivingAtStopTask != null)
         {
             getRoutesArrivingAtStopTask.cancel(true);
         }
@@ -577,7 +551,7 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
         if (googleApiClient != null)
         {
             googleApiClient.disconnect();
-        }*/
+        }
     }
 
     private class GetRoutesArrivingAtStopTask extends AsyncTask<ArrayList<BusStop>, Void, ArrayList<BusStop>>

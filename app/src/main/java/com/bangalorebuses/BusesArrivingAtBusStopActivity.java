@@ -17,17 +17,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 
-import static com.bangalorebuses.Constants.NETWORK_QUERY_IO_EXCEPTION;
 import static com.bangalorebuses.Constants.NETWORK_QUERY_NO_ERROR;
 import static com.bangalorebuses.Constants.db;
 
@@ -37,7 +32,6 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
     ArrayList<BusRoute> busRoutesToGetTimingsOf = new ArrayList<>();
     int numberOfBusRouteTimingQueriesMade = 0;
     private BusStop selectedBusStop = new BusStop();
-    private GetBusesArrivingAtStopTask getBusesArrivingAtStopTask;
     private GetRoutesArrivingAtStopTask getRoutesArrivingAtStopTask;
     private int numberOfBusRouteTimingsFound = 0;
     private ListView listView;
@@ -47,6 +41,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
     private TextView errorTextView;
     private TextView errorResolutionTextView;
     private LinearLayout updatingBusesProgressBarLinearLayout;
+    private ArrayList<GetBusesEnRouteTask> runningAsyncTasks = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -127,9 +122,9 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
                 if (numberOfBusRouteTimingQueriesMade == busRoutesToGetTimingsOf.size() - 1)
                 {
                     errorLinearLayout.setVisibility(View.GONE);
-                    if (getBusesArrivingAtStopTask != null)
+                    if (getRoutesArrivingAtStopTask != null)
                     {
-                        getBusesArrivingAtStopTask.cancel(true);
+                        getRoutesArrivingAtStopTask.cancel(true);
                     }
                     // Get buses scheduled to arrive at the selected bus stop
                     if (isNetworkAvailable())
@@ -157,9 +152,9 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
     public void fixError()
     {
         errorLinearLayout.setVisibility(View.GONE);
-        if (getBusesArrivingAtStopTask != null)
+        if (getRoutesArrivingAtStopTask != null)
         {
-            getBusesArrivingAtStopTask.cancel(true);
+            getRoutesArrivingAtStopTask.cancel(true);
         }
         // Get buses scheduled to arrive at the selected bus stop
         if (isNetworkAvailable())
@@ -167,9 +162,8 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
 
             updatingBusesProgressBarLinearLayout.setVisibility(View.VISIBLE);
             busStopHasTraceableBuses = false;
-            String requestBody = "stopID=" + Integer.toString(selectedBusStop.getBusStopId());
-            getBusesArrivingAtStopTask = new GetBusesArrivingAtStopTask(this);
-            getBusesArrivingAtStopTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, requestBody);
+            getRoutesArrivingAtStopTask = new GetRoutesArrivingAtStopTask();
+            getRoutesArrivingAtStopTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, selectedBusStop.getBusStopId());
         }
         else
         {
@@ -200,61 +194,29 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
 
     }
 
-    @Override
-    public void onBusesAtStopFound(String errorMessage, JSONArray buses)
+    private void onBusRoutesDetailsFound(ArrayList<BusRoute> busRoutes)
     {
-        Set<String> busNumbersSet = new HashSet<>();
-
-        if (errorMessage.equals(NETWORK_QUERY_NO_ERROR))
+        numberOfBusRouteTimingQueriesMade = 0;
+        busRoutesToGetTimingsOf.clear();
+        busRoutesToGetTimingsOf = busRoutes;
+        busRoutesToDisplay.clear();
+        numberOfBusRouteTimingsFound = 0;
+        if(busRoutes.size() != 0)
         {
-            try
-            {
-                for (int i = 0; i < buses.length(); i++)
-                {
-                    busNumbersSet.add(buses.getJSONArray(i).get(3).toString().substring(buses.getJSONArray(i).get(3).toString().indexOf(":") + 1, buses.getJSONArray(i).get(3).toString().length()));
-                }
-
-                if (busNumbersSet.size() == 0)
-                {
-                    updatingBusesProgressBarLinearLayout.setVisibility(View.GONE);
-                    listView.setVisibility(View.GONE);
-                    setErrorLayoutContent(R.drawable.ic_directions_bus_black_big, "Oh no! Looks like there aren't any buses arriving at this bus stop any time soon...", "Retry");
-                    errorLinearLayout.setVisibility(View.VISIBLE);
-                }
-                else
-                {
-                    ArrayList<String> busNumbers = new ArrayList<>();
-                    Iterator<String> iterator = busNumbersSet.iterator();
-                    while (iterator.hasNext())
-                    {
-                        busNumbers.add(iterator.next());
-                    }
-                }
-            }
-            catch (JSONException e)
-            {
-                updatingBusesProgressBarLinearLayout.setVisibility(View.GONE);
-                listView.setVisibility(View.GONE);
-                setErrorLayoutContent(R.drawable.ic_directions_bus_black_big, "Sorry! Something went wrong while trying to get buses arriving at this bus stop.", "Retry");
-                errorLinearLayout.setVisibility(View.VISIBLE);
-            }
-        }
-        else if (errorMessage.equals(NETWORK_QUERY_IO_EXCEPTION))
-        {
-            updatingBusesProgressBarLinearLayout.setVisibility(View.GONE);
-            listView.setVisibility(View.GONE);
-            setErrorLayoutContent(R.drawable.ic_directions_bus_black_big, "Oh no! Looks like there aren't any buses arriving at this bus stop any time soon...", "Retry");
-            errorLinearLayout.setVisibility(View.VISIBLE);
-        }
-        else
-        {
-            updatingBusesProgressBarLinearLayout.setVisibility(View.GONE);
             if (isNetworkAvailable())
             {
-                updatingBusesProgressBarLinearLayout.setVisibility(View.GONE);
-                listView.setVisibility(View.GONE);
-                setErrorLayoutContent(R.drawable.ic_directions_bus_black_big, "Sorry! Something went wrong while trying to get buses arriving at this bus stop.", "Retry");
-                errorLinearLayout.setVisibility(View.VISIBLE);
+                for (; numberOfBusRouteTimingQueriesMade < 10; numberOfBusRouteTimingQueriesMade++)
+                {
+                    if (numberOfBusRouteTimingQueriesMade < busRoutesToGetTimingsOf.size())
+                    {
+                        BusStop busStop = new BusStop();
+                        busStop.setBusStopRouteOrder(busRoutesToGetTimingsOf.get(numberOfBusRouteTimingQueriesMade).getSelectedBusStopRouteOrder());
+                        String requestBody = "routeNO=" + busRoutesToGetTimingsOf.get(numberOfBusRouteTimingQueriesMade).getBusRouteNumber() + "&" + "direction=" + busRoutesToGetTimingsOf.get(numberOfBusRouteTimingQueriesMade).getBusRouteDirection();
+                        GetBusesEnRouteTask getBusesEnRouteTask = new GetBusesEnRouteTask(this, busStop, busRoutesToGetTimingsOf.get(numberOfBusRouteTimingQueriesMade));
+                        getBusesEnRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, requestBody);
+                        runningAsyncTasks.add(getBusesEnRouteTask);
+                    }
+                }
             }
             else
             {
@@ -264,47 +226,13 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
                 errorLinearLayout.setVisibility(View.VISIBLE);
             }
         }
-    }
-
-    private void onBusRoutesDetailsFound(ArrayList<BusRoute> busRoutes)
-    {
-        numberOfBusRouteTimingQueriesMade = 0;
-        busRoutesToGetTimingsOf.clear();
-        busRoutesToGetTimingsOf = busRoutes;
-        busRoutesToDisplay.clear();
-        numberOfBusRouteTimingsFound = 0;
-        if (isNetworkAvailable())
-        {
-            for (; numberOfBusRouteTimingQueriesMade < 10; numberOfBusRouteTimingQueriesMade++)
-            {
-                if (numberOfBusRouteTimingQueriesMade < busRoutesToGetTimingsOf.size())
-                {
-                    BusStop busStop = new BusStop();
-                    busStop.setBusStopRouteOrder(busRoutesToGetTimingsOf.get(numberOfBusRouteTimingQueriesMade).getSelectedBusStopRouteOrder());
-                    String requestBody = "routeNO=" + busRoutesToGetTimingsOf.get(numberOfBusRouteTimingQueriesMade).getBusRouteNumber() + "&" + "direction=" + busRoutesToGetTimingsOf.get(numberOfBusRouteTimingQueriesMade).getBusRouteDirection();
-                    new GetBusesEnRouteTask(this, busStop, busRoutesToGetTimingsOf.get(numberOfBusRouteTimingQueriesMade)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, requestBody);
-                }
-            }
-        }
         else
         {
             updatingBusesProgressBarLinearLayout.setVisibility(View.GONE);
             listView.setVisibility(View.GONE);
-            setErrorLayoutContent(R.drawable.ic_cloud_off_black, "Uh oh! No data connection.", "Retry");
+            setErrorLayoutContent(R.drawable.ic_directions_bus_black_big, "Oh no! Looks like there aren't any buses arriving at this bus stop any time soon...", "Retry");
             errorLinearLayout.setVisibility(View.VISIBLE);
         }
-    }
-
-    @Override
-    public void onBusRouteDetailsFound(String errorMessage, BusRoute route, boolean isForBusList, String routeDirection)
-    {
-
-    }
-
-    @Override
-    public void onStopsOnBusRouteFound(String errorMessage, BusStop[] busStops, BusRoute route)
-    {
-
     }
 
     @Override
@@ -357,6 +285,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
                     BusesArrivingAtStopListCustomAdapter customAdapter = new BusesArrivingAtStopListCustomAdapter(this, busRoutesToDisplay);
                     customAdapter.notifyDataSetChanged();
                     listView.setAdapter(customAdapter);
+                    listView.setVisibility(View.VISIBLE);
                 }
             }
         }
@@ -370,7 +299,9 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
                     BusStop busStop = new BusStop();
                     busStop.setBusStopRouteOrder(busRoutesToGetTimingsOf.get(numberOfBusRouteTimingQueriesMade).getSelectedBusStopRouteOrder());
                     String requestBody = "routeNO=" + busRoutesToGetTimingsOf.get(numberOfBusRouteTimingQueriesMade).getBusRouteNumber() + "&" + "direction=" + busRoutesToGetTimingsOf.get(numberOfBusRouteTimingQueriesMade).getBusRouteDirection();
-                    new GetBusesEnRouteTask(this, busStop, busRoutesToGetTimingsOf.get(numberOfBusRouteTimingQueriesMade)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, requestBody);
+                    GetBusesEnRouteTask getBusesEnRouteTask = new GetBusesEnRouteTask(this, busStop, busRoutesToGetTimingsOf.get(numberOfBusRouteTimingQueriesMade));
+                    getBusesEnRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, requestBody);
+                    runningAsyncTasks.add(getBusesEnRouteTask);
                     numberOfBusRouteTimingQueriesMade++;
                 }
                 else
@@ -395,12 +326,6 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
                 errorLinearLayout.setVisibility(View.VISIBLE);
             }
         }
-    }
-
-    @Override
-    public void onTimeToBusesFound(boolean isError, Bus[] buses)
-    {
-
     }
 
     private int calculateTravelTime(int numberOfBusStopsToTravel, String routeNumber)
@@ -459,32 +384,21 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
     }
 
     @Override
-    protected void onPause()
+    protected void onDestroy()
     {
-        super.onPause();
-    }
+        super.onDestroy();
 
-    @Override
-    protected void onStop()
-    {
-        super.onStop();
-        if (getBusesArrivingAtStopTask != null)
-        {
-            getBusesArrivingAtStopTask.cancel(true);
-        }
         if (getRoutesArrivingAtStopTask != null)
         {
             getRoutesArrivingAtStopTask.cancel(true);
         }
-    }
 
-    @Override
-    protected void onDestroy()
-    {
-        super.onDestroy();
-        if (getBusesArrivingAtStopTask != null)
+        for (GetBusesEnRouteTask getBusesEnRouteTask : runningAsyncTasks)
         {
-            getBusesArrivingAtStopTask.cancel(true);
+            if (getBusesEnRouteTask != null && getBusesEnRouteTask.getStatus().equals(AsyncTask.Status.RUNNING))
+            {
+                getBusesEnRouteTask.cancel(true);
+            }
         }
     }
 

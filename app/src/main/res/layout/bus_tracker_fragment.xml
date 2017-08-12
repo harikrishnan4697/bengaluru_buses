@@ -13,7 +13,7 @@
         android:layout_alignParentTop="true"
         android:background="@color/colorPrimary"
         android:orientation="horizontal"
-        android:padding="16dp">
+        android:padding="10dp">
 
         <Button
             android:id="@+id/choose_bus_number_button"

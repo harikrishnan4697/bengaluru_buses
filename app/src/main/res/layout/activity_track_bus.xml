@@ -1,24 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
     tools:context="com.bangalorebuses.TrackBusActivity">
 
-    <RadioGroup
-        android:id="@+id/direction_selection_radio_group"
+    <LinearLayout
+        android:id="@+id/directionSelectionLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:background="@color/colorPrimary"
         android:orientation="vertical"
-        android:paddingBottom="4dp"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:visibility="visible">
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
 
         <TextView
             android:layout_width="match_parent"
@@ -27,47 +24,67 @@
             android:gravity="start"
             android:text="@string/direction_label_text"
             android:textColor="#FFFFFF"
-            android:textSize="15sp"/>
+            android:textSize="14sp"/>
 
-        <RadioButton
-            android:id="@+id/direction_up_radio_button"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/white_rounded_background_borderless"
-            android:maxLines="2"
-            android:onClick="directionChosen"
-            android:padding="8dp"
-            android:textSize="15sp"/>
+            android:layout_height="wrap_content">
 
-        <RadioButton
-            android:id="@+id/direction_down_radio_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:background="@drawable/white_rounded_background_borderless"
-            android:maxLines="2"
-            android:onClick="directionChosen"
-            android:padding="8dp"
-            android:textSize="15sp"/>
-    </RadioGroup>
+            <TextView
+                android:id="@+id/directionNameTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@id/changeDirectionImageView"
+                android:layout_toStartOf="@id/changeDirectionImageView"
+                android:background="@drawable/white_rounded_background_borderless"
+                android:ellipsize="end"
+                android:gravity="start"
+                android:maxLines="2"
+                android:padding="10dp"
+                android:text="Central Silk Board To Kempegowda International Airport"
+                android:textColor="#000000"
+                android:textSize="14sp"/>
+
+            <ImageView
+                android:id="@+id/changeDirectionImageView"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:clickable="true"
+                android:onClick="swapDirection"
+                android:src="@drawable/ic_swap_horiz_white"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/bus_stop_selection_linear_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/direction_selection_radio_group"
+        android:layout_below="@id/directionSelectionLinearLayout"
         android:background="@color/colorPrimary"
         android:orientation="vertical"
-        android:padding="8dp"
+        android:padding="10dp"
         android:visibility="visible">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="10dp"
             android:text="@string/bus_stop_label_text"
             android:textColor="#FFFFFF"
-            android:textSize="15sp"/>
+            android:textSize="14sp"/>
 
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -83,18 +100,18 @@
                 android:spinnerMode="dropdown"
                 android:textAlignment="viewStart"/>
         </RelativeLayout>
+
     </LinearLayout>
 
-    <!--<com.google.android.gms.ads.AdView
-        android:id="@+id/track_bus_activity_footer_ad"
+    <ListView
+        android:id="@+id/listView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_alignParentBottom="true"
-        android:layout_centerInParent="true"
-        ads:adSize="BANNER"
-        ads:adUnitId="ca-app-pub-4515741125560154/2111234828"/>-->
-
-    <LinearLayout
+        android:layout_below="@id/bus_stop_selection_linear_layout"
+        android:animateLayoutChanges="true"/>
+    
+    <!--<LinearLayout
         android:id="@+id/buses_linear_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -113,11 +130,6 @@
             android:textColor="#000000"
             android:textSize="16sp"
             android:visibility="gone"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="#000000"/>
 
         <ScrollView
             android:layout_width="match_parent"
@@ -295,19 +307,6 @@
 
         </ScrollView>
 
-    </LinearLayout>
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/floatingBusTimingsRefreshActionButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_margin="10dp"
-        android:clickable="true"
-        android:onClick="refresh"
-        android:src="@drawable/ic_refresh_white"
-        app:fabSize="mini"/>
+    </LinearLayout>-->
 
 </RelativeLayout>

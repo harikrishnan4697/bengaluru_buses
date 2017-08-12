@@ -1,16 +1,31 @@
 package com.bangalorebuses;
 
-import android.app.ProgressDialog;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
+import android.os.PersistableBundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.LinearLayout;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
+import android.widget.AdapterView;
+import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import org.json.JSONArray;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+
+import static com.bangalorebuses.Constants.DIRECTION_DOWN;
+import static com.bangalorebuses.Constants.DIRECTION_UP;
+import static com.bangalorebuses.Constants.db;
 
 /**
  * This activity allows the user to track a bus route
@@ -21,9 +36,250 @@ import android.widget.TextView;
  * @since 18-6-2017
  */
 
-public class TrackBusActivity extends AppCompatActivity// implements NetworkingHelper, AdapterView.OnItemSelectedListener
+public class TrackBusActivity extends AppCompatActivity implements NetworkingHelper, AdapterView.OnItemSelectedListener
 {
-    private final String DIRECTION_UP = "UP";
+    private GetRoutesWithNumberTask getRoutesWithNumberTask;
+    private GetStopsOnRouteTask getStopsOnRouteTask;
+    private ListView listView;
+    private Spinner spinner;
+    private TextView directionTextView;
+    private ImageView directionSwapImageView;
+    private Animation directionSwapAnimation;
+    private BusRoute routeUp;
+    private BusRoute routeDown;
+    private String currentlySelectedDirection = DIRECTION_UP;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState)
+    {
+        super.onCreate(savedInstanceState, persistentState);
+
+        // Initialise XML elements
+        listView = (ListView) findViewById(R.id.listView);
+        spinner = (Spinner) findViewById(R.id.route_stop_list_spinner);
+        directionTextView = (TextView) findViewById(R.id.directionNameTextView);
+        directionSwapImageView = (ImageView) findViewById(R.id.changeDirectionImageView);
+        directionSwapAnimation = AnimationUtils.loadAnimation(this, R.anim.rotate_once);
+
+        trackBusesOnRoute(getIntent().getStringExtra("ROUTE_NUMBER"));
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        MenuInflater menuInflater = new MenuInflater(this);
+        menuInflater.inflate(R.menu.track_bus_activity_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case R.id.trackBusActivityRefresh:
+                //TODO
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return true;
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
+    {
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent)
+    {
+
+    }
+
+    public void swapDirection(View view)
+    {
+        directionSwapImageView.startAnimation(directionSwapAnimation);
+
+        if (currentlySelectedDirection.equals(DIRECTION_UP))
+        {
+            directionTextView.setText(routeDown.getBusRouteDirectionName());
+            currentlySelectedDirection = DIRECTION_DOWN;
+        }
+        else if (currentlySelectedDirection.equals(DIRECTION_DOWN))
+        {
+            directionTextView.setText(routeUp.getBusRouteDirectionName());
+            currentlySelectedDirection = DIRECTION_UP;
+        }
+        else
+        {
+            // TODO Select a default direction
+        }
+    }
+
+    private void trackBusesOnRoute(String routeNumber)
+    {
+        getRoutesWithNumberTask = new GetRoutesWithNumberTask();
+        getRoutesWithNumberTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, routeNumber);
+    }
+
+    @Override
+    public void onBusStopsFound(boolean isError, JSONArray busStopsArray)
+    {
+
+    }
+
+    private void onRoutesWithNumberFound(ArrayList<BusRoute> busRoutes)
+    {
+        for (BusRoute busRoute : busRoutes)
+        {
+            if (busRoute.getBusRouteDirection().equals(DIRECTION_UP))
+            {
+                routeUp = busRoute;
+            }
+            else if (busRoute.getBusRouteDirection().equals(DIRECTION_DOWN))
+            {
+                routeDown = busRoute;
+            }
+        }
+
+        if (routeUp != null)
+        {
+            directionTextView.setText(routeUp.getBusRouteDirectionName());
+            currentlySelectedDirection = DIRECTION_UP;
+
+            if (routeDown == null)
+            {
+                directionSwapImageView.setEnabled(false);
+            }
+
+            getStopsOnRouteTask = new GetStopsOnRouteTask();
+            getStopsOnRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, routeUp.getBusRouteId());
+        }
+        else if (routeDown != null)
+        {
+            directionTextView.setText(routeDown.getBusRouteDirectionName());
+            currentlySelectedDirection = DIRECTION_DOWN;
+            directionSwapImageView.setEnabled(false);
+
+            getStopsOnRouteTask = new GetStopsOnRouteTask();
+            getStopsOnRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, routeDown.getBusRouteId());
+        }
+        else
+        {
+            //TODO Can't track this route
+        }
+
+    }
+
+    private void onBusStopsOnRouteFound(ArrayList<BusStop> busStops)
+    {
+
+    }
+
+    @Override
+    public void onBusesEnRouteFound(String errorMessage, ArrayList<Bus> buses, int numberOfBusesFound, BusRoute route, BusStop selectedBusStop)
+    {
+
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        if (getRoutesWithNumberTask != null &&
+                getRoutesWithNumberTask.getStatus().equals(AsyncTask.Status.FINISHED))
+        {
+            getRoutesWithNumberTask.cancel(true);
+        }
+        if (getStopsOnRouteTask != null &&
+                getStopsOnRouteTask.getStatus().equals(AsyncTask.Status.FINISHED))
+        {
+            getStopsOnRouteTask.cancel(true);
+        }
+    }
+
+    private class GetRoutesWithNumberTask extends AsyncTask<String, Void, ArrayList<BusRoute>>
+    {
+        @Override
+        protected ArrayList<BusRoute> doInBackground(String... routeNumber)
+        {
+            return DbQueries.getRoutesWithNumber(db, routeNumber[0]);
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<BusRoute> busRoutes)
+        {
+            super.onPostExecute(busRoutes);
+            onRoutesWithNumberFound(busRoutes);
+        }
+    }
+
+    private class GetStopsOnRouteTask extends AsyncTask<Integer, Void, ArrayList<BusStop>>
+    {
+        @Override
+        protected ArrayList<BusStop> doInBackground(Integer... routeId)
+        {
+            ArrayList<BusStop> busStops = DbQueries.getStopsOnRoute(db, routeId[0]);
+            Collections.sort(busStops, new Comparator<BusStop>()
+            {
+                @Override
+                public int compare(BusStop busStop1, BusStop busStop2)
+                {
+                    return busStop1.getBusStopRouteOrder() - busStop2.getBusStopRouteOrder();
+                }
+
+            });
+            return busStops;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<BusStop> busStops)
+        {
+            super.onPostExecute(busStops);
+            onBusStopsOnRouteFound(busStops);
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /*private final String DIRECTION_UP = "UP";
     private final String DIRECTION_DOWN = "DN";
     private RadioGroup directionSelectionRadioGroup;
     private RadioButton upDirectionRadioButton;
@@ -76,15 +332,11 @@ public class TrackBusActivity extends AppCompatActivity// implements NetworkingH
         busDetailsLinearLayout2 = (LinearLayout) findViewById(R.id.bus_linear_layout_2);
         busDetailsLinearLayout3 = (LinearLayout) findViewById(R.id.bus_linear_layout_3);
         busDetailsLinearLayout4 = (LinearLayout) findViewById(R.id.bus_linear_layout_4);
-        /*MobileAds.initialize(this, "ca-app-pub-4515741125560154~6681035222");
-        adView = (AdView) findViewById(R.id.track_bus_activity_footer_ad);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        adView.loadAd(adRequest);*/
         stopsOnRouteSpinner = (Spinner) findViewById(R.id.route_stop_list_spinner);
         rotatingAnimation = AnimationUtils.loadAnimation(this, R.anim.rotate);
         busTimingsRefreshFloatingActionButton = (FloatingActionButton) findViewById(R.id.floatingBusTimingsRefreshActionButton);
         route = new BusRoute();
-        /*route.setBusRouteNumber(getIntent().getStringExtra("ROUTE_NUMBER"));
+        route.setBusRouteNumber(getIntent().getStringExtra("ROUTE_NUMBER"));
         route.setUpRouteId(getIntent().getStringExtra("UP_ROUTE_ID"));
         route.setDownRouteId(getIntent().getStringExtra("DOWN_ROUTE_ID"));
         route.setUpRouteName(getIntent().getStringExtra("UP_ROUTE_NAME"));
@@ -94,11 +346,11 @@ public class TrackBusActivity extends AppCompatActivity// implements NetworkingH
         selectedBusStop.setBusStopName(getIntent().getStringExtra("STOP_NAME"));
         selectedBusStop.setLatitude(getIntent().getStringExtra("STOP_LAT"));
         selectedBusStop.setLongitude(getIntent().getStringExtra("STOP_LONG"));
-        setTitle("Tracking " + route.getRouteNumber());TODO
-        trackBus();*/
+        setTitle("Tracking " + route.getRouteNumber());
+        trackBus();
     }
 
-    /*@Override
+    @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
         MenuInflater menuInflater = getMenuInflater();
@@ -474,7 +726,7 @@ public class TrackBusActivity extends AppCompatActivity// implements NetworkingH
                 }
                 onTimeToBusesFound(false, buses);
 
-                /*if (isNetworkAvailable())
+                if (isNetworkAvailable())
                 {
                     new GetTimeToBusesTask(this, busStopList[position], numberOfBusesFound).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, buses);
                 }
@@ -515,218 +767,4 @@ public class TrackBusActivity extends AppCompatActivity// implements NetworkingH
                 errorMessageTextView.setVisibility(View.VISIBLE);
             }
         }
-    }
-
-    @Override
-    public void onTimeToBusesFound(boolean isError, Bus[] buses)
-    {
-        downDirectionRadioButton.setEnabled(true);
-        upDirectionRadioButton.setEnabled(true);
-        stopsOnRouteSpinner.setEnabled(true);
-        setBusIcons();
-        if (!isError)
-        {
-            if (buses[0].getTimeToBus() != null)
-            {
-                if (!buses[0].getTripIsYetToBegin())
-                {
-                    if (buses[0].getIsDue())
-                    {
-                        busTimingTextView1.setText("is Due");
-                    }
-                    else if (buses[0].getTimeToBus().equals("UNAVAILABLE"))
-                    {
-                        busTimingTextView1.setText("arrival time is unavailable");
-                    }
-                    else
-                    {
-                        busTimingTextView1.setText("in " + buses[0].getTimeToBus());
-                    }
-                    busIsAtTextView1.setText("currently near " + buses[0].getNameOfStopBusIsAt());
-                }
-                else
-                {
-                    busTimingTextView1.setText("trip is yet to begin");
-                    busIsAtTextView1.setText("currently at " + buses[0].getNameOfStopBusIsAt());
-                }
-                busDetailsLinearLayout1.setVisibility(View.VISIBLE);
-            }
-
-            if (buses[1].getTimeToBus() != null)
-            {
-                if (!buses[1].getTripIsYetToBegin())
-                {
-                    if (buses[1].getIsDue())
-                    {
-                        busTimingTextView2.setText("is Due");
-                    }
-                    else if (buses[1].getTimeToBus().equals("UNAVAILABLE"))
-                    {
-                        busTimingTextView2.setText("arrival time is unavailable");
-                    }
-                    else
-                    {
-                        busTimingTextView2.setText("in " + buses[1].getTimeToBus());
-                    }
-                    busIsAtTextView2.setText("currently near " + buses[1].getNameOfStopBusIsAt());
-                }
-                else
-                {
-                    busTimingTextView2.setText("trip is yet to begin");
-                    busIsAtTextView2.setText("currently at " + buses[1].getNameOfStopBusIsAt());
-                }
-                busDetailsLinearLayout2.setVisibility(View.VISIBLE);
-            }
-
-            if (buses[2].getTimeToBus() != null)
-            {
-                if (!buses[2].getTripIsYetToBegin())
-                {
-                    if (buses[2].getIsDue())
-                    {
-                        busTimingTextView3.setText("is Due");
-                    }
-                    else if (buses[2].getTimeToBus().equals("UNAVAILABLE"))
-                    {
-                        busTimingTextView3.setText("arrival time is unavailable");
-                    }
-                    else
-                    {
-                        busTimingTextView3.setText("in " + buses[2].getTimeToBus());
-                    }
-                    busIsAtTextView3.setText("currently near " + buses[2].getNameOfStopBusIsAt());
-                }
-                else
-                {
-                    busTimingTextView3.setText("trip is yet to begin");
-                    busIsAtTextView3.setText("currently at " + buses[2].getNameOfStopBusIsAt());
-                }
-                busDetailsLinearLayout3.setVisibility(View.VISIBLE);
-            }
-
-            if (buses[3].getTimeToBus() != null)
-            {
-                if (!buses[3].getTripIsYetToBegin())
-                {
-                    if (buses[3].getIsDue())
-                    {
-                        busTimingTextView4.setText("is Due");
-                    }
-                    else if (buses[3].getTimeToBus().equals("UNAVAILABLE"))
-                    {
-                        busTimingTextView4.setText("arrival time is unavailable");
-                    }
-                    else
-                    {
-                        busTimingTextView4.setText("in " + buses[3].getTimeToBus());
-                    }
-                    busIsAtTextView4.setText("currently near " + buses[3].getNameOfStopBusIsAt());
-                }
-                else
-                {
-                    busTimingTextView4.setText("trip is yet to begin");
-                    busIsAtTextView4.setText("currently at " + buses[3].getNameOfStopBusIsAt());
-                }
-                busDetailsLinearLayout4.setVisibility(View.VISIBLE);
-            }
-
-            canRefresh = false;
-            new CountDownTimer(5000, 5000)
-            {
-                @Override
-                public void onTick(long millisUntilFinished)
-                {
-
-                }
-
-                @Override
-                public void onFinish()
-                {
-                    canRefresh = true;
-                }
-            }.start();
-        }
-        else
-        {
-            if (isNetworkAvailable())
-            {
-                errorMessageTextView.setText("Could not get bus arrival timings! Please try again later.");
-                errorMessageTextView.setVisibility(View.VISIBLE);
-            }
-            else
-            {
-                errorMessageTextView.setText(R.string.error_connecting_to_the_internet_click_refresh_text);
-                errorMessageTextView.setVisibility(View.VISIBLE);
-            }
-        }
-        busTimingsRefreshFloatingActionButton.clearAnimation();
-        busTimingsRefreshFloatingActionButton.setEnabled(true);
-        progressDialog.dismiss();
-    }
-
-    private void setBusIcons()
-    {
-        ImageView busIcon1 = (ImageView) findViewById(R.id.bus_icon_1);
-        ImageView busIcon2 = (ImageView) findViewById(R.id.bus_icon_2);
-        ImageView busIcon3 = (ImageView) findViewById(R.id.bus_icon_3);
-        ImageView busIcon4 = (ImageView) findViewById(R.id.bus_icon_4);
-        if (route.getRouteNumber().length() > 5 && route.getRouteNumber().substring(0, 5).equals("KIAS-"))
-        {
-            busIcon1.setImageResource(R.drawable.ic_flight_black);
-            busIcon2.setImageResource(R.drawable.ic_flight_black);
-            busIcon3.setImageResource(R.drawable.ic_flight_black);
-            busIcon4.setImageResource(R.drawable.ic_flight_black);
-        }
-        else if (route.getRouteNumber().length() > 2 && route.getRouteNumber().substring(0, 2).equals("V-"))
-        {
-            busIcon1.setImageResource(R.drawable.ic_directions_bus_ac);
-            busIcon2.setImageResource(R.drawable.ic_directions_bus_ac);
-            busIcon3.setImageResource(R.drawable.ic_directions_bus_ac);
-            busIcon4.setImageResource(R.drawable.ic_directions_bus_ac);
-        }
-        else if (route.getRouteNumber().contains("CHAKRA-") || route.getRouteNumber().contains("MF"))
-        {
-            busIcon1.setImageResource(R.drawable.ic_directions_bus_special);
-            busIcon2.setImageResource(R.drawable.ic_directions_bus_special);
-            busIcon3.setImageResource(R.drawable.ic_directions_bus_special);
-            busIcon4.setImageResource(R.drawable.ic_directions_bus_special);
-        }
-        else
-        {
-            busIcon1.setImageResource(R.drawable.ic_directions_bus_ordinary);
-            busIcon2.setImageResource(R.drawable.ic_directions_bus_ordinary);
-            busIcon3.setImageResource(R.drawable.ic_directions_bus_ordinary);
-            busIcon4.setImageResource(R.drawable.ic_directions_bus_ordinary);
-        }
-    }
-
-    @Override
-    protected void onPause()
-    {
-        super.onPause();
-        if (adView != null)
-        {
-            adView.pause();
-        }
-    }
-
-    @Override
-    public void onResume()
-    {
-        if (adView != null)
-        {
-            adView.resume();
-        }
-        super.onResume();
-    }
-
-    @Override
-    public void onDestroy()
-    {
-        if (adView != null)
-        {
-            adView.destroy();
-        }
-        super.onDestroy();
     }*/
-}

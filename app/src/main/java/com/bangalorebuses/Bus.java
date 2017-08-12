@@ -18,6 +18,7 @@ class Bus
     private int busRouteOrder;
     private boolean isDue;
     private BusRoute busRoute;
+    private String busCurrentlyNearBusStop;
 
     public String getBusRegistrationNumber()
     {
@@ -87,5 +88,15 @@ class Bus
     public void setBusRoute(BusRoute busRoute)
     {
         this.busRoute = busRoute;
+    }
+
+    public String getBusCurrentlyNearBusStop()
+    {
+        return busCurrentlyNearBusStop;
+    }
+
+    public void setBusCurrentlyNearBusStop(String busCurrentlyNearBusStop)
+    {
+        this.busCurrentlyNearBusStop = busCurrentlyNearBusStop;
     }
 }

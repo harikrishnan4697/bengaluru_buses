@@ -1,5 +1,6 @@
 package com.bangalorebuses;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -80,7 +82,8 @@ public class SearchActivity extends AppCompatActivity
         searchResultsListView.setAdapter(listAdapter);
         progressBar.setVisibility(View.GONE);
         searchEditText.setEnabled(true);
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(searchEditText, InputMethodManager.SHOW_IMPLICIT);
         searchResultsListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
         {
 
