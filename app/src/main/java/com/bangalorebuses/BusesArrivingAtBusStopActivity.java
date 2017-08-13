@@ -212,7 +212,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
                         BusStop busStop = new BusStop();
                         busStop.setBusStopRouteOrder(busRoutesToGetTimingsOf.get(numberOfBusRouteTimingQueriesMade).getSelectedBusStopRouteOrder());
                         String requestBody = "routeNO=" + busRoutesToGetTimingsOf.get(numberOfBusRouteTimingQueriesMade).getBusRouteNumber() + "&" + "direction=" + busRoutesToGetTimingsOf.get(numberOfBusRouteTimingQueriesMade).getBusRouteDirection();
-                        GetBusesEnRouteTask getBusesEnRouteTask = new GetBusesEnRouteTask(this, busStop, busRoutesToGetTimingsOf.get(numberOfBusRouteTimingQueriesMade));
+                        GetBusesEnRouteTask getBusesEnRouteTask = new GetBusesEnRouteTask(this, busStop.getBusStopRouteOrder(), busRoutesToGetTimingsOf.get(numberOfBusRouteTimingQueriesMade));
                         getBusesEnRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, requestBody);
                         runningAsyncTasks.add(getBusesEnRouteTask);
                     }
@@ -236,12 +236,12 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onBusesEnRouteFound(String errorMessage, ArrayList<Bus> buses, int numberOfBusesFound, BusRoute route, BusStop selectedBusStop)
+    public void onBusesEnRouteFound(String errorMessage, int busStopRouteOrder, ArrayList<Bus> buses, BusRoute route)
     {
         numberOfBusRouteTimingsFound++;
         if (errorMessage.equals(NETWORK_QUERY_NO_ERROR))
         {
-            if (numberOfBusesFound != 0)
+            if (buses.size() != 0)
             {
                 ArrayList<Bus> busesOnRoute = new ArrayList<>();
                 for (int i = 0; i < 3; i++)
@@ -263,8 +263,8 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
                     else
                     {
                         buses.get(i).setBusETA(calculateTravelTime(DbQueries.getNumberOfStopsBetweenRouteOrders(db,
-                                route.getBusRouteId(), buses.get(i).getBusRouteOrder(),
-                                selectedBusStop.getBusStopRouteOrder()), route.getBusRouteNumber()));
+                                route.getBusRouteId(), buses.get(i).getBusRouteOrder(), busStopRouteOrder),
+                                route.getBusRouteNumber()));
                     }
                     busesOnRoute.add(buses.get(i));
                 }
@@ -299,7 +299,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
                     BusStop busStop = new BusStop();
                     busStop.setBusStopRouteOrder(busRoutesToGetTimingsOf.get(numberOfBusRouteTimingQueriesMade).getSelectedBusStopRouteOrder());
                     String requestBody = "routeNO=" + busRoutesToGetTimingsOf.get(numberOfBusRouteTimingQueriesMade).getBusRouteNumber() + "&" + "direction=" + busRoutesToGetTimingsOf.get(numberOfBusRouteTimingQueriesMade).getBusRouteDirection();
-                    GetBusesEnRouteTask getBusesEnRouteTask = new GetBusesEnRouteTask(this, busStop, busRoutesToGetTimingsOf.get(numberOfBusRouteTimingQueriesMade));
+                    GetBusesEnRouteTask getBusesEnRouteTask = new GetBusesEnRouteTask(this, busStop.getBusStopRouteOrder(), busRoutesToGetTimingsOf.get(numberOfBusRouteTimingQueriesMade));
                     getBusesEnRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, requestBody);
                     runningAsyncTasks.add(getBusesEnRouteTask);
                     numberOfBusRouteTimingQueriesMade++;

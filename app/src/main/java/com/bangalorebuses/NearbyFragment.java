@@ -503,7 +503,7 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
     }
 
     @Override
-    public void onBusesEnRouteFound(String errorMessage, ArrayList<Bus> buses, int numberOfBusesFound, BusRoute route, BusStop selectedBusStop)
+    public void onBusesEnRouteFound(String errorMessage, int busStopRouteOrder, ArrayList<Bus> buses, BusRoute busRoute)
     {
 
     }

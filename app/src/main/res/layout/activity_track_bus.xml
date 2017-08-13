@@ -30,6 +30,22 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <ImageView
+                android:id="@+id/changeDirectionImageView"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:clickable="true"
+                android:onClick="swapDirection"
+                android:src="@drawable/ic_swap_horiz_white"/>
+
             <TextView
                 android:id="@+id/directionNameTextView"
                 android:layout_width="wrap_content"
@@ -47,22 +63,6 @@
                 android:text="Central Silk Board To Kempegowda International Airport"
                 android:textColor="#000000"
                 android:textSize="14sp"/>
-
-            <ImageView
-                android:id="@+id/changeDirectionImageView"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:layout_gravity="center"
-                android:layout_marginBottom="10dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="10dp"
-                android:clickable="true"
-                android:onClick="swapDirection"
-                android:src="@drawable/ic_swap_horiz_white"/>
 
         </RelativeLayout>
 

@@ -560,68 +560,8 @@ public class TripPlannerFragment extends Fragment implements NetworkingHelper, T
 
     }
 
-    /**
-     * This is a callback method called by the GetBusRouteDetailsTask.
-     *
-     * @param errorMessage   This parameter is to convey if the task encountered an error.
-     * @param route          This parameter is a Route object with all the details set.
-     * @param isForBusList   This parameter is returned back as it was passed to the
-     *                       constructor. If true, the bus route details are for
-     *                       the list of buses at route. Else, the bus route details
-     *                       are for a route number the user entered manually.
-     * @param routeDirection This parameter is to convey if the route number that was passed
-     *                       to the task had a direction of UP or DN.
-     */
-    public void onBusRouteDetailsFound(String errorMessage, BusRoute route, boolean isForBusList, String routeDirection)
-    {
-
-    }
-
-    /**
-     * This is a callback method called by the GetStopsOnBusRouteTask.
-     *
-     * @param errorMessage This parameter is to convey if the task encountered an error.
-     * @param busStops     This parameter is a JSONArray of all the bus stops
-     *                     for a particular route id.
-     */
     @Override
-    public void onStopsOnBusRouteFound(String errorMessage, BusStop[] busStops, BusRoute route)
-    {
-
-    }
-
-    /**
-     * This is a callback method called by the GetBusesEnRouteTask.
-     *
-     * @param errorMessage       This parameter is to convey if the task encountered an error.
-     * @param buses              This parameter is an array of buses en-route that the task found.
-     * @param numberOfBusesFound This parameter is the number of en-route buses the task found.
-     */
-    @Override
-    public void onBusesEnRouteFound(String errorMessage, ArrayList<Bus> buses, int numberOfBusesFound, BusRoute route, BusStop selectedBusStop)
-    {
-
-    }
-
-    /**
-     * This is a callback method called by the GetTimeToBusesTask.
-     *
-     * @param isError This parameter is to convey if the task encountered an error.
-     * @param buses   This parameter is an array of buses with their time to bus stop set.
-     */
-    public void onTimeToBusesFound(boolean isError, Bus[] buses)
-    {
-
-    }
-
-    /**
-     * This is a callback method called by the GetBusesArrivingAtStopTask.
-     *
-     * @param errorMessage This parameter is to convey if the task encountered an error.
-     * @param buses        This parameter is a JSONArray of arriving at a bus stop.
-     */
-    @Override
-    public void onBusesAtStopFound(String errorMessage, JSONArray buses)
+    public void onBusesEnRouteFound(String errorMessage, int busStopRouteOrder, ArrayList<Bus> buses, BusRoute busRoute)
     {
 
     }

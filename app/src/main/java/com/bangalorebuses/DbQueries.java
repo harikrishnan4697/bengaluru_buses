@@ -25,6 +25,18 @@ class DbQueries
         return routes;
     }
 
+    public static ArrayList<String> getAllDistinctRouteNumbers(SQLiteDatabase db)
+    {
+        Cursor cursor = db.rawQuery("select distinct Routes.RouteNumber from Routes", null);
+        ArrayList<String> busRouteNumbers = new ArrayList<>();
+        while (cursor.moveToNext())
+        {
+            busRouteNumbers.add(cursor.getString(0));
+        }
+        cursor.close();
+        return busRouteNumbers;
+    }
+
     public static BusRoute getRouteDetails(SQLiteDatabase db, int routeId)
     {
         BusRoute route = new BusRoute();

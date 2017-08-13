@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -40,6 +41,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
 {
     private GetRoutesWithNumberTask getRoutesWithNumberTask;
     private GetStopsOnRouteTask getStopsOnRouteTask;
+    private GetBusesEnRouteTask getBusesEnRouteTask;
     private ListView listView;
     private Spinner spinner;
     private TextView directionTextView;
@@ -89,7 +91,24 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
     {
+        if(currentlySelectedDirection.equals(DIRECTION_UP))
+        {
+            getBusesEnRouteTask = new GetBusesEnRouteTask(this, routeUp.getBusRouteStops()
+                    .get(position).getBusStopRouteOrder(), routeUp);
+            String requestParameters = "routeNO=" + routeUp.getBusRouteNumber() + "&" + "direction=" + DIRECTION_UP;
+            getBusesEnRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, requestParameters);
+        }
+        else if (currentlySelectedDirection.equals(DIRECTION_DOWN))
+        {
+            getBusesEnRouteTask = new GetBusesEnRouteTask(this, routeDown.getBusRouteStops()
+                    .get(position).getBusStopRouteOrder(), routeDown);
+            String requestParameters = "routeNO=" + routeDown.getBusRouteNumber() + "&" + "direction=" + DIRECTION_DOWN;
+            getBusesEnRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, requestParameters);
+        }
+        else
+        {
 
+        }
     }
 
     @Override
@@ -154,34 +173,72 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
                 directionSwapImageView.setEnabled(false);
             }
 
-            getStopsOnRouteTask = new GetStopsOnRouteTask();
+            getStopsOnRouteTask = new GetStopsOnRouteTask(routeUp);
             getStopsOnRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, routeUp.getBusRouteId());
         }
-        else if (routeDown != null)
-        {
-            directionTextView.setText(routeDown.getBusRouteDirectionName());
-            currentlySelectedDirection = DIRECTION_DOWN;
-            directionSwapImageView.setEnabled(false);
 
-            getStopsOnRouteTask = new GetStopsOnRouteTask();
+        if (routeDown != null)
+        {
+            if (routeUp == null)
+            {
+                directionTextView.setText(routeDown.getBusRouteDirectionName());
+                currentlySelectedDirection = DIRECTION_DOWN;
+                directionSwapImageView.setEnabled(false);
+            }
+
+            getStopsOnRouteTask = new GetStopsOnRouteTask(routeDown);
             getStopsOnRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, routeDown.getBusRouteId());
+        }
+
+    }
+
+    private void onBusStopsOnRouteFound(BusRoute busRoute)
+    {
+        if (busRoute.getBusRouteDirection().equals(DIRECTION_UP))
+        {
+            routeUp = busRoute;
+        }
+        else if (busRoute.getBusRouteDirection().equals(DIRECTION_DOWN))
+        {
+            routeDown = busRoute;
+        }
+
+        updateSpinner();
+    }
+
+    private void updateSpinner()
+    {
+        ArrayList<String> routeStopNames = new ArrayList<>();
+
+        if(currentlySelectedDirection.equals(DIRECTION_UP))
+        {
+            for(BusStop routeStop: routeUp.getBusRouteStops())
+            {
+                routeStopNames.add(routeStop.getBusStopName());
+            }
+        }
+        else if (currentlySelectedDirection.equals(DIRECTION_DOWN))
+        {
+            for(BusStop routeStop: routeDown.getBusRouteStops())
+            {
+                routeStopNames.add(routeStop.getBusStopName());
+            }
         }
         else
         {
-            //TODO Can't track this route
+            // TODO No direction selected!
         }
 
-    }
-
-    private void onBusStopsOnRouteFound(ArrayList<BusStop> busStops)
-    {
-
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item, routeStopNames);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(this);
     }
 
     @Override
-    public void onBusesEnRouteFound(String errorMessage, ArrayList<Bus> buses, int numberOfBusesFound, BusRoute route, BusStop selectedBusStop)
+    public void onBusesEnRouteFound(String errorMessage, int busStopRouteOrder, ArrayList<Bus> buses, BusRoute busRoute)
     {
-
+        TrackBusListCustomAdapter trackBusListCustomAdapter = new TrackBusListCustomAdapter(this, buses);
+        listView.setAdapter(trackBusListCustomAdapter);
     }
 
     @Override
@@ -218,6 +275,13 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
 
     private class GetStopsOnRouteTask extends AsyncTask<Integer, Void, ArrayList<BusStop>>
     {
+        private BusRoute busRoute;
+
+        GetStopsOnRouteTask(BusRoute busRoute)
+        {
+            this.busRoute = busRoute;
+        }
+
         @Override
         protected ArrayList<BusStop> doInBackground(Integer... routeId)
         {
@@ -238,7 +302,8 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         protected void onPostExecute(ArrayList<BusStop> busStops)
         {
             super.onPostExecute(busStops);
-            onBusStopsOnRouteFound(busStops);
+            busRoute.setBusRouteStops(busStops);
+            onBusStopsOnRouteFound(busRoute);
         }
     }
 }

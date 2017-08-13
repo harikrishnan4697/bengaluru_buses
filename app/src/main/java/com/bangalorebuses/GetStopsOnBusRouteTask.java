@@ -94,6 +94,6 @@ class GetStopsOnBusRouteTask extends AsyncTask<Void, Void, Void>
     protected void onPostExecute(Void params)
     {
         BusStop[] busStops1 = new BusStop[0]; // Fake array to make the error go away
-        caller.onStopsOnBusRouteFound(errorMessage, busStops1, route);
+        //caller.onStopsOnBusRouteFound(errorMessage, busStops1, route);
     }
 }

@@ -31,7 +31,7 @@ public class SearchActivity extends AppCompatActivity
     private String searchType;
     private Intent resultIntent = new Intent();
     private GetAllStops getAllStops;
-    private GetAllRoutes getAllRoutes;
+    private GetAllDistinctRouteNumbers getAllDistinctRouteNumbers;
     private GetAllDistinctStopNames getAllDistinctStopNames;
 
     @Override
@@ -66,8 +66,8 @@ public class SearchActivity extends AppCompatActivity
         }
         else if (searchType.equals(SEARCH_TYPE_BUS_ROUTE))
         {
-            getAllRoutes = new GetAllRoutes();
-            getAllRoutes.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            getAllDistinctRouteNumbers = new GetAllDistinctRouteNumbers();
+            getAllDistinctRouteNumbers.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
     }
 
@@ -122,9 +122,48 @@ public class SearchActivity extends AppCompatActivity
         });
     }
 
-    private void onAllRoutesFound(ArrayList<BusRoute> busRoutes)
+    private void onAllDistinctRouteNumbersFound(ArrayList<String> routeNumbers)
     {
+        final BusNumberListCustomAdapterRouteNumber listAdapter = new BusNumberListCustomAdapterRouteNumber(this, routeNumbers);
+        searchResultsListView.setAdapter(listAdapter);
+        progressBar.setVisibility(View.GONE);
+        searchEditText.setEnabled(true);
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(searchEditText, InputMethodManager.SHOW_IMPLICIT);
+        searchResultsListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
 
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                resultIntent.putExtra("ROUTE_NUMBER", ((String) parent.getItemAtPosition(position)));
+                setResult(RESULT_OK, resultIntent);
+                getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+                finish();
+            }
+        });
+
+        searchEditText.addTextChangedListener(new TextWatcher()
+        {
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count)
+            {
+                listAdapter.getFilter().filter(s);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s)
+            {
+
+            }
+        });
     }
 
     /**
@@ -138,12 +177,12 @@ public class SearchActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onStop()
+    protected void onDestroy()
     {
-        super.onStop();
-        if (getAllRoutes != null)
+        super.onDestroy();
+        if (getAllDistinctRouteNumbers != null)
         {
-            getAllRoutes.cancel(true);
+            getAllDistinctRouteNumbers.cancel(true);
         }
         if (getAllStops != null)
         {
@@ -263,19 +302,19 @@ public class SearchActivity extends AppCompatActivity
         });
     }*/
 
-    private class GetAllRoutes extends AsyncTask<Void, Void, ArrayList<BusRoute>>
+    private class GetAllDistinctRouteNumbers extends AsyncTask<Void, Void, ArrayList<String>>
     {
         @Override
-        protected ArrayList<BusRoute> doInBackground(Void... params)
+        protected ArrayList<String> doInBackground(Void... params)
         {
-            return DbQueries.getAllRoutes(db);
+            return DbQueries.getAllDistinctRouteNumbers(db);
         }
 
         @Override
-        protected void onPostExecute(ArrayList<BusRoute> busRoutes)
+        protected void onPostExecute(ArrayList<String> routeNumbers)
         {
-            super.onPostExecute(busRoutes);
-            onAllRoutesFound(busRoutes);
+            super.onPostExecute(routeNumbers);
+            onAllDistinctRouteNumbersFound(routeNumbers);
         }
     }
 

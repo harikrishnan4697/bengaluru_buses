@@ -21,17 +21,16 @@ class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
 {
     private NetworkingHelper caller;
     private String errorMessage = NETWORK_QUERY_NO_ERROR;
-    private BusStop selectedBusStop;
-    private int numberOfBusesFound;
     private ArrayList<Bus> buses = new ArrayList<>();
-    private BusRoute route;
+    private BusRoute busRoute;
+    private int busStopRouteOrder;
 
 
-    GetBusesEnRouteTask(NetworkingHelper caller, BusStop busStop, BusRoute route)
+    GetBusesEnRouteTask(NetworkingHelper caller, int busStopRouteOrder, BusRoute busRoute)
     {
         this.caller = caller;
-        this.selectedBusStop = busStop;
-        this.route = route;
+        this.busStopRouteOrder = busStopRouteOrder;
+        this.busRoute = busRoute;
     }
 
     @Override
@@ -47,7 +46,7 @@ class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
             errorMessage = NETWORK_QUERY_URL_EXCEPTION;
             return null;
         }
-        numberOfBusesFound = 0;
+
         HttpURLConnection client;
         String line;
         StringBuilder busesEnRouteResult = new StringBuilder();
@@ -87,14 +86,14 @@ class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
             JSONArray jsonArray = new JSONArray(busesEnRouteResult.toString());
             for (int i = 0; i < jsonArray.length(); i++)
             {
-                if (Integer.parseInt(jsonArray.getJSONArray(i).getString(12).replace("routeorder:", "")) <= selectedBusStop.getBusStopRouteOrder())
+                if (Integer.parseInt(jsonArray.getJSONArray(i).getString(12).replace("routeorder:", "")) <= busStopRouteOrder)
                 {
                     for (int j = 0; j < jsonArray.length(); j++)
                     {
                         if ((i + j) < jsonArray.length())
                         {
                             Bus bus = new Bus();
-                            if (Integer.parseInt(jsonArray.getJSONArray(i + j).getString(12).replace("routeorder:", "")) == selectedBusStop.getBusStopRouteOrder())
+                            if (Integer.parseInt(jsonArray.getJSONArray(i + j).getString(12).replace("routeorder:", "")) == busStopRouteOrder)
                             {
                                 bus.setDue(true);
                             }
@@ -104,7 +103,6 @@ class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
                             bus.setBusRegistrationNumber(jsonArray.getJSONArray(i + j).getString(0).replace("vehicleno:", ""));
                             bus.setBusRouteOrder(Integer.parseInt(jsonArray.getJSONArray(i + j).getString(12).replace("routeorder:", "")));
                             buses.add(bus);
-                            numberOfBusesFound++;
                         }
                         else
                         {
@@ -125,6 +123,6 @@ class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
     @Override
     protected void onPostExecute(Void aVoid)
     {
-        caller.onBusesEnRouteFound(errorMessage, buses, numberOfBusesFound, route, selectedBusStop);
+        caller.onBusesEnRouteFound(errorMessage, busStopRouteOrder, buses, busRoute);
     }
 }

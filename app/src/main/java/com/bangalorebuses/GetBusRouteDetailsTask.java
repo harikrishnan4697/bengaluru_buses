@@ -114,6 +114,6 @@ class GetBusRouteDetailsTask extends AsyncTask<BusRoute, Void, Void>
     @Override
     protected void onPostExecute(Void params)
     {
-        caller.onBusRouteDetailsFound(errorMessage, route, isForBusList, routeDirection);
+        //caller.onBusRouteDetailsFound(errorMessage, route, isForBusList, routeDirection);
     }
 }

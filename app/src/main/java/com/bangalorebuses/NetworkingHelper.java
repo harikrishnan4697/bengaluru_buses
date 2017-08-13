@@ -51,9 +51,8 @@ interface NetworkingHelper
      *
      * @param errorMessage            This parameter is to convey if the task encountered an error.
      * @param buses              This parameter is an array of buses en-route that the task found.
-     * @param numberOfBusesFound This parameter is the number of en-route buses the task found.
      */
-    void onBusesEnRouteFound(String errorMessage, ArrayList<Bus> buses, int numberOfBusesFound, BusRoute route, BusStop selectedBusStop);
+    void onBusesEnRouteFound(String errorMessage, int busStopRouteOrder, ArrayList<Bus> buses, BusRoute busRoute);
 
     /**
      * This is a callback method called by the GetTimeToBusesTask.

@@ -126,6 +126,6 @@ class GetBusesArrivingAtStopTask extends AsyncTask<String, Void, JSONArray>
          Calls the onBusesAtStopFound() callback method defined in the
          NetworkingHelper interface
         */
-        caller.onBusesAtStopFound(errorMessage, jsonArray);
+        //caller.onBusesAtStopFound(errorMessage, jsonArray);
     }
 }
