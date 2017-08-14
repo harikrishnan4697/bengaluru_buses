@@ -5,8 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="#FFFFFF"
-    android:minHeight="65dp"
     android:padding="10dp">
+    <!--android:minHeight="65dp"-->
 
     <ImageView
         android:id="@+id/imageView"
@@ -41,7 +41,7 @@
             android:maxLines="1"
             android:text="Metro Feeder"
             android:textColor="#000000"
-            android:textSize="12sp"/>
+            android:textSize="14sp"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -62,13 +62,13 @@
                 android:maxLines="1"
                 android:text="MF-1"
                 android:textColor="#000000"
-                android:textSize="14sp"/>
+                android:textSize="16sp"/>
 
         </LinearLayout>
 
     </RelativeLayout>
 
-    <TextView
+    <!--<TextView
         android:id="@+id/routeDirectionNameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -78,7 +78,8 @@
         android:layout_toRightOf="@+id/imageView"
         android:ellipsize="end"
         android:maxLines="2"
+        android:textColor="#000000"
         android:text="SV Road Metro Station To SV Road Metro Station"
-        android:textSize="12sp"/>
+        android:textSize="12sp"/>-->
 
 </RelativeLayout>
