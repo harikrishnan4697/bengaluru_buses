@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="#FFFFFF"
+    android:minHeight="65dp"
     android:padding="16dp">
 
     <TextView
@@ -17,7 +18,7 @@
         android:maxLines="2"
         android:text="Dodda Nekkundi"
         android:textColor="#000000"
-        android:textSize="16sp"/>
+        android:textSize="14sp"/>
 
     <TextView
         android:id="@+id/busStopDirectionNameTextView"
@@ -31,6 +32,6 @@
         android:maxLines="2"
         android:text="towards - Marathahalli Bridge"
         android:textColor="#000000"
-        android:textSize="14sp"/>
+        android:textSize="12sp"/>
 
 </RelativeLayout>

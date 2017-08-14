@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 class BusNumberListCustomAdapterRouteNumber extends BaseAdapter implements Filterable
@@ -25,6 +26,7 @@ class BusNumberListCustomAdapterRouteNumber extends BaseAdapter implements Filte
     BusNumberListCustomAdapterRouteNumber(Activity context, ArrayList<String> busRouteNumbers)
     {
         super();
+        Collections.sort(busRouteNumbers);
         this.context = context;
         this.busRouteNumbers = busRouteNumbers;
         this.filteredBusRouteNumbers = busRouteNumbers;
@@ -124,7 +126,8 @@ class BusNumberListCustomAdapterRouteNumber extends BaseAdapter implements Filte
             for (int i = 0; i < count; i++)
             {
                 routeNumber = busRouteNumbers.get(i);
-                if (routeNumber.toLowerCase().contains(filterString))
+                if (routeNumber.length() >= filterString.length() &&
+                        routeNumber.toLowerCase().substring(0, filterString.length()).equals(filterString))
                 {
                     filtered_route_numbers.add(routeNumber);
                 }
@@ -141,6 +144,7 @@ class BusNumberListCustomAdapterRouteNumber extends BaseAdapter implements Filte
         protected void publishResults(CharSequence constraint, FilterResults results)
         {
             filteredBusRouteNumbers = (ArrayList<String>) results.values;
+            Collections.sort(filteredBusRouteNumbers);
             notifyDataSetChanged();
         }
 

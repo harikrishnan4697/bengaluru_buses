@@ -32,8 +32,8 @@
 
             <ImageView
                 android:id="@+id/changeDirectionImageView"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
@@ -42,6 +42,7 @@
                 android:layout_marginLeft="10dp"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
+                android:background="@drawable/orange_rounded_background_borderless"
                 android:clickable="true"
                 android:onClick="swapDirection"
                 android:src="@drawable/ic_swap_horiz_white"/>
@@ -59,8 +60,8 @@
                 android:ellipsize="end"
                 android:gravity="start"
                 android:maxLines="2"
+                android:onClick="swapDirection"
                 android:padding="10dp"
-                android:text="Central Silk Board To Kempegowda International Airport"
                 android:textColor="#000000"
                 android:textSize="14sp"/>
 
@@ -110,203 +111,5 @@
         android:layout_alignParentBottom="true"
         android:layout_below="@id/bus_stop_selection_linear_layout"
         android:animateLayoutChanges="true"/>
-    
-    <!--<LinearLayout
-        android:id="@+id/buses_linear_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_below="@id/bus_stop_selection_linear_layout"
-        android:background="#FFFFFF"
-        android:orientation="vertical"
-        android:visibility="visible">
-
-        <TextView
-            android:id="@+id/error_message_text_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:gravity="center"
-            android:textColor="#000000"
-            android:textSize="16sp"
-            android:visibility="gone"/>
-
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:scrollbars="none">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <LinearLayout
-                    android:id="@+id/bus_linear_layout_1"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:id="@+id/bus_icon_1"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_marginEnd="16dp"
-                        android:layout_marginRight="16dp"
-                        android:contentDescription="@string/image_content_description_text"/>
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/buses_text_view_1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="#000000"
-                            android:textSize="18sp"/>
-
-                        <TextView
-                            android:id="@+id/is_at_stop_text_view_1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="5dp"
-                            android:maxLines="1"
-                            android:textSize="14sp"/>
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/bus_linear_layout_2"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:id="@+id/bus_icon_2"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_marginEnd="16dp"
-                        android:layout_marginRight="16dp"
-                        android:contentDescription="@string/image_content_description_text"/>
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/buses_text_view_2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="#000000"
-                            android:textSize="18sp"/>
-
-                        <TextView
-                            android:id="@+id/is_at_stop_text_view_2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="5dp"
-                            android:maxLines="1"
-                            android:textSize="14sp"/>
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/bus_linear_layout_3"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:id="@+id/bus_icon_3"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_marginEnd="16dp"
-                        android:layout_marginRight="16dp"
-                        android:contentDescription="@string/image_content_description_text"/>
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/buses_text_view_3"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="#000000"
-                            android:textSize="18sp"/>
-
-                        <TextView
-                            android:id="@+id/is_at_stop_text_view_3"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="5dp"
-                            android:maxLines="1"
-                            android:textSize="14sp"/>
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/bus_linear_layout_4"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="24dp"
-                    android:layout_marginTop="24dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:id="@+id/bus_icon_4"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_marginEnd="16dp"
-                        android:layout_marginRight="16dp"
-                        android:contentDescription="@string/image_content_description_text"/>
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/buses_text_view_4"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="#000000"
-                            android:textSize="18sp"/>
-
-                        <TextView
-                            android:id="@+id/is_at_stop_text_view_4"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="5dp"
-                            android:maxLines="1"
-                            android:textSize="14sp"/>
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </ScrollView>
-
-    </LinearLayout>-->
 
 </RelativeLayout>

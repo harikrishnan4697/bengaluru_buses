@@ -69,11 +69,12 @@
 
         <ImageView
             android:id="@+id/switch_bus_stops_image_view"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:layout_gravity="center"
-            android:layout_marginLeft="16dp"
-            android:layout_marginStart="16dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/orange_rounded_background_borderless"
             android:clickable="true"
             android:src="@drawable/ic_swap_vert_white"/>
 

@@ -102,6 +102,7 @@ class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
                             bus.setBusLong(nearestLatLong.substring(nearestLatLong.indexOf(",") + 1, nearestLatLong.length() - 1));
                             bus.setBusRegistrationNumber(jsonArray.getJSONArray(i + j).getString(0).replace("vehicleno:", ""));
                             bus.setBusRouteOrder(Integer.parseInt(jsonArray.getJSONArray(i + j).getString(12).replace("routeorder:", "")));
+                            bus.setBusRoute(busRoute);
                             buses.add(bus);
                         }
                         else

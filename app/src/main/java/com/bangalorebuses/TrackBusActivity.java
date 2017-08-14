@@ -1,8 +1,9 @@
 package com.bangalorebuses;
 
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.PersistableBundle;
+import android.os.CountDownTimer;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -21,6 +22,7 @@ import android.widget.TextView;
 import org.json.JSONArray;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 
@@ -47,14 +49,23 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
     private TextView directionTextView;
     private ImageView directionSwapImageView;
     private Animation directionSwapAnimation;
+    private Animation directionSwapAnimationBackwards;
     private BusRoute routeUp;
     private BusRoute routeDown;
     private String currentlySelectedDirection = DIRECTION_UP;
+    private boolean routeIsOnlyInOneDirection = false;
+    private ProgressDialog progressDialog;
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState)
+    protected void onCreate(@Nullable Bundle savedInstanceState)
     {
-        super.onCreate(savedInstanceState, persistentState);
+        super.onCreate(savedInstanceState);
+
+        if (getSupportActionBar() != null)
+        {
+            getSupportActionBar().setElevation(0);
+        }
+        setContentView(R.layout.activity_track_bus);
 
         // Initialise XML elements
         listView = (ListView) findViewById(R.id.listView);
@@ -62,6 +73,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         directionTextView = (TextView) findViewById(R.id.directionNameTextView);
         directionSwapImageView = (ImageView) findViewById(R.id.changeDirectionImageView);
         directionSwapAnimation = AnimationUtils.loadAnimation(this, R.anim.rotate_once);
+        directionSwapAnimationBackwards = AnimationUtils.loadAnimation(this, R.anim.rotate_once_backwards);
 
         trackBusesOnRoute(getIntent().getStringExtra("ROUTE_NUMBER"));
     }
@@ -69,7 +81,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-        MenuInflater menuInflater = new MenuInflater(this);
+        MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.track_bus_activity_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
@@ -79,6 +91,9 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
     {
         switch (item.getItemId())
         {
+            case android.R.id.home:
+                finish();
+                break;
             case R.id.trackBusActivityRefresh:
                 //TODO
                 break;
@@ -91,8 +106,11 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
     {
-        if(currentlySelectedDirection.equals(DIRECTION_UP))
+        progressDialog.dismiss();
+        progressDialog = ProgressDialog.show(this, "Please wait", "Getting buses...");
+        if (currentlySelectedDirection.equals(DIRECTION_UP))
         {
+            //TODO Check for internet
             getBusesEnRouteTask = new GetBusesEnRouteTask(this, routeUp.getBusRouteStops()
                     .get(position).getBusStopRouteOrder(), routeUp);
             String requestParameters = "routeNO=" + routeUp.getBusRouteNumber() + "&" + "direction=" + DIRECTION_UP;
@@ -107,7 +125,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         }
         else
         {
-
+            // TODO No direction selected!
         }
     }
 
@@ -119,26 +137,56 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
 
     public void swapDirection(View view)
     {
-        directionSwapImageView.startAnimation(directionSwapAnimation);
-
-        if (currentlySelectedDirection.equals(DIRECTION_UP))
+        if (!routeIsOnlyInOneDirection)
         {
-            directionTextView.setText(routeDown.getBusRouteDirectionName());
-            currentlySelectedDirection = DIRECTION_DOWN;
-        }
-        else if (currentlySelectedDirection.equals(DIRECTION_DOWN))
-        {
-            directionTextView.setText(routeUp.getBusRouteDirectionName());
-            currentlySelectedDirection = DIRECTION_UP;
+            directionSwapImageView.startAnimation(directionSwapAnimation);
+            if (currentlySelectedDirection.equals(DIRECTION_UP))
+            {
+                directionTextView.setText(getBusRouteDestinationName(routeDown.getBusRouteDirectionName()));
+                currentlySelectedDirection = DIRECTION_DOWN;
+                progressDialog.dismiss();
+                progressDialog = ProgressDialog.show(this, "Please wait", "Getting buses...");
+                getStopsOnRouteTask = new GetStopsOnRouteTask(routeDown);
+                getStopsOnRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, routeDown.getBusRouteId());
+            }
+            else if (currentlySelectedDirection.equals(DIRECTION_DOWN))
+            {
+                directionTextView.setText(getBusRouteDestinationName(routeUp.getBusRouteDirectionName()));
+                currentlySelectedDirection = DIRECTION_UP;
+                progressDialog.dismiss();
+                progressDialog = ProgressDialog.show(this, "Please wait", "Getting buses...");
+                getStopsOnRouteTask = new GetStopsOnRouteTask(routeUp);
+                getStopsOnRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, routeUp.getBusRouteId());
+            }
+            else
+            {
+                // TODO Select a default direction
+            }
         }
         else
         {
-            // TODO Select a default direction
+            directionSwapImageView.startAnimation(directionSwapAnimation);
+            new CountDownTimer(200, 200)
+            {
+                @Override
+                public void onTick(long millisUntilFinished)
+                {
+
+                }
+
+                @Override
+                public void onFinish()
+                {
+                    directionSwapImageView.startAnimation(directionSwapAnimationBackwards);
+                }
+            }.start();
+            //Toast.makeText(this, "This bus runs only in one direction...", Toast.LENGTH_SHORT).show();
         }
     }
 
     private void trackBusesOnRoute(String routeNumber)
     {
+        progressDialog = ProgressDialog.show(this, "Please wait", "Getting buses...");
         getRoutesWithNumberTask = new GetRoutesWithNumberTask();
         getRoutesWithNumberTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, routeNumber);
     }
@@ -165,12 +213,13 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
 
         if (routeUp != null)
         {
-            directionTextView.setText(routeUp.getBusRouteDirectionName());
+
+            directionTextView.setText(getBusRouteDestinationName(routeUp.getBusRouteDirectionName()));
             currentlySelectedDirection = DIRECTION_UP;
 
             if (routeDown == null)
             {
-                directionSwapImageView.setEnabled(false);
+                routeIsOnlyInOneDirection = true;
             }
 
             getStopsOnRouteTask = new GetStopsOnRouteTask(routeUp);
@@ -181,13 +230,12 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         {
             if (routeUp == null)
             {
-                directionTextView.setText(routeDown.getBusRouteDirectionName());
+                directionTextView.setText(getBusRouteDestinationName(routeDown.getBusRouteDirectionName()));
                 currentlySelectedDirection = DIRECTION_DOWN;
-                directionSwapImageView.setEnabled(false);
+                routeIsOnlyInOneDirection = true;
+                getStopsOnRouteTask = new GetStopsOnRouteTask(routeDown);
+                getStopsOnRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, routeDown.getBusRouteId());
             }
-
-            getStopsOnRouteTask = new GetStopsOnRouteTask(routeDown);
-            getStopsOnRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, routeDown.getBusRouteId());
         }
 
     }
@@ -197,29 +245,29 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         if (busRoute.getBusRouteDirection().equals(DIRECTION_UP))
         {
             routeUp = busRoute;
+            updateSpinner(DIRECTION_UP);
         }
         else if (busRoute.getBusRouteDirection().equals(DIRECTION_DOWN))
         {
             routeDown = busRoute;
+            updateSpinner(DIRECTION_DOWN);
         }
-
-        updateSpinner();
     }
 
-    private void updateSpinner()
+    private void updateSpinner(String direction)
     {
         ArrayList<String> routeStopNames = new ArrayList<>();
 
-        if(currentlySelectedDirection.equals(DIRECTION_UP))
+        if (direction.equals(DIRECTION_UP))
         {
-            for(BusStop routeStop: routeUp.getBusRouteStops())
+            for (BusStop routeStop : routeUp.getBusRouteStops())
             {
                 routeStopNames.add(routeStop.getBusStopName());
             }
         }
-        else if (currentlySelectedDirection.equals(DIRECTION_DOWN))
+        else if (direction.equals(DIRECTION_DOWN))
         {
-            for(BusStop routeStop: routeDown.getBusRouteStops())
+            for (BusStop routeStop : routeDown.getBusRouteStops())
             {
                 routeStopNames.add(routeStop.getBusStopName());
             }
@@ -237,8 +285,74 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
     @Override
     public void onBusesEnRouteFound(String errorMessage, int busStopRouteOrder, ArrayList<Bus> buses, BusRoute busRoute)
     {
+        for (Bus bus: buses)
+        {
+            bus.setBusETA(calculateTravelTime(DbQueries.getNumberOfStopsBetweenRouteOrders(db, busRoute.getBusRouteId(),
+                    bus.getBusRouteOrder(), busStopRouteOrder), busRoute.getBusRouteNumber()));
+
+            String currentlyNearBusStop = "Unknown";
+            for (BusStop busStop: busRoute.getBusRouteStops())
+            {
+                if (busStop.getBusStopRouteOrder() == bus.getBusRouteOrder())
+                {
+                    currentlyNearBusStop = busStop.getBusStopName();
+                }
+            }
+
+            bus.setBusCurrentlyNearBusStop(currentlyNearBusStop);
+        }
+
+        progressDialog.dismiss();
         TrackBusListCustomAdapter trackBusListCustomAdapter = new TrackBusListCustomAdapter(this, buses);
         listView.setAdapter(trackBusListCustomAdapter);
+    }
+
+    private int calculateTravelTime(int numberOfBusStopsToTravel, String routeNumber)
+    {
+        Calendar calendar = Calendar.getInstance();
+        int travelTime;
+
+        if ((calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) || (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY))
+        {
+            // Check if the bus is an airport shuttle (airport shuttles take longer to travel
+            // from one bus stop to another as they don't stop at all bus stops)
+            if (routeNumber.contains("KIAS-"))
+            {
+                travelTime = numberOfBusStopsToTravel * 4;  // 4 Minutes to get from a bus stop to another for the airport shuttle weekends
+            }
+            else
+            {
+                travelTime = numberOfBusStopsToTravel * 2;  // 2 Minutes to get from a bus stop to another for other buses during weekends
+            }
+        }
+        else if ((calendar.get(Calendar.HOUR_OF_DAY) > 7 && calendar.get(Calendar.HOUR_OF_DAY) < 11) || (calendar.get(Calendar.HOUR_OF_DAY) > 16 && calendar.get(Calendar.HOUR_OF_DAY) < 21))
+        {
+            // Check if the bus is an airport shuttle (airport shuttles take longer to travel
+            // from one bus stop to another as they don't stop at all bus stops)
+            if (routeNumber.contains("KIAS-"))
+            {
+                travelTime = numberOfBusStopsToTravel * 5;  // 5 Minutes to get from a bus stop to another for the airport shuttle in peak-time
+            }
+            else
+            {
+                travelTime = numberOfBusStopsToTravel * 3;  // 3 Minutes to get from a bus stop to another for other buses in peak-time
+            }
+        }
+        else
+        {
+            // Check if the bus is an airport shuttle (airport shuttles take longer to travel
+            // from one bus stop to another as they don't stop at all bus stops)
+            if (routeNumber.contains("KIAS-"))
+            {
+                travelTime = numberOfBusStopsToTravel * 4;  // 4 Minutes to get from a bus stop to another for the airport shuttle
+            }
+            else
+            {
+                travelTime = (int) (numberOfBusStopsToTravel * 2.5);  // 2.5 Minutes to get from a bus stop to another for other buses
+            }
+        }
+
+        return travelTime;
     }
 
     @Override
@@ -255,6 +369,20 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         {
             getStopsOnRouteTask.cancel(true);
         }
+    }
+
+    private String getBusRouteDestinationName(String directionName)
+    {
+        String busRouteDestinationName = directionName;
+        if (busRouteDestinationName.contains(" To "))
+        {
+            busRouteDestinationName = busRouteDestinationName.substring(busRouteDestinationName.indexOf("To "), busRouteDestinationName.length());
+        }
+        else if (busRouteDestinationName.contains(" to "))
+        {
+            busRouteDestinationName = busRouteDestinationName.substring(busRouteDestinationName.indexOf("to "), busRouteDestinationName.length());
+        }
+        return busRouteDestinationName;
     }
 
     private class GetRoutesWithNumberTask extends AsyncTask<String, Void, ArrayList<BusRoute>>

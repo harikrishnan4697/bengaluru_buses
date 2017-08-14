@@ -145,7 +145,7 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
             case R.id.nearby_search:
                 Intent searchActivityIntent = new Intent(getContext(), SearchActivity.class);
                 searchActivityIntent.putExtra("SEARCH_TYPE", Constants.SEARCH_TYPE_BUS_STOP_WITH_DIRECTION);
-                getActivity().startActivityForResult(searchActivityIntent, Constants.SEARCH_NEARBY_BUS_STOP_REQUEST_CODE);
+                startActivityForResult(searchActivityIntent, Constants.SEARCH_NEARBY_BUS_STOP_REQUEST_CODE);
                 break;
             case R.id.nearby_refresh:
                 createLocationRequest();

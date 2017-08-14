@@ -94,7 +94,6 @@ public class SearchActivity extends AppCompatActivity
                 resultIntent.putExtra("BUS_STOP_DIRECTION_NAME", ((BusStop) parent.getItemAtPosition(position)).getBusStopDirectionName());
                 resultIntent.putExtra("BUS_STOP_ID", ((BusStop) parent.getItemAtPosition(position)).getBusStopId());
                 setResult(RESULT_OK, resultIntent);
-                getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
                 finish();
             }
         });
@@ -138,7 +137,6 @@ public class SearchActivity extends AppCompatActivity
             {
                 resultIntent.putExtra("ROUTE_NUMBER", ((String) parent.getItemAtPosition(position)));
                 setResult(RESULT_OK, resultIntent);
-                getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
                 finish();
             }
         });

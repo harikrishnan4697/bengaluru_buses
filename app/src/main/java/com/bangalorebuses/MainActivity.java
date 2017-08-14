@@ -135,7 +135,14 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        selectedFragment.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && selectedFragment != null)
+        {
+            selectedFragment.onActivityResult(requestCode, resultCode, data);
+        }
+        else
+        {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     @Override

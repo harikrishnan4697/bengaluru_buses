@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 
 import org.json.JSONArray;
@@ -47,6 +48,15 @@ public class BusTrackerFragment extends Fragment implements NetworkingHelper
                 searchBusNumber();
             }
         });
+        ImageView busNumberSelectionImageView = (ImageView) view.findViewById(R.id.busNumberSelectionImageView);
+        busNumberSelectionImageView.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                searchBusNumber();
+            }
+        });
         recentSearchesListView = (ListView) view.findViewById(R.id.recentSearchesListView);
         initialiseRecentSearches();
         return view;
@@ -56,7 +66,7 @@ public class BusTrackerFragment extends Fragment implements NetworkingHelper
     {
         Intent searchActivityIntent = new Intent(getContext(), SearchActivity.class);
         searchActivityIntent.putExtra("SEARCH_TYPE", Constants.SEARCH_TYPE_BUS_ROUTE);
-        getActivity().startActivityForResult(searchActivityIntent, Constants.SEARCH_REQUEST_CODE);
+        startActivityForResult(searchActivityIntent, Constants.SEARCH_REQUEST_CODE);
     }
 
     private void initialiseRecentSearches()
@@ -113,7 +123,7 @@ public class BusTrackerFragment extends Fragment implements NetworkingHelper
     {
         if (resultCode == RESULT_OK && requestCode == Constants.SEARCH_REQUEST_CODE)
         {
-            Intent trackBusActivityIntent = new Intent(getContext(), SearchActivity.class);
+            Intent trackBusActivityIntent = new Intent(getContext(), TrackBusActivity.class);
             trackBusActivityIntent.putExtra("ROUTE_NUMBER", data.getStringExtra("ROUTE_NUMBER"));
             startActivity(trackBusActivityIntent);
         }

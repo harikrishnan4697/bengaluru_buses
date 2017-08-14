@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -48,8 +49,9 @@ class TrackBusListCustomAdapter extends BaseAdapter
         {
             holder = new TrackBusListCustomAdapter.ViewHolder();
             convertView = inflater.inflate(R.layout.track_bus_list_item, null);
-            holder.busRouteNumberTextView = (TextView) convertView.findViewById(R.id.busStopNameTextView);
-            holder.busETATextView = (TextView) convertView.findViewById(R.id.busStopDirectionNameTextView);
+            holder.routeTypeImageView = (ImageView) convertView.findViewById(R.id.imageView);
+            holder.busRouteNumberTextView = (TextView) convertView.findViewById(R.id.routeNumberTextView);
+            holder.busETATextView = (TextView) convertView.findViewById(R.id.busETATextView);
             holder.currentlyNearTextView = (TextView) convertView.findViewById(R.id.currentlyNearTextView);
             holder.busRegistrationNumberTextView = (TextView) convertView.findViewById(R.id.registrationNumberTextView);
             convertView.setTag(holder);
@@ -59,7 +61,27 @@ class TrackBusListCustomAdapter extends BaseAdapter
             holder = (TrackBusListCustomAdapter.ViewHolder) convertView.getTag();
         }
 
+        if (buses.get(position).getBusRoute().getBusRouteNumber().length() > 5 &&
+                buses.get(position).getBusRoute().getBusRouteNumber().contains("KIAS-"))
+        {
+            holder.routeTypeImageView.setImageResource(R.drawable.ic_flight_blue);
+        }
+        else if (buses.get(position).getBusRoute().getBusRouteNumber().length() > 1 &&
+                buses.get(position).getBusRoute().getBusRouteNumber().substring(0, 2).equals("V-"))
+        {
+            holder.routeTypeImageView.setImageResource(R.drawable.ic_directions_bus_ac);
+        }
+        else if (buses.get(position).getBusRoute().getBusRouteNumber().contains("MF-"))
+        {
+            holder.routeTypeImageView.setImageResource(R.drawable.ic_directions_bus_special);
+        }
+        else
+        {
+            holder.routeTypeImageView.setImageResource(R.drawable.ic_directions_bus_ordinary);
+        }
+
         holder.busRouteNumberTextView.setText(buses.get(position).getBusRoute().getBusRouteNumber());
+
         String busETA;
         if (!buses.get(position).isDue())
         {
@@ -78,13 +100,14 @@ class TrackBusListCustomAdapter extends BaseAdapter
             busETA = "due";
         }
         holder.busETATextView.setText(busETA);
-        holder.currentlyNearTextView.setText(buses.get(position).getBusCurrentlyNearBusStop());
-        holder.busRegistrationNumberTextView.setText(buses.get(position).getBusRegistrationNumber());
+        holder.currentlyNearTextView.setText("Currently near - " + buses.get(position).getBusCurrentlyNearBusStop());
+        holder.busRegistrationNumberTextView.setText("Registration number - " + buses.get(position).getBusRegistrationNumber());
         return convertView;
     }
 
     private static class ViewHolder
     {
+        ImageView routeTypeImageView;
         TextView busRouteNumberTextView;
         TextView busETATextView;
         TextView currentlyNearTextView;
