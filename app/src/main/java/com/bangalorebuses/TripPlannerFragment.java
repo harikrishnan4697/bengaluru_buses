@@ -92,7 +92,7 @@ public class TripPlannerFragment extends Fragment implements TripPlannerHelper
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
-        findDirectRoutes("Dodda Nekkundi", "Banashankari TTMC");
+        findDirectRoutes("Dodda Nekkundi", "EMC2");
     }
 
     private void searchOrigin()
@@ -173,6 +173,7 @@ public class TripPlannerFragment extends Fragment implements TripPlannerHelper
     {
         //TODO Check for internet connection
         numberOfDirectTripQueriesMade = 0;
+        numberOfDirectTripBusesFound = 0;
         directTripsToQuery = directTrips;
 
         for (; numberOfDirectTripQueriesMade < 10; numberOfDirectTripQueriesMade++)
