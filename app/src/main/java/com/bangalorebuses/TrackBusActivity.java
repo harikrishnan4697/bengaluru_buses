@@ -28,6 +28,7 @@ import java.util.Comparator;
 
 import static com.bangalorebuses.Constants.DIRECTION_DOWN;
 import static com.bangalorebuses.Constants.DIRECTION_UP;
+import static com.bangalorebuses.Constants.NETWORK_QUERY_NO_ERROR;
 import static com.bangalorebuses.Constants.db;
 
 /**
@@ -55,6 +56,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
     private String currentlySelectedDirection = DIRECTION_UP;
     private boolean routeIsOnlyInOneDirection = false;
     private ProgressDialog progressDialog;
+    private BusStop currentlySelectedBusStop;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
@@ -95,7 +97,28 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
                 finish();
                 break;
             case R.id.trackBusActivityRefresh:
-                //TODO
+                if (currentlySelectedBusStop != null)
+                {
+                    if (currentlySelectedDirection.equals(DIRECTION_UP))
+                    {
+                        //TODO Check for internet
+                        getBusesEnRouteTask = new GetBusesEnRouteTask(this, currentlySelectedBusStop.getBusStopRouteOrder(), routeUp);
+                        progressDialog = ProgressDialog.show(this, "Please wait", "Getting buses");
+                        String requestParameters = "routeNO=" + routeUp.getBusRouteNumber() + "&" + "direction=" + DIRECTION_UP;
+                        getBusesEnRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, requestParameters);
+                    }
+                    else if (currentlySelectedDirection.equals(DIRECTION_DOWN))
+                    {
+                        getBusesEnRouteTask = new GetBusesEnRouteTask(this, currentlySelectedBusStop.getBusStopRouteOrder(), routeDown);
+                        progressDialog = ProgressDialog.show(this, "Please wait", "Getting buses");
+                        String requestParameters = "routeNO=" + routeDown.getBusRouteNumber() + "&" + "direction=" + DIRECTION_DOWN;
+                        getBusesEnRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, requestParameters);
+                    }
+                    else
+                    {
+                        // TODO No direction selected!
+                    }
+                }
                 break;
             default:
                 return super.onOptionsItemSelected(item);
@@ -111,6 +134,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         if (currentlySelectedDirection.equals(DIRECTION_UP))
         {
             //TODO Check for internet
+            currentlySelectedBusStop = routeUp.getBusRouteStops().get(position);
             getBusesEnRouteTask = new GetBusesEnRouteTask(this, routeUp.getBusRouteStops()
                     .get(position).getBusStopRouteOrder(), routeUp);
             String requestParameters = "routeNO=" + routeUp.getBusRouteNumber() + "&" + "direction=" + DIRECTION_UP;
@@ -118,6 +142,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         }
         else if (currentlySelectedDirection.equals(DIRECTION_DOWN))
         {
+            currentlySelectedBusStop = routeDown.getBusRouteStops().get(position);
             getBusesEnRouteTask = new GetBusesEnRouteTask(this, routeDown.getBusRouteStops()
                     .get(position).getBusStopRouteOrder(), routeDown);
             String requestParameters = "routeNO=" + routeDown.getBusRouteNumber() + "&" + "direction=" + DIRECTION_DOWN;
@@ -139,13 +164,13 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
     {
         if (!routeIsOnlyInOneDirection)
         {
+            progressDialog.dismiss();
+            progressDialog = ProgressDialog.show(this, "Please wait", "Getting buses...");
             directionSwapImageView.startAnimation(directionSwapAnimation);
             if (currentlySelectedDirection.equals(DIRECTION_UP))
             {
                 directionTextView.setText(getBusRouteDestinationName(routeDown.getBusRouteDirectionName()));
                 currentlySelectedDirection = DIRECTION_DOWN;
-                progressDialog.dismiss();
-                progressDialog = ProgressDialog.show(this, "Please wait", "Getting buses...");
                 getStopsOnRouteTask = new GetStopsOnRouteTask(routeDown);
                 getStopsOnRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, routeDown.getBusRouteId());
             }
@@ -153,8 +178,6 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
             {
                 directionTextView.setText(getBusRouteDestinationName(routeUp.getBusRouteDirectionName()));
                 currentlySelectedDirection = DIRECTION_UP;
-                progressDialog.dismiss();
-                progressDialog = ProgressDialog.show(this, "Please wait", "Getting buses...");
                 getStopsOnRouteTask = new GetStopsOnRouteTask(routeUp);
                 getStopsOnRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, routeUp.getBusRouteId());
             }
@@ -285,26 +308,34 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
     @Override
     public void onBusesEnRouteFound(String errorMessage, int busStopRouteOrder, ArrayList<Bus> buses, BusRoute busRoute)
     {
-        for (Bus bus: buses)
+        if (errorMessage.equals(NETWORK_QUERY_NO_ERROR))
         {
-            bus.setBusETA(calculateTravelTime(DbQueries.getNumberOfStopsBetweenRouteOrders(db, busRoute.getBusRouteId(),
-                    bus.getBusRouteOrder(), busStopRouteOrder), busRoute.getBusRouteNumber()));
-
-            String currentlyNearBusStop = "Unknown";
-            for (BusStop busStop: busRoute.getBusRouteStops())
+            for (Bus bus : buses)
             {
-                if (busStop.getBusStopRouteOrder() == bus.getBusRouteOrder())
+                bus.setBusETA(calculateTravelTime(DbQueries.getNumberOfStopsBetweenRouteOrders(db, busRoute.getBusRouteId(),
+                        bus.getBusRouteOrder(), busStopRouteOrder), busRoute.getBusRouteNumber()));
+
+                String currentlyNearBusStop = "Unknown";
+                for (BusStop busStop : busRoute.getBusRouteStops())
                 {
-                    currentlyNearBusStop = busStop.getBusStopName();
+                    if (busStop.getBusStopRouteOrder() == bus.getBusRouteOrder())
+                    {
+                        currentlyNearBusStop = busStop.getBusStopName();
+                    }
                 }
+
+                bus.setBusCurrentlyNearBusStop(currentlyNearBusStop);
             }
 
-            bus.setBusCurrentlyNearBusStop(currentlyNearBusStop);
+            TrackBusListCustomAdapter trackBusListCustomAdapter = new TrackBusListCustomAdapter(this, buses);
+            listView.setAdapter(trackBusListCustomAdapter);
+            progressDialog.dismiss();
+            listView.setVisibility(View.VISIBLE);
         }
-
-        progressDialog.dismiss();
-        TrackBusListCustomAdapter trackBusListCustomAdapter = new TrackBusListCustomAdapter(this, buses);
-        listView.setAdapter(trackBusListCustomAdapter);
+        else
+        {
+            //TODO
+        }
     }
 
     private int calculateTravelTime(int numberOfBusStopsToTravel, String routeNumber)
@@ -359,6 +390,11 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
     protected void onDestroy()
     {
         super.onDestroy();
+        if (getBusesEnRouteTask != null &&
+                getBusesEnRouteTask.getStatus().equals(AsyncTask.Status.FINISHED))
+        {
+            getBusesEnRouteTask.cancel(true);
+        }
         if (getRoutesWithNumberTask != null &&
                 getRoutesWithNumberTask.getStatus().equals(AsyncTask.Status.FINISHED))
         {

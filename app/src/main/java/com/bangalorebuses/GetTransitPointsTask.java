@@ -107,6 +107,6 @@ class GetTransitPointsTask extends AsyncTask<BusStop, Void, BusStop[]>
     @Override
     protected void onPostExecute(BusStop[] transitPoints)
     {
-        caller.onTransitPointsFound(errorMessage, transitPoints);
+        //caller.onTransitPointsFound(errorMessage, transitPoints);
     }
 }

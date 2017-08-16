@@ -111,6 +111,6 @@ class GetDirectBusesTask extends AsyncTask<BusStop, Void, Bus[]>
     @Override
     protected void onPostExecute(Bus[] buses)
     {
-        caller.onDirectBusesFound(errorMessage, buses);
+        //caller.onDirectBusesFound(errorMessage, buses);
     }
 }

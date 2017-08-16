@@ -104,6 +104,6 @@ class GetIndirectBusesTask extends AsyncTask<BusStop, Void, Void>
     @Override
     protected void onPostExecute(Void aVoid)
     {
-        caller.onIndirectBusesFound(errorMessage, buses, transitPoint, routeMessage);
+        //caller.onIndirectBusesFound(errorMessage, buses, transitPoint, routeMessage);
     }
 }

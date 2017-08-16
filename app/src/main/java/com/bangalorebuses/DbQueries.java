@@ -121,6 +121,20 @@ class DbQueries
         return routes;
     }
 
+    public static int getStopRouteOrder(SQLiteDatabase db, int routeId, int stopId)
+    {
+        Cursor cursor = db.rawQuery("select RouteStops.StopRouteOrder from RouteStops where RouteStops.RouteId = "
+                + routeId + " and RouteStops.StopId = " + stopId, null);
+
+        int routeOrder = -1;
+        if (cursor.moveToNext())
+        {
+            routeOrder = cursor.getInt(0);
+        }
+        cursor.close();
+        return routeOrder;
+    }
+
     public static ArrayList<String> getRouteDepartureTimings(SQLiteDatabase db, int routeId)
     {
         Cursor cursor = db.rawQuery("select RouteTimings.RouteDepartureTime from RouteTimings" +
@@ -149,9 +163,16 @@ class DbQueries
             BusStop originStop = new BusStop();
             BusStop destinationStop = new BusStop();
             BusRoute route = new BusRoute();
+
             route.setBusRouteId(cursor.getInt(0));
+            directTrip.setRoute(route);
+
             originStop.setBusStopId(cursor.getInt(1));
+            directTrip.setOriginStop(originStop);
+
             destinationStop.setBusStopId(cursor.getInt(2));
+            directTrip.setDestinationStop(destinationStop);
+
             directTrips.add(directTrip);
         }
         cursor.close();

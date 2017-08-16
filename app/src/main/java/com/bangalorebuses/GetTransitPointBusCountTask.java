@@ -95,6 +95,6 @@ class GetTransitPointBusCountTask extends AsyncTask<BusStop, Void, Void>
     @Override
     protected void onPostExecute(Void aVoid)
     {
-        caller.onTransitPointBusCountFound(errorMessage, originToTransitPointBusCount, transitPointToDestinationBusCount, transitPoint);
+        //caller.onTransitPointBusCountFound(errorMessage, originToTransitPointBusCount, transitPointToDestinationBusCount, transitPoint);
     }
 }

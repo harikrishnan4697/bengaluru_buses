@@ -5,6 +5,7 @@ class DirectTrip
     private BusStop originStop = new BusStop();
     private BusStop destinationStop = new BusStop();
     private BusRoute route = new BusRoute();
+    private int travelTime;
 
     public BusStop getOriginStop()
     {
@@ -34,5 +35,15 @@ class DirectTrip
     public void setRoute(BusRoute route)
     {
         this.route = route;
+    }
+
+    public int getTravelTime()
+    {
+        return travelTime;
+    }
+
+    public void setTravelTime(int travelTime)
+    {
+        this.travelTime = travelTime;
     }
 }

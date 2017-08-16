@@ -35,6 +35,8 @@ class Constants
     static final int SEARCH_REQUEST_CODE = 13;
     static final int LOCATION_PERMISSION_REQUEST_CODE = 36;
     static final String ROUTE_SEARCH_HISTORY_FILENAME = "route_search_history";
+    static final String TRIP_TYPE_DIRECT = "TYPE_DIRECT_TRIP";
+    static final String TRIP_TYPE_INDIRECT = "TYPE_INDIRECT";
 
     static SQLiteDatabase db;
 }

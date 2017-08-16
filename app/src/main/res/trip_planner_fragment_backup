@@ -1,0 +1,577 @@
+/*private BusStop startBusStop = new BusStop();
+    private BusStop endBusStop = new BusStop();
+    private Button originButton;
+    private Button destinationButton;
+    private ProgressBar progressBar;
+    private TextView errorMessageTextView;
+    private GetDirectBusesTask getDirectBusesTask;
+    private GetTransitPointsTask getTransitPointsTask;
+    private GetIndirectBusesTask originToTransitPointIndirectBuses;
+    private GetIndirectBusesTask transitPointToDestinationIndirectBuses;
+    private ListView routeOptionsListView;
+    private RelativeLayout containerRelativeLayout;
+    private int numberOfNetworkRequestsMade = 0;
+    private int numberOfTransitPointsFound = 0;
+    private List<HashMap<String, String>> inDirectRoutesList = new ArrayList<>();
+    private HashMap<String, HashMap> inDirectRoutes = new HashMap<>();
+    private ImageView switchBusStopsImageView;
+    private Animation rotateOnce;
+    private SimpleAdapter adapter;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    {
+        View view = inflater.inflate(R.layout.trip_planner_fragment, container, false);
+        containerRelativeLayout = (RelativeLayout) view.findViewById(R.id.trip_planner_container_relative_layout);
+        routeOptionsListView = (ListView) view.findViewById(R.id.route_options_list_view);
+        if (routeOptionsListView != null && adapter != null)
+        {
+            routeOptionsListView.setAdapter(adapter);
+            routeOptionsListView.setVisibility(View.VISIBLE);
+        }
+        progressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
+        errorMessageTextView = (TextView) view.findViewById(R.id.trip_planner_fragment_error_message_text_view);
+        originButton = (Button) view.findViewById(R.id.trip_planner_origin_button);
+        if (originButton != null && startBusStop != null && startBusStop.getBusStopName() != null)
+        {
+            originButton.setText(startBusStop.getBusStopName());
+        }
+        originButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                searchOrigin();
+            }
+        });
+        destinationButton = (Button) view.findViewById(R.id.trip_planner_destination_button);
+        if (destinationButton != null && endBusStop != null && endBusStop.getBusStopName() != null)
+        {
+            destinationButton.setText(endBusStop.getBusStopName());
+        }
+        destinationButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                searchDestination();
+            }
+        });
+        rotateOnce = AnimationUtils.loadAnimation(getContext(), R.anim.rotate_once);
+        switchBusStopsImageView = (ImageView) view.findViewById(R.id.switch_bus_stops_image_view);
+        switchBusStopsImageView.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                switchStartAndEndBusStops();
+            }
+        });
+        return view;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState)
+    {
+        super.onActivityCreated(savedInstanceState);
+        setRetainInstance(true);
+    }
+
+    private boolean isNetworkAvailable()
+    {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null;
+    }
+
+    private void searchOrigin()
+    {
+        Intent searchActivityIntent = new Intent(getContext(), SearchActivity.class);
+        searchActivityIntent.putExtra("SEARCH_TYPE", Constants.SEARCH_TYPE_BUS_STOP);
+        startActivityForResult(searchActivityIntent, Constants.SEARCH_START_BUS_STOP_REQUEST_CODE);
+    }
+
+    private void searchDestination()
+    {
+        Intent searchActivityIntent = new Intent(getContext(), SearchActivity.class);
+        searchActivityIntent.putExtra("SEARCH_TYPE", Constants.SEARCH_TYPE_BUS_STOP);
+        startActivityForResult(searchActivityIntent, Constants.SEARCH_END_BUS_STOP_REQUEST_CODE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        if (resultCode == RESULT_OK)
+        {
+            if (requestCode == Constants.SEARCH_START_BUS_STOP_REQUEST_CODE)
+            {
+                startBusStop.setBusStopName(data.getStringExtra("BUS_STOP_NAME"));
+                originButton.setText(data.getStringExtra("BUS_STOP_NAME"));
+            }
+            else if (requestCode == Constants.SEARCH_END_BUS_STOP_REQUEST_CODE)
+            {
+                endBusStop.setBusStopName(data.getStringExtra("BUS_STOP_NAME"));
+                destinationButton.setText(data.getStringExtra("BUS_STOP_NAME"));
+            }
+
+            if (originButton != null && !originButton.getText().equals("") && destinationButton != null && !destinationButton.getText().equals(""))
+            {
+                getPossibleRoutes();
+            }
+        }
+    }
+
+    private void getPossibleRoutes()
+    {
+        if (isNetworkAvailable())
+        {
+            inDirectRoutes.clear();
+            if (originToTransitPointIndirectBuses != null && transitPointToDestinationIndirectBuses != null)
+            {
+                originToTransitPointIndirectBuses.cancel(true);
+                transitPointToDestinationIndirectBuses.cancel(true);
+            }
+            errorMessageTextView.setVisibility(View.GONE);
+            routeOptionsListView.setVisibility(View.GONE);
+            if (startBusStop == null || endBusStop == null || startBusStop.getBusStopName() == null || endBusStop.getBusStopName() == null || startBusStop.getBusStopName().equals("") || endBusStop.getBusStopName().equals(""))
+            {
+                Toast.makeText(getContext(), "Please choose a start and end bus stop!", Toast.LENGTH_SHORT).show();
+                errorMessageTextView.setVisibility(View.GONE);
+            }
+            else
+            {
+                appendLog("\n\n-- Getting routes from " + startBusStop.getBusStopName() + " to " + endBusStop.getBusStopName() + " --");
+                switchBusStopsImageView.setEnabled(false);
+                originButton.setEnabled(false);
+                destinationButton.setEnabled(false);
+                new GetDirectRoutesBetweenStops().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            }
+        }
+        else
+        {
+            errorMessageTextView.setText(R.string.error_connecting_to_the_internet_text);
+            errorMessageTextView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void switchStartAndEndBusStops()
+    {
+        switchBusStopsImageView.startAnimation(rotateOnce);
+        BusStop backupStartBusStop = startBusStop;
+        startBusStop = endBusStop;
+        originButton.setText(startBusStop.getBusStopName());
+        endBusStop = backupStartBusStop;
+        destinationButton.setText(endBusStop.getBusStopName());
+        getPossibleRoutes();
+    }
+
+    @Override
+    public void onDirectBusesFound(String errorMessage, Bus[] buses)
+    {
+        inDirectRoutesList.clear();
+        if (errorMessage.equals(Constants.NETWORK_QUERY_NO_ERROR))
+        {
+            appendLog("Found " + buses.length + " direct buses from " + startBusStop.getBusStopName() + " to " + endBusStop.getBusStopName());
+            progressBar.setVisibility(View.GONE);
+            switchBusStopsImageView.setEnabled(true);
+            originButton.setEnabled(true);
+            destinationButton.setEnabled(true);
+            List<HashMap<String, String>> aList = new ArrayList<>();
+            int numberOfDirectBusesFound = 0;
+
+            for (int i = 0; i < buses.length; i++)
+            {
+                numberOfDirectBusesFound++;
+                buses[i].setBusRouteNumber(buses[i].getBusRouteNumber().replace("UP", ""));
+                buses[i].setBusRouteNumber(buses[i].getBusRouteNumber().replace("DN", ""));
+                HashMap<String, String> hm = new HashMap<>();
+                hm.put("route_number", buses[i].getBusRouteNumber());
+                if (buses[i].getBusRouteOrder() == 1)
+                {
+                    hm.put("bus_eta", "Trip is yet to begin");
+                }
+                else
+                {
+                    if (buses[i].getBusETA() <= 180)
+                    {
+                        hm.put("bus_eta", "Due");
+                    }
+                    else
+                    {
+                        hm.put("bus_eta", Integer.toString(buses[i].getBusETA() / 60) + " min");
+                    }
+                }
+                aList.add(hm);
+            }
+
+            String[] from = {"route_number", "bus_eta"};
+            int[] to = {R.id.bus_number_text_view, R.id.bus_eta_text_view};
+            adapter = new SimpleAdapter(getActivity().getBaseContext(), aList, R.layout.trip_planner_direct_buses_list_item, from, to);
+            routeOptionsListView.setAdapter(adapter);
+            routeOptionsListView.setVisibility(View.VISIBLE);
+            Snackbar.make(containerRelativeLayout, "Found " + numberOfDirectBusesFound + " direct buses", Snackbar.LENGTH_LONG).show();
+        }
+        else
+        {
+            if (isNetworkAvailable())
+            {
+                appendLog("There aren't any direct buses from " + startBusStop.getBusStopName() + " to " + endBusStop.getBusStopName() + ". Checking for indirect routes...");
+                if (errorMessage.equals(Constants.NETWORK_QUERY_IO_EXCEPTION))
+                {
+                    errorMessageTextView.setText("There aren't any direct routes. Looking for indirect routes...");
+                    errorMessageTextView.setVisibility(View.VISIBLE);
+                    getTransitPointsTask = new GetTransitPointsTask(this);
+                    getTransitPointsTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, startBusStop, endBusStop);
+                }
+                else if (errorMessage.equals(Constants.NETWORK_QUERY_URL_EXCEPTION))
+                {
+                    progressBar.setVisibility(View.GONE);
+                    switchBusStopsImageView.setEnabled(true);
+                    originButton.setEnabled(true);
+                    destinationButton.setEnabled(true);
+                    errorMessageTextView.setText("Something went wrong! Please click try again later.");
+                    errorMessageTextView.setVisibility(View.VISIBLE);
+                }
+                else if (errorMessage.equals(Constants.NETWORK_QUERY_REQUEST_TIMEOUT_EXCEPTION))
+                {
+                    progressBar.setVisibility(View.GONE);
+                    switchBusStopsImageView.setEnabled(true);
+                    originButton.setEnabled(true);
+                    destinationButton.setEnabled(true);
+                    errorMessageTextView.setText("Connection timed out! Please try again later.");
+                    errorMessageTextView.setVisibility(View.VISIBLE);
+                }
+                else if (errorMessage.equals(Constants.NETWORK_QUERY_JSON_EXCEPTION))
+                {
+                    errorMessageTextView.setText("There aren't any direct routes. Looking for indirect routes...");
+                    errorMessageTextView.setVisibility(View.VISIBLE);
+                    getTransitPointsTask = new GetTransitPointsTask(this);
+                    getTransitPointsTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, startBusStop, endBusStop);
+                }
+            }
+            else
+            {
+                progressBar.setVisibility(View.GONE);
+                switchBusStopsImageView.setEnabled(true);
+                originButton.setEnabled(true);
+                destinationButton.setEnabled(true);
+                errorMessageTextView.setText(R.string.error_connecting_to_the_internet_text);
+                errorMessageTextView.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    @Override
+    public void onTransitPointsFound(String errorMessage, BusStop[] transitPoints)
+    {
+        if (errorMessage.equals(Constants.NETWORK_QUERY_NO_ERROR))
+        {
+            if (transitPoints.length != 0)
+            {
+                appendLog("\nFound transit points:");
+                errorMessageTextView.setText("Found transit points. Locating buses...");
+                errorMessageTextView.setVisibility(View.VISIBLE);
+                numberOfTransitPointsFound = transitPoints.length;
+                numberOfNetworkRequestsMade = 0;
+                for (BusStop transitPoint : transitPoints)
+                {
+                    appendLog(transitPoint.getBusStopName() + ", ");
+                    progressBar.setVisibility(View.VISIBLE);
+                    switchBusStopsImageView.setEnabled(false);
+                    originButton.setEnabled(false);
+                    destinationButton.setEnabled(false);
+                    inDirectRoutes.put(transitPoint.getBusStopName(), new HashMap<String, String>());
+                    numberOfNetworkRequestsMade = numberOfNetworkRequestsMade + 2;
+                    Toast.makeText(getContext(), "Getting buses to and from " + transitPoint.getBusStopName(), Toast.LENGTH_SHORT).show();
+                    originToTransitPointIndirectBuses = new GetIndirectBusesTask(this, Constants.ROUTE_TYPE_ORIGIN_TO_TRANSIT_POINT);
+                    originToTransitPointIndirectBuses.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, startBusStop, transitPoint, transitPoint);
+                    transitPointToDestinationIndirectBuses = new GetIndirectBusesTask(this, Constants.ROUTE_TYPE_TRANSIT_POINT_TO_DESTINATION);
+                    transitPointToDestinationIndirectBuses.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, transitPoint, endBusStop, transitPoint);
+
+                }
+                appendLog("\nLocating buses from origin to transit point and transit point to destination...");
+            }
+            else
+            {
+                progressBar.setVisibility(View.GONE);
+                switchBusStopsImageView.setEnabled(true);
+                originButton.setEnabled(true);
+                destinationButton.setEnabled(true);
+                errorMessageTextView.setText("There aren't any direct or indirect buses from " + startBusStop.getBusStopName() + " to " + endBusStop.getBusStopName() + " right now.");
+                errorMessageTextView.setVisibility(View.VISIBLE);
+            }
+        }
+        else
+        {
+            progressBar.setVisibility(View.GONE);
+            switchBusStopsImageView.setEnabled(true);
+            originButton.setEnabled(true);
+            destinationButton.setEnabled(true);
+            if (isNetworkAvailable())
+            {
+                if (errorMessage.equals(Constants.NETWORK_QUERY_IO_EXCEPTION))
+                {
+                    errorMessageTextView.setText("Something went wrong! Please try again later.");
+                    errorMessageTextView.setVisibility(View.VISIBLE);
+                }
+                else if (errorMessage.equals(Constants.NETWORK_QUERY_URL_EXCEPTION))
+                {
+                    errorMessageTextView.setText("Something went wrong! Please try again later.");
+                    errorMessageTextView.setVisibility(View.VISIBLE);
+                }
+                else if (errorMessage.equals(Constants.NETWORK_QUERY_REQUEST_TIMEOUT_EXCEPTION))
+                {
+                    errorMessageTextView.setText("Connection timed out! Please try again later.");
+                    errorMessageTextView.setVisibility(View.VISIBLE);
+                }
+                else if (errorMessage.equals(Constants.NETWORK_QUERY_JSON_EXCEPTION))
+                {
+                    errorMessageTextView.setText("There aren't any direct or indirect buses from " + startBusStop.getBusStopName() + " to " + endBusStop.getBusStopName() + " right now.");
+                    errorMessageTextView.setVisibility(View.VISIBLE);
+                }
+            }
+            else
+            {
+                errorMessageTextView.setText(R.string.error_connecting_to_the_internet_text);
+                errorMessageTextView.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    @Override
+    public void onTransitPointBusCountFound(String errorMessage, int originToTransitPointBusCount, int transitPointToDestinationBusCount, BusStop transitPoint)
+    {
+        if (errorMessage.equals(Constants.NETWORK_QUERY_NO_ERROR))
+        {
+            numberOfTransitPointsFound--;
+            if (originToTransitPointBusCount != 0 && transitPointToDestinationBusCount != 0)
+            {
+                inDirectRoutes.put(transitPoint.getBusStopName(), new HashMap<String, String>());
+                numberOfNetworkRequestsMade++;
+                Toast.makeText(getContext(), "Getting buses to and from " + transitPoint.getBusStopName(), Toast.LENGTH_SHORT).show();
+                originToTransitPointIndirectBuses = new GetIndirectBusesTask(this, Constants.ROUTE_TYPE_ORIGIN_TO_TRANSIT_POINT);
+                originToTransitPointIndirectBuses.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, startBusStop, transitPoint, transitPoint);
+                transitPointToDestinationIndirectBuses = new GetIndirectBusesTask(this, Constants.ROUTE_TYPE_TRANSIT_POINT_TO_DESTINATION);
+                transitPointToDestinationIndirectBuses.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, transitPoint, endBusStop, transitPoint);
+            }
+            else if (numberOfTransitPointsFound == 0 && numberOfNetworkRequestsMade == 0)
+            {
+                progressBar.setVisibility(View.GONE);
+                switchBusStopsImageView.setEnabled(true);
+                originButton.setEnabled(true);
+                destinationButton.setEnabled(true);
+                errorMessageTextView.setText("There aren't any direct or indirect buses from " + startBusStop.getBusStopName() + " to " + endBusStop.getBusStopName() + " right now.");
+                errorMessageTextView.setVisibility(View.VISIBLE);
+            }
+        }
+        else
+        {
+
+        }
+    }
+
+    @Override
+    public void onIndirectBusesFound(String errorMessage, Bus[] buses, BusStop transitPoint, String routeMessage)
+    {
+        appendLog(numberOfNetworkRequestsMade + " request responses remaining");
+        numberOfNetworkRequestsMade--;
+        if (errorMessage.equals(Constants.NETWORK_QUERY_NO_ERROR))
+        {
+            buses[0].setBusRouteNumber(buses[0].getBusRouteNumber().replace("UP", ""));
+            buses[0].setBusRouteNumber(buses[0].getBusRouteNumber().replace("DN", ""));
+            buses[0].setBusRouteNumber(buses[0].getBusRouteNumber().replace("UP", ""));
+            buses[0].setBusRouteNumber(buses[0].getBusRouteNumber().replace("DN", ""));
+
+            HashMap<String, String> hashMap = inDirectRoutes.get(transitPoint.getBusStopName());
+
+            if (routeMessage.equals(Constants.ROUTE_TYPE_ORIGIN_TO_TRANSIT_POINT))
+            {
+                hashMap.put("transit_point_name", "Change at " + transitPoint.getBusStopName());
+
+                hashMap.put("origin_to_transit_point_route_number", buses[0].getBusRouteNumber());
+
+                if (buses[0].getBusRouteOrder() != 1)
+                {
+                    if (buses[0].getBusETA() <= 180)
+                    {
+                        hashMap.put("origin_to_transit_point_bus_eta", "Due");
+                    }
+                    else
+                    {
+                        hashMap.put("origin_to_transit_point_bus_eta", Integer.toString(buses[0].getBusETA() / 60) + " min");
+                    }
+                }
+                else
+                {
+                    hashMap.put("origin_to_transit_point_bus_eta", "Trip is yet to begin");
+                }
+            }
+            else if (routeMessage.equals(Constants.ROUTE_TYPE_TRANSIT_POINT_TO_DESTINATION))
+            {
+                hashMap.put("transit_point_to_destination_route_number", buses[0].getBusRouteNumber());
+
+                if (buses[0].getBusRouteOrder() != 1)
+                {
+                    if (buses[0].getBusETA() <= 180)
+                    {
+                        hashMap.put("transit_point_to_destination_bus_eta", "Due");
+                    }
+                    else
+                    {
+                        hashMap.put("transit_point_to_destination_bus_eta", Integer.toString(buses[0].getBusETA() / 60) + " min");
+                    }
+                }
+                else
+                {
+                    hashMap.put("transit_point_to_destination_bus_eta", "Trip is yet to begin");
+                }
+            }
+
+            if (hashMap.containsKey("transit_point_name") && hashMap.containsKey("origin_to_transit_point_route_number") && hashMap.containsKey("transit_point_to_destination_route_number"))
+            {
+                appendLog("Found a valid indirect route");
+                inDirectRoutesList.add(hashMap);
+                String[] from = {"transit_point_name", "origin_to_transit_point_route_number", "origin_to_transit_point_bus_eta", "transit_point_to_destination_route_number", "transit_point_to_destination_bus_eta"};
+                //int[] to = {R.id.transit_point_text_view, R.id.bus_1_number_text_view, R.id.bus_1_eta_text_view, R.id.bus_2_number_text_view, R.id.bus_2_eta_text_view};
+                if (getActivity() != null)
+                {
+                    //adapter = new SimpleAdapter(getActivity().getBaseContext(), inDirectRoutesList, R.layout.trip_planner_route_option_list_item, from, to);
+                    errorMessageTextView.setVisibility(View.GONE);
+                    routeOptionsListView.setAdapter(adapter);
+                    routeOptionsListView.setVisibility(View.VISIBLE);
+                }
+                else
+                {
+                    progressBar.setVisibility(View.GONE);
+                    switchBusStopsImageView.setEnabled(true);
+                    originButton.setEnabled(true);
+                    destinationButton.setEnabled(true);
+                    errorMessageTextView.setText("getActivity() returned null!");
+                    errorMessageTextView.setVisibility(View.VISIBLE);
+                }
+            }
+        }
+        else
+        {
+
+        }
+
+        if (numberOfNetworkRequestsMade <= 0)
+        {
+            progressBar.setVisibility(View.GONE);
+            switchBusStopsImageView.setEnabled(true);
+            originButton.setEnabled(true);
+            destinationButton.setEnabled(true);
+        }
+    }
+
+    public void appendLog(String text)
+    {
+        File logFile = new File("sdcard/log.file");
+        if (!logFile.exists())
+        {
+            try
+            {
+                logFile.createNewFile();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        try
+        {
+            //BufferedWriter for performance, true to set append to file flag
+            BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
+            buf.append(text);
+            buf.newLine();
+            buf.close();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public void onBusStopsFound(boolean isError, JSONArray busStopsArray)
+    {
+
+    }
+
+    @Override
+    public void onBusesEnRouteFound(String errorMessage, int busStopRouteOrder, ArrayList<Bus> buses, BusRoute busRoute)
+    {
+
+    }
+
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+        if (getDirectBusesTask != null)
+        {
+            getDirectBusesTask.cancel(true);
+        }
+        if (getTransitPointsTask != null)
+        {
+            getTransitPointsTask.cancel(true);
+        }
+    }
+
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+        if (getDirectBusesTask != null)
+        {
+            getDirectBusesTask.cancel(true);
+        }
+        if (getTransitPointsTask != null)
+        {
+            getTransitPointsTask.cancel(true);
+        }
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+        if (getDirectBusesTask != null)
+        {
+            getDirectBusesTask.cancel(true);
+        }
+        if (getTransitPointsTask != null)
+        {
+            getTransitPointsTask.cancel(true);
+        }
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+    }
+
+    class GetDirectRoutesBetweenStops extends AsyncTask<Void, Void, Void>
+    {
+        @Override
+        protected Void doInBackground(Void... params)
+        {
+            DbQueries.getDirectRoutesBetweenStops(db, startBusStop.getBusStopName(), endBusStop.getBusStopName());
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid)
+        {
+            errorMessageTextView.setText("Found direct routes");
+            errorMessageTextView.setVisibility(View.VISIBLE);
+            super.onPostExecute(aVoid);
+        }
+    }*/
