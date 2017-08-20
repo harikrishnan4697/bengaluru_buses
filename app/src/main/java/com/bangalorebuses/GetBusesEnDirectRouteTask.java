@@ -2,20 +2,9 @@ package com.bangalorebuses;
 
 import android.os.AsyncTask;
 
-import org.json.JSONArray;
-
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 
-import static com.bangalorebuses.Constants.NETWORK_QUERY_IO_EXCEPTION;
-import static com.bangalorebuses.Constants.NETWORK_QUERY_JSON_EXCEPTION;
 import static com.bangalorebuses.Constants.NETWORK_QUERY_NO_ERROR;
-import static com.bangalorebuses.Constants.NETWORK_QUERY_REQUEST_TIMEOUT_EXCEPTION;
-import static com.bangalorebuses.Constants.NETWORK_QUERY_URL_EXCEPTION;
 
 class GetBusesEnDirectRouteTask extends AsyncTask<Void, Void, Void>
 {
@@ -33,7 +22,7 @@ class GetBusesEnDirectRouteTask extends AsyncTask<Void, Void, Void>
     @Override
     protected Void doInBackground(Void... params)
     {
-        String requestBody = "routeNO=" + directTrip.getRoute().getBusRouteNumber() +
+        /*String requestBody = "routeNO=" + directTrip.getRoute().getBusRouteNumber() +
                 "&direction=" + directTrip.getRoute().getBusRouteDirection();
         URL busesEnRouteURL;
         try
@@ -118,7 +107,7 @@ class GetBusesEnDirectRouteTask extends AsyncTask<Void, Void, Void>
         catch (org.json.JSONException e)
         {
             errorMessage = NETWORK_QUERY_JSON_EXCEPTION;
-        }
+        }*/
         return null;
     }
 
@@ -126,7 +115,7 @@ class GetBusesEnDirectRouteTask extends AsyncTask<Void, Void, Void>
     protected void onPostExecute(Void aVoid)
     {
         super.onPostExecute(aVoid);
-        directTrip.getRoute().setBusRouteBuses(buses);
+        //directTrip.getRoute().setBusRouteBuses(buses);
         caller.onBusesEnDirectRouteFound(errorMessage, directTrip);
     }
 }

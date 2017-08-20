@@ -112,4 +112,45 @@
         android:layout_below="@id/bus_stop_selection_linear_layout"
         android:animateLayoutChanges="true"/>
 
+    <LinearLayout
+        android:id="@+id/errorLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/bus_stop_selection_linear_layout"
+        android:animateLayoutChanges="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <ImageView
+            android:id="@+id/errorImageView"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_sad_face"/>
+
+        <TextView
+            android:id="@+id/errorTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:text="Uh oh! Something went wrong. Please try again in a little bit..."
+            android:textAlignment="center"
+            android:textColor="#000000"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/errorResolutionTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:background="@drawable/white_rounded_background"
+            android:padding="16dp"
+            android:text="Retry"
+            android:textAllCaps="true"
+            android:textColor="@color/colorSpecialServiceBus"/>
+
+    </LinearLayout>
+
 </RelativeLayout>

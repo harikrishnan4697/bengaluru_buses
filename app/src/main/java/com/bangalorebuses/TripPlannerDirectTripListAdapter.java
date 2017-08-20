@@ -44,7 +44,7 @@ class TripPlannerDirectTripListAdapter extends BaseAdapter
     @Override
     public View getView(int position, View convertView, ViewGroup parent)
     {
-        TripPlannerDirectTripListAdapter.ViewHolder holder;
+        /*TripPlannerDirectTripListAdapter.ViewHolder holder;
         if (convertView == null)
         {
             holder = new TripPlannerDirectTripListAdapter.ViewHolder();
@@ -60,7 +60,6 @@ class TripPlannerDirectTripListAdapter extends BaseAdapter
         {
             holder = (TripPlannerDirectTripListAdapter.ViewHolder) convertView.getTag();
         }
-
         if (directTrips.get(position).getRoute().getBusRouteNumber().length() > 5 &&
                 directTrips.get(position).getRoute().getBusRouteNumber().contains("KIAS-"))
         {
@@ -103,7 +102,7 @@ class TripPlannerDirectTripListAdapter extends BaseAdapter
         {
             holder.originBusStopNameTextView.setText("From " + directTrips.get(position).getOriginStop().getBusStopName()
                     + " " + directTrips.get(position).getOriginStop().getBusStopDirectionName());
-        }
+        }*/
         return convertView;
     }
 

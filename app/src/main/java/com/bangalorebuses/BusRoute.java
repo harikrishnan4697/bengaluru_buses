@@ -1,5 +1,6 @@
 package com.bangalorebuses;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -10,7 +11,7 @@ import java.util.ArrayList;
  * @since 18-6-2017
  */
 
-class BusRoute
+class BusRoute implements Serializable
 {
     private int busRouteId;
     private String busRouteNumber;

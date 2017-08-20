@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -73,7 +74,46 @@ public class SearchActivity extends AppCompatActivity
 
     private void onAllDistinctStopNamesFound(ArrayList<String> busStopNames)
     {
+        final ArrayAdapter<String> listAdapter = new ArrayAdapter<>(this,android.R.layout.simple_list_item_1,
+                android.R.id.text1, busStopNames);
+        searchResultsListView.setAdapter(listAdapter);
+        progressBar.setVisibility(View.GONE);
+        searchEditText.setEnabled(true);
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(searchEditText, InputMethodManager.SHOW_IMPLICIT);
+        searchResultsListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
 
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                resultIntent.putExtra("BUS_STOP_NAME", (String) parent.getItemAtPosition(position));
+                setResult(RESULT_OK, resultIntent);
+                finish();
+            }
+        });
+
+        searchEditText.addTextChangedListener(new TextWatcher()
+        {
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count)
+            {
+                listAdapter.getFilter().filter(s);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s)
+            {
+
+            }
+        });
     }
 
     private void onAllStopsFound(final ArrayList<BusStop> busStops)

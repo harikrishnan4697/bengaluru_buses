@@ -1,11 +1,15 @@
 package com.bangalorebuses;
 
-class DirectTrip
+import java.io.Serializable;
+import java.util.ArrayList;
+
+class DirectTrip implements Serializable
 {
     private BusStop originStop = new BusStop();
     private BusStop destinationStop = new BusStop();
-    private BusRoute route = new BusRoute();
-    private int travelTime;
+    private ArrayList<BusRoute> busRoutes = new ArrayList<>();
+    private int shortestTravelTime;
+    private String nextThreeBusArrivals;
 
     public BusStop getOriginStop()
     {
@@ -27,23 +31,38 @@ class DirectTrip
         this.destinationStop = destinationStop;
     }
 
-    public BusRoute getRoute()
+    public ArrayList<BusRoute> getBusRoutes()
     {
-        return route;
+        return busRoutes;
     }
 
-    public void setRoute(BusRoute route)
+    public void setBusRoutes(ArrayList<BusRoute> busRoutes)
     {
-        this.route = route;
+        this.busRoutes = busRoutes;
     }
 
-    public int getTravelTime()
+    public void addBusRoute(BusRoute busRoute)
     {
-        return travelTime;
+        this.busRoutes.add(busRoute);
     }
 
-    public void setTravelTime(int travelTime)
+    public int getShortestTravelTime()
     {
-        this.travelTime = travelTime;
+        return shortestTravelTime;
+    }
+
+    public void setShortestTravelTime(int shortestTravelTime)
+    {
+        this.shortestTravelTime = shortestTravelTime;
+    }
+
+    public String getNextThreeBusArrivals()
+    {
+        return nextThreeBusArrivals;
+    }
+
+    public void setNextThreeBusArrivals(String next3BusArrivals)
+    {
+        this.nextThreeBusArrivals = next3BusArrivals;
     }
 }

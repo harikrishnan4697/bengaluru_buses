@@ -1,5 +1,7 @@
 package com.bangalorebuses;
 
+import java.io.Serializable;
+
 /**
  * This class is used to keep track of all the characteristics
  * of a bus.
@@ -9,7 +11,7 @@ package com.bangalorebuses;
  * @since 23-6-2017
  */
 
-class Bus
+class Bus implements Serializable
 {
     private String busRegistrationNumber;
     private String busLat;

@@ -26,4 +26,6 @@
     <string name="image_content_description_text">Type of bus service</string>
     <string name="error_invalid_route_text">This bus cannot be tracked.</string>
     <string name="error_getting_stop_details_text">Error getting bus stop details! Please try again later.</string>
+    
+    <string name="please_select_a_direction_error">Please select a direction!</string>
 </resources>

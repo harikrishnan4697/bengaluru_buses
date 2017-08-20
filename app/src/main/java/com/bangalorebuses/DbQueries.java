@@ -159,21 +159,35 @@ class DbQueries
         ArrayList<DirectTrip> directTrips = new ArrayList<>();
         while (cursor.moveToNext())
         {
-            DirectTrip directTrip = new DirectTrip();
+            boolean directRouteWithOriginStopExists = false;
             BusStop originStop = new BusStop();
             BusStop destinationStop = new BusStop();
-            BusRoute route = new BusRoute();
+            BusRoute busRoute = new BusRoute();
 
-            route.setBusRouteId(cursor.getInt(0));
-            directTrip.setRoute(route);
-
+            busRoute.setBusRouteId(cursor.getInt(0));
             originStop.setBusStopId(cursor.getInt(1));
-            directTrip.setOriginStop(originStop);
-
             destinationStop.setBusStopId(cursor.getInt(2));
-            directTrip.setDestinationStop(destinationStop);
 
-            directTrips.add(directTrip);
+            for (int i = 0; i < directTrips.size(); i++)
+            {
+                if (directTrips.get(i).getOriginStop().getBusStopId() == originStop.getBusStopId())
+                {
+                    directTrips.get(i).addBusRoute(busRoute);
+                    directRouteWithOriginStopExists = true;
+                    break;
+                }
+            }
+
+            if (!directRouteWithOriginStopExists)
+            {
+                DirectTrip directTrip = new DirectTrip();
+
+                directTrip.setOriginStop(originStop);
+                directTrip.addBusRoute(busRoute);
+                directTrip.setDestinationStop(destinationStop);
+
+                directTrips.add(directTrip);
+            }
         }
         cursor.close();
         return directTrips;

@@ -36,6 +36,7 @@
                     android:src="@drawable/ic_location_on_black"/>
 
                 <TextView
+                    android:id="@+id/originBusStopNameTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
@@ -44,7 +45,7 @@
                     android:maxLines="2"
                     android:text="Dodda Nekkundi (towards - Hebbala)"
                     android:textColor="#000000"
-                    android:textSize="12sp"/>
+                    android:textSize="14sp"/>
 
             </LinearLayout>
 
@@ -87,6 +88,7 @@
                         android:layout_alignParentEnd="true"
                         android:layout_alignParentRight="true"
                         android:layout_centerVertical="true"
+                        android:clickable="true"
                         android:src="@drawable/ic_refresh_black"/>
 
                 </RelativeLayout>
@@ -116,18 +118,10 @@
                         android:layout_toRightOf="@id/routeServiceTypeImageView"
                         android:background="@drawable/grey_rounded_background_borderless"
                         android:ellipsize="end"
-                        android:maxLines="1"
-                        android:text="KIAS-8C"
+                        android:maxLines="2"
+                        android:text="KIAS-8"
                         android:textColor="#000000"
                         android:textSize="12sp"/>
-
-                    <ImageView
-                        android:layout_width="15dp"
-                        android:layout_height="15dp"
-                        android:layout_centerVertical="true"
-                        android:layout_toLeftOf="@id/busETATextView"
-                        android:layout_toStartOf="@id/busETATextView"
-                        android:src="@drawable/ic_rss_feed_orange"/>
 
                     <TextView
                         android:id="@+id/busETATextView"
@@ -141,6 +135,14 @@
                         android:text="13 Min"
                         android:textColor="#000000"
                         android:textSize="12sp"/>
+
+                    <ImageView
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_centerVertical="true"
+                        android:layout_toLeftOf="@id/busETATextView"
+                        android:layout_toStartOf="@id/busETATextView"
+                        android:src="@drawable/ic_rss_feed_orange"/>
 
                 </RelativeLayout>
 
@@ -186,7 +188,7 @@
                     android:maxLines="1"
                     android:text="In transit"
                     android:textColor="#000000"
-                    android:textSize="12sp"/>
+                    android:textSize="14sp"/>
 
             </LinearLayout>
 
@@ -202,13 +204,13 @@
                     android:layout_height="wrap_content">
 
                     <ImageView
-                        android:id="@+id/waitForRideImageView"
+                        android:id="@+id/rideTheBusImageView"
                         android:layout_width="25dp"
                         android:layout_height="25dp"
                         android:layout_alignParentLeft="true"
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
-                        android:src="@drawable/ic_access_time_black"/>
+                        android:src="@drawable/ic_airline_seat_recline_normal_black"/>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -216,9 +218,9 @@
                         android:layout_centerVertical="true"
                         android:layout_marginLeft="10dp"
                         android:layout_marginStart="10dp"
-                        android:layout_toEndOf="@id/waitForRideImageView"
-                        android:layout_toRightOf="@id/waitForRideImageView"
-                        android:text="Wait"
+                        android:layout_toEndOf="@id/rideTheBusImageView"
+                        android:layout_toRightOf="@id/rideTheBusImageView"
+                        android:text="Ride the bus"
                         android:textColor="#000000"
                         android:textSize="12sp"/>
 
@@ -239,7 +241,7 @@
                         android:background="@drawable/white_rounded_background_borderless"
                         android:ellipsize="end"
                         android:maxLines="1"
-                        android:text="Ride for 17 stops:"
+                        android:text="17 stops"
                         android:textColor="#000000"
                         android:textSize="12sp"/>
 
@@ -292,6 +294,7 @@
                     android:src="@drawable/ic_flag_black"/>
 
                 <TextView
+                    android:id="@+id/destinationBusStopNameTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
@@ -300,7 +303,7 @@
                     android:maxLines="1"
                     android:text="Kempegowda International Airport"
                     android:textColor="#000000"
-                    android:textSize="12sp"/>
+                    android:textSize="14sp"/>
 
             </LinearLayout>
 

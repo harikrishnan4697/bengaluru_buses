@@ -1,6 +1,8 @@
 package com.bangalorebuses;
 
-class BusStop
+import java.io.Serializable;
+
+class BusStop implements Serializable
 {
     private String busStopName;
     private String busStopLat;

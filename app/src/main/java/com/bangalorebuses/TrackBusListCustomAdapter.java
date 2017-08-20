@@ -83,7 +83,15 @@ class TrackBusListCustomAdapter extends BaseAdapter
         holder.busRouteNumberTextView.setText(buses.get(position).getBusRoute().getBusRouteNumber());
 
         String busETA;
-        if (!buses.get(position).isDue())
+        if (buses.get(position).isDue())
+        {
+            busETA = "due";
+        }
+        else if (buses.get(position).getBusRouteOrder() == 1)
+        {
+            busETA = "at origin";
+        }
+        else
         {
             if (buses.get(position).getBusETA() >= 60)
             {
@@ -95,10 +103,7 @@ class TrackBusListCustomAdapter extends BaseAdapter
                 busETA = buses.get(position).getBusETA() + " min";
             }
         }
-        else
-        {
-            busETA = "due";
-        }
+
         holder.busETATextView.setText(busETA);
         holder.currentlyNearTextView.setText("Currently near - " + buses.get(position).getBusCurrentlyNearBusStop());
         holder.busRegistrationNumberTextView.setText("Registration number - " + buses.get(position).getBusRegistrationNumber());

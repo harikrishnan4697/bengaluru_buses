@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -42,6 +43,7 @@ public class TripPlannerFragment extends Fragment implements TripPlannerHelper
     private int numberOfDirectTripQueriesMade = 0;
     private ListView listView;
     private ProgressBar progressBar;
+    private DirectTrip fastestDirectTrip;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -92,7 +94,8 @@ public class TripPlannerFragment extends Fragment implements TripPlannerHelper
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
-        findDirectRoutes("Dodda Nekkundi", "EMC2");
+        originBusStop = new BusStop();
+        destinationBusStop = new BusStop();
     }
 
     private void searchOrigin()
@@ -118,6 +121,11 @@ public class TripPlannerFragment extends Fragment implements TripPlannerHelper
         originBusStop = tempDestinationBusStop;
 
         updateSearchButtonText();
+
+        if (originBusStop.getBusStopName() != null && destinationBusStop.getBusStopName() != null)
+        {
+            findDirectRoutes(originBusStop.getBusStopName(), destinationBusStop.getBusStopName());
+        }
     }
 
     private void updateSearchButtonText()
@@ -143,11 +151,17 @@ public class TripPlannerFragment extends Fragment implements TripPlannerHelper
             }
 
             updateSearchButtonText();
+
+            if (originBusStop.getBusStopName() != null && destinationBusStop.getBusStopName() != null)
+            {
+                findDirectRoutes(originBusStop.getBusStopName(), destinationBusStop.getBusStopName());
+            }
         }
     }
 
     private void findDirectRoutes(String originBusStopName, String destinationBusStopName)
     {
+        //listView.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
         getDirectRoutesBetweenStops = new GetDirectRoutesBetweenStops();
         getDirectRoutesBetweenStops.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
@@ -164,7 +178,7 @@ public class TripPlannerFragment extends Fragment implements TripPlannerHelper
         else
         {
             progressBar.setVisibility(View.GONE);
-            Toast.makeText(getActivity(), "There don't seem to be any direct routes...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "There aren't any direct routes...", Toast.LENGTH_SHORT).show();
             //TODO No Direct Trips Found
         }
     }
@@ -175,11 +189,13 @@ public class TripPlannerFragment extends Fragment implements TripPlannerHelper
         numberOfDirectTripQueriesMade = 0;
         numberOfDirectTripBusesFound = 0;
         directTripsToQuery = directTrips;
+        this.directTrips.clear();
 
-        for (; numberOfDirectTripQueriesMade < 10; numberOfDirectTripQueriesMade++)
+        for (; numberOfDirectTripQueriesMade < 20; numberOfDirectTripQueriesMade++)
         {
             if (numberOfDirectTripQueriesMade < directTripsToQuery.size())
             {
+                //Log.i("TripPlanner", "Querying " + directTripsToQuery.get(numberOfDirectTripQueriesMade).getRoute().getBusRouteNumber());
                 new GetBusesEnDirectRouteTask(this, directTripsToQuery.get(numberOfDirectTripQueriesMade)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             }
         }
@@ -188,10 +204,11 @@ public class TripPlannerFragment extends Fragment implements TripPlannerHelper
     @Override
     public void onBusesEnDirectRouteFound(String errorMessage, DirectTrip directTrip)
     {
+        //Log.i("TripPlanner", directTrip.getRoute().getBusRouteNumber() + " queried. " + numberOfDirectTripBusesFound + "/" + numberOfDirectTripQueriesMade + " complete.");
         numberOfDirectTripBusesFound++;
         if (errorMessage.equals(NETWORK_QUERY_NO_ERROR))
         {
-            if (directTrip.getRoute().getBusRouteBuses().size() != 0)
+            /*if (directTrip.getRoute().getBusRouteBuses().size() != 0)
             {
                 directTrip.getRoute().getBusRouteBuses().get(0).setBusETA(calculateTravelTime(
                         DbQueries.getNumberOfStopsBetweenRouteOrders(db, directTrip.getRoute().getBusRouteId(),
@@ -205,7 +222,7 @@ public class TripPlannerFragment extends Fragment implements TripPlannerHelper
 
                 directTrip.setTravelTime(travelTimeFromOriginToDestination + directTrip.getRoute().getBusRouteBuses().get(0).getBusETA());
                 directTrips.add(directTrip);
-            }
+            }*/
         }
         else
         {
@@ -217,6 +234,7 @@ public class TripPlannerFragment extends Fragment implements TripPlannerHelper
             if (numberOfDirectTripQueriesMade < directTripsToQuery.size())
             {
                 //TODO check for internet connection
+                //Log.i("TripPlanner", "Querying " + directTripsToQuery.get(numberOfDirectTripQueriesMade).getRoute().getBusRouteNumber());
                 new GetBusesEnDirectRouteTask(this, directTripsToQuery.get(numberOfDirectTripQueriesMade)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 numberOfDirectTripQueriesMade++;
             }
@@ -225,27 +243,51 @@ public class TripPlannerFragment extends Fragment implements TripPlannerHelper
         if (numberOfDirectTripBusesFound == directTripsToQuery.size())
         {
             progressBar.setVisibility(View.GONE);
-            DirectTrip fastestDirectTrip = null;
+            fastestDirectTrip = null;
             for (DirectTrip directTripToCompare : directTrips)
             {
                 if (fastestDirectTrip != null)
                 {
-                    if (directTripToCompare.getTravelTime() < fastestDirectTrip.getTravelTime())
+                    /*if (directTripToCompare.getTravelTime() != 0 &&
+                            directTripToCompare.getTravelTime() < fastestDirectTrip.getTravelTime())
                     {
                         fastestDirectTrip = directTripToCompare;
-                    }
+                    }*/
                 }
                 else
                 {
-                    fastestDirectTrip = directTripToCompare;
+                    /*if (directTripToCompare.getTravelTime() != 0)
+                    {
+                        fastestDirectTrip = directTripToCompare;
+                    }*/
                 }
             }
 
             ArrayList<DirectTrip> directTripsToDisplay = new ArrayList<>();
-            directTripsToDisplay.add(fastestDirectTrip);
-
-            TripPlannerDirectTripListAdapter adapter = new TripPlannerDirectTripListAdapter(getActivity(), directTripsToDisplay);
-            listView.setAdapter(adapter);
+            if (fastestDirectTrip != null)
+            {
+                directTripsToDisplay.add(fastestDirectTrip);
+                TripPlannerDirectTripListAdapter adapter = new TripPlannerDirectTripListAdapter(getActivity(), directTripsToDisplay);
+                listView.setVisibility(View.VISIBLE);
+                listView.setAdapter(adapter);
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+                {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+                    {
+                        Intent directTripDetailsIntent = new Intent(getContext(), DirectTripDetailsActivity.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable("DIRECT_TRIP", fastestDirectTrip);
+                        directTripDetailsIntent.putExtras(bundle);
+                        startActivity(directTripDetailsIntent);
+                    }
+                });
+            }
+            else
+            {
+                // TODO No routes right now
+                Toast.makeText(getActivity(), "There aren't any direct routes right now", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -320,15 +362,15 @@ public class TripPlannerFragment extends Fragment implements TripPlannerHelper
         {
             for (DirectTrip directTrip : directTrips[0])
             {
-                directTrip.setRoute(DbQueries.getRouteDetails(db, directTrip.getRoute().getBusRouteId()));
+                //directTrip.setRoute(DbQueries.getRouteDetails(db, directTrip.getRoute().getBusRouteId()));
 
                 directTrip.setOriginStop(DbQueries.getStopDetails(db, directTrip.getOriginStop().getBusStopId()));
-                directTrip.getOriginStop().setBusStopRouteOrder(DbQueries.getStopRouteOrder(db, directTrip.getRoute().getBusRouteId(),
-                        directTrip.getOriginStop().getBusStopId()));
+                /*directTrip.getOriginStop().setBusStopRouteOrder(DbQueries.getStopRouteOrder(db, directTrip.getRoute().getBusRouteId(),
+                        directTrip.getOriginStop().getBusStopId()));*/
 
                 directTrip.setDestinationStop(DbQueries.getStopDetails(db, directTrip.getDestinationStop().getBusStopId()));
-                directTrip.getDestinationStop().setBusStopRouteOrder(DbQueries.getStopRouteOrder(db, directTrip.getRoute().getBusRouteId(),
-                        directTrip.getDestinationStop().getBusStopId()));
+                /*directTrip.getDestinationStop().setBusStopRouteOrder(DbQueries.getStopRouteOrder(db, directTrip.getRoute().getBusRouteId(),
+                        directTrip.getDestinationStop().getBusStopId()));*/
             }
 
             return directTrips[0];
