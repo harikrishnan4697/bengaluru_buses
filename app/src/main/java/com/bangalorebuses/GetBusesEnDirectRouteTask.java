@@ -2,28 +2,39 @@ package com.bangalorebuses;
 
 import android.os.AsyncTask;
 
+import org.json.JSONArray;
+
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 
+import static com.bangalorebuses.Constants.NETWORK_QUERY_IO_EXCEPTION;
+import static com.bangalorebuses.Constants.NETWORK_QUERY_JSON_EXCEPTION;
 import static com.bangalorebuses.Constants.NETWORK_QUERY_NO_ERROR;
+import static com.bangalorebuses.Constants.NETWORK_QUERY_REQUEST_TIMEOUT_EXCEPTION;
+import static com.bangalorebuses.Constants.NETWORK_QUERY_URL_EXCEPTION;
 
 class GetBusesEnDirectRouteTask extends AsyncTask<Void, Void, Void>
 {
-    private DirectTrip directTrip;
+    private BusRoute busRoute;
     private String errorMessage = NETWORK_QUERY_NO_ERROR;
     private TripPlannerHelper caller;
     private ArrayList<Bus> buses = new ArrayList<>();
 
-    GetBusesEnDirectRouteTask(TripPlannerHelper caller, DirectTrip directTrip)
+    GetBusesEnDirectRouteTask(TripPlannerHelper caller, BusRoute busRoute)
     {
-        this.directTrip = directTrip;
+        this.busRoute = busRoute;
         this.caller = caller;
     }
 
     @Override
     protected Void doInBackground(Void... params)
     {
-        /*String requestBody = "routeNO=" + directTrip.getRoute().getBusRouteNumber() +
-                "&direction=" + directTrip.getRoute().getBusRouteDirection();
+        String requestBody = "routeNO=" + busRoute.getBusRouteNumber() +
+                "&direction=" + busRoute.getBusRouteDirection();
         URL busesEnRouteURL;
         try
         {
@@ -75,7 +86,7 @@ class GetBusesEnDirectRouteTask extends AsyncTask<Void, Void, Void>
             for (int i = 0; i < jsonArray.length(); i++)
             {
                 if (Integer.parseInt(jsonArray.getJSONArray(i).getString(12).replace("routeorder:", "")) <=
-                        directTrip.getOriginStop().getBusStopRouteOrder())
+                        busRoute.getTripPlannerOriginBusStop().getBusStopRouteOrder())
                 {
                     for (int j = 0; j < jsonArray.length(); j++)
                     {
@@ -83,7 +94,7 @@ class GetBusesEnDirectRouteTask extends AsyncTask<Void, Void, Void>
                         {
                             Bus bus = new Bus();
                             if (Integer.parseInt(jsonArray.getJSONArray(i + j).getString(12).replace("routeorder:", ""))
-                                    == directTrip.getOriginStop().getBusStopRouteOrder())
+                                    == busRoute.getTripPlannerOriginBusStop().getBusStopRouteOrder())
                             {
                                 bus.setDue(true);
                             }
@@ -92,7 +103,7 @@ class GetBusesEnDirectRouteTask extends AsyncTask<Void, Void, Void>
                             bus.setBusLong(nearestLatLong.substring(nearestLatLong.indexOf(",") + 1, nearestLatLong.length() - 1));
                             bus.setBusRegistrationNumber(jsonArray.getJSONArray(i + j).getString(0).replace("vehicleno:", ""));
                             bus.setBusRouteOrder(Integer.parseInt(jsonArray.getJSONArray(i + j).getString(12).replace("routeorder:", "")));
-                            bus.setBusRoute(directTrip.getRoute());
+                            bus.setBusRoute(busRoute);
                             buses.add(bus);
                         }
                         else
@@ -107,7 +118,7 @@ class GetBusesEnDirectRouteTask extends AsyncTask<Void, Void, Void>
         catch (org.json.JSONException e)
         {
             errorMessage = NETWORK_QUERY_JSON_EXCEPTION;
-        }*/
+        }
         return null;
     }
 
@@ -115,7 +126,7 @@ class GetBusesEnDirectRouteTask extends AsyncTask<Void, Void, Void>
     protected void onPostExecute(Void aVoid)
     {
         super.onPostExecute(aVoid);
-        //directTrip.getRoute().setBusRouteBuses(buses);
-        caller.onBusesEnDirectRouteFound(errorMessage, directTrip);
+        busRoute.setBusRouteBuses(buses);
+        caller.onBusesEnDirectRouteFound(errorMessage, busRoute);
     }
 }

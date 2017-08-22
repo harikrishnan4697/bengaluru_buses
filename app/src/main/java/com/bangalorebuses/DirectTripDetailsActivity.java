@@ -217,6 +217,6 @@ public class DirectTripDetailsActivity extends AppCompatActivity
 
     private void setDestinationBusStopDetails()
     {
-        destinationBusStopNameTextView.setText(directTrip.getDestinationStop().getBusStopName());
+        destinationBusStopNameTextView.setText(directTrip.getDestinationBusStopName());
     }
 }

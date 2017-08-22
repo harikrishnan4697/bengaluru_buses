@@ -35,17 +35,28 @@ class DirectTripsRecyclerViewAdapter extends RecyclerView.Adapter<DirectTripsRec
     @Override
     public void onBindViewHolder(DirectTripsViewHolder directTripsViewHolder, int i)
     {
-        directTripsViewHolder.tripDurationTextView.setText(directTrips.get(i).getShortestTravelTime());
+        String travelTimeAsText;
+        if (directTrips.get(i).getShortestTravelTime() >= 60)
+        {
+            int hours = directTrips.get(i).getShortestTravelTime() / 60;
+            travelTimeAsText = hours + " hr " + directTrips.get(i).getShortestTravelTime() % 60 + " min";
+        }
+        else
+        {
+            travelTimeAsText = directTrips.get(i).getShortestTravelTime() + " min";
+        }
+
+        directTripsViewHolder.tripDurationTextView.setText(travelTimeAsText);
 
         if (directTrips.get(i).getOriginStop().getBusStopDirectionName().contains(")"))
         {
-            directTripsViewHolder.tripDurationTextView.setText("From " + directTrips.get(i).getOriginStop().getBusStopName()
+            directTripsViewHolder.tripOriginBusStopNameTextView.setText("From " + directTrips.get(i).getOriginStop().getBusStopName()
                     + " " + directTrips.get(i).getOriginStop().getBusStopDirectionName().substring(0,
                     directTrips.get(i).getOriginStop().getBusStopDirectionName().indexOf(")") + 1));
         }
         else
         {
-            directTripsViewHolder.tripDurationTextView.setText("From " + directTrips.get(i).getOriginStop().getBusStopName()
+            directTripsViewHolder.tripOriginBusStopNameTextView.setText("From " + directTrips.get(i).getOriginStop().getBusStopName()
                     + " " + directTrips.get(i).getOriginStop().getBusStopDirectionName());
         }
 
@@ -80,7 +91,7 @@ class DirectTripsRecyclerViewAdapter extends RecyclerView.Adapter<DirectTripsRec
         {
             super(itemView);
             cardView = (CardView) itemView.findViewById(R.id.directTripCardView);
-            tripDurationTextView = (TextView) itemView.findViewById(R.id.tripDurationTextView);
+            tripDurationTextView = (TextView) itemView.findViewById(R.id.travelTimeTextView);
             tripOriginBusStopNameTextView = (TextView) itemView.findViewById(R.id.tripOriginStopNameTextView);
             busArrivalTimingsTextView = (TextView) itemView.findViewById(R.id.busArrivalTimingsTextView);
             itemView.setOnClickListener(this);

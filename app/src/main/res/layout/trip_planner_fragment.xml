@@ -362,6 +362,15 @@
         android:animateLayoutChanges="true"
         android:visibility="visible"/>-->
 
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/origin_destination_linear_layout"
+        android:layout_centerHorizontal="true"
+        android:background="@color/colorDefaultBackground"
+        android:orientation="vertical"/>
+
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
@@ -370,12 +379,5 @@
         android:layout_centerInParent="true"
         android:layout_margin="16dp"
         android:visibility="gone"/>
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/origin_destination_linear_layout"
-        android:orientation="vertical"/>
 
 </RelativeLayout>

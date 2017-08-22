@@ -164,9 +164,11 @@ class DbQueries
             BusStop destinationStop = new BusStop();
             BusRoute busRoute = new BusRoute();
 
-            busRoute.setBusRouteId(cursor.getInt(0));
             originStop.setBusStopId(cursor.getInt(1));
             destinationStop.setBusStopId(cursor.getInt(2));
+            busRoute.setBusRouteId(cursor.getInt(0));
+            busRoute.setTripPlannerOriginBusStop(originStop);
+            busRoute.setTripPlannerDestinationBusStop(destinationStop);
 
             for (int i = 0; i < directTrips.size(); i++)
             {
@@ -184,7 +186,7 @@ class DbQueries
 
                 directTrip.setOriginStop(originStop);
                 directTrip.addBusRoute(busRoute);
-                directTrip.setDestinationStop(destinationStop);
+                directTrip.setDestinationBusStopName(destinationStopName);
 
                 directTrips.add(directTrip);
             }

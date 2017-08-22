@@ -5,9 +5,9 @@
     android:id="@+id/directTripCardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginLeft="16dp"
-    android:layout_marginRight="16dp"
-    android:layout_marginTop="16dp"
+    android:layout_marginLeft="10dp"
+    android:layout_marginRight="10dp"
+    android:layout_marginTop="10dp"
     android:clickable="true"
     app:cardCornerRadius="5dp">
 
@@ -25,7 +25,7 @@
             android:layout_alignParentTop="true">
 
             <TextView
-                android:id="@+id/tripDurationTextView"
+                android:id="@+id/travelTimeTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
@@ -45,11 +45,13 @@
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="10dp"
                 android:layout_marginStart="10dp"
-                android:layout_toEndOf="@id/tripDurationTextView"
-                android:layout_toRightOf="@id/tripDurationTextView"
+                android:layout_toEndOf="@id/travelTimeTextView"
+                android:layout_toRightOf="@id/travelTimeTextView"
+                android:ellipsize="end"
+                android:maxLines="2"
                 android:text="From Dodda Nekkundi (towards - Marathahalli Bridge)"
                 android:textColor="#000000"
-                android:textSize="12sp"/>
+                android:textSize="14sp"/>
 
         </RelativeLayout>
 
@@ -61,8 +63,8 @@
 
             <ImageView
                 android:id="@+id/busIcon"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
@@ -81,7 +83,7 @@
                 android:maxLines="1"
                 android:text="Bus arriving in:"
                 android:textColor="#000000"
-                android:textSize="12sp"/>
+                android:textSize="14sp"/>
 
             <TextView
                 android:id="@+id/busArrivalTimingsTextView"
@@ -96,11 +98,11 @@
                 android:maxLines="1"
                 android:text="Due, 20 min, 1 hr 17 min"
                 android:textColor="#000000"
-                android:textSize="12sp"/>
+                android:textSize="14sp"/>
 
             <ImageView
-                android:layout_width="15dp"
-                android:layout_height="15dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:layout_centerVertical="true"
                 android:layout_toLeftOf="@id/busArrivalTimingsTextView"
                 android:layout_toStartOf="@id/busArrivalTimingsTextView"

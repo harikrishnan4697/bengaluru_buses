@@ -22,6 +22,9 @@ class BusRoute implements Serializable
     private ArrayList<String> busRouteDepartureTimings;
     private ArrayList<Bus> busRouteBuses;
     private int selectedBusStopRouteOrder;
+    private BusStop tripPlannerOriginBusStop = new BusStop();
+    private BusStop tripPlannerDestinationBusStop = new BusStop();
+    private int shortestOriginToDestinationTravelTime;
 
     public int getBusRouteId()
     {
@@ -111,5 +114,35 @@ class BusRoute implements Serializable
     public void setSelectedBusStopRouteOrder(int selectedBusStopRouteOrder)
     {
         this.selectedBusStopRouteOrder = selectedBusStopRouteOrder;
+    }
+
+    public BusStop getTripPlannerOriginBusStop()
+    {
+        return tripPlannerOriginBusStop;
+    }
+
+    public void setTripPlannerOriginBusStop(BusStop tripPlannerOriginBusStop)
+    {
+        this.tripPlannerOriginBusStop = tripPlannerOriginBusStop;
+    }
+
+    public BusStop getTripPlannerDestinationBusStop()
+    {
+        return tripPlannerDestinationBusStop;
+    }
+
+    public void setTripPlannerDestinationBusStop(BusStop tripPlannerDestinationBusStop)
+    {
+        this.tripPlannerDestinationBusStop = tripPlannerDestinationBusStop;
+    }
+
+    public int getShortestOriginToDestinationTravelTime()
+    {
+        return shortestOriginToDestinationTravelTime;
+    }
+
+    public void setShortestOriginToDestinationTravelTime(int shortestOriginToDestinationTravelTime)
+    {
+        this.shortestOriginToDestinationTravelTime = shortestOriginToDestinationTravelTime;
     }
 }
