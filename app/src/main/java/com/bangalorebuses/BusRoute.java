@@ -22,8 +22,8 @@ class BusRoute implements Serializable
     private ArrayList<String> busRouteDepartureTimings;
     private ArrayList<Bus> busRouteBuses;
     private int selectedBusStopRouteOrder;
-    private BusStop tripPlannerOriginBusStop = new BusStop();
-    private BusStop tripPlannerDestinationBusStop = new BusStop();
+    private BusStop tripPlannerOriginBusStop;
+    private BusStop tripPlannerDestinationBusStop;
     private int shortestOriginToDestinationTravelTime;
 
     public int getBusRouteId()

@@ -1,207 +1,180 @@
 package com.bangalorebuses;
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.AsyncTask;
+import static com.bangalorebuses.Constants.db;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Calendar;
-
-import static com.bangalorebuses.Constants.NETWORK_QUERY_NO_ERROR;
-
-class DirectTrip implements Serializable, TripPlannerHelper
+class DirectTrip extends Trip
 {
-    private BusStop originStop = new BusStop();
-    private String destinationBusStopName;
-    private ArrayList<BusRoute> busRoutes = new ArrayList<>();
-    private int shortestTravelTime;
-    private String nextThreeBusArrivals;
-    private int numberOfBusRoutesQueried;
-    private int numberOfBusRouteQueriesComplete;
-    private DirectTripHelper directTripHelper;
-    private ArrayList<BusRoute> busRoutesWithBuses = new ArrayList<>();
-
-    /**
-     * This method is used to check if the user's device
-     * has a Wi-Fi or Cellular data connection.
-     *
-     * @return boolean This returns true or false based on the status
-     * of the Wi-Fi and Cellular data connection.
-     */
-    private boolean isNetworkAvailable(Context context)
-    {
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null;
-    }
-
-    public BusStop getOriginStop()
-    {
-        return originStop;
-    }
-
-    public void setOriginStop(BusStop originStop)
-    {
-        this.originStop = originStop;
-    }
-
-    public String getDestinationBusStopName()
-    {
-        return destinationBusStopName;
-    }
-
-    public void setDestinationBusStopName(String destinationBusStopName)
-    {
-        this.destinationBusStopName = destinationBusStopName;
-    }
-
-    public ArrayList<BusRoute> getBusRoutes()
-    {
-        return busRoutes;
-    }
-
-    public void setBusRoutes(ArrayList<BusRoute> busRoutes)
-    {
-        this.busRoutes = busRoutes;
-    }
-
-    public void addBusRoute(BusRoute busRoute)
-    {
-        this.busRoutes.add(busRoute);
-    }
-
-    public int getShortestTravelTime()
-    {
-        return shortestTravelTime;
-    }
-
-    public void setShortestTravelTime(int shortestTravelTime)
-    {
-        this.shortestTravelTime = shortestTravelTime;
-    }
-
-    public String getNextThreeBusArrivals()
-    {
-        return nextThreeBusArrivals;
-    }
-
-    public void setNextThreeBusArrivals(String nextThreeBusArrivals)
-    {
-        this.nextThreeBusArrivals = nextThreeBusArrivals;
-    }
-
-    public int getBusesOnBusRoutes(DirectTripHelper directTripHelper, Context context)
-    {
-        this.directTripHelper = directTripHelper;
-        if (isNetworkAvailable(context))
-        {
-            numberOfBusRoutesQueried = 0;
-            busRoutesWithBuses.clear();
-            numberOfBusRouteQueriesComplete = 0;
-
-            for (; numberOfBusRoutesQueried < 10; numberOfBusRoutesQueried++)
-            {
-                if (numberOfBusRoutesQueried < busRoutes.size())
-                {
-                    new GetBusesEnDirectRouteTask(this, busRoutes.get(numberOfBusRoutesQueried))
-                            .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                }
-                else
-                {
-                    break;
-                }
-            }
-        }
-        else
-        {
-            return -1;
-        }
-
-        return 0;
-    }
-
     @Override
-    public void onBusesEnDirectRouteFound(String errorMessage, BusRoute busRoute)
+    public void showTrip(TripsRecyclerViewAdapter.TripsViewHolder holder)
     {
-        numberOfBusRouteQueriesComplete++;
+        holder.tripDurationTextView.setText(getTravelTime(getBusRoutes().get(0).getShortestOriginToDestinationTravelTime()));
 
-        if (errorMessage.equals(NETWORK_QUERY_NO_ERROR))
+        if (getOriginBusStop().getBusStopDirectionName().contains(")"))
         {
-            busRoutesWithBuses.add(busRoute);
+            holder.tripOriginBusStopNameTextView.setText("From " + getOriginBusStop().getBusStopName() +
+                    " " + getOriginBusStop().getBusStopDirectionName().substring(0,
+                    getOriginBusStop().getBusStopDirectionName().indexOf(")") + 1));
         }
         else
         {
-            // TODO Handle error
+            holder.tripDurationTextView.setText("From " + getOriginBusStop().getBusStopName() +
+                    " " + getOriginBusStop().getBusStopDirectionName());
         }
 
-        synchronized (this)
+        if (getBusRoutes().get(0).getBusRouteNumber().length() > 5 &&
+                getBusRoutes().get(0).getBusRouteNumber().contains("KIAS-"))
         {
-            if (numberOfBusRoutesQueried < busRoutes.size())
-            {
-                new GetBusesEnDirectRouteTask(this, busRoutes.get(numberOfBusRoutesQueried))
-                        .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                numberOfBusRoutesQueried++;
-            }
+            holder.busRouteServiceTypeImageView.setImageResource(R.drawable.ic_flight_blue);
+        }
+        else if (getBusRoutes().get(0).getBusRouteNumber().length() > 1 &&
+                getBusRoutes().get(0).getBusRouteNumber().substring(0, 2).equals("V-"))
+        {
+            holder.busRouteServiceTypeImageView.setImageResource(R.drawable.ic_directions_bus_ac);
+        }
+        else if (getBusRoutes().get(0).getBusRouteNumber().contains("MF-"))
+        {
+            holder.busRouteServiceTypeImageView.setImageResource(R.drawable.ic_directions_bus_special);
+        }
+        else
+        {
+            holder.busRouteServiceTypeImageView.setImageResource(R.drawable.ic_directions_bus_ordinary);
         }
 
-        if (numberOfBusRouteQueriesComplete == numberOfBusRoutesQueried)
-        {
-            busRoutes = busRoutesWithBuses;
+        holder.busRouteNumberTextView.setText(getBusRoutes().get(0).getBusRouteNumber());
 
-            if (directTripHelper != null)
+        String nextThreeBuses = getETAAsString(getBusRoutes().get(0).getBusRouteBuses().get(0));
+        for (int busCount = 1; busCount < 3; busCount++)
+        {
+            if (busCount < getBusRoutes().get(0).getBusRouteBuses().size())
             {
-                directTripHelper.onDirectTripBusesEnRoutesFound(this);
+                nextThreeBuses = nextThreeBuses + ", " + getETAAsString(getBusRoutes().get(0).getBusRouteBuses().get(busCount));
             }
+            else
+            {
+                break;
+            }
+        }
+        holder.busETAsTextView.setText(nextThreeBuses);
+
+        holder.numberOfStopsToTravelTextView.setText("Ride the bus for " + String.valueOf(DbQueries.getNumberOfStopsBetweenRouteOrders(db,
+                getBusRoutes().get(0).getBusRouteId(), getBusRoutes().get(0).getTripPlannerOriginBusStop()
+                        .getBusStopRouteOrder(), getBusRoutes().get(0).getTripPlannerDestinationBusStop()
+                        .getBusStopRouteOrder())) + " stops");
+    }
+
+    private String getETAAsString(Bus bus)
+    {
+        if (!bus.isDue())
+        {
+            String travelTime;
+
+            if (bus.getBusETA() >= 60)
+            {
+                int hours = bus.getBusETA() / 60;
+                travelTime = hours + " hr " + bus.getBusETA() % 60 + " min";
+            }
+            else
+            {
+                travelTime = bus.getBusETA() + " min";
+            }
+            return travelTime;
+        }
+        else
+        {
+            return "due";
         }
     }
 
-    private int calculateTravelTime(int numberOfBusStopsToTravel, String routeNumber)
+    private String getTravelTime(int travelTimeInMins)
     {
-        Calendar calendar = Calendar.getInstance();
-        int travelTime;
+        String travelTime;
 
-        if ((calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) || (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY))
+        if (travelTimeInMins >= 60)
         {
-            // Check if the bus is an airport shuttle (airport shuttles take longer to travel
-            // from one bus stop to another as they don't stop at all bus stops)
-            if (routeNumber.contains("KIAS-"))
-            {
-                travelTime = numberOfBusStopsToTravel * 4;  // 4 Minutes to get from a bus stop to another for the airport shuttle weekends
-            }
-            else
-            {
-                travelTime = numberOfBusStopsToTravel * 2;  // 2 Minutes to get from a bus stop to another for other buses during weekends
-            }
-        }
-        else if ((calendar.get(Calendar.HOUR_OF_DAY) > 7 && calendar.get(Calendar.HOUR_OF_DAY) < 11) || (calendar.get(Calendar.HOUR_OF_DAY) > 16 && calendar.get(Calendar.HOUR_OF_DAY) < 21))
-        {
-            // Check if the bus is an airport shuttle (airport shuttles take longer to travel
-            // from one bus stop to another as they don't stop at all bus stops)
-            if (routeNumber.contains("KIAS-"))
-            {
-                travelTime = numberOfBusStopsToTravel * 5;  // 5 Minutes to get from a bus stop to another for the airport shuttle in peak-time
-            }
-            else
-            {
-                travelTime = numberOfBusStopsToTravel * 3;  // 3 Minutes to get from a bus stop to another for other buses in peak-time
-            }
+            int hours = travelTimeInMins / 60;
+            travelTime = hours + " hr " + travelTimeInMins % 60 + " min";
         }
         else
         {
-            // Check if the bus is an airport shuttle (airport shuttles take longer to travel
-            // from one bus stop to another as they don't stop at all bus stops)
-            if (routeNumber.contains("KIAS-"))
-            {
-                travelTime = numberOfBusStopsToTravel * 4;  // 4 Minutes to get from a bus stop to another for the airport shuttle
-            }
-            else
-            {
-                travelTime = (int) (numberOfBusStopsToTravel * 2.5);  // 2.5 Minutes to get from a bus stop to another for other buses
-            }
+            travelTime = travelTimeInMins + " min";
         }
-
         return travelTime;
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        /*String travelTimeAsText;
+        if (getShortestTravelTime() >= 60)
+        {
+            int hours = directTrips.get(i).getShortestTravelTime() / 60;
+            travelTimeAsText = hours + " hr " + directTrips.get(i).getShortestTravelTime() % 60 + " min";
+        }
+        else
+        {
+            travelTimeAsText = directTrips.get(i).getShortestTravelTime() + " min";
+        }
+
+        directTripsViewHolder.tripDurationTextView.setText(travelTimeAsText);
+
+        if (directTrips.get(i).getOriginStop().getBusStopDirectionName().contains(")"))
+        {
+            directTripsViewHolder.tripOriginBusStopNameTextView.setText("From " + directTrips.get(i).getOriginStop().getBusStopName()
+                    + " " + directTrips.get(i).getOriginStop().getBusStopDirectionName().substring(0,
+                    directTrips.get(i).getOriginStop().getBusStopDirectionName().indexOf(")") + 1));
+        }
+        else
+        {
+            directTripsViewHolder.tripOriginBusStopNameTextView.setText("From " + directTrips.get(i).getOriginStop().getBusStopName()
+                    + " " + directTrips.get(i).getOriginStop().getBusStopDirectionName());
+        }
+
+        String nextThreeBuses = getETAAsString(directTrips.get(i).getBusesOnDirectTrip().get(0));
+        for (int busCount = 1; busCount < 3; busCount++)
+        {
+            if (busCount < directTrips.get(i).getBusesOnDirectTrip().size())
+            {
+                nextThreeBuses = nextThreeBuses + ", " + getETAAsString(directTrips.get(i).getBusesOnDirectTrip().get(busCount));
+            }
+            else
+            {
+                break;
+            }
+        }
+        directTripsViewHolder.busArrivalTimingsTextView.setText(nextThreeBuses);
+    }
+
+    private String getETAAsString(Bus bus)
+    {
+        if (!bus.isDue())
+        {
+            String travelTime;
+
+            if (bus.getBusETA() >= 60)
+            {
+                int hours = bus.getBusETA() / 60;
+                travelTime = hours + " hr " + bus.getBusETA() % 60 + " min";
+            }
+            else
+            {
+                travelTime = bus.getBusETA() + " min";
+            }
+            return travelTime;
+        }
+        else
+        {
+            return "due";
+        }
+    }*/
 }

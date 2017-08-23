@@ -12,7 +12,7 @@ import java.util.Calendar;
 
 public class DirectTripDetailsActivity extends AppCompatActivity
 {
-    private DirectTrip directTrip;
+    private DirectTripOld directTrip;
 
     private TextView originBusStopNameTextView;
     private ImageView refreshArrivalTimingsImageView;
@@ -59,7 +59,7 @@ public class DirectTripDetailsActivity extends AppCompatActivity
 
         Intent intent = this.getIntent();
         Bundle bundle = intent.getExtras();
-        directTrip = (DirectTrip) bundle.getSerializable("DIRECT_TRIP");
+        directTrip = (DirectTripOld) bundle.getSerializable("DIRECT_TRIP");
 
         setOriginBusStopDetails();
 

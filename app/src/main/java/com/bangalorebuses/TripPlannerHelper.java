@@ -12,5 +12,5 @@ interface TripPlannerHelper
 
     void onTransitPointBusCountFound(String errorMessage, int originToTransitPointBusCount, int transitPointToDestinationBusCount, BusStop transitPoint);*/
 
-    void onBusesEnDirectRouteFound(String errorMessage, BusRoute busRoute);
+    void onBusesInServiceFound(String errorMessage, BusRoute busRoute);
 }

@@ -14,10 +14,10 @@ import java.util.ArrayList;
 class TripPlannerDirectTripListAdapter extends BaseAdapter
 {
     public Activity context;
-    private ArrayList<DirectTrip> directTrips = null;
+    private ArrayList<DirectTripOld> directTrips = null;
     private LayoutInflater inflater;
 
-    TripPlannerDirectTripListAdapter(Activity context, ArrayList<DirectTrip> directTrips)
+    TripPlannerDirectTripListAdapter(Activity context, ArrayList<DirectTripOld> directTrips)
     {
         super();
         this.context = context;

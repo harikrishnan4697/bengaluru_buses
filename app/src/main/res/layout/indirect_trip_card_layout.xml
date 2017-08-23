@@ -2,7 +2,7 @@
 <android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/directTripCardView"
+    android:id="@+id/inDirectTripCardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginLeft="10dp"
@@ -27,7 +27,7 @@
             android:layout_alignParentTop="true">
 
             <TextView
-                android:id="@+id/totalTravelDurationTextView"
+                android:id="@+id/travelTimeTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
@@ -43,14 +43,14 @@
                 android:textSize="14sp"/>
 
             <TextView
-                android:id="@+id/originBusStopNameTextView"
+                android:id="@+id/tripOriginStopNameTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="10dp"
                 android:layout_marginStart="10dp"
-                android:layout_toEndOf="@id/totalTravelDurationTextView"
-                android:layout_toRightOf="@id/totalTravelDurationTextView"
+                android:layout_toEndOf="@id/travelTimeTextView"
+                android:layout_toRightOf="@id/travelTimeTextView"
                 android:ellipsize="end"
                 android:maxLines="2"
                 android:text="From Dodda Nekkundi (towards - Marathahalli Bridge)"
@@ -66,7 +66,7 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_below="@id/tripInfoRelativeLayout"
-            android:layout_marginTop="16dp">
+            android:layout_marginTop="10dp">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -80,14 +80,13 @@
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:id="@+id/busServiceTypeImageView"
+                    android:id="@+id/busImageView"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:layout_gravity="center_vertical"
                     android:src="@drawable/ic_directions_bus_ordinary"/>
 
                 <TextView
-                    android:id="@+id/busRouteNumberTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
@@ -140,7 +139,7 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_below="@id/routeInfoRelativeLayout"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="10dp"
             android:orientation="horizontal">
 
             <ImageView

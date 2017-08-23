@@ -148,7 +148,7 @@ class DbQueries
         return departureTimings;
     }
 
-    public static ArrayList<DirectTrip> getDirectRoutesBetweenStops(SQLiteDatabase db, String originStopName, String destinationStopName)
+    public static ArrayList<Trip> getDirectTripsBetweenStops(SQLiteDatabase db, String originStopName, String destinationStopName)
     {
         Cursor cursor = db.rawQuery("select distinct sub1.RouteId, sub1.StopId," +
                 " sub2.StopId from (select RouteStops.RouteId,RouteStops.StopId, RouteStops.StopRouteOrder" +
@@ -156,40 +156,26 @@ class DbQueries
                 " join (select RouteStops.RouteId, RouteStops.StopId, RouteStops.StopRouteOrder from Stops join RouteStops where" +
                 " Stops.StopName = '" + destinationStopName + "' and Stops.StopId = RouteStops.StopId)sub2 where" +
                 " sub1.RouteId = sub2.RouteId and sub1.StopRouteOrder < sub2.StopRouteOrder", null);
-        ArrayList<DirectTrip> directTrips = new ArrayList<>();
+        ArrayList<Trip> directTrips = new ArrayList<>();
         while (cursor.moveToNext())
         {
-            boolean directRouteWithOriginStopExists = false;
             BusStop originStop = new BusStop();
             BusStop destinationStop = new BusStop();
             BusRoute busRoute = new BusRoute();
+            DirectTrip directTrip = new DirectTrip();
 
             originStop.setBusStopId(cursor.getInt(1));
             destinationStop.setBusStopId(cursor.getInt(2));
+
             busRoute.setBusRouteId(cursor.getInt(0));
             busRoute.setTripPlannerOriginBusStop(originStop);
             busRoute.setTripPlannerDestinationBusStop(destinationStop);
 
-            for (int i = 0; i < directTrips.size(); i++)
-            {
-                if (directTrips.get(i).getOriginStop().getBusStopId() == originStop.getBusStopId())
-                {
-                    directTrips.get(i).addBusRoute(busRoute);
-                    directRouteWithOriginStopExists = true;
-                    break;
-                }
-            }
+            directTrip.setOriginBusStop(originStop);
+            directTrip.addBusRoute(busRoute);
+            directTrip.setDestinationBusStopName(destinationStopName);
 
-            if (!directRouteWithOriginStopExists)
-            {
-                DirectTrip directTrip = new DirectTrip();
-
-                directTrip.setOriginStop(originStop);
-                directTrip.addBusRoute(busRoute);
-                directTrip.setDestinationBusStopName(destinationStopName);
-
-                directTrips.add(directTrip);
-            }
+            directTrips.add(directTrip);
         }
         cursor.close();
         return directTrips;

@@ -12,18 +12,18 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 
-import org.json.JSONArray;
-
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Stack;
 
 import static android.app.Activity.RESULT_OK;
+import static android.content.Context.MODE_APPEND;
 
-public class BusTrackerFragment extends Fragment implements NetworkingHelper
+public class BusTrackerFragment extends Fragment
 {
     private Button busNumberSelectionButton;
     private ListView recentSearchesListView;
@@ -106,7 +106,7 @@ public class BusTrackerFragment extends Fragment implements NetworkingHelper
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                 {
-                    Intent trackBusActivityIntent = new Intent(getContext(), SearchActivity.class);
+                    Intent trackBusActivityIntent = new Intent(getContext(), TrackBusActivity.class);
                     trackBusActivityIntent.putExtra("ROUTE_NUMBER", parent.getItemAtPosition(position).toString());
                     startActivity(trackBusActivityIntent);
                 }
@@ -123,21 +123,21 @@ public class BusTrackerFragment extends Fragment implements NetworkingHelper
     {
         if (resultCode == RESULT_OK && requestCode == Constants.SEARCH_REQUEST_CODE)
         {
+            try
+            {
+                FileOutputStream fileOutputStream = getActivity().openFileOutput(Constants.ROUTE_SEARCH_HISTORY_FILENAME, MODE_APPEND);
+                fileOutputStream.write((data.getStringExtra("ROUTE_NUMBER") + "\n").getBytes());
+                fileOutputStream.close();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+
             Intent trackBusActivityIntent = new Intent(getContext(), TrackBusActivity.class);
             trackBusActivityIntent.putExtra("ROUTE_NUMBER", data.getStringExtra("ROUTE_NUMBER"));
             startActivity(trackBusActivityIntent);
         }
-    }
-
-    public void onBusStopsFound(boolean isError, JSONArray busStopsArray)
-    {
-
-    }
-
-    @Override
-    public void onBusesEnRouteFound(String errorMessage, int busStopRouteOrder, ArrayList<Bus> buses, BusRoute busRoute)
-    {
-
     }
 
     @Override

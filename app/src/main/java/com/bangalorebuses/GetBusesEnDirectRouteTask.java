@@ -127,6 +127,6 @@ class GetBusesEnDirectRouteTask extends AsyncTask<Void, Void, Void>
     {
         super.onPostExecute(aVoid);
         busRoute.setBusRouteBuses(buses);
-        caller.onBusesEnDirectRouteFound(errorMessage, busRoute);
+        caller.onBusesInServiceFound(errorMessage, busRoute);
     }
 }

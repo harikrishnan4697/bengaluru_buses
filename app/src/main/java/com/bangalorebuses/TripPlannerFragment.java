@@ -8,13 +8,15 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -29,7 +31,7 @@ import static com.bangalorebuses.Constants.SEARCH_START_BUS_STOP_REQUEST_CODE;
 import static com.bangalorebuses.Constants.SEARCH_TYPE_BUS_STOP;
 import static com.bangalorebuses.Constants.db;
 
-public class TripPlannerFragment extends Fragment implements DirectTripHelper
+public class TripPlannerFragment extends Fragment implements TripHelper
 {
     private Animation swapAnimation;
     private BusStop originBusStop = new BusStop();
@@ -37,12 +39,11 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper
     private ImageView swapDirectionImageView;
     private Button searchOriginButton;
     private Button searchDestinationButton;
-    private GetDirectRoutesBetweenStops getDirectRoutesBetweenStops;
-    private GetDirectTripDetails getDirectTripDetails;
-    private ListView listView;
+    private GetTripsBetweenStops getTripsBetweenStops;
+    private GetTripDetails getTripDetails;
     private ProgressBar progressBar;
     private RecyclerView recyclerView;
-    private ArrayList<DirectTrip> directTripsToDisplay = new ArrayList<>();
+    private ArrayList<Trip> tripsToDisplay = new ArrayList<>();
     private int numberOfDirectTripsFound = 0;
     private int numberOfDirectTripRouteBusesFound = 0;
 
@@ -85,7 +86,6 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper
                 searchDestination();
             }
         });
-        listView = (ListView) view.findViewById(R.id.listView);
         progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
 
@@ -93,11 +93,62 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        MenuInflater menuInflater = getActivity().getMenuInflater();
+        menuInflater.inflate(R.menu.trip_planner_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case R.id.action_refresh:
+                if (originBusStop.getBusStopName() != null && destinationBusStop.getBusStopName() != null)
+                {
+                    findDirectTrips(originBusStop.getBusStopName(), destinationBusStop.getBusStopName());
+                }
+                break;
+            case R.id.action_clear:
+                clearAll();
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return true;
+    }
+
+    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
+        setHasOptionsMenu(true);
+        clearAll();
+    }
+
+    private void clearAll()
+    {
+        progressBar.setVisibility(View.GONE);
+        recyclerView.setVisibility(View.GONE);
         originBusStop = new BusStop();
         destinationBusStop = new BusStop();
+        tripsToDisplay.clear();
+        numberOfDirectTripsFound = 0;
+        numberOfDirectTripRouteBusesFound = 0;
+
+        if (getTripsBetweenStops != null)
+        {
+            getTripsBetweenStops.cancel(true);
+        }
+
+        if (getTripDetails != null)
+        {
+            getTripDetails.cancel(true);
+        }
+
+        updateSearchButtonText();
     }
 
     private void searchOrigin()
@@ -116,6 +167,16 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper
 
     private void swapDirection()
     {
+        if (getTripsBetweenStops != null)
+        {
+            getTripsBetweenStops.cancel(true);
+        }
+
+        if (getTripDetails != null)
+        {
+            getTripDetails.cancel(true);
+        }
+
         swapDirectionImageView.startAnimation(swapAnimation);
 
         BusStop tempDestinationBusStop = destinationBusStop;
@@ -126,7 +187,7 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper
 
         if (originBusStop.getBusStopName() != null && destinationBusStop.getBusStopName() != null)
         {
-            findDirectRoutes(originBusStop.getBusStopName(), destinationBusStop.getBusStopName());
+            findDirectTrips(originBusStop.getBusStopName(), destinationBusStop.getBusStopName());
         }
     }
 
@@ -156,68 +217,93 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper
 
             if (originBusStop.getBusStopName() != null && destinationBusStop.getBusStopName() != null)
             {
-                findDirectRoutes(originBusStop.getBusStopName(), destinationBusStop.getBusStopName());
+                findDirectTrips(originBusStop.getBusStopName(), destinationBusStop.getBusStopName());
             }
         }
     }
 
-    private void findDirectRoutes(String originBusStopName, String destinationBusStopName)
+    private void findDirectTrips(String originBusStopName, String destinationBusStopName)
     {
+        if (getTripsBetweenStops != null)
+        {
+            getTripsBetweenStops.cancel(true);
+        }
+
+        if (getTripDetails != null)
+        {
+            getTripDetails.cancel(true);
+        }
+
         recyclerView.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
-        getDirectRoutesBetweenStops = new GetDirectRoutesBetweenStops();
-        getDirectRoutesBetweenStops.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
+
+        getTripsBetweenStops = new GetTripsBetweenStops();
+        getTripsBetweenStops.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
                 originBusStopName, destinationBusStopName);
     }
 
-    private void onDirectRoutesFound(ArrayList<DirectTrip> directTrips)
+    private void onTripsFound(ArrayList<Trip> trips)
     {
-        if (directTrips.size() != 0)
+        if (trips.size() != 0)
         {
-            getDirectTripDetails = new GetDirectTripDetails();
-            getDirectTripDetails.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, directTrips);
+            getTripDetails = new GetTripDetails();
+            getTripDetails.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, trips);
         }
         else
         {
             progressBar.setVisibility(View.GONE);
-            Toast.makeText(getActivity(), "There aren't any direct routes...", Toast.LENGTH_SHORT).show();
-            //TODO No Direct Trips Found
+            Toast.makeText(getActivity(), "There aren't any trips...", Toast.LENGTH_SHORT).show();
+            //TODO No Trips Found
         }
     }
 
-    private void onDirectTripDetailsFound(ArrayList<DirectTrip> directTrips)
+    private void onTripDetailsFound(ArrayList<Trip> trips)
     {
-        numberOfDirectTripsFound = directTrips.size();
+        numberOfDirectTripsFound = trips.size();
         numberOfDirectTripRouteBusesFound = 0;
-        directTripsToDisplay.clear();
-        for (DirectTrip directTrip : directTrips)
+        tripsToDisplay.clear();
+        for (Trip aTrip : trips)
         {
-            directTrip.getBusesOnBusRoutes(this, getContext());
+            aTrip.getBusesOnFirstBusRoute(this, getContext());
         }
     }
 
     @Override
-    public void onDirectTripBusesEnRoutesFound(DirectTrip directTrip)
+    public void onBusesInServiceFound(Trip trip)
     {
         numberOfDirectTripRouteBusesFound++;
 
-        for (BusRoute busRoute: directTrip.getBusRoutes())
+        if (trip.getBusRoutes().get(0).getBusRouteBuses().size() > 0)
         {
-            for (Bus bus: busRoute.getBusRouteBuses())
-            {
-                bus.setBusETA(calculateTravelTime(DbQueries.getNumberOfStopsBetweenRouteOrders(db, busRoute.getBusRouteId(),
-                        bus.getBusRouteOrder(), busRoute.getTripPlannerOriginBusStop().getBusStopRouteOrder()),
-                        busRoute.getBusRouteNumber()));
-            }
-
-            if (busRoute.getBusRouteBuses().size() > 0)
-            {
-                busRoute.setShortestOriginToDestinationTravelTime(calculateTravelTime(DbQueries.getNumberOfStopsBetweenRouteOrders(
-                        db, busRoute.getBusRouteId(), busRoute.getBusRouteBuses().get(0).getBusRouteOrder(),
-                        busRoute.getTripPlannerDestinationBusStop().getBusStopRouteOrder()),
-                        busRoute.getBusRouteNumber()));
-            }
+            tripsToDisplay.add(trip);
         }
+
+        Collections.sort(tripsToDisplay, new Comparator<Trip>()
+        {
+            @Override
+            public int compare(Trip o1, Trip o2)
+            {
+                return o1.getBusRoutes().get(0).getShortestOriginToDestinationTravelTime() -
+                        o2.getBusRoutes().get(0).getShortestOriginToDestinationTravelTime();
+            }
+        });
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+        recyclerView.setLayoutManager(linearLayoutManager);
+        TripsRecyclerViewAdapter adapter = new TripsRecyclerViewAdapter(tripsToDisplay);
+        recyclerView.setAdapter(adapter);
+        recyclerView.setVisibility(View.VISIBLE);
+
+        if (numberOfDirectTripRouteBusesFound == numberOfDirectTripsFound)
+        {
+            progressBar.setVisibility(View.GONE);
+        }
+    }
+
+    /*@Override
+    public void onDirectTripBusesEnRoutesFound(DirectTripOld directTrip)
+    {
+        numberOfDirectTripRouteBusesFound++;
 
         Collections.sort(directTrip.getBusRoutes(), new Comparator<BusRoute>()
         {
@@ -230,7 +316,7 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper
 
         int shortestTravelTime = 0;
 
-        for (BusRoute busRoute: directTrip.getBusRoutes())
+        for (BusRoute busRoute : directTrip.getBusRoutes())
         {
             if (shortestTravelTime != 0)
             {
@@ -247,106 +333,49 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper
         }
         directTrip.setShortestTravelTime(shortestTravelTime);
 
-        directTripsToDisplay.add(directTrip);
+        if (directTrip.getShortestTravelTime() != 0)
+        {
+            ArrayList<Bus> busesOnDirectTrip = new ArrayList<>();
+
+            for (BusRoute busRoute: directTrip.getBusRoutes())
+            {
+                for (Bus bus: busRoute.getBusRouteBuses())
+                {
+                    busesOnDirectTrip.add(bus);
+                }
+            }
+
+            Collections.sort(busesOnDirectTrip, new Comparator<Bus>()
+            {
+                @Override
+                public int compare(Bus o1, Bus o2)
+                {
+                    return o1.getBusETA() - o2.getBusETA();
+                }
+            });
+
+            directTrip.setBusesOnDirectTrip(busesOnDirectTrip);
+
+            directTripsToDisplay.add(directTrip);
+        }
 
         if (numberOfDirectTripRouteBusesFound == numberOfDirectTripsFound)
         {
+            Collections.sort(directTripsToDisplay, new Comparator<DirectTripOld>()
+            {
+                @Override
+                public int compare(DirectTripOld o1, DirectTripOld o2)
+                {
+                    return o1.getShortestTravelTime() - o2.getShortestTravelTime();
+                }
+            });
+
             progressBar.setVisibility(View.GONE);
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
             recyclerView.setLayoutManager(linearLayoutManager);
             DirectTripsRecyclerViewAdapter adapter = new DirectTripsRecyclerViewAdapter(directTripsToDisplay);
             recyclerView.setAdapter(adapter);
             recyclerView.setVisibility(View.VISIBLE);
-        }
-    }
-
-    /*@Override
-    public void onBusesEnDirectRouteFound(String errorMessage, DirectTrip directTrip)
-    {
-        //Log.i("TripPlanner", directTrip.getRoute().getBusRouteNumber() + " queried. " + numberOfDirectTripBusesFound + "/" + numberOfDirectTripQueriesMade + " complete.");
-        numberOfDirectTripBusesFound++;
-        if (errorMessage.equals(NETWORK_QUERY_NO_ERROR))
-        {
-            if (directTrip.getRoute().getBusRouteBuses().size() != 0)
-            {
-                directTrip.getRoute().getBusRouteBuses().get(0).setBusETA(calculateTravelTime(
-                        DbQueries.getNumberOfStopsBetweenRouteOrders(db, directTrip.getRoute().getBusRouteId(),
-                                directTrip.getRoute().getBusRouteBuses().get(0).getBusRouteOrder(),
-                                directTrip.getOriginStop().getBusStopRouteOrder()), directTrip.getRoute().getBusRouteNumber()));
-
-                int travelTimeFromOriginToDestination = calculateTravelTime(
-                        DbQueries.getNumberOfStopsBetweenRouteOrders(db, directTrip.getRoute().getBusRouteId(),
-                                directTrip.getOriginStop().getBusStopRouteOrder(),
-                                directTrip.getDestinationStop().getBusStopRouteOrder()), directTrip.getRoute().getBusRouteNumber());
-
-                directTrip.setTravelTime(travelTimeFromOriginToDestination + directTrip.getRoute().getBusRouteBuses().get(0).getBusETA());
-                directTrips.add(directTrip);
-            }
-        }
-        else
-        {
-            //TODO
-        }
-
-        synchronized (this)
-        {
-            if (numberOfDirectTripQueriesMade < directTripsToQuery.size())
-            {
-                //TODO check for internet connection
-                //Log.i("TripPlanner", "Querying " + directTripsToQuery.get(numberOfDirectTripQueriesMade).getRoute().getBusRouteNumber());
-                new GetBusesEnDirectRouteTask(this, directTripsToQuery.get(numberOfDirectTripQueriesMade)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                numberOfDirectTripQueriesMade++;
-            }
-        }
-
-        if (numberOfDirectTripBusesFound == directTripsToQuery.size())
-        {
-            progressBar.setVisibility(View.GONE);
-            fastestDirectTrip = null;
-            for (DirectTrip directTripToCompare : directTrips)
-            {
-                if (fastestDirectTrip != null)
-                {
-                    if (directTripToCompare.getTravelTime() != 0 &&
-                            directTripToCompare.getTravelTime() < fastestDirectTrip.getTravelTime())
-                    {
-                        fastestDirectTrip = directTripToCompare;
-                    }
-                }
-                else
-                {
-                    if (directTripToCompare.getTravelTime() != 0)
-                    {
-                        fastestDirectTrip = directTripToCompare;
-                    }
-                }
-            }
-
-            ArrayList<DirectTrip> directTripsToDisplay = new ArrayList<>();
-            if (fastestDirectTrip != null)
-            {
-                directTripsToDisplay.add(fastestDirectTrip);
-                TripPlannerDirectTripListAdapter adapter = new TripPlannerDirectTripListAdapter(getActivity(), directTripsToDisplay);
-                listView.setVisibility(View.VISIBLE);
-                listView.setAdapter(adapter);
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
-                {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-                    {
-                        Intent directTripDetailsIntent = new Intent(getContext(), DirectTripDetailsActivity.class);
-                        Bundle bundle = new Bundle();
-                        bundle.putSerializable("DIRECT_TRIP", fastestDirectTrip);
-                        directTripDetailsIntent.putExtras(bundle);
-                        startActivity(directTripDetailsIntent);
-                    }
-                });
-            }
-            else
-            {
-                // TODO No routes right now
-                Toast.makeText(getActivity(), "There aren't any direct routes right now", Toast.LENGTH_SHORT).show();
-            }
         }
     }*/
 
@@ -398,69 +427,69 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper
         return travelTime;
     }
 
-    private class GetDirectRoutesBetweenStops extends AsyncTask<String, Void, ArrayList<DirectTrip>>
+    private class GetTripsBetweenStops extends AsyncTask<String, Void, ArrayList<Trip>>
     {
         @Override
-        protected ArrayList<DirectTrip> doInBackground(String... busStopNames)
+        protected ArrayList<Trip> doInBackground(String... busStopNames)
         {
-            return DbQueries.getDirectRoutesBetweenStops(db, busStopNames[0], busStopNames[1]);
+            return DbQueries.getDirectTripsBetweenStops(db, busStopNames[0], busStopNames[1]);
         }
 
         @Override
-        protected void onPostExecute(ArrayList<DirectTrip> directTrips)
+        protected void onPostExecute(ArrayList<Trip> trips)
         {
-            super.onPostExecute(directTrips);
-            onDirectRoutesFound(directTrips);
+            super.onPostExecute(trips);
+            onTripsFound(trips);
         }
     }
 
-    private class GetDirectTripDetails extends AsyncTask<ArrayList<DirectTrip>, Void, ArrayList<DirectTrip>>
+    private class GetTripDetails extends AsyncTask<ArrayList<Trip>, Void, ArrayList<Trip>>
     {
         @Override
-        protected ArrayList<DirectTrip> doInBackground(ArrayList<DirectTrip>... directTrips)
+        protected ArrayList<Trip> doInBackground(ArrayList<Trip>... trips)
         {
-            for (DirectTrip directTrip : directTrips[0])
+            for (Trip trip : trips[0])
             {
-                directTrip.setOriginStop(DbQueries.getStopDetails(db, directTrip.getOriginStop().getBusStopId()));
+                trip.setOriginBusStop(DbQueries.getStopDetails(db, trip.getOriginBusStop().getBusStopId()));
 
-                for (int i = 0; i < directTrip.getBusRoutes().size(); i++)
+                for (int i = 0; i < trip.getBusRoutes().size(); i++)
                 {
-                    BusStop routeOriginBusStop = DbQueries.getStopDetails(db, directTrip.getBusRoutes()
+                    BusStop routeOriginBusStop = DbQueries.getStopDetails(db, trip.getBusRoutes()
                             .get(i).getTripPlannerOriginBusStop().getBusStopId());
 
                     if (routeOriginBusStop != null)
                     {
                         routeOriginBusStop.setBusStopRouteOrder(DbQueries.getStopRouteOrder(db,
-                                directTrip.getBusRoutes().get(i).getBusRouteId(),
-                                directTrip.getBusRoutes().get(i).getTripPlannerOriginBusStop().getBusStopId()));
+                                trip.getBusRoutes().get(i).getBusRouteId(),
+                                trip.getBusRoutes().get(i).getTripPlannerOriginBusStop().getBusStopId()));
                     }
 
-                    BusStop routeDestinationBusStop = DbQueries.getStopDetails(db, directTrip.getBusRoutes().get(i)
-                                    .getTripPlannerDestinationBusStop().getBusStopId());
+                    BusStop routeDestinationBusStop = DbQueries.getStopDetails(db, trip.getBusRoutes().get(i)
+                            .getTripPlannerDestinationBusStop().getBusStopId());
 
                     if (routeDestinationBusStop != null)
                     {
                         routeDestinationBusStop.setBusStopRouteOrder(DbQueries.getStopRouteOrder(db,
-                                directTrip.getBusRoutes().get(i).getBusRouteId(),
-                                directTrip.getBusRoutes().get(i).getTripPlannerDestinationBusStop().getBusStopId()));
+                                trip.getBusRoutes().get(i).getBusRouteId(),
+                                trip.getBusRoutes().get(i).getTripPlannerDestinationBusStop().getBusStopId()));
                     }
 
-                    directTrip.getBusRoutes().set(i, (DbQueries.getRouteDetails(db,
-                            directTrip.getBusRoutes().get(i).getBusRouteId())));
+                    trip.getBusRoutes().set(i, (DbQueries.getRouteDetails(db,
+                            trip.getBusRoutes().get(i).getBusRouteId())));
 
-                    directTrip.getBusRoutes().get(i).setTripPlannerOriginBusStop(routeOriginBusStop);
-                    directTrip.getBusRoutes().get(i).setTripPlannerDestinationBusStop(routeDestinationBusStop);
+                    trip.getBusRoutes().get(i).setTripPlannerOriginBusStop(routeOriginBusStop);
+                    trip.getBusRoutes().get(i).setTripPlannerDestinationBusStop(routeDestinationBusStop);
                 }
             }
 
-            return directTrips[0];
+            return trips[0];
         }
 
         @Override
-        protected void onPostExecute(ArrayList<DirectTrip> directTrips)
+        protected void onPostExecute(ArrayList<Trip> trips)
         {
-            super.onPostExecute(directTrips);
-            onDirectTripDetailsFound(directTrips);
+            super.onPostExecute(trips);
+            onTripDetailsFound(trips);
         }
     }
 }
