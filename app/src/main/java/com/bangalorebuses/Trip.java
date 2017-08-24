@@ -122,14 +122,10 @@ abstract class Trip implements TripPlannerHelper
                         busRoute.getBusRouteNumber()));
             }
         }
-        else
-        {
-            // TODO Handle error
-        }
 
         if (tripHelper != null)
         {
-            tripHelper.onBusesInServiceFound(this);
+            tripHelper.onBusesInServiceFound(errorMessage, this);
         }
     }
 

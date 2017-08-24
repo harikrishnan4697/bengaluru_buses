@@ -3,5 +3,5 @@ package com.bangalorebuses;
 
 interface TripHelper
 {
-    void onBusesInServiceFound(Trip trip);
+    void onBusesInServiceFound(String errorMessage, Trip trip);
 }

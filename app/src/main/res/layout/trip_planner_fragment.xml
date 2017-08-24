@@ -3,7 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/trip_planner_container_relative_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/colorDefaultBackground">
 
     <LinearLayout
         android:id="@+id/origin_destination_linear_layout"
@@ -76,47 +77,6 @@
             android:background="@drawable/orange_rounded_background_borderless"
             android:clickable="true"
             android:src="@drawable/ic_swap_vert_white"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/errorLinearLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:animateLayoutChanges="true"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:visibility="gone">
-
-        <ImageView
-            android:id="@+id/errorImageView"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_margin="16dp"
-            android:src="@drawable/ic_location_off_black"/>
-
-        <TextView
-            android:id="@+id/errorTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:text="Can't find bus stops nearby because GPS is off."
-            android:textAlignment="center"
-            android:textColor="#000000"
-            android:textSize="16sp"/>
-
-        <TextView
-            android:id="@+id/errorResolutionTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:background="@drawable/white_rounded_background"
-            android:padding="16dp"
-            android:text="Turn on GPS"
-            android:textAllCaps="true"
-            android:textColor="@color/colorSpecialServiceBus"/>
 
     </LinearLayout>
 
@@ -362,22 +322,80 @@
         android:animateLayoutChanges="true"
         android:visibility="visible"/>-->
 
+    <LinearLayout
+        android:id="@+id/updatingLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/origin_destination_linear_layout"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Updating..."
+            android:textColor="#000000"
+            android:textSize="16sp"/>
+
+        <ProgressBar
+            android:id="@+id/updatingBusStopsProgressBar"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:visibility="visible"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/errorLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/updatingLinearLayout"
+        android:animateLayoutChanges="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <ImageView
+            android:id="@+id/errorImageView"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_location_off_black"/>
+
+        <TextView
+            android:id="@+id/errorTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:text="Can't find bus stops nearby because GPS is off."
+            android:textAlignment="center"
+            android:textColor="#000000"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/errorResolutionTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:background="@drawable/white_rounded_background"
+            android:padding="16dp"
+            android:text="Turn on GPS"
+            android:textAllCaps="true"
+            android:textColor="@color/colorSpecialServiceBus"/>
+
+    </LinearLayout>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/origin_destination_linear_layout"
-        android:layout_centerHorizontal="true"
-        android:background="@color/colorDefaultBackground"
+        android:layout_below="@id/updatingLinearLayout"
         android:orientation="vertical"/>
-
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerInParent="true"
-        android:layout_margin="16dp"
-        android:visibility="gone"/>
 
 </RelativeLayout>

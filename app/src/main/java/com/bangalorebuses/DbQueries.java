@@ -103,8 +103,8 @@ class DbQueries
     public static ArrayList<BusRoute> getRoutesArrivingAtStop(SQLiteDatabase db, int stopId)
     {
         Cursor cursor = db.rawQuery("select Routes.RouteId, Routes.RouteNumber, Routes.RouteServiceType," +
-                        " Routes.RouteDirection, Routes.RouteDirectionName, RouteStops.StopRouteOrder" +
-                        " from RouteStops join Routes where RouteStops.RouteId = Routes.RouteId and " +
+                " Routes.RouteDirection, Routes.RouteDirectionName, RouteStops.StopRouteOrder" +
+                " from RouteStops join Routes where RouteStops.RouteId = Routes.RouteId and " +
                 "RouteStops.StopId = " + stopId, null);
         ArrayList<BusRoute> routes = new ArrayList<>();
         while (cursor.moveToNext())
@@ -266,5 +266,47 @@ class DbQueries
             cursor.close();
             return -1;
         }
+    }
+
+    public static ArrayList<TransitPoint> getTransitPoints(SQLiteDatabase db, String originBusStopName, String destinationBusStopName)
+    {
+        Cursor cursor = db.rawQuery("select distinct Stops.StopName from (select distinct parent1.StopId from " +
+                "(select distinct RouteStops.StopId from (select RouteStops.RouteId,RouteStops.StopId from Stops " +
+                "join RouteStops where Stops.StopName = '" + originBusStopName + "' and Stops.StopId = RouteStops.StopId)sub1 " +
+                "join RouteStops where RouteStops.RouteId = sub1.RouteId)parent1 join (select distinct RouteStops.StopId " +
+                "from (select RouteStops.RouteId,RouteStops.StopId from Stops join RouteStops where " +
+                "Stops.StopName = '" + destinationBusStopName + "' and Stops.StopId = RouteStops.StopId)sub2 join RouteStops where " +
+                "RouteStops.RouteId = sub2.RouteId)parent2 where parent1.StopId = parent2.StopId) parentParent1 " +
+                "join Stops where parentParent1.StopId = Stops.StopId", null);
+
+        ArrayList<TransitPoint> transitPoints = new ArrayList<>();
+
+        while (cursor.moveToNext())
+        {
+            TransitPoint transitPoint = new TransitPoint();
+            transitPoint.setTransitPointName(cursor.getString(0));
+            transitPoints.add(transitPoint);
+        }
+
+        cursor.close();
+        return transitPoints;
+    }
+
+    public static int getNumberOfRoutesBetweenStops(SQLiteDatabase db, String originBusStopName, String destinationBusStopName)
+    {
+        int numberOfRoutes = -1;
+        Cursor cursor = db.rawQuery("select count(*) from (select RouteStops.RouteId,RouteStops.StopId," +
+                " RouteStops.StopRouteOrder from Stops join RouteStops where Stops.StopName = '" + originBusStopName +
+                "' and Stops.StopId = RouteStops.StopId)sub1 join (select RouteStops.RouteId, RouteStops.StopId, " +
+                "RouteStops.StopRouteOrder from Stops join RouteStops where Stops.StopName = '" + destinationBusStopName +
+                "' and Stops.StopId = RouteStops.StopId)sub2 where sub1.RouteId = sub2.RouteId and sub1.StopRouteOrder " +
+                "< sub2.StopRouteOrder", null);
+
+        if (cursor.moveToNext())
+        {
+            numberOfRoutes = cursor.getInt(0);
+        }
+        cursor.close();
+        return numberOfRoutes;
     }
 }
