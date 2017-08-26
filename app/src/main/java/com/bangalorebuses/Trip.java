@@ -123,9 +123,12 @@ abstract class Trip implements TripPlannerHelper
             }
         }
 
-        if (tripHelper != null)
+        synchronized (this)
         {
-            tripHelper.onBusesInServiceFound(errorMessage, this);
+            if (tripHelper != null)
+            {
+                tripHelper.onBusesInServiceFound(errorMessage, this);
+            }
         }
     }
 
@@ -138,7 +141,7 @@ abstract class Trip implements TripPlannerHelper
         {
             // Check if the bus is an airport shuttle (airport shuttles take longer to travel
             // from one bus stop to another as they don't stop at all bus stops)
-            if (routeNumber.contains("KIAS-"))
+            if (routeNumber.contains("KIAS-" ))
             {
                 travelTime = numberOfBusStopsToTravel * 4;  // 4 Minutes to get from a bus stop to another for the airport shuttle weekends
             }
@@ -151,7 +154,7 @@ abstract class Trip implements TripPlannerHelper
         {
             // Check if the bus is an airport shuttle (airport shuttles take longer to travel
             // from one bus stop to another as they don't stop at all bus stops)
-            if (routeNumber.contains("KIAS-"))
+            if (routeNumber.contains("KIAS-" ))
             {
                 travelTime = numberOfBusStopsToTravel * 5;  // 5 Minutes to get from a bus stop to another for the airport shuttle in peak-time
             }
@@ -164,7 +167,7 @@ abstract class Trip implements TripPlannerHelper
         {
             // Check if the bus is an airport shuttle (airport shuttles take longer to travel
             // from one bus stop to another as they don't stop at all bus stops)
-            if (routeNumber.contains("KIAS-"))
+            if (routeNumber.contains("KIAS-" ))
             {
                 travelTime = numberOfBusStopsToTravel * 4;  // 4 Minutes to get from a bus stop to another for the airport shuttle
             }

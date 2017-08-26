@@ -1,5 +1,7 @@
 package com.bangalorebuses;
 
+import android.view.View;
+
 import static com.bangalorebuses.Constants.db;
 
 class DirectTrip extends Trip
@@ -24,23 +26,23 @@ class DirectTrip extends Trip
         if (getBusRoutes().get(0).getBusRouteNumber().length() > 5 &&
                 getBusRoutes().get(0).getBusRouteNumber().contains("KIAS-"))
         {
-            holder.busRouteServiceTypeImageView.setImageResource(R.drawable.ic_flight_blue);
+            holder.firstLegBusRouteServiceTypeImageView.setImageResource(R.drawable.ic_flight_blue);
         }
         else if (getBusRoutes().get(0).getBusRouteNumber().length() > 1 &&
                 getBusRoutes().get(0).getBusRouteNumber().substring(0, 2).equals("V-"))
         {
-            holder.busRouteServiceTypeImageView.setImageResource(R.drawable.ic_directions_bus_ac);
+            holder.firstLegBusRouteServiceTypeImageView.setImageResource(R.drawable.ic_directions_bus_ac);
         }
         else if (getBusRoutes().get(0).getBusRouteNumber().contains("MF-"))
         {
-            holder.busRouteServiceTypeImageView.setImageResource(R.drawable.ic_directions_bus_special);
+            holder.firstLegBusRouteServiceTypeImageView.setImageResource(R.drawable.ic_directions_bus_special);
         }
         else
         {
-            holder.busRouteServiceTypeImageView.setImageResource(R.drawable.ic_directions_bus_ordinary);
+            holder.firstLegBusRouteServiceTypeImageView.setImageResource(R.drawable.ic_directions_bus_ordinary);
         }
 
-        holder.busRouteNumberTextView.setText(getBusRoutes().get(0).getBusRouteNumber());
+        holder.firstLegBusRouteNumberTextView.setText(getBusRoutes().get(0).getBusRouteNumber());
 
         String nextThreeBuses = getETAAsString(getBusRoutes().get(0).getBusRouteBuses().get(0));
         for (int busCount = 1; busCount < 3; busCount++)
@@ -54,12 +56,16 @@ class DirectTrip extends Trip
                 break;
             }
         }
-        holder.busETAsTextView.setText(nextThreeBuses);
+        holder.firstLegBusETAsTextView.setText(nextThreeBuses);
 
-        holder.numberOfStopsToTravelTextView.setText("Ride the bus for " + String.valueOf(DbQueries.getNumberOfStopsBetweenRouteOrders(db,
-                getBusRoutes().get(0).getBusRouteId(), getBusRoutes().get(0).getTripPlannerOriginBusStop()
-                        .getBusStopRouteOrder(), getBusRoutes().get(0).getTripPlannerDestinationBusStop()
-                        .getBusStopRouteOrder())) + " stops");
+        holder.firstLegRideTheBusTextView.setText("Ride the bus for " + String.valueOf
+                (DbQueries.getNumberOfStopsBetweenRouteOrders(db, getBusRoutes().get(0).getBusRouteId(),
+                        getBusRoutes().get(0).getTripPlannerOriginBusStop()
+                                .getBusStopRouteOrder(), getBusRoutes().get(0).getTripPlannerDestinationBusStop()
+                                .getBusStopRouteOrder())) + " stops");
+
+        holder.transitPointInfoLinearLayout.setVisibility(View.GONE);
+        holder.secondLegInfoRelativeLayout.setVisibility(View.GONE);
     }
 
     private String getETAAsString(Bus bus)

@@ -2,6 +2,7 @@ package com.bangalorebuses;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * This class is used to keep all details about a bus route together.
@@ -19,7 +20,7 @@ class BusRoute implements Serializable
     private String busRouteDirection;
     private String busRouteDirectionName;
     private ArrayList<BusStop> busRouteStops;
-    private ArrayList<String> busRouteDepartureTimings;
+    private ArrayList<Date> busRouteDepartureTimings;
     private ArrayList<Bus> busRouteBuses;
     private int selectedBusStopRouteOrder;
     private BusStop tripPlannerOriginBusStop;
@@ -76,12 +77,12 @@ class BusRoute implements Serializable
         this.busRouteDirectionName = busRouteDirectionName;
     }
 
-    public ArrayList<String> getBusRouteDepartureTimings()
+    public ArrayList<Date> getBusRouteDepartureTimings()
     {
         return busRouteDepartureTimings;
     }
 
-    public void setBusRouteDepartureTimings(ArrayList<String> busRouteDepartureTimings)
+    public void setBusRouteDepartureTimings(ArrayList<Date> busRouteDepartureTimings)
     {
         this.busRouteDepartureTimings = busRouteDepartureTimings;
     }

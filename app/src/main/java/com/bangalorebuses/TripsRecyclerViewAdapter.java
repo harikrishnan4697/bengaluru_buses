@@ -1,11 +1,12 @@
 package com.bangalorebuses;
 
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.List;
@@ -29,7 +30,7 @@ class TripsRecyclerViewAdapter extends RecyclerView.Adapter<TripsRecyclerViewAda
     public TripsViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
     {
         return new TripsViewHolder(LayoutInflater.from(parent.getContext()).inflate(
-                R.layout.direct_trip_card_layout, parent, false));
+                R.layout.trip_card_layout, parent, false));
     }
 
     @Override
@@ -46,25 +47,43 @@ class TripsRecyclerViewAdapter extends RecyclerView.Adapter<TripsRecyclerViewAda
 
     class TripsViewHolder extends RecyclerView.ViewHolder
     {
-
-        CardView cardView;
         TextView tripDurationTextView;
         TextView tripOriginBusStopNameTextView;
-        ImageView busRouteServiceTypeImageView;
-        TextView busRouteNumberTextView;
-        TextView busETAsTextView;
-        TextView numberOfStopsToTravelTextView;
+
+        ImageView firstLegBusRouteServiceTypeImageView;
+        TextView firstLegBusRouteNumberTextView;
+        TextView firstLegBusETAsTextView;
+        TextView firstLegRideTheBusTextView;
+
+        LinearLayout transitPointInfoLinearLayout;
+        TextView transitPointBusStopNameTextView;
+
+        RelativeLayout secondLegInfoRelativeLayout;
+        ImageView secondLegBusRouteServiceTypeImageView;
+        TextView secondLegBusRouteNumberTextView;
+        TextView secondLegBusETAsTextView;
+        TextView secondLegRideTheBusTextView;
 
         TripsViewHolder(View itemView)
         {
             super(itemView);
-            cardView = (CardView) itemView.findViewById(R.id.directTripCardView);
+            // TODO check if works without card view
             tripDurationTextView = (TextView) itemView.findViewById(R.id.totalTravelDurationTextView);
             tripOriginBusStopNameTextView = (TextView) itemView.findViewById(R.id.originBusStopNameTextView);
-            busRouteServiceTypeImageView = (ImageView) itemView.findViewById(R.id.busServiceTypeImageView);
-            busRouteNumberTextView = (TextView) itemView.findViewById(R.id.busRouteNumberTextView);
-            busETAsTextView = (TextView) itemView.findViewById(R.id.busArrivalTimingsTextView);
-            numberOfStopsToTravelTextView = (TextView) itemView.findViewById(R.id.rideTheBusTextView);
+
+            firstLegBusRouteServiceTypeImageView = (ImageView) itemView.findViewById(R.id.firstLegBusServiceTypeImageView);
+            firstLegBusRouteNumberTextView = (TextView) itemView.findViewById(R.id.firstLegBusRouteNumberTextView);
+            firstLegBusETAsTextView = (TextView) itemView.findViewById(R.id.firstLegBusArrivalTimingsTextView);
+            firstLegRideTheBusTextView = (TextView) itemView.findViewById(R.id.firstLegRideTheBusTextView);
+
+            transitPointInfoLinearLayout = (LinearLayout) itemView.findViewById(R.id.transitPointInfoLinearLayout);
+            transitPointBusStopNameTextView = (TextView) itemView.findViewById(R.id.transitPointBusStopNameTextView);
+
+            secondLegInfoRelativeLayout = (RelativeLayout) itemView.findViewById(R.id.tripSecondLegRelativeLayout);
+            secondLegBusRouteServiceTypeImageView = (ImageView) itemView.findViewById(R.id.secondLegBusServiceTypeImageView);
+            secondLegBusRouteNumberTextView = (TextView) itemView.findViewById(R.id.secondlegBusRouteNumberTextView);
+            secondLegBusETAsTextView = (TextView) itemView.findViewById(R.id.secondLegBusArrivalTimingsTextView);
+            secondLegRideTheBusTextView = (TextView) itemView.findViewById(R.id.secondLegRideTheBusTextView);
         }
     }
 }
