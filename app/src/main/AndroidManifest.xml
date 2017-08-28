@@ -44,13 +44,6 @@
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait">
         </activity>
-        <activity
-            android:name=".TripDetailsActivity"
-            android:parentActivityName=".MainActivity"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity android:name=".DirectTripDetailsActivity">
-        </activity>
     </application>
 
 </manifest>

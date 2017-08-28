@@ -220,7 +220,7 @@ class DbQueries
             busRoute.setTripPlannerDestinationBusStop(destinationStop);
 
             directTrip.setOriginBusStop(originStop);
-            directTrip.addBusRoute(busRoute);
+            directTrip.setBusRoute(busRoute);
             directTrip.setDestinationBusStopName(destinationStopName);
 
             directTrips.add(directTrip);
@@ -353,12 +353,13 @@ class DbQueries
     public static int getNumberOfRoutesBetweenStops(SQLiteDatabase db, String originBusStopName, String destinationBusStopName)
     {
         int numberOfRoutes = -1;
-        Cursor cursor = db.rawQuery("select count(*) from (select RouteStops.RouteId,RouteStops.StopId," +
-                " RouteStops.StopRouteOrder from Stops join RouteStops where Stops.StopName = '" + originBusStopName +
-                "' and Stops.StopId = RouteStops.StopId)sub1 join (select RouteStops.RouteId, RouteStops.StopId, " +
-                "RouteStops.StopRouteOrder from Stops join RouteStops where Stops.StopName = '" + destinationBusStopName +
-                "' and Stops.StopId = RouteStops.StopId)sub2 where sub1.RouteId = sub2.RouteId and sub1.StopRouteOrder " +
-                "< sub2.StopRouteOrder", null);
+        Cursor cursor = db.rawQuery("select count(*) from (select distinct sub1.RouteId from " +
+                "(select RouteStops.RouteId,RouteStops.StopId, RouteStops.StopRouteOrder " +
+                "from Stops join RouteStops where Stops.StopName = '" + originBusStopName + "' and " +
+                "Stops.StopId = RouteStops.StopId)sub1 join (select RouteStops.RouteId, " +
+                "RouteStops.StopId, RouteStops.StopRouteOrder from Stops join RouteStops " +
+                "where Stops.StopName = '" + destinationBusStopName + "' and Stops.StopId = RouteStops.StopId)sub2 " +
+                "where sub1.RouteId = sub2.RouteId and sub1.StopRouteOrder < sub2.StopRouteOrder)parent1", null);
 
         if (cursor.moveToNext())
         {

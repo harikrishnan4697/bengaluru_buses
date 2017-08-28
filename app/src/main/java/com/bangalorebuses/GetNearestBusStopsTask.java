@@ -38,6 +38,7 @@ class GetNearestBusStopsTask extends AsyncTask<URL, Void, JSONArray>
                 result.append(line);
             }
             reader.close();
+            httpURLConnection.disconnect();
         }
         catch (java.net.SocketTimeoutException e)
         {

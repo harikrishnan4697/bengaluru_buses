@@ -3,18 +3,11 @@ package com.bangalorebuses;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 
-import static com.bangalorebuses.Constants.NETWORK_QUERY_NO_ERROR;
-import static com.bangalorebuses.Constants.db;
-
-class DirectTripOld implements Serializable, TripPlannerHelper
+class DirectTripOld //implements Serializable, DirectTripHelper
 {
     private BusStop originStop = new BusStop();
     private String destinationBusStopName;
@@ -22,7 +15,7 @@ class DirectTripOld implements Serializable, TripPlannerHelper
     private int shortestTravelTime;
     private int numberOfBusRoutesQueried;
     private int numberOfBusRouteQueriesComplete;
-    private TripHelper directTripHelper;
+    //private TripHelper directTripHelper;
     private ArrayList<BusRoute> busRoutesWithBuses = new ArrayList<>();
     private ArrayList<Bus> busesOnDirectTrip = new ArrayList<>();
 
@@ -85,7 +78,7 @@ class DirectTripOld implements Serializable, TripPlannerHelper
         this.shortestTravelTime = shortestTravelTime;
     }
 
-    public int getBusesOnBusRoutes(TripHelper directTripHelper, Context context)
+    /*public int getBusesOnBusRoutes(TripHelper directTripHelper, Context context)
     {
         this.directTripHelper = directTripHelper;
         if (isNetworkAvailable(context))
@@ -175,7 +168,7 @@ class DirectTripOld implements Serializable, TripPlannerHelper
                 //directTripHelper.onBusesInServiceFound(this);
             }
         }
-    }
+    }*/
 
     private int calculateTravelTime(int numberOfBusStopsToTravel, String routeNumber)
     {

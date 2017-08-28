@@ -1,26 +1,62 @@
 package com.bangalorebuses;
 
-import android.os.AsyncTask;
-
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
-
-import static com.bangalorebuses.Constants.db;
 
 class IndirectTrip extends Trip
 {
+    private ArrayList<BusRoute> busRoutesOnLeg1 = new ArrayList<>();
+    private ArrayList<BusRoute> busRoutesOnLeg2 = new ArrayList<>();
+
     private TransitPoint transitPoint;
-    private int numberOfBusStopsBetweenOriginAndDestination;
-    private int score;
+    private int transitPointScore;
+
+    private int numberOfStopsOnLeg1;
+    private int numberOfStopsOnLeg2;
 
     @Override
     public void showTrip(TripsRecyclerViewAdapter.TripsViewHolder holder)
     {
 
+    }
+
+    public ArrayList<BusRoute> getBusRoutesOnLeg1()
+    {
+        return busRoutesOnLeg1;
+    }
+
+    public void setBusRoutesOnLeg1(ArrayList<BusRoute> busRoutesOnLeg1)
+    {
+        this.busRoutesOnLeg1 = busRoutesOnLeg1;
+    }
+
+    public void addBusRouteToLeg1(BusRoute busRoute)
+    {
+        busRoutesOnLeg1.add(busRoute);
+    }
+
+    public void clearBusRoutesOnLeg1()
+    {
+        busRoutesOnLeg1.clear();
+    }
+
+    public ArrayList<BusRoute> getBusRoutesOnLeg2()
+    {
+        return busRoutesOnLeg2;
+    }
+
+    public void setBusRoutesOnLeg2(ArrayList<BusRoute> busRoutesOnLeg2)
+    {
+        this.busRoutesOnLeg2 = busRoutesOnLeg2;
+    }
+
+    public void addBusRouteToLeg2(BusRoute busRoute)
+    {
+        busRoutesOnLeg2.add(busRoute);
+    }
+
+    public void clearBusRoutesOnLeg2()
+    {
+        busRoutesOnLeg2.clear();
     }
 
     public TransitPoint getTransitPoint()
@@ -33,95 +69,33 @@ class IndirectTrip extends Trip
         this.transitPoint = transitPoint;
     }
 
-    public int getNumberOfBusStopsBetweenOriginAndDestination()
+    public int getTransitPointScore()
     {
-        return numberOfBusStopsBetweenOriginAndDestination;
+        return transitPointScore;
     }
 
-    public void setNumberOfBusStopsBetweenOriginAndDestination(int numberOfBusStopsBetweenOriginAndDestination)
+    public void setTransitPointScore(int transitPointScore)
     {
-        this.numberOfBusStopsBetweenOriginAndDestination = numberOfBusStopsBetweenOriginAndDestination;
+        this.transitPointScore = transitPointScore;
     }
 
-    public int getScore()
+    public int getNumberOfStopsOnLeg1()
     {
-        return score;
+        return numberOfStopsOnLeg1;
     }
 
-    public void setScore(int score)
+    public void setNumberOfStopsOnLeg1(int numberOfStopsOnLeg1)
     {
-        this.score = score;
+        this.numberOfStopsOnLeg1 = numberOfStopsOnLeg1;
     }
 
-    private void onRoutesBetweenBusStopFound(ArrayList<BusRoute> busRoutes)
+    public int getNumberOfStopsOnLeg2()
     {
-
+        return numberOfStopsOnLeg2;
     }
 
-    class GetRoutesBetweenBusStops extends AsyncTask<Void, Void, ArrayList<BusRoute>>
+    public void setNumberOfStopsOnLeg2(int numberOfStopsOnLeg2)
     {
-        private String originBusStopName;
-        private String destinationBusStopName;
-
-        GetRoutesBetweenBusStops(String originBusStopName, String destinationBusStopName)
-        {
-            this.originBusStopName = originBusStopName;
-            this.destinationBusStopName = destinationBusStopName;
-        }
-
-        @Override
-        protected ArrayList<BusRoute> doInBackground(Void... params)
-        {
-            ArrayList<BusRoute> busRoutes = DbQueries.getRoutesBetweenStops(db, originBusStopName, destinationBusStopName);
-
-            for (int i = 0; i < busRoutes.size(); i++)
-            {
-                // Get all details about the route
-                busRoutes.set(i, DbQueries.getRouteDetails(db, busRoutes.get(i).getBusRouteId()));
-
-                // Get all bus stops on the route
-                busRoutes.get(i).setBusRouteStops(DbQueries.getStopsOnRoute(db, busRoutes.get(i).getBusRouteId()));
-
-                // Get all the route's departure timings
-                ArrayList<String> busRouteDepartureTimings = DbQueries.getRouteDepartureTimings
-                        (db, busRoutes.get(i).getBusRouteId());
-
-                ArrayList<Date> busRouteDepartureTimingsAsDates = new ArrayList<>();
-
-                for (String busRouteDepartureTiming : busRouteDepartureTimings)
-                {
-                    DateFormat dateFormat = new SimpleDateFormat("hh:mm:ss", Locale.getDefault());
-
-                    try
-                    {
-                        Date date = dateFormat.parse(busRouteDepartureTiming);
-                        busRouteDepartureTimingsAsDates.add(date);
-                    }
-                    catch (ParseException e)
-                    {
-                        // TODO fatal error occurred
-                    }
-                }
-
-                busRoutes.get(i).setBusRouteDepartureTimings(busRouteDepartureTimingsAsDates);
-
-                // Get all origin bus stop details
-                busRoutes.get(i).setTripPlannerOriginBusStop(DbQueries.getStopDetails
-                        (db, busRoutes.get(i).getTripPlannerOriginBusStop().getBusStopId()));
-
-                // get all destination bus stop details
-                busRoutes.get(i).setTripPlannerDestinationBusStop(DbQueries.getStopDetails
-                        (db, busRoutes.get(i).getTripPlannerDestinationBusStop().getBusStopId()));
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<BusRoute> busRoutes)
-        {
-            super.onPostExecute(busRoutes);
-            onRoutesBetweenBusStopFound(busRoutes);
-        }
+        this.numberOfStopsOnLeg2 = numberOfStopsOnLeg2;
     }
 }

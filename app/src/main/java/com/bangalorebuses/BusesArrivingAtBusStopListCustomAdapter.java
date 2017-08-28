@@ -11,13 +11,13 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-class BusesArrivingAtStopListCustomAdapter extends BaseAdapter
+class BusesArrivingAtBusStopListCustomAdapter extends BaseAdapter
 {
     public Activity context;
     private ArrayList<BusRoute> busRoutes = null;
     private LayoutInflater inflater;
 
-    BusesArrivingAtStopListCustomAdapter(Activity context, ArrayList<BusRoute> busRoutes)
+    BusesArrivingAtBusStopListCustomAdapter(Activity context, ArrayList<BusRoute> busRoutes)
     {
         super();
         this.context = context;
@@ -48,7 +48,7 @@ class BusesArrivingAtStopListCustomAdapter extends BaseAdapter
         if (convertView == null)
         {
             holder = new ViewHolder();
-            convertView = inflater.inflate(R.layout.buses_arriving_at_stop_list_item, null);
+            convertView = inflater.inflate(R.layout.buses_arriving_at_bus_stop_list_item, null);
 
             holder.imgViewLogo = (ImageView) convertView.findViewById(R.id.imageView);
             holder.txtViewRouteNumber = (TextView) convertView.findViewById(R.id.routeNumberTextView);

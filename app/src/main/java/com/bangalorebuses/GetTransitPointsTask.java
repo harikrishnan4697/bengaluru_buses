@@ -26,9 +26,9 @@ import java.net.URL;
 class GetTransitPointsTask extends AsyncTask<BusStop, Void, BusStop[]>
 {
     private String errorMessage = Constants.NETWORK_QUERY_NO_ERROR;
-    private TripPlannerHelper caller;
+    private DirectTripHelper caller;
 
-    GetTransitPointsTask(TripPlannerHelper caller)
+    GetTransitPointsTask(DirectTripHelper caller)
     {
         this.caller = caller;
     }
@@ -71,6 +71,7 @@ class GetTransitPointsTask extends AsyncTask<BusStop, Void, BusStop[]>
                 result.append(line);
             }
             reader.close();
+            client.disconnect();
         }
         catch (java.net.SocketTimeoutException e)
         {

@@ -12,35 +12,36 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-class BusNumberListCustomAdapter extends BaseAdapter implements Filterable
+class AllBusRoutesSearchListCustomAdapter extends BaseAdapter implements Filterable
 {
     public Activity context;
-    private List<BusRoute> busRoutes = null;
-    private List<BusRoute> filteredBusRoutes = null;
+    private List<String> busRouteNumbers = null;
+    private List<String> filteredBusRouteNumbers = null;
     private LayoutInflater inflater;
     private ItemFilter mFilter = new ItemFilter();
 
-    BusNumberListCustomAdapter(Activity context, ArrayList<BusRoute> busRoutes)
+    AllBusRoutesSearchListCustomAdapter(Activity context, ArrayList<String> busRouteNumbers)
     {
         super();
+        Collections.sort(busRouteNumbers);
         this.context = context;
-        this.busRoutes = busRoutes;
-        this.filteredBusRoutes = busRoutes;
+        this.busRouteNumbers = busRouteNumbers;
+        this.filteredBusRouteNumbers = busRouteNumbers;
         this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
     public int getCount()
     {
-        return filteredBusRoutes.size();
+        return filteredBusRouteNumbers.size();
     }
 
     public Object getItem(int position)
     {
-        return filteredBusRoutes.get(position);
+        return filteredBusRouteNumbers.get(position);
     }
 
     public long getItemId(int position)
@@ -55,12 +56,11 @@ class BusNumberListCustomAdapter extends BaseAdapter implements Filterable
         if (convertView == null)
         {
             holder = new ViewHolder();
-            convertView = inflater.inflate(R.layout.bus_number_search_list_item, null);
+            convertView = inflater.inflate(R.layout.all_routes_search_list_item, null);
 
             holder.imageView = (ImageView) convertView.findViewById(R.id.imageView);
             holder.routeNumberTextView = (TextView) convertView.findViewById(R.id.routeNumberTextView);
             holder.routeServiceTypeNameTextView = (TextView) convertView.findViewById(R.id.routeServiceTypeTextView);
-            //holder.routeDirectionNameTextView = (TextView) convertView.findViewById(R.id.routeDirectionNameTextView);
 
             convertView.setTag(holder);
         }
@@ -69,18 +69,18 @@ class BusNumberListCustomAdapter extends BaseAdapter implements Filterable
             holder = (ViewHolder) convertView.getTag();
         }
 
-        if (filteredBusRoutes.get(position).getBusRouteNumber().contains("KIAS-"))
+        if (filteredBusRouteNumbers.get(position).contains("KIAS-"))
         {
             holder.imageView.setImageResource(R.drawable.ic_flight_blue);
             holder.routeServiceTypeNameTextView.setText("Airport Shuttle");
         }
-        else if (filteredBusRoutes.get(position).getBusRouteNumber().length() > 2 &&
-                filteredBusRoutes.get(position).getBusRouteNumber().substring(0, 2).equals("V-"))
+        else if (filteredBusRouteNumbers.get(position).length() > 2 &&
+                filteredBusRouteNumbers.get(position).substring(0, 2).equals("V-"))
         {
             holder.imageView.setImageResource(R.drawable.ic_directions_bus_ac);
             holder.routeServiceTypeNameTextView.setText("A/C");
         }
-        else if (filteredBusRoutes.get(position).getBusRouteNumber().contains("MF-"))
+        else if (filteredBusRouteNumbers.get(position).contains("MF-"))
         {
             holder.imageView.setImageResource(R.drawable.ic_directions_bus_special);
             holder.routeServiceTypeNameTextView.setText("Metro Feeder");
@@ -91,8 +91,7 @@ class BusNumberListCustomAdapter extends BaseAdapter implements Filterable
             holder.routeServiceTypeNameTextView.setText("Non A/C");
         }
 
-        holder.routeNumberTextView.setText(filteredBusRoutes.get(position).getBusRouteNumber());
-        holder.routeDirectionNameTextView.setText(filteredBusRoutes.get(position).getBusRouteDirectionName());
+        holder.routeNumberTextView.setText(filteredBusRouteNumbers.get(position));
 
         return convertView;
     }
@@ -107,7 +106,6 @@ class BusNumberListCustomAdapter extends BaseAdapter implements Filterable
         ImageView imageView;
         TextView routeNumberTextView;
         TextView routeServiceTypeNameTextView;
-        TextView routeDirectionNameTextView;
     }
 
     private class ItemFilter extends Filter
@@ -120,22 +118,23 @@ class BusNumberListCustomAdapter extends BaseAdapter implements Filterable
 
             FilterResults results = new FilterResults();
 
-            int count = busRoutes.size();
-            final ArrayList<BusRoute> filtered_routes = new ArrayList<>(count);
+            int count = busRouteNumbers.size();
+            final ArrayList<String> filtered_route_numbers = new ArrayList<>(count);
 
-            BusRoute busRoute;
+            String routeNumber;
 
             for (int i = 0; i < count; i++)
             {
-                busRoute = busRoutes.get(i);
-                if (busRoute.getBusRouteNumber().toLowerCase().contains(filterString))
+                routeNumber = busRouteNumbers.get(i);
+                if (routeNumber.length() >= filterString.length() &&
+                        routeNumber.toLowerCase().substring(0, filterString.length()).equals(filterString))
                 {
-                    filtered_routes.add(busRoute);
+                    filtered_route_numbers.add(routeNumber);
                 }
             }
 
-            results.values = filtered_routes;
-            results.count = filtered_routes.size();
+            results.values = filtered_route_numbers;
+            results.count = filtered_route_numbers.size();
 
             return results;
         }
@@ -144,7 +143,8 @@ class BusNumberListCustomAdapter extends BaseAdapter implements Filterable
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results)
         {
-            filteredBusRoutes = (ArrayList<BusRoute>) results.values;
+            filteredBusRouteNumbers = (ArrayList<String>) results.values;
+            Collections.sort(filteredBusRouteNumbers);
             notifyDataSetChanged();
         }
 

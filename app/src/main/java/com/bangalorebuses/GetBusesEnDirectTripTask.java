@@ -17,25 +17,24 @@ import static com.bangalorebuses.Constants.NETWORK_QUERY_NO_ERROR;
 import static com.bangalorebuses.Constants.NETWORK_QUERY_REQUEST_TIMEOUT_EXCEPTION;
 import static com.bangalorebuses.Constants.NETWORK_QUERY_URL_EXCEPTION;
 
-class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
+class GetBusesEnDirectTripTask extends AsyncTask<Void, Void, Void>
 {
-    private NetworkingHelper caller;
+    private DirectTrip directTrip;
     private String errorMessage = NETWORK_QUERY_NO_ERROR;
+    private DirectTripHelper caller;
     private ArrayList<Bus> buses = new ArrayList<>();
-    private BusRoute busRoute;
-    private int busStopRouteOrder;
 
-
-    GetBusesEnRouteTask(NetworkingHelper caller, int busStopRouteOrder, BusRoute busRoute)
+    GetBusesEnDirectTripTask(DirectTripHelper caller, DirectTrip directTrip)
     {
+        this.directTrip = directTrip;
         this.caller = caller;
-        this.busStopRouteOrder = busStopRouteOrder;
-        this.busRoute = busRoute;
     }
 
     @Override
-    protected Void doInBackground(String... requestBody)
+    protected Void doInBackground(Void... params)
     {
+        String requestBody = "routeNO=" + directTrip.getBusRoute().getBusRouteNumber() +
+                "&direction=" + directTrip.getBusRoute().getBusRouteDirection();
         URL busesEnRouteURL;
         try
         {
@@ -47,29 +46,32 @@ class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
             return null;
         }
 
-        HttpURLConnection client;
+        HttpURLConnection httpURLConnection;
         String line;
         StringBuilder busesEnRouteResult = new StringBuilder();
         try
         {
-            client = (HttpURLConnection) busesEnRouteURL.openConnection();
-            client.setRequestMethod("POST");
-            client.setRequestProperty("Accept", "application/json");
-            client.setDoOutput(true);
-            client.setConnectTimeout(Constants.NETWORK_QUERY_CONNECT_TIMEOUT);
-            client.setReadTimeout(Constants.NETWORK_QUERY_READ_TIMEOUT);
-            client.connect();
-            BufferedOutputStream writer = new BufferedOutputStream(client.getOutputStream());
-            writer.write(requestBody[0].getBytes());
+            httpURLConnection = (HttpURLConnection) busesEnRouteURL.openConnection();
+            httpURLConnection.setRequestMethod("POST");
+            httpURLConnection.setRequestProperty("Accept", "application/json");
+            httpURLConnection.setDoOutput(true);
+            httpURLConnection.setConnectTimeout(Constants.NETWORK_QUERY_CONNECT_TIMEOUT);
+            httpURLConnection.setReadTimeout(Constants.NETWORK_QUERY_READ_TIMEOUT);
+            httpURLConnection.connect();
+
+            BufferedOutputStream writer = new BufferedOutputStream(httpURLConnection.getOutputStream());
+            writer.write(requestBody.getBytes());
             writer.flush();
             writer.close();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
             while ((line = reader.readLine()) != null)
             {
                 busesEnRouteResult.append(line);
             }
             reader.close();
-            client.disconnect();
+
+            httpURLConnection.disconnect();
         }
         catch (java.net.SocketTimeoutException e)
         {
@@ -89,14 +91,16 @@ class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
             {
                 if (!isCancelled())
                 {
-                    if (Integer.parseInt(jsonArray.getJSONArray(i).getString(12).replace("routeorder:", "")) <= busStopRouteOrder)
+                    if (Integer.parseInt(jsonArray.getJSONArray(i).getString(12).replace("routeorder:", "")) <=
+                            directTrip.getBusRoute().getTripPlannerOriginBusStop().getBusStopRouteOrder())
                     {
                         for (int j = 0; j < jsonArray.length(); j++)
                         {
                             if ((i + j) < jsonArray.length())
                             {
                                 Bus bus = new Bus();
-                                if (Integer.parseInt(jsonArray.getJSONArray(i + j).getString(12).replace("routeorder:", "")) == busStopRouteOrder)
+                                if (Integer.parseInt(jsonArray.getJSONArray(i + j).getString(12).replace("routeorder:", ""))
+                                        == directTrip.getBusRoute().getTripPlannerOriginBusStop().getBusStopRouteOrder())
                                 {
                                     bus.setDue(true);
                                 }
@@ -105,7 +109,7 @@ class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
                                 bus.setBusLong(nearestLatLong.substring(nearestLatLong.indexOf(",") + 1, nearestLatLong.length() - 1));
                                 bus.setBusRegistrationNumber(jsonArray.getJSONArray(i + j).getString(0).replace("vehicleno:", ""));
                                 bus.setBusRouteOrder(Integer.parseInt(jsonArray.getJSONArray(i + j).getString(12).replace("routeorder:", "")));
-                                bus.setBusRoute(busRoute);
+                                bus.setBusRoute(directTrip.getBusRoute());
                                 buses.add(bus);
                             }
                             else
@@ -121,6 +125,8 @@ class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
                     break;
                 }
             }
+
+            directTrip.getBusRoute().setBusRouteBuses(buses);
         }
         catch (org.json.JSONException e)
         {
@@ -132,6 +138,7 @@ class GetBusesEnRouteTask extends AsyncTask<String, Void, Void>
     @Override
     protected void onPostExecute(Void aVoid)
     {
-        caller.onBusesEnRouteFound(errorMessage, busStopRouteOrder, buses, busRoute);
+        super.onPostExecute(aVoid);
+        caller.onBusesInServiceFound(errorMessage, directTrip);
     }
 }

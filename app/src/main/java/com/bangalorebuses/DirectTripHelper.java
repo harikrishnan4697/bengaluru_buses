@@ -1,6 +1,6 @@
 package com.bangalorebuses;
 
-interface TripPlannerHelper
+interface DirectTripHelper
 {
 
     /*
@@ -12,5 +12,5 @@ interface TripPlannerHelper
 
     void onTransitPointBusCountFound(String errorMessage, int originToTransitPointBusCount, int transitPointToDestinationBusCount, BusStop transitPoint);*/
 
-    void onBusesInServiceFound(String errorMessage, BusRoute busRoute);
+    void onBusesInServiceFound(String errorMessage, DirectTrip directTrip);
 }

@@ -282,7 +282,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
                         }
 
                     });
-                    BusesArrivingAtStopListCustomAdapter customAdapter = new BusesArrivingAtStopListCustomAdapter(this, busRoutesToDisplay);
+                    BusesArrivingAtBusStopListCustomAdapter customAdapter = new BusesArrivingAtBusStopListCustomAdapter(this, busRoutesToDisplay);
                     customAdapter.notifyDataSetChanged();
                     listView.setAdapter(customAdapter);
                     listView.setVisibility(View.VISIBLE);
@@ -395,7 +395,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
 
         for (GetBusesEnRouteTask getBusesEnRouteTask : runningAsyncTasks)
         {
-            if (getBusesEnRouteTask != null && getBusesEnRouteTask.getStatus().equals(AsyncTask.Status.RUNNING))
+            if (getBusesEnRouteTask != null)
             {
                 getBusesEnRouteTask.cancel(true);
             }

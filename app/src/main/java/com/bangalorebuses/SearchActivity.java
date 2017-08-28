@@ -17,6 +17,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import static com.bangalorebuses.Constants.SEARCH_TYPE_BUS_ROUTE;
 import static com.bangalorebuses.Constants.SEARCH_TYPE_BUS_STOP;
@@ -28,7 +29,6 @@ public class SearchActivity extends AppCompatActivity
     ProgressBar progressBar;
     private EditText searchEditText;
     private ListView searchResultsListView;
-    private BusNumberListCustomAdapter customListAdapter;
     private String searchType;
     private Intent resultIntent = new Intent();
     private GetAllStops getAllStops;
@@ -74,6 +74,7 @@ public class SearchActivity extends AppCompatActivity
 
     private void onAllDistinctStopNamesFound(ArrayList<String> busStopNames)
     {
+        Collections.sort(busStopNames);
         final ArrayAdapter<String> listAdapter = new ArrayAdapter<>(this,android.R.layout.simple_list_item_1,
                 android.R.id.text1, busStopNames);
         searchResultsListView.setAdapter(listAdapter);
@@ -163,7 +164,7 @@ public class SearchActivity extends AppCompatActivity
 
     private void onAllDistinctRouteNumbersFound(ArrayList<String> routeNumbers)
     {
-        final BusNumberListCustomAdapterRouteNumber listAdapter = new BusNumberListCustomAdapterRouteNumber(this, routeNumbers);
+        final AllBusRoutesSearchListCustomAdapter listAdapter = new AllBusRoutesSearchListCustomAdapter(this, routeNumbers);
         searchResultsListView.setAdapter(listAdapter);
         progressBar.setVisibility(View.GONE);
         searchEditText.setEnabled(true);

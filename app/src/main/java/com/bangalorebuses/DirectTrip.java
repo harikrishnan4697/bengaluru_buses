@@ -6,10 +6,22 @@ import static com.bangalorebuses.Constants.db;
 
 class DirectTrip extends Trip
 {
+    private BusRoute busRoute;
+
+    public BusRoute getBusRoute()
+    {
+        return busRoute;
+    }
+
+    public void setBusRoute(BusRoute busRoute)
+    {
+        this.busRoute = busRoute;
+    }
+
     @Override
     public void showTrip(TripsRecyclerViewAdapter.TripsViewHolder holder)
     {
-        holder.tripDurationTextView.setText(getTravelTime(getBusRoutes().get(0).getShortestOriginToDestinationTravelTime()));
+        holder.tripDurationTextView.setText(getTravelTime(busRoute.getShortestOriginToDestinationTravelTime()));
 
         if (getOriginBusStop().getBusStopDirectionName().contains(")"))
         {
@@ -23,17 +35,15 @@ class DirectTrip extends Trip
                     " " + getOriginBusStop().getBusStopDirectionName());
         }
 
-        if (getBusRoutes().get(0).getBusRouteNumber().length() > 5 &&
-                getBusRoutes().get(0).getBusRouteNumber().contains("KIAS-"))
+        if (busRoute.getBusRouteNumber().length() > 5 && busRoute.getBusRouteNumber().contains("KIAS-"))
         {
             holder.firstLegBusRouteServiceTypeImageView.setImageResource(R.drawable.ic_flight_blue);
         }
-        else if (getBusRoutes().get(0).getBusRouteNumber().length() > 1 &&
-                getBusRoutes().get(0).getBusRouteNumber().substring(0, 2).equals("V-"))
+        else if (busRoute.getBusRouteNumber().length() > 1 && busRoute.getBusRouteNumber().substring(0, 2).equals("V-"))
         {
             holder.firstLegBusRouteServiceTypeImageView.setImageResource(R.drawable.ic_directions_bus_ac);
         }
-        else if (getBusRoutes().get(0).getBusRouteNumber().contains("MF-"))
+        else if (busRoute.getBusRouteNumber().contains("MF-"))
         {
             holder.firstLegBusRouteServiceTypeImageView.setImageResource(R.drawable.ic_directions_bus_special);
         }
@@ -42,14 +52,14 @@ class DirectTrip extends Trip
             holder.firstLegBusRouteServiceTypeImageView.setImageResource(R.drawable.ic_directions_bus_ordinary);
         }
 
-        holder.firstLegBusRouteNumberTextView.setText(getBusRoutes().get(0).getBusRouteNumber());
+        holder.firstLegBusRouteNumberTextView.setText(busRoute.getBusRouteNumber());
 
-        String nextThreeBuses = getETAAsString(getBusRoutes().get(0).getBusRouteBuses().get(0));
+        String nextThreeBuses = getTravelTime(busRoute.getBusRouteBuses().get(0).getBusETA());
         for (int busCount = 1; busCount < 3; busCount++)
         {
-            if (busCount < getBusRoutes().get(0).getBusRouteBuses().size())
+            if (busCount < busRoute.getBusRouteBuses().size())
             {
-                nextThreeBuses = nextThreeBuses + ", " + getETAAsString(getBusRoutes().get(0).getBusRouteBuses().get(busCount));
+                nextThreeBuses = nextThreeBuses + ", " + getTravelTime(busRoute.getBusRouteBuses().get(busCount).getBusETA());
             }
             else
             {
@@ -59,128 +69,31 @@ class DirectTrip extends Trip
         holder.firstLegBusETAsTextView.setText(nextThreeBuses);
 
         holder.firstLegRideTheBusTextView.setText("Ride the bus for " + String.valueOf
-                (DbQueries.getNumberOfStopsBetweenRouteOrders(db, getBusRoutes().get(0).getBusRouteId(),
-                        getBusRoutes().get(0).getTripPlannerOriginBusStop()
-                                .getBusStopRouteOrder(), getBusRoutes().get(0).getTripPlannerDestinationBusStop()
-                                .getBusStopRouteOrder())) + " stops");
+                (DbQueries.getNumberOfStopsBetweenRouteOrders(db, busRoute.getBusRouteId(), busRoute.getTripPlannerOriginBusStop()
+                        .getBusStopRouteOrder(), busRoute.getTripPlannerDestinationBusStop()
+                        .getBusStopRouteOrder())) + " stops");
 
         holder.transitPointInfoLinearLayout.setVisibility(View.GONE);
         holder.secondLegInfoRelativeLayout.setVisibility(View.GONE);
     }
 
-    private String getETAAsString(Bus bus)
-    {
-        if (!bus.isDue())
-        {
-            String travelTime;
-
-            if (bus.getBusETA() >= 60)
-            {
-                int hours = bus.getBusETA() / 60;
-                travelTime = hours + " hr " + bus.getBusETA() % 60 + " min";
-            }
-            else
-            {
-                travelTime = bus.getBusETA() + " min";
-            }
-            return travelTime;
-        }
-        else
-        {
-            return "due";
-        }
-    }
-
-    private String getTravelTime(int travelTimeInMins)
+    private String getTravelTime(int travelTimeInMinutes)
     {
         String travelTime;
 
-        if (travelTimeInMins >= 60)
+        if (travelTimeInMinutes >= 60)
         {
-            int hours = travelTimeInMins / 60;
-            travelTime = hours + " hr " + travelTimeInMins % 60 + " min";
+            int hours = travelTimeInMinutes / 60;
+            travelTime = hours + " hr " + travelTimeInMinutes % 60 + " min";
+        }
+        else if (travelTimeInMinutes == 0)
+        {
+            travelTime = "Due";
         }
         else
         {
-            travelTime = travelTimeInMins + " min";
+            travelTime = travelTimeInMinutes + " min";
         }
         return travelTime;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        /*String travelTimeAsText;
-        if (getShortestTravelTime() >= 60)
-        {
-            int hours = directTrips.get(i).getShortestTravelTime() / 60;
-            travelTimeAsText = hours + " hr " + directTrips.get(i).getShortestTravelTime() % 60 + " min";
-        }
-        else
-        {
-            travelTimeAsText = directTrips.get(i).getShortestTravelTime() + " min";
-        }
-
-        directTripsViewHolder.tripDurationTextView.setText(travelTimeAsText);
-
-        if (directTrips.get(i).getOriginStop().getBusStopDirectionName().contains(")"))
-        {
-            directTripsViewHolder.tripOriginBusStopNameTextView.setText("From " + directTrips.get(i).getOriginStop().getBusStopName()
-                    + " " + directTrips.get(i).getOriginStop().getBusStopDirectionName().substring(0,
-                    directTrips.get(i).getOriginStop().getBusStopDirectionName().indexOf(")") + 1));
-        }
-        else
-        {
-            directTripsViewHolder.tripOriginBusStopNameTextView.setText("From " + directTrips.get(i).getOriginStop().getBusStopName()
-                    + " " + directTrips.get(i).getOriginStop().getBusStopDirectionName());
-        }
-
-        String nextThreeBuses = getETAAsString(directTrips.get(i).getBusesOnDirectTrip().get(0));
-        for (int busCount = 1; busCount < 3; busCount++)
-        {
-            if (busCount < directTrips.get(i).getBusesOnDirectTrip().size())
-            {
-                nextThreeBuses = nextThreeBuses + ", " + getETAAsString(directTrips.get(i).getBusesOnDirectTrip().get(busCount));
-            }
-            else
-            {
-                break;
-            }
-        }
-        directTripsViewHolder.busArrivalTimingsTextView.setText(nextThreeBuses);
-    }
-
-    private String getETAAsString(Bus bus)
-    {
-        if (!bus.isDue())
-        {
-            String travelTime;
-
-            if (bus.getBusETA() >= 60)
-            {
-                int hours = bus.getBusETA() / 60;
-                travelTime = hours + " hr " + bus.getBusETA() % 60 + " min";
-            }
-            else
-            {
-                travelTime = bus.getBusETA() + " min";
-            }
-            return travelTime;
-        }
-        else
-        {
-            return "due";
-        }
-    }*/
 }

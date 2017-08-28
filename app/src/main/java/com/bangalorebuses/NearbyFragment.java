@@ -540,14 +540,6 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
     public void onDestroy()
     {
         super.onDestroy();
-        if (getRoutesArrivingAtStopTask != null)
-        {
-            getRoutesArrivingAtStopTask.cancel(true);
-        }
-        if (getNearestBusStopsTask != null)
-        {
-            getNearestBusStopsTask.cancel(true);
-        }
         if (googleApiClient != null)
         {
             googleApiClient.disconnect();
