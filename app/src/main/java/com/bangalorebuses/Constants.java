@@ -37,6 +37,8 @@ class Constants
     static final String ROUTE_SEARCH_HISTORY_FILENAME = "route_search_history";
     static final String TRIP_TYPE_DIRECT = "TYPE_DIRECT_TRIP";
     static final String TRIP_TYPE_INDIRECT = "TYPE_INDIRECT";
-
+    // Constants for db query tasks
+    static final String NUMBER_OF_ROUTES_TYPE_ORIGIN_TO_TRANSIT_POINT = "ORIGIN-TRANSIT_POINT";
+    static final String NUMBER_OF_ROUTES_TYPE_TRANSIT_POINT_TO_DESTINATION = "TRANSIT_POINT-DESTINATION";
     static SQLiteDatabase db;
 }

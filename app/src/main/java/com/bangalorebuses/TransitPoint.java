@@ -4,6 +4,7 @@ class TransitPoint
 {
     private String transitPointName;
     private int numberOfRoutesBetweenOriginAndTransitPoint;
+    private int numberOfRoutesBetweenTransitPointAndDestination;
 
     public String getTransitPointName()
     {
@@ -23,5 +24,15 @@ class TransitPoint
     public void setNumberOfRoutesBetweenOriginAndTransitPoint(int numberOfRoutesBetweenOriginAndTransitPoint)
     {
         this.numberOfRoutesBetweenOriginAndTransitPoint = numberOfRoutesBetweenOriginAndTransitPoint;
+    }
+
+    public int getNumberOfRoutesBetweenTransitPointAndDestination()
+    {
+        return numberOfRoutesBetweenTransitPointAndDestination;
+    }
+
+    public void setNumberOfRoutesBetweenTransitPointAndDestination(int numberOfRoutesBetweenTransitPointAndDestination)
+    {
+        this.numberOfRoutesBetweenTransitPointAndDestination = numberOfRoutesBetweenTransitPointAndDestination;
     }
 }

@@ -87,7 +87,7 @@ public class BusTrackerFragment extends Fragment
                 stack.push(line);
             }
 
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 5; i++)
             {
                 if (!stack.isEmpty())
                 {

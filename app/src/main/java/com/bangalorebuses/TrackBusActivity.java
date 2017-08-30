@@ -1,6 +1,5 @@
 package com.bangalorebuses;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -64,12 +63,13 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
     private BusRoute routeDown;
     private String currentlySelectedDirection = DIRECTION_UP;
     private boolean routeIsOnlyInOneDirection = false;
-    private ProgressDialog progressDialog;
+    //private ProgressDialog progressDialog;
     private BusStop currentlySelectedBusStop;
     private LinearLayout errorLinearLayout;
     private ImageView errorImageView;
     private TextView errorTextView;
     private TextView errorResolutionTextView;
+    private LinearLayout updatingLinearLayout;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
@@ -103,6 +103,8 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
             }
         });
         errorLinearLayout.setVisibility(View.GONE);
+        updatingLinearLayout = (LinearLayout) findViewById(R.id.updatingLinearLayout);
+        updatingLinearLayout.setVisibility(View.GONE);
 
         trackBusesOnRoute(getIntent().getStringExtra("ROUTE_NUMBER"));
     }
@@ -149,13 +151,14 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
     {
-        progressDialog.dismiss();
-        progressDialog = ProgressDialog.show(this, "Please wait", "Getting buses...");
+        cancelAllTasks();
+        errorLinearLayout.setVisibility(View.GONE);
 
         if (isNetworkAvailable())
         {
             if (currentlySelectedDirection.equals(DIRECTION_UP))
             {
+                updatingLinearLayout.setVisibility(View.VISIBLE);
                 currentlySelectedBusStop = routeUp.getBusRouteStops().get(position);
                 getBusesEnRouteTask = new GetBusesEnRouteTask(this, routeUp.getBusRouteStops()
                         .get(position).getBusStopRouteOrder(), routeUp);
@@ -164,6 +167,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
             }
             else if (currentlySelectedDirection.equals(DIRECTION_DOWN))
             {
+                updatingLinearLayout.setVisibility(View.VISIBLE);
                 currentlySelectedBusStop = routeDown.getBusRouteStops().get(position);
                 getBusesEnRouteTask = new GetBusesEnRouteTask(this, routeDown.getBusRouteStops()
                         .get(position).getBusStopRouteOrder(), routeDown);
@@ -177,7 +181,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         }
         else
         {
-            progressDialog.dismiss();
+            updatingLinearLayout.setVisibility(View.GONE);
             setErrorLayoutContent(R.drawable.ic_cloud_off_black, "Uh oh! No data connection.", "Retry");
             errorLinearLayout.setVisibility(View.VISIBLE);
             listView.setVisibility(View.GONE);
@@ -194,8 +198,9 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
     {
         if (!routeIsOnlyInOneDirection)
         {
-            progressDialog.dismiss();
-            progressDialog = ProgressDialog.show(this, "Please wait", "Getting buses...");
+            cancelAllTasks();
+            errorLinearLayout.setVisibility(View.GONE);
+            updatingLinearLayout.setVisibility(View.VISIBLE);
             directionSwapImageView.startAnimation(directionSwapAnimation);
             if (currentlySelectedDirection.equals(DIRECTION_UP))
             {
@@ -239,7 +244,8 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
 
     private void trackBusesOnRoute(String routeNumber)
     {
-        progressDialog = ProgressDialog.show(this, "Please wait", "Getting buses...");
+        errorLinearLayout.setVisibility(View.GONE);
+        updatingLinearLayout.setVisibility(View.VISIBLE);
         getRoutesWithNumberTask = new GetRoutesWithNumberTask();
         getRoutesWithNumberTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, routeNumber);
     }
@@ -359,15 +365,15 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
                     bus.setBusCurrentlyNearBusStop(currentlyNearBusStop);
                 }
 
+                updatingLinearLayout.setVisibility(View.GONE);
                 TrackBusListCustomAdapter trackBusListCustomAdapter = new TrackBusListCustomAdapter(this, buses);
                 listView.setAdapter(trackBusListCustomAdapter);
-                progressDialog.dismiss();
                 errorLinearLayout.setVisibility(View.GONE);
                 listView.setVisibility(View.VISIBLE);
             }
             else
             {
-                progressDialog.dismiss();
+                updatingLinearLayout.setVisibility(View.GONE);
                 setErrorLayoutContent(R.drawable.ic_directions_bus_black, "Whoops! There don't seem to be any buses arriving " +
                         "at this stop anytime soon.", "Retry");
                 errorLinearLayout.setVisibility(View.VISIBLE);
@@ -378,11 +384,11 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         {
             if (isNetworkAvailable())
             {
+                updatingLinearLayout.setVisibility(View.GONE);
                 switch (errorMessage)
                 {
                     case NETWORK_QUERY_IO_EXCEPTION:
                     {
-                        progressDialog.dismiss();
                         setErrorLayoutContent(R.drawable.ic_sad_face, "Sorry! Something went wrong.", "Retry");
                         errorLinearLayout.setVisibility(View.VISIBLE);
                         listView.setVisibility(View.GONE);
@@ -390,7 +396,6 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
                     }
                     case NETWORK_QUERY_JSON_EXCEPTION:
                     {
-                        progressDialog.dismiss();
                         setErrorLayoutContent(R.drawable.ic_directions_bus_black, "Whoops! There don't seem to be any buses arriving " +
                                 "at this stop anytime soon.", "Retry");
                         errorLinearLayout.setVisibility(View.VISIBLE);
@@ -399,7 +404,6 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
                     }
                     case NETWORK_QUERY_REQUEST_TIMEOUT_EXCEPTION:
                     {
-                        progressDialog.dismiss();
                         setErrorLayoutContent(R.drawable.ic_cloud_off_black, "Uh oh! Data connection seems to be slow. Couldn't track buses.", "Retry");
                         errorLinearLayout.setVisibility(View.VISIBLE);
                         listView.setVisibility(View.GONE);
@@ -407,7 +411,6 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
                     }
                     case NETWORK_QUERY_URL_EXCEPTION:
                     {
-                        progressDialog.dismiss();
                         setErrorLayoutContent(R.drawable.ic_sad_face, "Sorry! Something went wrong.", "Retry");
                         errorLinearLayout.setVisibility(View.VISIBLE);
                         listView.setVisibility(View.GONE);
@@ -415,7 +418,6 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
                     }
                     default:
                     {
-                        progressDialog.dismiss();
                         setErrorLayoutContent(R.drawable.ic_sad_face, "Sorry! Something went wrong.", "Retry");
                         errorLinearLayout.setVisibility(View.VISIBLE);
                         listView.setVisibility(View.GONE);
@@ -425,7 +427,6 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
             }
             else
             {
-                progressDialog.dismiss();
                 setErrorLayoutContent(R.drawable.ic_cloud_off_black, "Uh oh! No data connection.", "Retry");
                 errorLinearLayout.setVisibility(View.VISIBLE);
                 listView.setVisibility(View.GONE);
@@ -488,8 +489,29 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         errorResolutionTextView.setText(resolutionButtonText);
     }
 
+    private void cancelAllTasks()
+    {
+        if (getRoutesWithNumberTask != null)
+        {
+            getRoutesWithNumberTask.cancel(true);
+        }
+
+        if (getStopsOnRouteTask != null)
+        {
+            getStopsOnRouteTask.cancel(true);
+        }
+
+        if (getBusesEnRouteTask != null)
+        {
+            getBusesEnRouteTask.cancel(true);
+        }
+    }
+
     private void refresh()
     {
+        cancelAllTasks();
+        errorLinearLayout.setVisibility(View.GONE);
+
         if (isNetworkAvailable())
         {
             if (currentlySelectedBusStop != null)
@@ -497,14 +519,14 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
                 if (currentlySelectedDirection.equals(DIRECTION_UP))
                 {
                     getBusesEnRouteTask = new GetBusesEnRouteTask(this, currentlySelectedBusStop.getBusStopRouteOrder(), routeUp);
-                    progressDialog = ProgressDialog.show(this, "Please wait", "Getting buses");
+                    updatingLinearLayout.setVisibility(View.VISIBLE);
                     String requestParameters = "routeNO=" + routeUp.getBusRouteNumber() + "&" + "direction=" + DIRECTION_UP;
                     getBusesEnRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, requestParameters);
                 }
                 else if (currentlySelectedDirection.equals(DIRECTION_DOWN))
                 {
                     getBusesEnRouteTask = new GetBusesEnRouteTask(this, currentlySelectedBusStop.getBusStopRouteOrder(), routeDown);
-                    progressDialog = ProgressDialog.show(this, "Please wait", "Getting buses");
+                    updatingLinearLayout.setVisibility(View.VISIBLE);
                     String requestParameters = "routeNO=" + routeDown.getBusRouteNumber() + "&" + "direction=" + DIRECTION_DOWN;
                     getBusesEnRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, requestParameters);
                 }
@@ -516,7 +538,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         }
         else
         {
-            progressDialog.dismiss();
+            updatingLinearLayout.setVisibility(View.GONE);
             setErrorLayoutContent(R.drawable.ic_cloud_off_black, "Uh oh! No data connection.", "Retry");
             errorLinearLayout.setVisibility(View.VISIBLE);
             listView.setVisibility(View.GONE);
@@ -570,7 +592,10 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         protected void onPostExecute(ArrayList<BusRoute> busRoutes)
         {
             super.onPostExecute(busRoutes);
-            onRoutesWithNumberFound(busRoutes);
+            if (!isCancelled())
+            {
+                onRoutesWithNumberFound(busRoutes);
+            }
         }
     }
 
@@ -604,7 +629,10 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         {
             super.onPostExecute(busStops);
             busRoute.setBusRouteStops(busStops);
-            onBusStopsOnRouteFound(busRoute);
+            if (!isCancelled())
+            {
+                onBusStopsOnRouteFound(busRoute);
+            }
         }
     }
 }

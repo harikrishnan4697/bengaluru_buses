@@ -32,61 +32,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.activity_main);
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-        bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
-        BottomNavigationBarHelper.disableShiftMode(bottomNavigationView);
-
-        // Manually displaying the first fragment - one time only
-        bottomNavigationView.setSelectedItemId(R.id.navigation_track_bus);
-        if (getSupportActionBar() != null)
-        {
-            actionBar = getSupportActionBar();
-            actionBar.setTitle("Bus tracker");
-            actionBar.setElevation(0);
-        }
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.frame_layout, busTrackerFragment);
-        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-        transaction.commitNow();
-        wasDisplayingSplashScreen = false;
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener()
-        {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item)
-            {
-                switch (item.getItemId())
-                {
-                    case R.id.navigation_near_me:
-                        selectedFragment = nearbyFragment;
-                        actionBar.setTitle("Bus stops nearby");
-                        break;
-                    case R.id.navigation_track_bus:
-                        selectedFragment = busTrackerFragment;
-                        actionBar.setTitle("Bus tracker");
-                        break;
-                    case R.id.navigation_trip_planner:
-                        selectedFragment = tripPlannerFragment;
-                        actionBar.setTitle("Trip planner");
-                        break;
-                }
-                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.frame_layout, selectedFragment);
-                transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-                transaction.commitNow();
-                return true;
-            }
-        });
-
-        bottomNavigationView.setOnNavigationItemReselectedListener(new BottomNavigationView.OnNavigationItemReselectedListener()
-        {
-            @Override
-            public void onNavigationItemReselected(@NonNull MenuItem item)
-            {
-
-            }
-        });
+        initializeActivity();
     }
 
     private void initializeActivity()
@@ -122,6 +68,7 @@ public class MainActivity extends AppCompatActivity
                 }
                 bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
                 BottomNavigationBarHelper.disableShiftMode(bottomNavigationView);
+                getDatabase();
 
                 // Manually displaying the first fragment - one time only
                 bottomNavigationView.setSelectedItemId(R.id.navigation_track_bus);
@@ -208,15 +155,20 @@ public class MainActivity extends AppCompatActivity
             initializeActivity();
         }
         activityWasPaused = false;
-        getDatabase();
     }
 
     @Override
     protected void onPause()
     {
         super.onPause();
-        //countDownTimer.cancel();
+        countDownTimer.cancel();
         activityWasPaused = true;
-        //Constants.db.close();
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        Constants.db.close();
     }
 }

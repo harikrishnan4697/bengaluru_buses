@@ -31,12 +31,14 @@ import java.util.Comparator;
 
 import static android.app.Activity.RESULT_OK;
 import static com.bangalorebuses.Constants.NETWORK_QUERY_NO_ERROR;
+import static com.bangalorebuses.Constants.NUMBER_OF_ROUTES_TYPE_ORIGIN_TO_TRANSIT_POINT;
+import static com.bangalorebuses.Constants.NUMBER_OF_ROUTES_TYPE_TRANSIT_POINT_TO_DESTINATION;
 import static com.bangalorebuses.Constants.SEARCH_END_BUS_STOP_REQUEST_CODE;
 import static com.bangalorebuses.Constants.SEARCH_START_BUS_STOP_REQUEST_CODE;
 import static com.bangalorebuses.Constants.SEARCH_TYPE_BUS_STOP;
 import static com.bangalorebuses.Constants.db;
 
-public class TripPlannerFragment extends Fragment implements DirectTripHelper
+public class TripPlannerFragment extends Fragment implements DirectTripHelper, IndirectTripHelper
 {
     private Animation swapAnimation;
     private ImageView swapDirectionImageView;
@@ -59,6 +61,8 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper
     private int numberOfDirectTripQueriesMade = 0;
     private int numberOfDirectTripRouteBusesFound = 0;
     private boolean wasGettingDirectTrips = false;
+
+    private ArrayList<IndirectTrip> indirectTrips = new ArrayList<>();
 
     private LinearLayout errorLinearLayout;
     private ImageView errorImageView;
@@ -363,7 +367,7 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper
                     originBusStop.getBusStopName() + " to " + destinationBusStop.getBusStopName() +
                     " ! Getting indirect trips...", Toast.LENGTH_SHORT).show();
 
-            //findIndirectTrips(originBusStop.getBusStopName(), destinationBusStop.getBusStopName());
+            findIndirectTrips(originBusStop.getBusStopName(), destinationBusStop.getBusStopName());
         }
     }
 
@@ -436,10 +440,10 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper
 
             if (tripsToDisplay.size() == 0)
             {
-                setErrorLayoutContent(R.drawable.ic_directions_black, "Whoops! " +
-                        "There don't seem to be any direct trips right now...", "Retry");
-                errorLinearLayout.setVisibility(View.VISIBLE);
-                recyclerView.setVisibility(View.GONE);
+                findIndirectTrips(originBusStop.getBusStopName(), destinationBusStop.getBusStopName());
+                Toast.makeText(getContext(), "There aren't any direct trips from " +
+                        originBusStop.getBusStopName() + " to " + destinationBusStop.getBusStopName() +
+                        " ! Getting indirect trips...", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -495,18 +499,18 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper
     // Everything to do with indirect trips
     private void findIndirectTrips(String originBusStopName, String destinationBusStopName)
     {
-        searchOriginButton.setEnabled(false);
-        searchDestinationButton.setEnabled(false);
-        swapDirectionImageView.setEnabled(false);
-
         errorLinearLayout.setVisibility(View.GONE);
         recyclerView.setVisibility(View.GONE);
         updatingLinearLayout.setVisibility(View.VISIBLE);
+        indirectTrips.clear();
 
         if (isNetworkAvailable())
         {
-            new GetTransitPoints().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
-                    originBusStopName, destinationBusStopName);
+            new TransitPointsWithNumberOfRoutesTask(this, originBusStopName, destinationBusStopName, NUMBER_OF_ROUTES_TYPE_ORIGIN_TO_TRANSIT_POINT)
+                    .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+            new TransitPointsWithNumberOfRoutesTask(this, originBusStopName, destinationBusStopName, NUMBER_OF_ROUTES_TYPE_TRANSIT_POINT_TO_DESTINATION)
+                    .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
         else
         {
@@ -517,45 +521,116 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper
         }
     }
 
-    private void onTransitPointsFound(ArrayList<IndirectTrip> indirectTrips)
+    @Override
+    public void onTransitPointsWithNumberOfRoutesFound(ArrayList<TransitPoint> transitPoints, String numberOfRoutesType)
     {
-        if (isNetworkAvailable())
+        if (transitPoints.size() == 0)
         {
-            new CalculateScoresForIndirectTripsTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, indirectTrips);
+            updatingLinearLayout.setVisibility(View.GONE);
+            Toast.makeText(getContext(), "There aren't are doirect or indirect trips...", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (indirectTrips.size() == 0)
+        {
+            for (TransitPoint transitPoint : transitPoints)
+            {
+                IndirectTrip indirectTrip = new IndirectTrip();
+                indirectTrip.setTransitPoint(transitPoint);
+                indirectTrips.add(indirectTrip);
+            }
+        }
+
+        if (numberOfRoutesType.equals(NUMBER_OF_ROUTES_TYPE_ORIGIN_TO_TRANSIT_POINT))
+        {
+            for (TransitPoint transitPoint : transitPoints)
+            {
+                for (IndirectTrip indirectTrip : indirectTrips)
+                {
+                    if (indirectTrip.getTransitPoint().getTransitPointName().equals(transitPoint.getTransitPointName()))
+                    {
+                        indirectTrip.getTransitPoint().setNumberOfRoutesBetweenOriginAndTransitPoint(
+                                transitPoint.getNumberOfRoutesBetweenOriginAndTransitPoint());
+                    }
+                }
+            }
         }
         else
         {
-            updatingLinearLayout.setVisibility(View.GONE);
-            setErrorLayoutContent(R.drawable.ic_cloud_off_black, "Uh oh! No data connection.", "Retry");
-            errorLinearLayout.setVisibility(View.VISIBLE);
-            recyclerView.setVisibility(View.GONE);
+            for (TransitPoint transitPoint : transitPoints)
+            {
+                for (IndirectTrip indirectTrip : indirectTrips)
+                {
+                    if (indirectTrip.getTransitPoint().getTransitPointName().equals(transitPoint.getTransitPointName()))
+                    {
+                        indirectTrip.getTransitPoint().setNumberOfRoutesBetweenTransitPointAndDestination(
+                                transitPoint.getNumberOfRoutesBetweenTransitPointAndDestination());
+                    }
+                }
+            }
+        }
+
+        if (indirectTrips.get(0).getTransitPoint().getNumberOfRoutesBetweenOriginAndTransitPoint() != 0 &&
+                indirectTrips.get(0).getTransitPoint().getNumberOfRoutesBetweenTransitPointAndDestination() != 0)
+        {
+            for (IndirectTrip indirectTrip : indirectTrips)
+            {
+                if (indirectTrip.getTransitPoint().getNumberOfRoutesBetweenOriginAndTransitPoint() <
+                        indirectTrip.getTransitPoint().getNumberOfRoutesBetweenTransitPointAndDestination())
+                {
+                    indirectTrip.setTransitPointScore(indirectTrip.getTransitPoint().getNumberOfRoutesBetweenOriginAndTransitPoint());
+                }
+                else
+                {
+                    indirectTrip.setTransitPointScore(indirectTrip.getTransitPoint().getNumberOfRoutesBetweenTransitPointAndDestination());
+                }
+            }
+
+            Collections.sort(indirectTrips, new Comparator<IndirectTrip>()
+            {
+                @Override
+                public int compare(IndirectTrip o1, IndirectTrip o2)
+                {
+                    return o2.getTransitPointScore() - o1.getTransitPointScore();
+                }
+            });
+
+            ArrayList<IndirectTrip> tempIndirectTrips = new ArrayList<>();
+
+            for (int i = 0; i < 5; i++)
+            {
+                if (i < indirectTrips.size())
+                {
+                    tempIndirectTrips.add(indirectTrips.get(i));
+                }
+            }
+
+            indirectTrips.clear();
+            indirectTrips = tempIndirectTrips;
+
+
         }
     }
 
-    private void onIndirectTripScoresFound(ArrayList<IndirectTrip> indirectTrips)
+    @Override
+    public void onRoutesOnLeg1Found(ArrayList<IndirectTrip> indirectTrips)
     {
-        Toast.makeText(getContext(), "Got transit point scores successfully!", Toast.LENGTH_SHORT).show();
 
-        Collections.sort(indirectTrips, new Comparator<IndirectTrip>()
-        {
-            @Override
-            public int compare(IndirectTrip o1, IndirectTrip o2)
-            {
-                return o2.getTransitPointScore() - o1.getTransitPointScore();
-            }
-        });
-
-        for (int i = 0; i < 5; i++)
-        {
-            if (i < indirectTrips.size())
-            {
-                indirectTrips.get(i).setOriginBusStop(originBusStop);
-                indirectTrips.get(i).setDestinationBusStopName(destinationBusStop.getBusStopName());
-                // TODO this.indirectTrips.get(i).getFastestRouteOnFirstLeg();
-            }
-        }
     }
 
+    @Override
+    public void onBusesInServiceFound(String errorMessage, IndirectTrip indirectTrip)
+    {
+
+    }
+
+    @Override
+    public void onRoutesOnLeg2Found(ArrayList<IndirectTrip> indirectTrips)
+    {
+
+    }
+
+    // Other stuff
     private void setErrorLayoutContent(int drawableResId, String errorMessage, String resolutionButtonText)
     {
         errorImageView.setImageResource(drawableResId);
@@ -631,56 +706,6 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper
             {
                 onDirectTripsFound(trips);
             }
-        }
-    }
-
-    private class GetTransitPoints extends AsyncTask<String, Void, ArrayList<IndirectTrip>>
-    {
-        @Override
-        protected ArrayList<IndirectTrip> doInBackground(String... busStopNames)
-        {
-            return DbQueries.getTransitPoints(db, busStopNames[0], busStopNames[1]);
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<IndirectTrip> indirectTrips)
-        {
-            super.onPostExecute(indirectTrips);
-            onTransitPointsFound(indirectTrips);
-        }
-    }
-
-    private class CalculateScoresForIndirectTripsTask extends AsyncTask<ArrayList<IndirectTrip>, Void, ArrayList<IndirectTrip>>
-    {
-        @Override
-        protected ArrayList<IndirectTrip> doInBackground(ArrayList<IndirectTrip>... params)
-        {
-            for (IndirectTrip indirectTrip : params[0])
-            {
-                int numberScheduledRoutesInLeg1 = DbQueries.getNumberOfRoutesBetweenStops(db, originBusStop.getBusStopName(),
-                        indirectTrip.getTransitPoint().getTransitPointName());
-
-                int numberScheduledRoutesInLeg2 = DbQueries.getNumberOfRoutesBetweenStops(db, indirectTrip.getTransitPoint()
-                        .getTransitPointName(), destinationBusStop.getBusStopName());
-
-                if (numberScheduledRoutesInLeg1 < numberScheduledRoutesInLeg2)
-                {
-                    indirectTrip.setTransitPointScore(numberScheduledRoutesInLeg1);
-                }
-                else
-                {
-                    indirectTrip.setTransitPointScore(numberScheduledRoutesInLeg2);
-                }
-            }
-
-            return params[0];
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<IndirectTrip> indirectTrips)
-        {
-            super.onPostExecute(indirectTrips);
-            onIndirectTripScoresFound(indirectTrips);
         }
     }
 }
