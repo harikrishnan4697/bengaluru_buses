@@ -62,7 +62,7 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
     private int numberOfDirectTripRouteBusesFound = 0;
     private boolean wasGettingDirectTrips = false;
 
-    private ArrayList<IndirectTrip> indirectTrips = new ArrayList<>();
+    private ArrayList<TransitPoint> transitPoints = new ArrayList<>();
 
     private LinearLayout errorLinearLayout;
     private ImageView errorImageView;
@@ -502,7 +502,7 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
         errorLinearLayout.setVisibility(View.GONE);
         recyclerView.setVisibility(View.GONE);
         updatingLinearLayout.setVisibility(View.VISIBLE);
-        indirectTrips.clear();
+        transitPoints.clear();
 
         if (isNetworkAvailable())
         {
@@ -522,110 +522,130 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
     }
 
     @Override
-    public void onTransitPointsWithNumberOfRoutesFound(ArrayList<TransitPoint> transitPoints, String numberOfRoutesType)
+    public void onTransitPointsAndRouteCountOriginToTPFound(ArrayList<TransitPoint> transitPoints)
     {
+        // Make sure that there are transit points.
         if (transitPoints.size() == 0)
         {
             updatingLinearLayout.setVisibility(View.GONE);
-            Toast.makeText(getContext(), "There aren't are doirect or indirect trips...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "There aren't are direct or indirect trips...", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        if (indirectTrips.size() == 0)
+        if (this.transitPoints.size() == 0)
         {
-            for (TransitPoint transitPoint : transitPoints)
-            {
-                IndirectTrip indirectTrip = new IndirectTrip();
-                indirectTrip.setTransitPoint(transitPoint);
-                indirectTrips.add(indirectTrip);
-            }
-        }
-
-        if (numberOfRoutesType.equals(NUMBER_OF_ROUTES_TYPE_ORIGIN_TO_TRANSIT_POINT))
-        {
-            for (TransitPoint transitPoint : transitPoints)
-            {
-                for (IndirectTrip indirectTrip : indirectTrips)
-                {
-                    if (indirectTrip.getTransitPoint().getTransitPointName().equals(transitPoint.getTransitPointName()))
-                    {
-                        indirectTrip.getTransitPoint().setNumberOfRoutesBetweenOriginAndTransitPoint(
-                                transitPoint.getNumberOfRoutesBetweenOriginAndTransitPoint());
-                    }
-                }
-            }
+            this.transitPoints = transitPoints;
         }
         else
         {
-            for (TransitPoint transitPoint : transitPoints)
+            for (TransitPoint transitPoint : this.transitPoints)
             {
-                for (IndirectTrip indirectTrip : indirectTrips)
+                for (TransitPoint tp : transitPoints)
                 {
-                    if (indirectTrip.getTransitPoint().getTransitPointName().equals(transitPoint.getTransitPointName()))
+                    if (transitPoint.getTransitPointName().equals(tp.getTransitPointName()))
                     {
-                        indirectTrip.getTransitPoint().setNumberOfRoutesBetweenTransitPointAndDestination(
-                                transitPoint.getNumberOfRoutesBetweenTransitPointAndDestination());
+                        transitPoint.setNumberOfRoutesBetweenOriginAndTransitPoint(
+                                tp.getNumberOfRoutesBetweenOriginAndTransitPoint());
                     }
                 }
             }
         }
 
-        if (indirectTrips.get(0).getTransitPoint().getNumberOfRoutesBetweenOriginAndTransitPoint() != 0 &&
-                indirectTrips.get(0).getTransitPoint().getNumberOfRoutesBetweenTransitPointAndDestination() != 0)
+        if (this.transitPoints.get(0).getNumberOfRoutesBetweenOriginAndTransitPoint() != 0 &&
+                this.transitPoints.get(0).getNumberOfRoutesBetweenTransitPointAndDestination() != 0)
         {
-            for (IndirectTrip indirectTrip : indirectTrips)
-            {
-                if (indirectTrip.getTransitPoint().getNumberOfRoutesBetweenOriginAndTransitPoint() <
-                        indirectTrip.getTransitPoint().getNumberOfRoutesBetweenTransitPointAndDestination())
-                {
-                    indirectTrip.setTransitPointScore(indirectTrip.getTransitPoint().getNumberOfRoutesBetweenOriginAndTransitPoint());
-                }
-                else
-                {
-                    indirectTrip.setTransitPointScore(indirectTrip.getTransitPoint().getNumberOfRoutesBetweenTransitPointAndDestination());
-                }
-            }
-
-            Collections.sort(indirectTrips, new Comparator<IndirectTrip>()
-            {
-                @Override
-                public int compare(IndirectTrip o1, IndirectTrip o2)
-                {
-                    return o2.getTransitPointScore() - o1.getTransitPointScore();
-                }
-            });
-
-            ArrayList<IndirectTrip> tempIndirectTrips = new ArrayList<>();
-
-            for (int i = 0; i < 5; i++)
-            {
-                if (i < indirectTrips.size())
-                {
-                    tempIndirectTrips.add(indirectTrips.get(i));
-                }
-            }
-
-            indirectTrips.clear();
-            indirectTrips = tempIndirectTrips;
-
-
+            onTransitPointsFound();
         }
     }
 
     @Override
-    public void onRoutesOnLeg1Found(ArrayList<IndirectTrip> indirectTrips)
+    public void onTransitPointsAndRouteCountTPToDestFound(ArrayList<TransitPoint> transitPoints)
     {
+        // Make sure that there are transit points.
+        if (transitPoints.size() == 0)
+        {
+            updatingLinearLayout.setVisibility(View.GONE);
+            Toast.makeText(getContext(), "There aren't are direct or indirect trips...", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
+        if (this.transitPoints.size() == 0)
+        {
+            this.transitPoints = transitPoints;
+        }
+        else
+        {
+            for (TransitPoint transitPoint : this.transitPoints)
+            {
+                for (TransitPoint tp : transitPoints)
+                {
+                    if (transitPoint.getTransitPointName().equals(tp.getTransitPointName()))
+                    {
+                        transitPoint.setNumberOfRoutesBetweenTransitPointAndDestination(
+                                tp.getNumberOfRoutesBetweenTransitPointAndDestination());
+                    }
+                }
+            }
+        }
+
+        if (this.transitPoints.get(0).getNumberOfRoutesBetweenOriginAndTransitPoint() != 0 &&
+                this.transitPoints.get(0).getNumberOfRoutesBetweenTransitPointAndDestination() != 0)
+        {
+            onTransitPointsFound();
+        }
+    }
+
+    private void onTransitPointsFound()
+    {
+        for (TransitPoint transitPoint : this.transitPoints)
+        {
+            if (transitPoint.getNumberOfRoutesBetweenOriginAndTransitPoint() <
+                    transitPoint.getNumberOfRoutesBetweenTransitPointAndDestination())
+            {
+                transitPoint.setTransitPointScore(transitPoint.getNumberOfRoutesBetweenOriginAndTransitPoint());
+            }
+            else
+            {
+                transitPoint.setTransitPointScore(transitPoint.getNumberOfRoutesBetweenTransitPointAndDestination());
+            }
+        }
+
+        Collections.sort(this.transitPoints, new Comparator<TransitPoint>()
+        {
+            @Override
+            public int compare(TransitPoint o1, TransitPoint o2)
+            {
+                return o2.getTransitPointScore() - o1.getTransitPointScore();
+            }
+        });
+
+        ArrayList<TransitPoint> tempTransitPoints = new ArrayList<>();
+
+        for (int i = 0; i < 5; i++)
+        {
+            if (i < this.transitPoints.size())
+            {
+                tempTransitPoints.add(this.transitPoints.get(i));
+            }
+        }
+
+        this.transitPoints = tempTransitPoints;
+
+        for (TransitPoint transitPoint : this.transitPoints)
+        {
+            new BusRoutesToAndFromTransitPointTask(this, originBusStop.getBusStopName(), transitPoint, destinationBusStop.getBusStopName())
+                    .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }
     }
 
     @Override
-    public void onBusesInServiceFound(String errorMessage, IndirectTrip indirectTrip)
+    public void onRoutesToAndFromTransitPointFound(TransitPoint transitPoint)
     {
-
+        transitPoint.getTransitPointName();
     }
 
     @Override
-    public void onRoutesOnLeg2Found(ArrayList<IndirectTrip> indirectTrips)
+    public void onBusesInServiceFound(String errorMessage, TransitPoint transitPoint)
     {
 
     }

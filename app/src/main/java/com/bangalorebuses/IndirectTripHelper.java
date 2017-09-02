@@ -4,11 +4,11 @@ import java.util.ArrayList;
 
 interface IndirectTripHelper
 {
-    void onTransitPointsWithNumberOfRoutesFound(ArrayList<TransitPoint> transitPoints, String numberOfRoutesType);
+    void onTransitPointsAndRouteCountOriginToTPFound(ArrayList<TransitPoint> transitPoints);
 
-    void onRoutesOnLeg1Found(ArrayList<IndirectTrip> indirectTrips);
+    void onTransitPointsAndRouteCountTPToDestFound(ArrayList<TransitPoint> transitPoints);
 
-    void onBusesInServiceFound(String errorMessage, IndirectTrip indirectTrip);
+    void onRoutesToAndFromTransitPointFound(TransitPoint transitPoint);
 
-    void onRoutesOnLeg2Found(ArrayList<IndirectTrip> indirectTrips);
+    void onBusesInServiceFound(String errorMessage, TransitPoint transitPoint);
 }

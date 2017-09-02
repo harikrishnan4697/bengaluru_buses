@@ -1,10 +1,15 @@
 package com.bangalorebuses;
 
+import java.util.ArrayList;
+
 class TransitPoint
 {
     private String transitPointName;
     private int numberOfRoutesBetweenOriginAndTransitPoint;
     private int numberOfRoutesBetweenTransitPointAndDestination;
+    private int transitPointScore;
+    private ArrayList<BusRoute> busRoutesToTransitPoint;
+    private ArrayList<BusRoute> busRoutesFromTransitPoint;
 
     public String getTransitPointName()
     {
@@ -34,5 +39,35 @@ class TransitPoint
     public void setNumberOfRoutesBetweenTransitPointAndDestination(int numberOfRoutesBetweenTransitPointAndDestination)
     {
         this.numberOfRoutesBetweenTransitPointAndDestination = numberOfRoutesBetweenTransitPointAndDestination;
+    }
+
+    public int getTransitPointScore()
+    {
+        return transitPointScore;
+    }
+
+    public void setTransitPointScore(int transitPointScore)
+    {
+        this.transitPointScore = transitPointScore;
+    }
+
+    public ArrayList<BusRoute> getBusRoutesToTransitPoint()
+    {
+        return busRoutesToTransitPoint;
+    }
+
+    public void setBusRoutesToTransitPoint(ArrayList<BusRoute> busRoutesToTransitPoint)
+    {
+        this.busRoutesToTransitPoint = busRoutesToTransitPoint;
+    }
+
+    public ArrayList<BusRoute> getBusRoutesFromTransitPoint()
+    {
+        return busRoutesFromTransitPoint;
+    }
+
+    public void setBusRoutesFromTransitPoint(ArrayList<BusRoute> busRoutesFromTransitPoint)
+    {
+        this.busRoutesFromTransitPoint = busRoutesFromTransitPoint;
     }
 }

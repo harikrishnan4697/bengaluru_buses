@@ -26,6 +26,7 @@ class BusRoute implements Serializable
     private BusStop tripPlannerOriginBusStop;
     private BusStop tripPlannerDestinationBusStop;
     private int shortestOriginToDestinationTravelTime;
+    private int shortestETA;
 
     public int getBusRouteId()
     {
@@ -145,5 +146,15 @@ class BusRoute implements Serializable
     public void setShortestOriginToDestinationTravelTime(int shortestOriginToDestinationTravelTime)
     {
         this.shortestOriginToDestinationTravelTime = shortestOriginToDestinationTravelTime;
+    }
+
+    public int getShortestETA()
+    {
+        return shortestETA;
+    }
+
+    public void setShortestETA(int shortestETA)
+    {
+        this.shortestETA = shortestETA;
     }
 }

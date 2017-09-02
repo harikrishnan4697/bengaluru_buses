@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 
 /**
  * This class extends AsyncTask and is used for querying the BMTC
@@ -23,26 +24,30 @@ import java.net.URL;
  * @since 2-7-2017
  */
 
-class GetTransitPointsTask extends AsyncTask<BusStop, Void, BusStop[]>
+class GetTransitPointsTask extends AsyncTask<Void, Void, ArrayList<TransitPoint>>
 {
     private String errorMessage = Constants.NETWORK_QUERY_NO_ERROR;
-    private DirectTripHelper caller;
+    private IndirectTripHelper caller;
+    private String originBusStopName;
+    private String destinationBusStopName;
 
-    GetTransitPointsTask(DirectTripHelper caller)
+    GetTransitPointsTask(IndirectTripHelper caller, String originBusStopName, String destinationBusStopName)
     {
         this.caller = caller;
+        this.originBusStopName = originBusStopName;
+        this.destinationBusStopName = destinationBusStopName;
     }
 
     @Override
-    protected BusStop[] doInBackground(BusStop... busStops)
+    protected ArrayList<TransitPoint> doInBackground(Void... voids)
     {
         URL requestURL;
         String requestBody;
-        BusStop[] transitPoints;
+        ArrayList<TransitPoint> transitPoints = new ArrayList<>();
         try
         {
             requestURL = new URL("http://bmtcmob.hostg.in/api/transitroute/transitpoint");
-            requestBody = "startStop=" + busStops[0].getBusStopName() + "&endStop=" + busStops[1].getBusStopName();
+            requestBody = "startStop=" + originBusStopName + "&endStop=" + destinationBusStopName;
         }
         catch (MalformedURLException e)
         {
@@ -88,12 +93,14 @@ class GetTransitPointsTask extends AsyncTask<BusStop, Void, BusStop[]>
         {
             JSONObject jsonObject = new JSONObject(result.toString());
             JSONArray jsonArray = new JSONArray(jsonObject.getJSONArray("transit_points").toString());
-            transitPoints = new BusStop[jsonArray.length()];
+
             for (int i = 0; i < jsonArray.length(); i++)
             {
-                JSONObject transitPoint = jsonArray.getJSONObject(i);
-                transitPoints[i] = new BusStop();
-                transitPoints[i].setBusStopName(transitPoint.getString("common_group_name"));
+                JSONObject transitPointJSONObject = jsonArray.getJSONObject(i);
+
+                TransitPoint transitPoint = new TransitPoint();
+                transitPoint.setTransitPointName(transitPointJSONObject.getString("common_group_name"));
+                transitPoints.add(transitPoint);
             }
         }
         catch (JSONException e)
@@ -106,8 +113,9 @@ class GetTransitPointsTask extends AsyncTask<BusStop, Void, BusStop[]>
     }
 
     @Override
-    protected void onPostExecute(BusStop[] transitPoints)
+    protected void onPostExecute(ArrayList<TransitPoint> transitPoints)
     {
-        //caller.onTransitPointsFound(errorMessage, transitPoints);
+        super.onPostExecute(transitPoints);
+        //caller.onTransitPointsWithNumberOfRoutesFound(transitPoints, "");
     }
 }
