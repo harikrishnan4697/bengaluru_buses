@@ -415,6 +415,32 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
                     }
                 });
 
+                ArrayList<Trip> tempTripsToDisplay = new ArrayList<>();
+                for (int i = 0; i < 5; i++)
+                {
+                    if (i < tripsToDisplay.size())
+                    {
+                        tempTripsToDisplay.add(tripsToDisplay.get(i));
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                tripsToDisplay.clear();
+                for (int i = 0; i < 3; i++)
+                {
+                    if (i < tempTripsToDisplay.size())
+                    {
+                        tripsToDisplay.add(tempTripsToDisplay.get(i));
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
                 recyclerViewAdapter.notifyDataSetChanged();
                 recyclerView.setVisibility(View.VISIBLE);
             }
@@ -521,6 +547,7 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
         }
     }
 
+    // TODO make separate/unique connections to the db
     @Override
     public void onTransitPointsAndRouteCountOriginToTPFound(ArrayList<TransitPoint> transitPoints)
     {
@@ -597,6 +624,8 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
 
     private void onTransitPointsFound()
     {
+        // For each transit point, set the score to the smaller number of routes
+        // of the two legs.
         for (TransitPoint transitPoint : this.transitPoints)
         {
             if (transitPoint.getNumberOfRoutesBetweenOriginAndTransitPoint() <
@@ -610,15 +639,17 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
             }
         }
 
+        // Sort the transit points in descending order based on their scores
         Collections.sort(this.transitPoints, new Comparator<TransitPoint>()
         {
             @Override
-            public int compare(TransitPoint o1, TransitPoint o2)
+            public int compare(TransitPoint tp1, TransitPoint tp2)
             {
-                return o2.getTransitPointScore() - o1.getTransitPointScore();
+                return tp2.getTransitPointScore() - tp1.getTransitPointScore();
             }
         });
 
+        // Keep only the top 5 transit points based on their scores
         ArrayList<TransitPoint> tempTransitPoints = new ArrayList<>();
 
         for (int i = 0; i < 5; i++)
@@ -631,6 +662,12 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
 
         this.transitPoints = tempTransitPoints;
 
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerViewAdapter = new TripsRecyclerViewAdapter(tripsToDisplay);
+        recyclerView.setAdapter(recyclerViewAdapter);
+        tripsToDisplay.clear();
+
         for (TransitPoint transitPoint : this.transitPoints)
         {
             new BusRoutesToAndFromTransitPointTask(this, originBusStop.getBusStopName(), transitPoint, destinationBusStop.getBusStopName())
@@ -641,14 +678,217 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
     @Override
     public void onRoutesToAndFromTransitPointFound(TransitPoint transitPoint)
     {
-        transitPoint.getTransitPointName();
+        for (int i = 0; i < 5; i++)
+        {
+            if (i < transitPoint.getBusRoutesToTransitPoint().size())
+            {
+                new IndirectTripBusesInServiceTask(this, transitPoint.getBusRoutesToTransitPoint().get(i), transitPoint).executeOnExecutor(
+                        AsyncTask.THREAD_POOL_EXECUTOR);
+            }
+            else
+            {
+                break;
+            }
+        }
     }
 
     @Override
-    public void onBusesInServiceFound(String errorMessage, TransitPoint transitPoint)
+    public void onBusesInServiceFound(String errorMessage, BusRoute busRoute, TransitPoint transitPoint)
+    {
+        synchronized (this)
+        {
+            if (errorMessage.equals(NETWORK_QUERY_NO_ERROR))
+            {
+                if (busRoute.getBusRouteBuses().size() != 0)
+                {
+                    IndirectTrip indirectTrip = new IndirectTrip();
+                    indirectTrip.setOriginBusStop(busRoute.getTripPlannerOriginBusStop());
+                    indirectTrip.setDestinationBusStopName(destinationBusStop.getBusStopName());
+
+                    busRoute.getBusRouteBuses().get(0).setBusETA(calculateTravelTime(DbQueries.getNumberOfStopsBetweenRouteOrders(db,
+                            busRoute.getBusRouteId(), busRoute.getBusRouteBuses().get(0).getBusRouteOrder(), busRoute.getTripPlannerOriginBusStop()
+                                    .getBusStopRouteOrder()), busRoute.getBusRouteNumber()));
+
+                    busRoute.getBusRouteBuses().get(0).setBusETAToTransitPoint(calculateTravelTime(DbQueries.getNumberOfStopsBetweenRouteOrders(db,
+                            busRoute.getBusRouteId(), busRoute.getBusRouteBuses().get(0).getBusRouteOrder(), busRoute.getTripPlannerDestinationBusStop()
+                                    .getBusStopRouteOrder()), busRoute.getBusRouteNumber()));
+
+                    indirectTrip.setBusToTransitPoint(busRoute.getBusRouteBuses().get(0));
+                    indirectTrip.setTransitPoint(transitPoint);
+                    indirectTrip.setBusFromTransitPoint(transitPoint.getBusRoutesFromTransitPoint().get(0).getBusRouteBuses().get(0));
+
+                    Bus bus = null;
+                    for (BusRoute busRouteFromTP : transitPoint.getBusRoutesFromTransitPoint())
+                    {
+                        for (Bus busFromTP : busRouteFromTP.getBusRouteBuses())
+                        {
+                            if (busFromTP.getBusETA() > (indirectTrip.getBusToTransitPoint().getBusETAToTransitPoint() + 2))
+                            {
+                                if (bus != null)
+                                {
+                                    if (busFromTP.getBusETA() < bus.getBusETA())
+                                    {
+                                        bus = busFromTP;
+                                    }
+                                }
+                                else
+                                {
+                                    bus = busFromTP;
+                                }
+                            }
+                        }
+                    }
+
+                    indirectTrip.setBusFromTransitPoint(bus);
+
+                    if (indirectTrip.getBusToTransitPoint() != null && indirectTrip.getBusFromTransitPoint() != null)
+                    {
+                        int travelTimeFromTPToDest = calculateTravelTime(DbQueries.getNumberOfStopsBetweenRouteOrders(db,
+                                indirectTrip.getBusFromTransitPoint().getBusRoute().getBusRouteId(), indirectTrip.getBusFromTransitPoint()
+                                        .getBusRoute().getTripPlannerOriginBusStop().getBusStopRouteOrder(), indirectTrip.getBusFromTransitPoint()
+                                        .getBusRoute().getTripPlannerDestinationBusStop().getBusStopRouteOrder()), indirectTrip.getBusFromTransitPoint()
+                                .getBusRoute().getBusRouteNumber());
+
+                        indirectTrip.setTripDuration(indirectTrip.getBusToTransitPoint().getBusETAToTransitPoint() + (indirectTrip.getBusFromTransitPoint()
+                                .getBusETA() - indirectTrip.getBusToTransitPoint().getBusETAToTransitPoint()) + travelTimeFromTPToDest);
+
+                        tripsToDisplay.add(indirectTrip);
+
+                        Collections.sort(tripsToDisplay, new Comparator<Trip>()
+                        {
+                            @Override
+                            public int compare(Trip o1, Trip o2)
+                            {
+                                return ((IndirectTrip) o1).getTripDuration() - ((IndirectTrip) o2).getTripDuration();
+                            }
+                        });
+
+                        ArrayList<Trip> tempTripsToDisplay = new ArrayList<>();
+                        for (int i = 0; i < 3; i++)
+                        {
+                            if (i < tripsToDisplay.size())
+                            {
+                                tempTripsToDisplay.add(tripsToDisplay.get(i));
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+
+                        tripsToDisplay.clear();
+                        for (int i = 0; i < 5; i++)
+                        {
+                            if (i < tempTripsToDisplay.size())
+                            {
+                                tripsToDisplay.add(tempTripsToDisplay.get(i));
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+
+                        recyclerViewAdapter.notifyDataSetChanged();
+                        recyclerView.setVisibility(View.VISIBLE);
+                    }
+                }
+                else
+                {
+                    //TODO
+                }
+            }
+            else
+            {
+                //TODO Handle errors
+            }
+        }
+    }
+
+    /*@Override
+    public void onBusesInServiceFound(String errorMessage, IndirectTrip indirectTrip)
     {
 
-    }
+        if (errorMessage.equals(NETWORK_QUERY_NO_ERROR))
+        {
+            if (indirectTrip.getBusRouteToTransitPoint().getBusRouteBuses().size() != 0)
+            {
+                Bus busToTransitPoint = indirectTrip.getBusRouteToTransitPoint().getBusRouteBuses().get(0);
+                busToTransitPoint.setBusETA(calculateTravelTime(DbQueries.getNumberOfStopsBetweenRouteOrders(db,
+                        indirectTrip.getBusRouteToTransitPoint().getBusRouteId(), busToTransitPoint.getBusRouteOrder(), indirectTrip.getBusRouteToTransitPoint()
+                                .getTripPlannerOriginBusStop().getBusStopRouteOrder()), indirectTrip.getBusRouteToTransitPoint()
+                        .getBusRouteNumber()));
+
+                busToTransitPoint.setBusETAToTransitPoint(busToTransitPoint.getBusETA() + calculateTravelTime(DbQueries.getNumberOfStopsBetweenRouteOrders(
+                        db, indirectTrip.getBusRouteToTransitPoint().getBusRouteId(), indirectTrip.getBusRouteToTransitPoint().getTripPlannerOriginBusStop()
+                                .getBusStopRouteOrder(), indirectTrip.getBusRouteToTransitPoint().getTripPlannerDestinationBusStop().getBusStopRouteOrder()),
+                        indirectTrip.getBusRouteToTransitPoint().getBusRouteNumber()));
+
+                indirectTrip.setBusToTransitPoint(busToTransitPoint);
+
+                Bus busFromTransitPoint = null;
+                for (BusRoute busRouteFromTransitPoint : indirectTrip.getBusRoutesFromTransitPoint())
+                {
+                    for (Bus bus : busRouteFromTransitPoint.getBusRouteBuses())
+                    {
+                        if (bus.getBusETA() > (busToTransitPoint.getBusETAToTransitPoint() + 2))
+                        {
+                            if (busFromTransitPoint != null)
+                            {
+                                if (busFromTransitPoint.getBusETA() > bus.getBusETA())
+                                {
+                                    busFromTransitPoint = bus;
+                                }
+                            }
+                            else
+                            {
+                                busFromTransitPoint = bus;
+                            }
+                        }
+                    }
+                }
+
+                if (busFromTransitPoint != null)
+                {
+                    indirectTrip.setBusFromTransitPoint(busFromTransitPoint);
+                    indirectTrip.setTripDuration(busToTransitPoint.getBusETAToTransitPoint() + 2 + busFromTransitPoint.getBusETA() + calculateTravelTime(DbQueries
+                            .getNumberOfStopsBetweenRouteOrders(db, busFromTransitPoint.getBusRoute().getBusRouteId(), busFromTransitPoint.getBusRoute()
+                                    .getTripPlannerOriginBusStop().getBusStopRouteOrder(), busFromTransitPoint.getBusRoute().getTripPlannerDestinationBusStop()
+                                    .getBusStopRouteOrder()), busFromTransitPoint.getBusRoute().getBusRouteNumber()));
+
+                    tripsToDisplay.add(indirectTrip);
+
+                    Collections.sort(tripsToDisplay, new Comparator<Trip>()
+                    {
+                        @Override
+                        public int compare(Trip o1, Trip o2)
+                        {
+                            return ((IndirectTrip) o1).getTripDuration() - ((IndirectTrip) o2).getTripDuration();
+                        }
+                    });
+
+                    ArrayList<Trip> tempTripsToDisplay = new ArrayList<>();
+                    for (int i = 0; i < 5; i++)
+                    {
+                        if (i < tripsToDisplay.size())
+                        {
+                            tempTripsToDisplay.add(tripsToDisplay.get(i));
+                        }
+                    }
+
+                    tripsToDisplay = tempTripsToDisplay;
+                    tripsToDisplay.trimToSize();
+
+                    recyclerViewAdapter.notifyDataSetChanged();
+                    recyclerView.setVisibility(View.VISIBLE);
+                }
+            }
+        }
+        else
+        {
+            // TODO handle errors
+        }
+    }*/
 
     // Other stuff
     private void setErrorLayoutContent(int drawableResId, String errorMessage, String resolutionButtonText)

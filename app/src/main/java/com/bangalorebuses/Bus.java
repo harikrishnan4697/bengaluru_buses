@@ -21,6 +21,7 @@ class Bus implements Serializable
     private boolean isDue;
     private BusRoute busRoute;
     private String busCurrentlyNearBusStop;
+    private int busETAToTransitPoint;
 
     public String getBusRegistrationNumber()
     {
@@ -100,5 +101,15 @@ class Bus implements Serializable
     public void setBusCurrentlyNearBusStop(String busCurrentlyNearBusStop)
     {
         this.busCurrentlyNearBusStop = busCurrentlyNearBusStop;
+    }
+
+    public int getBusETAToTransitPoint()
+    {
+        return busETAToTransitPoint;
+    }
+
+    public void setBusETAToTransitPoint(int busETAToTransitPoint)
+    {
+        this.busETAToTransitPoint = busETAToTransitPoint;
     }
 }

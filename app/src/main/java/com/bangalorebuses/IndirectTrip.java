@@ -1,62 +1,128 @@
 package com.bangalorebuses;
 
-import java.util.ArrayList;
+import android.view.View;
+
+import static com.bangalorebuses.Constants.db;
 
 class IndirectTrip extends Trip
 {
-    private ArrayList<BusRoute> busRoutesOnLeg1 = new ArrayList<>();
-    private ArrayList<BusRoute> busRoutesOnLeg2 = new ArrayList<>();
+    private int tripDuration;
+    private Bus busToTransitPoint;
+    private Bus busFromTransitPoint;
 
     private TransitPoint transitPoint;
-    private int transitPointScore;
-
-    private int numberOfStopsOnLeg1;
-    private int numberOfStopsOnLeg2;
 
     @Override
     public void showTrip(TripsRecyclerViewAdapter.TripsViewHolder holder)
     {
+        holder.tripDurationTextView.setText(getTravelTime(tripDuration));
 
+        if (getOriginBusStop().getBusStopDirectionName().contains(")"))
+        {
+            holder.tripOriginBusStopNameTextView.setText("From " + getOriginBusStop().getBusStopName() + " " + getOriginBusStop()
+                    .getBusStopDirectionName().substring(0, getOriginBusStop().getBusStopDirectionName().indexOf(")") + 1));
+        }
+        else
+        {
+            holder.tripDurationTextView.setText("From " + getOriginBusStop().getBusStopName() + " " + getOriginBusStop().getBusStopDirectionName());
+        }
+
+        holder.firstLegBusRouteNumberTextView.setText(busToTransitPoint.getBusRoute().getBusRouteNumber());
+        holder.secondLegBusRouteNumberTextView.setText(busFromTransitPoint.getBusRoute().getBusRouteNumber());
+
+        holder.firstLegRideTheBusTextView.setText("Ride the bus for " + String.valueOf
+                (DbQueries.getNumberOfStopsBetweenRouteOrders(db, busToTransitPoint.getBusRoute().getBusRouteId(), getOriginBusStop()
+                        .getBusStopRouteOrder(), busToTransitPoint.getBusRoute().getTripPlannerDestinationBusStop().getBusStopRouteOrder())) + " stops");
+
+        holder.secondLegRideTheBusTextView.setText("Ride the bus for " + String.valueOf
+                (DbQueries.getNumberOfStopsBetweenRouteOrders(db, busFromTransitPoint.getBusRoute().getBusRouteId(), busFromTransitPoint
+                        .getBusRoute().getTripPlannerOriginBusStop().getBusStopRouteOrder(), busFromTransitPoint.getBusRoute()
+                        .getTripPlannerDestinationBusStop().getBusStopRouteOrder())) + " stops");
+
+        if (busFromTransitPoint.getBusRoute().getTripPlannerOriginBusStop().getBusStopDirectionName().contains(")"))
+        {
+            holder.transitPointBusStopNameTextView.setText("Change buses at " + busFromTransitPoint.getBusRoute().getTripPlannerOriginBusStop().getBusStopName() + " " +
+                    busFromTransitPoint.getBusRoute().getTripPlannerOriginBusStop().getBusStopDirectionName().substring(0, busFromTransitPoint
+                            .getBusRoute().getTripPlannerOriginBusStop().getBusStopDirectionName().indexOf(")") + 1));
+        }
+        else
+        {
+            holder.transitPointBusStopNameTextView.setText("Change buses at " + busFromTransitPoint.getBusRoute().getTripPlannerOriginBusStop().getBusStopName() +
+                    " " + busFromTransitPoint.getBusRoute().getTripPlannerOriginBusStop().getBusStopDirectionName());
+        }
+
+
+        if (busToTransitPoint.getBusRoute().getBusRouteNumber().length() > 5 && busToTransitPoint.getBusRoute().getBusRouteNumber().contains("KIAS-"))
+        {
+            holder.firstLegBusRouteServiceTypeImageView.setImageResource(R.drawable.ic_flight_blue);
+        }
+        else if (busToTransitPoint.getBusRoute().getBusRouteNumber().length() > 1 && busToTransitPoint.getBusRoute().getBusRouteNumber()
+                .substring(0, 2).equals("V-"))
+        {
+            holder.firstLegBusRouteServiceTypeImageView.setImageResource(R.drawable.ic_directions_bus_ac);
+        }
+        else if (busToTransitPoint.getBusRoute().getBusRouteNumber().contains("MF-"))
+        {
+            holder.firstLegBusRouteServiceTypeImageView.setImageResource(R.drawable.ic_directions_bus_special);
+        }
+        else
+        {
+            holder.firstLegBusRouteServiceTypeImageView.setImageResource(R.drawable.ic_directions_bus_ordinary);
+        }
+
+        if (busFromTransitPoint.getBusRoute().getBusRouteNumber().length() > 5 && busFromTransitPoint.getBusRoute().getBusRouteNumber().contains("KIAS-"))
+        {
+            holder.secondLegBusRouteServiceTypeImageView.setImageResource(R.drawable.ic_flight_blue);
+        }
+        else if (busFromTransitPoint.getBusRoute().getBusRouteNumber().length() > 1 && busFromTransitPoint.getBusRoute().getBusRouteNumber()
+                .substring(0, 2).equals("V-"))
+        {
+            holder.secondLegBusRouteServiceTypeImageView.setImageResource(R.drawable.ic_directions_bus_ac);
+        }
+        else if (busFromTransitPoint.getBusRoute().getBusRouteNumber().contains("MF-"))
+        {
+            holder.secondLegBusRouteServiceTypeImageView.setImageResource(R.drawable.ic_directions_bus_special);
+        }
+        else
+        {
+            holder.secondLegBusRouteServiceTypeImageView.setImageResource(R.drawable.ic_directions_bus_ordinary);
+        }
+
+        holder.firstLegBusETAsTextView.setText(String.valueOf(getTravelTime(busToTransitPoint.getBusETA())));
+        holder.secondLegBusETAsTextView.setText(String.valueOf(getTravelTime(busFromTransitPoint.getBusETA())));
+
+        holder.transitPointInfoLinearLayout.setVisibility(View.VISIBLE);
+        holder.secondLegInfoRelativeLayout.setVisibility(View.VISIBLE);
     }
 
-    public ArrayList<BusRoute> getBusRoutesOnLeg1()
+    private String getTravelTime(int travelTimeInMinutes)
     {
-        return busRoutesOnLeg1;
+        String travelTime;
+
+        if (travelTimeInMinutes >= 60)
+        {
+            int hours = travelTimeInMinutes / 60;
+            travelTime = hours + " hr " + travelTimeInMinutes % 60 + " min";
+        }
+        else if (travelTimeInMinutes == 0)
+        {
+            travelTime = "Due";
+        }
+        else
+        {
+            travelTime = travelTimeInMinutes + " min";
+        }
+        return travelTime;
     }
 
-    public void setBusRoutesOnLeg1(ArrayList<BusRoute> busRoutesOnLeg1)
+    public Bus getBusFromTransitPoint()
     {
-        this.busRoutesOnLeg1 = busRoutesOnLeg1;
+        return busFromTransitPoint;
     }
 
-    public void addBusRouteToLeg1(BusRoute busRoute)
+    public void setBusFromTransitPoint(Bus busFromTransitPoint)
     {
-        busRoutesOnLeg1.add(busRoute);
-    }
-
-    public void clearBusRoutesOnLeg1()
-    {
-        busRoutesOnLeg1.clear();
-    }
-
-    public ArrayList<BusRoute> getBusRoutesOnLeg2()
-    {
-        return busRoutesOnLeg2;
-    }
-
-    public void setBusRoutesOnLeg2(ArrayList<BusRoute> busRoutesOnLeg2)
-    {
-        this.busRoutesOnLeg2 = busRoutesOnLeg2;
-    }
-
-    public void addBusRouteToLeg2(BusRoute busRoute)
-    {
-        busRoutesOnLeg2.add(busRoute);
-    }
-
-    public void clearBusRoutesOnLeg2()
-    {
-        busRoutesOnLeg2.clear();
+        this.busFromTransitPoint = busFromTransitPoint;
     }
 
     public TransitPoint getTransitPoint()
@@ -69,33 +135,23 @@ class IndirectTrip extends Trip
         this.transitPoint = transitPoint;
     }
 
-    public int getTransitPointScore()
+    public Bus getBusToTransitPoint()
     {
-        return transitPointScore;
+        return busToTransitPoint;
     }
 
-    public void setTransitPointScore(int transitPointScore)
+    public void setBusToTransitPoint(Bus busToTransitPoint)
     {
-        this.transitPointScore = transitPointScore;
+        this.busToTransitPoint = busToTransitPoint;
     }
 
-    public int getNumberOfStopsOnLeg1()
+    public int getTripDuration()
     {
-        return numberOfStopsOnLeg1;
+        return tripDuration;
     }
 
-    public void setNumberOfStopsOnLeg1(int numberOfStopsOnLeg1)
+    public void setTripDuration(int tripDuration)
     {
-        this.numberOfStopsOnLeg1 = numberOfStopsOnLeg1;
-    }
-
-    public int getNumberOfStopsOnLeg2()
-    {
-        return numberOfStopsOnLeg2;
-    }
-
-    public void setNumberOfStopsOnLeg2(int numberOfStopsOnLeg2)
-    {
-        this.numberOfStopsOnLeg2 = numberOfStopsOnLeg2;
+        this.tripDuration = tripDuration;
     }
 }

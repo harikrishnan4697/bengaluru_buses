@@ -48,8 +48,7 @@ class BusRoutesToAndFromTransitPointTask extends AsyncTask<Void, Void, Void>
         for (BusRoute busRoute : originToTransitPointBusRoutes)
         {
             // Get the buses in service on each of the bus routes
-            busRoute.setBusRouteBuses(getScheduledBuses(busRoute.getBusRouteId(), busRoute.getBusRouteNumber(),
-                    busRoute.getTripPlannerOriginBusStop().getBusStopRouteOrder()));
+            busRoute.setBusRouteBuses(getScheduledBuses(busRoute));
 
             // Add the bus route to the temporary list only if there are buses in service and if
             // the list doesn't already contain it.
@@ -99,8 +98,7 @@ class BusRoutesToAndFromTransitPointTask extends AsyncTask<Void, Void, Void>
         for (BusRoute busRoute : transitPointToDestinationBusRoutes)
         {
             // Get the buses in service on each of the bus routes
-            busRoute.setBusRouteBuses(getScheduledBuses(busRoute.getBusRouteId(), busRoute.getBusRouteNumber(),
-                    busRoute.getTripPlannerOriginBusStop().getBusStopRouteOrder()));
+            busRoute.setBusRouteBuses(getScheduledBuses(busRoute));
 
             // Add the bus route to the temporary list only if there are buses in service and if
             // the list doesn't already contain it.
@@ -182,33 +180,36 @@ class BusRoutesToAndFromTransitPointTask extends AsyncTask<Void, Void, Void>
         return busRoutes;
     }
 
-    private ArrayList<Bus> getScheduledBuses(int busRouteId, String busRouteNumber, int tripOriginBusStopRouteOrder)
+    private ArrayList<Bus> getScheduledBuses(BusRoute busRoute)
     {
         ArrayList<Bus> busesOnBusRoute = new ArrayList<>();
 
         Cursor cursor = db.rawQuery("select RouteTimings.RouteDepartureTime from RouteTimings where RouteTimings.RouteId = " +
-                busRouteId, null);
+                busRoute.getBusRouteId(), null);
 
         while (cursor.moveToNext())
         {
             Bus bus = new Bus();
 
             int timeOfDayBusWillArrive = cursor.getInt(0) + calculateTravelTime(DbQueries.getNumberOfStopsBetweenRouteOrders(db,
-                    busRouteId, 1, tripOriginBusStopRouteOrder), busRouteNumber);
+                    busRoute.getBusRouteId(), 1, busRoute.getTripPlannerOriginBusStop().getBusStopRouteOrder()), busRoute.getBusRouteNumber());
 
             Date date = new Date();
-
+            // TODO Use calendar class
             int busETA = timeOfDayBusWillArrive - ((date.getHours() * 60) + date.getMinutes());
 
             if (busETA > -1)
             {
+                bus.setBusRoute(busRoute);
                 bus.setBusETA(busETA);
+                bus.setBusRouteOrder(1);
                 busesOnBusRoute.add(bus);
             }
         }
 
         cursor.close();
 
+        // Sort the buses based on their ETA
         Collections.sort(busesOnBusRoute, new Comparator<Bus>()
         {
             @Override
@@ -221,18 +222,8 @@ class BusRoutesToAndFromTransitPointTask extends AsyncTask<Void, Void, Void>
         return busesOnBusRoute;
     }
 
-    private int calculateBusETA(int busRouteId, String busRouteNumber, int busDepartureTime,
-                                int tripOriginBusStopRouteOrder)
-    {
-        // Time of day the bus will arrive at the origin bus stop of the trip
-        int timeOfDayBusWillArrive = busDepartureTime + calculateTravelTime(DbQueries.getNumberOfStopsBetweenRouteOrders(db,
-                busRouteId, 1, tripOriginBusStopRouteOrder), busRouteNumber);
-
-        // Convert the time of day to ETA in minutes
-        Date date = new Date();
-        return timeOfDayBusWillArrive - ((date.getHours() * 60) + date.getMinutes());
-    }
-
+    // TODO Create a utils class and put this method there
+    // Calculates how long it would take to travel a certain number of bus stops on a particular bus route
     private int calculateTravelTime(int numberOfBusStopsToTravel, String routeNumber)
     {
         Calendar calendar = Calendar.getInstance();

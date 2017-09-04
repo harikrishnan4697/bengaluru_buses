@@ -81,7 +81,7 @@ class TripsRecyclerViewAdapter extends RecyclerView.Adapter<TripsRecyclerViewAda
 
             secondLegInfoRelativeLayout = (RelativeLayout) itemView.findViewById(R.id.tripSecondLegRelativeLayout);
             secondLegBusRouteServiceTypeImageView = (ImageView) itemView.findViewById(R.id.secondLegBusServiceTypeImageView);
-            secondLegBusRouteNumberTextView = (TextView) itemView.findViewById(R.id.secondlegBusRouteNumberTextView);
+            secondLegBusRouteNumberTextView = (TextView) itemView.findViewById(R.id.secondLegBusRouteNumberTextView);
             secondLegBusETAsTextView = (TextView) itemView.findViewById(R.id.secondLegBusArrivalTimingsTextView);
             secondLegRideTheBusTextView = (TextView) itemView.findViewById(R.id.secondLegRideTheBusTextView);
         }

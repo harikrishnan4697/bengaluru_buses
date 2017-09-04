@@ -10,5 +10,5 @@ interface IndirectTripHelper
 
     void onRoutesToAndFromTransitPointFound(TransitPoint transitPoint);
 
-    void onBusesInServiceFound(String errorMessage, TransitPoint transitPoint);
+    void onBusesInServiceFound(String errorMessage, BusRoute busRoute, TransitPoint transitPoint);
 }

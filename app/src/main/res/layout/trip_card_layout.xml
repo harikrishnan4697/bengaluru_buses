@@ -35,7 +35,7 @@
                 android:ellipsize="end"
                 android:gravity="center"
                 android:maxLines="1"
-                android:text="1 hr 23 min"
+                android:text="Unknown"
                 android:textColor="#000000"
                 android:textSize="14sp"/>
 
@@ -50,7 +50,7 @@
                 android:layout_toRightOf="@id/totalTravelDurationTextView"
                 android:ellipsize="end"
                 android:maxLines="2"
-                android:text="From Dodda Nekkundi (towards - Marathahalli Bridge)"
+                android:text="Unknown"
                 android:textColor="#000000"
                 android:textSize="12sp"/>
 
@@ -97,7 +97,7 @@
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
                         android:maxLines="1"
-                        android:text="due, 2 min, 6 min"
+                        android:text="Unknown"
                         android:textColor="#000000"
                         android:textSize="12sp"/>
 
@@ -119,7 +119,7 @@
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:layout_gravity="center_vertical"
-                        android:src="@drawable/ic_directions_bus_ordinary"/>
+                        android:src="@drawable/ic_directions_bus_black"/>
 
                     <TextView
                         android:id="@+id/firstLegBusRouteNumberTextView"
@@ -131,7 +131,7 @@
                         android:background="@drawable/grey_rounded_background_borderless"
                         android:ellipsize="end"
                         android:maxLines="1"
-                        android:text="500-D"
+                        android:text="Unknown"
                         android:textColor="#000000"
                         android:textSize="12sp"/>
 
@@ -165,7 +165,7 @@
                     android:layout_marginStart="5dp"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="Ride the bus for 7 stops"
+                    android:text="Unknown"
                     android:textColor="#000000"
                     android:textSize="12sp"/>
 
@@ -192,7 +192,7 @@
                 android:layout_gravity="center_vertical"
                 android:ellipsize="end"
                 android:maxLines="2"
-                android:text="Change at B Channasandra Bridge (towards - Banasawadi)"
+                android:text="Unknown"
                 android:textColor="#000000"
                 android:textSize="12sp"/>
 
@@ -232,10 +232,10 @@
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:layout_gravity="center_vertical"
-                        android:src="@drawable/ic_directions_bus_ordinary"/>
+                        android:src="@drawable/ic_directions_bus_black"/>
 
                     <TextView
-                        android:id="@+id/secondlegBusRouteNumberTextView"
+                        android:id="@+id/secondLegBusRouteNumberTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
@@ -244,7 +244,7 @@
                         android:background="@drawable/grey_rounded_background_borderless"
                         android:ellipsize="end"
                         android:maxLines="1"
-                        android:text="300-E"
+                        android:text="Unknown"
                         android:textColor="#000000"
                         android:textSize="12sp"/>
 
@@ -259,7 +259,7 @@
                     android:layout_centerVertical="true"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="22 min, 34 min, 47 min"
+                    android:text="Unknown"
                     android:textColor="#000000"
                     android:textSize="12sp"/>
 
@@ -291,7 +291,7 @@
                     android:layout_marginStart="5dp"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="Ride the bus for 12 stops"
+                    android:text="Unknown"
                     android:textColor="#000000"
                     android:textSize="12sp"/>
 

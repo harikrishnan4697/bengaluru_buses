@@ -2,28 +2,41 @@ package com.bangalorebuses;
 
 import android.os.AsyncTask;
 
+import org.json.JSONArray;
+
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 
+import static com.bangalorebuses.Constants.NETWORK_QUERY_IO_EXCEPTION;
+import static com.bangalorebuses.Constants.NETWORK_QUERY_JSON_EXCEPTION;
 import static com.bangalorebuses.Constants.NETWORK_QUERY_NO_ERROR;
+import static com.bangalorebuses.Constants.NETWORK_QUERY_REQUEST_TIMEOUT_EXCEPTION;
+import static com.bangalorebuses.Constants.NETWORK_QUERY_URL_EXCEPTION;
 
-class IndirectTripBusesInServiceTask extends AsyncTask<Void, Void, IndirectTrip>
+class IndirectTripBusesInServiceTask extends AsyncTask<Void, Void, Void>
 {
     private IndirectTripHelper caller;
     private String errorMessage = NETWORK_QUERY_NO_ERROR;
     private ArrayList<Bus> buses = new ArrayList<>();
-    private IndirectTrip indirectTrip;
+    private BusRoute busRoute;
+    private TransitPoint transitPoint;
 
 
-    IndirectTripBusesInServiceTask(IndirectTripHelper caller, IndirectTrip indirectTrip)
+    IndirectTripBusesInServiceTask(IndirectTripHelper caller, BusRoute busRoute, TransitPoint transitPoint)
     {
         this.caller = caller;
-        this.indirectTrip = indirectTrip;
+        this.busRoute = busRoute;
+        this.transitPoint = transitPoint;
     }
 
     @Override
-    protected IndirectTrip doInBackground(Void... voids)
+    protected Void doInBackground(Void... voids)
     {
-        /*URL busesEnRouteURL;
+        URL busesEnRouteURL;
         try
         {
             busesEnRouteURL = new URL("http://bmtcmob.hostg.in/api/itsroutewise/details");
@@ -34,7 +47,7 @@ class IndirectTripBusesInServiceTask extends AsyncTask<Void, Void, IndirectTrip>
             return null;
         }
 
-        String re
+        String requestParameters = "routeNO=" + busRoute.getBusRouteNumber() + "&" + "direction=" + busRoute.getBusRouteDirection();
 
         HttpURLConnection client;
         String line;
@@ -49,7 +62,7 @@ class IndirectTripBusesInServiceTask extends AsyncTask<Void, Void, IndirectTrip>
             client.setReadTimeout(Constants.NETWORK_QUERY_READ_TIMEOUT);
             client.connect();
             BufferedOutputStream writer = new BufferedOutputStream(client.getOutputStream());
-            writer.write(requestBody[0].getBytes());
+            writer.write(requestParameters.getBytes());
             writer.flush();
             writer.close();
             BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
@@ -78,14 +91,16 @@ class IndirectTripBusesInServiceTask extends AsyncTask<Void, Void, IndirectTrip>
             {
                 if (!isCancelled())
                 {
-                    if (Integer.parseInt(jsonArray.getJSONArray(i).getString(12).replace("routeorder:", "")) <= busStopRouteOrder)
+                    if (Integer.parseInt(jsonArray.getJSONArray(i).getString(12).replace("routeorder:", "")) <=
+                            busRoute.getTripPlannerOriginBusStop().getBusStopRouteOrder())
                     {
                         for (int j = 0; j < jsonArray.length(); j++)
                         {
                             if ((i + j) < jsonArray.length())
                             {
                                 Bus bus = new Bus();
-                                if (Integer.parseInt(jsonArray.getJSONArray(i + j).getString(12).replace("routeorder:", "")) == busStopRouteOrder)
+                                if (Integer.parseInt(jsonArray.getJSONArray(i + j).getString(12).replace("routeorder:", "")) ==
+                                        busRoute.getTripPlannerOriginBusStop().getBusStopRouteOrder())
                                 {
                                     bus.setDue(true);
                                 }
@@ -114,8 +129,15 @@ class IndirectTripBusesInServiceTask extends AsyncTask<Void, Void, IndirectTrip>
         catch (org.json.JSONException e)
         {
             errorMessage = NETWORK_QUERY_JSON_EXCEPTION;
-        }*/
+        }
+        busRoute.setBusRouteBuses(buses);
         return null;
     }
 
+    @Override
+    protected void onPostExecute(Void param)
+    {
+        super.onPostExecute(param);
+        caller.onBusesInServiceFound(errorMessage, busRoute, transitPoint);
+    }
 }
