@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Error message strings -->
+    <string name="error_message_no_data_connection">"Uh oh! There doesn't seem to be a data connection."</string>
+    <string name="error_message_location_access_denied">"Hold on! We need access to the GPS of your device to find bus stops nearby."</string>
+    <string name="error_message_location_off">"Wait a minute! We can't find bus stops nearby because the GPS on your device is turned off."</string>
+
+    <!-- Fix error button strings -->
+    <string name="fix_error_retry">"Retry"</string>
+    <string name="fix_error_allow_access">"Allow access"</string>
+    <string name="fix_error_turn_on">"Turn on"</string>¬
+
+</resources>

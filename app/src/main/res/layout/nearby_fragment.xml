@@ -4,7 +4,7 @@
     android:id="@+id/containerRelativeLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorDefaultBackground">
+    android:background="@color/layout_background">
 
     <LinearLayout
         android:id="@+id/updatingBusStopsProgressBarLinearLayout"
@@ -13,20 +13,20 @@
         android:layout_alignParentTop="true"
         android:gravity="center"
         android:orientation="horizontal"
-        android:paddingBottom="10dp"
-        android:paddingTop="10dp">
+        android:paddingBottom="@dimen/layout_padding_bottom"
+        android:paddingTop="@dimen/layout_padding_top">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Updating..."
             android:textColor="#000000"
-            android:textSize="16sp"/>
+            android:textSize="@dimen/text_size_big"/>
 
         <ProgressBar
             android:id="@+id/updatingBusStopsProgressBar"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="@dimen/image_view_width"
+            android:layout_height="@dimen/image_view_height"
             android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
             android:visibility="visible"/>
@@ -44,38 +44,41 @@
         android:id="@+id/errorLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:animateLayoutChanges="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
         android:gravity="center"
         android:orientation="vertical"
         android:visibility="visible">
 
         <ImageView
             android:id="@+id/errorImageView"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_margin="16dp"
+            android:layout_width="@dimen/error_image_view_width"
+            android:layout_height="@dimen/error_image_view_width"
+            android:layout_margin="@dimen/layout_margin"
             android:src="@drawable/ic_location_off_black"/>
 
         <TextView
             android:id="@+id/errorTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:text="Can't find bus stops nearby because GPS is off."
+            android:layout_marginEnd="@dimen/layout_margin_right"
+            android:layout_marginLeft="@dimen/layout_margin_left"
+            android:layout_marginRight="@dimen/layout_margin_right"
+            android:layout_marginStart="@dimen/layout_margin_left"
+            android:text="@string/error_message_location_access_denied"
             android:textAlignment="center"
-            android:textColor="#000000"
-            android:textSize="16sp"/>
+            android:textColor="@color/text_color_black"
+            android:textSize="@dimen/text_size_big"/>
 
         <TextView
             android:id="@+id/errorResolutionTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
+            android:layout_margin="@dimen/layout_margin"
             android:background="@drawable/white_rounded_background"
-            android:padding="16dp"
-            android:text="Turn on GPS"
+            android:padding="@dimen/layout_padding"
+            android:text="@string/fix_error_allow_access"
             android:textAllCaps="true"
             android:textColor="@color/colorSpecialServiceBus"/>
 

@@ -5,18 +5,21 @@
     android:id="@+id/nearbyBusStopCardView"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginLeft="16dp"
-    android:layout_marginRight="16dp"
-    android:layout_marginTop="16dp"
+    android:layout_marginEnd="@dimen/layout_margin_right"
+    android:layout_marginLeft="@dimen/layout_margin_left"
+    android:layout_marginRight="@dimen/layout_margin_right"
+    android:layout_marginStart="@dimen/layout_margin_left"
+    android:layout_marginTop="@dimen/layout_margin_top"
+    android:background="@color/item_background"
     android:clickable="true"
-    app:cardCornerRadius="5dp">
+    app:cardCornerRadius="@dimen/card_view_corner_radius">
 
     <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="@dimen/layout_padding">
 
         <TextView
             android:id="@+id/busStopNameTextView"
@@ -25,10 +28,10 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="@dimen/layout_margin_bottom_reduced"
             android:text="Kempegowda International Airport"
-            android:textColor="#000000"
-            android:textSize="16sp"/>
+            android:textColor="@color/text_color_black"
+            android:textSize="@dimen/text_size_big"/>
 
         <TextView
             android:id="@+id/busStopDirectionTextView"
@@ -37,10 +40,10 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_below="@id/busStopNameTextView"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="@dimen/layout_margin_bottom"
             android:text="towards Bengaluru City"
-            android:textColor="#000000"
-            android:textSize="14sp"/>
+            android:textColor="@color/text_color_black"
+            android:textSize="@dimen/text_size_medium"/>
 
         <TextView
             android:id="@+id/busStopDistanceTextView"
@@ -49,18 +52,18 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_below="@id/busStopDirectionTextView"
-            android:layout_marginLeft="10dp"
-            android:layout_marginStart="10dp"
+            android:layout_marginLeft="@dimen/layout_margin_left"
+            android:layout_marginStart="@dimen/layout_margin_left"
             android:gravity="center"
             android:text="0.35 Km away"
             android:textAlignment="center"
             android:textColor="#000000"
-            android:textSize="14sp"/>
+            android:textSize="@dimen/text_size_medium"/>
 
         <ImageView
             android:id="@+id/imageView"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="@dimen/image_view_width"
+            android:layout_height="@dimen/image_view_height"
             android:layout_below="@+id/busStopDirectionTextView"
             android:layout_toLeftOf="@+id/busStopDistanceTextView"
             android:layout_toStartOf="@+id/busStopDistanceTextView"
@@ -68,8 +71,8 @@
 
         <ImageView
             android:id="@+id/metroFeederImageView"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="@dimen/image_view_width"
+            android:layout_height="@dimen/image_view_height"
             android:layout_below="@+id/busStopDirectionTextView"
             android:layout_toEndOf="@+id/airportShuttleImageView"
             android:layout_toRightOf="@+id/airportShuttleImageView"
@@ -78,13 +81,13 @@
 
         <ImageView
             android:id="@+id/airportShuttleImageView"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="@dimen/image_view_width"
+            android:layout_height="@dimen/image_view_height"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_below="@+id/busStopDirectionTextView"
-            android:layout_marginEnd="10dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginEnd="@dimen/layout_margin_right"
+            android:layout_marginRight="@dimen/layout_margin_right"
             android:visibility="visible"
             app:srcCompat="@drawable/ic_flight_blue"/>
 

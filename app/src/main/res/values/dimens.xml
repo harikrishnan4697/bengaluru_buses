@@ -1,5 +1,46 @@
 <resources>
-    <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
+    <!-- Layout margin dimensions -->
+    <dimen name="layout_margin">10dp</dimen>
+    <dimen name="layout_margin_top">10dp</dimen>
+    <dimen name="layout_margin_bottom">10dp</dimen>
+    <dimen name="layout_margin_left">10dp</dimen>
+    <dimen name="layout_margin_right">10dp</dimen>
+
+    <!-- Layout margin dimensions (reduced) -->
+    <dimen name="layout_margin_reduced">5dp</dimen>
+    <dimen name="layout_margin_top_reduced">5dp</dimen>
+    <dimen name="layout_margin_bottom_reduced">5dp</dimen>
+    <dimen name="layout_margin_left_reduced">5dp</dimen>
+    <dimen name="layout_margin_right_reduced">5dp</dimen>
+
+    <!-- Layout padding dimensions -->
+    <dimen name="layout_padding">10dp</dimen>
+    <dimen name="layout_padding_top">10dp</dimen>
+    <dimen name="layout_padding_bottom">10dp</dimen>
+    <dimen name="layout_padding_left">10dp</dimen>
+    <dimen name="layout_padding_right">10dp</dimen>
+
+    <!-- Layout padding dimensions (reduced) -->
+    <dimen name="layout_padding_reduced">5dp</dimen>
+    <dimen name="layout_padding_top_reduced">5dp</dimen>
+    <dimen name="layout_padding_bottom_reduced">5dp</dimen>
+    <dimen name="layout_padding_left_reduced">5dp</dimen>
+    <dimen name="layout_padding_right_reduced">5dp</dimen>
+
+    <!-- ImageView dimensions -->
+    <dimen name="image_view_height">25dp</dimen>
+    <dimen name="image_view_width">25dp</dimen>
+    <dimen name="error_image_view_height">60dp</dimen>
+    <dimen name="error_image_view_width">60dp</dimen>
+    <dimen name="real_time_image_view_height">15dp</dimen>
+    <dimen name="real_time_image_view_width">15dp</dimen>
+
+    <!-- Default text sizes -->
+    <dimen name="text_size_big">16sp</dimen>
+    <dimen name="text_size_medium">14sp</dimen>
+    <dimen name="text_size_small">12sp</dimen>
+
+    <!-- CardView dimensions -->
+    <dimen name="card_view_corner_radius">5dp</dimen>
+
 </resources>

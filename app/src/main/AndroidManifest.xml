@@ -29,18 +29,18 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".TrackBusActivity"
+            android:name=".tracker.TrackBusActivity"
             android:label="Track a bus"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".SearchActivity"
+            android:name=".search.SearchActivity"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".BusesArrivingAtBusStopActivity"
+            android:name=".busarrivals.BusesArrivingAtBusStopActivity"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait">
         </activity>
