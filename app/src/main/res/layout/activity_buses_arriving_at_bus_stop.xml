@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/layout_background"
+    android:background="@color/layout_background_color"
     tools:context="com.bangalorebuses.busarrivals.BusesArrivingAtBusStopActivity">
 
     <TextView
@@ -17,7 +17,7 @@
         android:maxLines="1"
         android:padding="@dimen/layout_padding"
         android:textAlignment="center"
-        android:textColor="@color/text_color_black"
+        android:textColor="@color/white_text_color"
         android:textSize="@dimen/text_size_big"/>
 
     <LinearLayout
@@ -27,22 +27,22 @@
         android:layout_below="@id/busStopDirectionNameTextView"
         android:gravity="center"
         android:orientation="horizontal"
-        android:paddingBottom="@dimen/layout_margin_bottom"
-        android:paddingTop="@dimen/layout_margin_top">
+        android:paddingBottom="@dimen/layout_margin"
+        android:paddingTop="@dimen/layout_margin">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Updating..."
-            android:textColor="@color/text_color_black"
+            android:textColor="@color/standard_text_color"
             android:textSize="@dimen/text_size_big"/>
 
         <ProgressBar
             android:id="@+id/updatingBusesProgressBar"
             android:layout_width="@dimen/image_view_width"
             android:layout_height="@dimen/image_view_height"
-            android:layout_marginLeft="@dimen/layout_margin_left"
-            android:layout_marginStart="@dimen/layout_margin_left"
+            android:layout_marginLeft="@dimen/layout_margin"
+            android:layout_marginStart="@dimen/layout_margin"
             android:visibility="visible"/>
 
     </LinearLayout>
@@ -67,18 +67,18 @@
             android:id="@+id/errorImageView"
             android:layout_width="@dimen/error_image_view_width"
             android:layout_height="@dimen/error_image_view_height"
-            android:layout_margin="@dimen/layout_margin_top"
+            android:layout_margin="@dimen/layout_margin"
             android:src="@drawable/ic_location_off_black"/>
 
         <TextView
             android:id="@+id/errorTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/layout_margin_right"
-            android:layout_marginRight="@dimen/layout_margin_right"
+            android:layout_marginLeft="@dimen/layout_margin"
+            android:layout_marginRight="@dimen/layout_margin"
             android:text="Can't find bus stops nearby because GPS is off."
             android:textAlignment="center"
-            android:textColor="@color/text_color_black"
+            android:textColor="@color/standard_text_color"
             android:textSize="@dimen/text_size_big"/>
 
         <TextView

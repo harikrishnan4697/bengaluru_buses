@@ -10,12 +10,13 @@
     <color name="colorBottomNavBar">#CFD8DC</color>
 
     <!-- Layout colors -->
-    <color name="layout_background">#CFD8DC</color>
-    <color name="item_background">#FFFFFF</color>
+    <color name="layout_background_color">#F5F5F5</color>
+    <color name="list_item_background_color">#FFFFFF</color>
 
     <!-- Text colors -->
-    <color name="text_color_black">#000000</color>
-    <color name="text_color_white">#FFFFFF</color>
-    <color name="text_color_orange">#FF9800</color>
+    <color name="standard_text_color">#000000</color>
+    <color name="sub_text_color">#757575</color>
+    <color name="white_text_color">#FFFFFF</color>
+    <color name="orange_text_color">#FF9800</color>
 
 </resources>

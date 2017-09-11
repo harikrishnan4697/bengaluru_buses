@@ -91,7 +91,7 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
     {
         View view = inflater.inflate(R.layout.trip_planner_fragment, container, false);
 
-        swapAnimation = AnimationUtils.loadAnimation(getActivity(), R.anim.rotate_once);
+        swapAnimation = AnimationUtils.loadAnimation(getActivity(), R.anim.rotate_once_forward);
         swapDirectionImageView = (ImageView) view.findViewById(R.id.swapDirectionImageView);
         swapDirectionImageView.setOnClickListener(new View.OnClickListener()
         {

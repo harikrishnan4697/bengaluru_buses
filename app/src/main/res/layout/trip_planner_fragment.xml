@@ -4,7 +4,7 @@
     android:id="@+id/trip_planner_container_relative_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/layout_background">
+    android:background="@color/layout_background_color">
 
     <LinearLayout
         android:id="@+id/origin_destination_linear_layout"
@@ -74,7 +74,7 @@
             android:layout_gravity="center"
             android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
-            android:background="@drawable/orange_rounded_background_borderless"
+            android:background="@drawable/orange_rounded_border"
             android:clickable="true"
             android:src="@drawable/ic_swap_vert_white"/>
 
@@ -141,7 +141,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            android:background="@drawable/white_rounded_background"
+            android:background="@drawable/white_rounded_background_borderless"
             android:padding="16dp"
             android:text="Turn on GPS"
             android:textAllCaps="true"

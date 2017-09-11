@@ -94,7 +94,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         spinner = (Spinner) findViewById(R.id.route_stop_list_spinner);
         directionTextView = (TextView) findViewById(R.id.directionNameTextView);
         directionSwapImageView = (ImageView) findViewById(R.id.changeDirectionImageView);
-        directionSwapAnimation = AnimationUtils.loadAnimation(this, R.anim.rotate_once);
+        directionSwapAnimation = AnimationUtils.loadAnimation(this, R.anim.rotate_once_forward);
         directionSwapAnimationBackwards = AnimationUtils.loadAnimation(this, R.anim.rotate_once_backwards);
         errorLinearLayout = (LinearLayout) findViewById(R.id.errorLinearLayout);
         errorImageView = (ImageView) findViewById(R.id.errorImageView);

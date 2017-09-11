@@ -4,27 +4,29 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/layout_background"
+    android:background="@color/layout_background_color"
     tools:context="com.bangalorebuses.tracker.TrackBusActivity">
 
     <LinearLayout
         android:id="@+id/directionSelectionLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:background="@color/colorPrimary"
         android:orientation="vertical"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp">
+        android:paddingLeft="@dimen/layout_padding"
+        android:paddingRight="@dimen/layout_padding">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="@dimen/layout_margin_reduced"
             android:gravity="start"
             android:text="@string/direction_label_text"
-            android:textColor="#FFFFFF"
-            android:textSize="14sp"/>
+            android:textColor="@color/white_text_color"
+            android:textSize="@dimen/text_size_small"/>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -38,14 +40,13 @@
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:layout_gravity="center"
-                android:layout_marginBottom="10dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/orange_rounded_background_borderless"
+                android:layout_marginBottom="@dimen/layout_margin"
+                android:layout_marginLeft="@dimen/layout_margin"
+                android:layout_marginStart="@dimen/layout_margin"
+                android:background="@drawable/orange_rounded_border"
                 android:clickable="true"
                 android:onClick="swapDirection"
-                android:src="@drawable/ic_swap_horiz_white"/>
+                android:src="@drawable/ic_swap_horiz_black"/>
 
             <TextView
                 android:id="@+id/directionNameTextView"
@@ -61,9 +62,9 @@
                 android:gravity="start"
                 android:maxLines="2"
                 android:onClick="swapDirection"
-                android:padding="10dp"
-                android:textColor="#000000"
-                android:textSize="14sp"/>
+                android:padding="@dimen/layout_padding"
+                android:textColor="@color/standard_text_color"
+                android:textSize="@dimen/text_size_medium"/>
 
         </RelativeLayout>
 
@@ -82,10 +83,10 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="@dimen/layout_margin_reduced"
             android:text="@string/bus_stop_label_text"
-            android:textColor="#FFFFFF"
-            android:textSize="14sp"/>
+            android:textColor="@color/white_text_color"
+            android:textSize="@dimen/text_size_small"/>
 
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -100,6 +101,7 @@
                 android:clickable="true"
                 android:spinnerMode="dropdown"
                 android:textAlignment="viewStart"/>
+
         </RelativeLayout>
 
     </LinearLayout>
@@ -115,19 +117,11 @@
         android:paddingTop="10dp"
         android:visibility="visible">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Updating..."
-            android:textColor="#000000"
-            android:textSize="16sp"/>
-
         <ProgressBar
             android:id="@+id/updatingBusStopsProgressBar"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginStart="10dp"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:background="@drawable/black_rounded_border"
             android:visibility="visible"/>
 
     </LinearLayout>
@@ -173,7 +167,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            android:background="@drawable/white_rounded_background"
             android:padding="16dp"
             android:text="Retry"
             android:textAllCaps="true"

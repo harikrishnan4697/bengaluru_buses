@@ -91,12 +91,6 @@ public class MainActivity extends AppCompatActivity
                 // Don't let the on-screen keyboard pop up for anything by default.
                 getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-                // Configure the actionbar
-                if (actionBar != null)
-                {
-                    actionBar.show();
-                }
-
                 bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
 
                 // Disable the default Android setting that makes icons on the bottom nav bar

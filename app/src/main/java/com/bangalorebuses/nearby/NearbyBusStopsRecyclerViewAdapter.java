@@ -1,11 +1,10 @@
 package com.bangalorebuses.nearby;
 
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bangalorebuses.R;
@@ -42,24 +41,6 @@ public class NearbyBusStopsRecyclerViewAdapter extends RecyclerView.Adapter<Near
         nearbyBusStopsViewHolder.busStopNameTextView.setText(nearbyBusStops.get(i).getBusStopName());
         nearbyBusStopsViewHolder.busStopDirectionNameTextView.setText(nearbyBusStops.get(i).getBusStopDirectionName());
         nearbyBusStopsViewHolder.busStopDistanceTextView.setText(nearbyBusStops.get(i).getBusStopDistance());
-
-        if (nearbyBusStops.get(i).isAirportShuttleStop())
-        {
-            nearbyBusStopsViewHolder.airportShuttleImageView.setVisibility(View.VISIBLE);
-        }
-        else
-        {
-            nearbyBusStopsViewHolder.airportShuttleImageView.setVisibility(View.GONE);
-        }
-
-        if (nearbyBusStops.get(i).isMetroFeederStop())
-        {
-            nearbyBusStopsViewHolder.metroFeederImageView.setVisibility(View.VISIBLE);
-        }
-        else
-        {
-            nearbyBusStopsViewHolder.metroFeederImageView.setVisibility(View.GONE);
-        }
     }
 
     @Override
@@ -80,23 +61,19 @@ public class NearbyBusStopsRecyclerViewAdapter extends RecyclerView.Adapter<Near
 
     public class NearbyBusStopViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
     {
-
-        CardView cardView;
         TextView busStopNameTextView;
         TextView busStopDirectionNameTextView;
         TextView busStopDistanceTextView;
-        ImageView airportShuttleImageView;
-        ImageView metroFeederImageView;
+        LinearLayout busesArrivingAtBusStopLinearLayout;
 
         NearbyBusStopViewHolder(View itemView)
         {
             super(itemView);
-            cardView = (CardView) itemView.findViewById(R.id.nearbyBusStopCardView);
-            busStopNameTextView = (TextView) itemView.findViewById(R.id.busStopNameTextView);
-            busStopDirectionNameTextView = (TextView) itemView.findViewById(R.id.busStopDirectionTextView);
-            busStopDistanceTextView = (TextView) itemView.findViewById(R.id.busStopDistanceTextView);
-            airportShuttleImageView = (ImageView) itemView.findViewById(R.id.airportShuttleImageView);
-            metroFeederImageView = (ImageView) itemView.findViewById(R.id.metroFeederImageView);
+            busStopNameTextView = (TextView) itemView.findViewById(R.id.nearby_bus_stop_name_text_view);
+            busStopDirectionNameTextView = (TextView) itemView.findViewById(R.id.nearby_bus_stop_direction_text_view);
+            busStopDistanceTextView = (TextView) itemView.findViewById(R.id.nearby_bus_stop_distance_text_view);
+            busesArrivingAtBusStopLinearLayout = (LinearLayout) itemView.findViewById(R.id
+                    .bus_routes_arriving_at_nearby_bus_stop_linear_layout);
             itemView.setOnClickListener(this);
         }
 

@@ -4,31 +4,59 @@
     android:id="@+id/containerRelativeLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/layout_background">
+    android:background="@color/layout_background_color">
+
+    <RelativeLayout
+        android:id="@+id/title_relative_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="@color/colorPrimary"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/title_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_centerVertical="true"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="Bus stops nearby"
+            android:textColor="@color/white_text_color"
+            android:textSize="20sp"/>
+
+        <ImageView
+            android:id="@+id/refresh_image_view"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/orange_rounded_border"
+            android:clickable="true"
+            android:src="@drawable/ic_refresh_black"/>
+
+    </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/updatingBusStopsProgressBarLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:layout_below="@id/title_relative_layout"
         android:gravity="center"
         android:orientation="horizontal"
-        android:paddingBottom="@dimen/layout_padding_bottom"
-        android:paddingTop="@dimen/layout_padding_top">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Updating..."
-            android:textColor="#000000"
-            android:textSize="@dimen/text_size_big"/>
+        android:paddingBottom="@dimen/layout_padding"
+        android:paddingTop="@dimen/layout_padding">
 
         <ProgressBar
             android:id="@+id/updatingBusStopsProgressBar"
-            android:layout_width="@dimen/image_view_width"
-            android:layout_height="@dimen/image_view_height"
-            android:layout_marginLeft="10dp"
-            android:layout_marginStart="10dp"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_gravity="center"
+            android:background="@drawable/black_rounded_border"
             android:visibility="visible"/>
 
     </LinearLayout>
@@ -62,13 +90,13 @@
             android:id="@+id/errorTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/layout_margin_right"
-            android:layout_marginLeft="@dimen/layout_margin_left"
-            android:layout_marginRight="@dimen/layout_margin_right"
-            android:layout_marginStart="@dimen/layout_margin_left"
+            android:layout_marginEnd="@dimen/layout_margin"
+            android:layout_marginLeft="@dimen/layout_margin"
+            android:layout_marginRight="@dimen/layout_margin"
+            android:layout_marginStart="@dimen/layout_margin"
             android:text="@string/error_message_location_access_denied"
             android:textAlignment="center"
-            android:textColor="@color/text_color_black"
+            android:textColor="@color/standard_text_color"
             android:textSize="@dimen/text_size_big"/>
 
         <TextView
@@ -76,7 +104,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/layout_margin"
-            android:background="@drawable/white_rounded_background"
+            android:background="@drawable/white_rounded_background_borderless"
             android:padding="@dimen/layout_padding"
             android:text="@string/fix_error_allow_access"
             android:textAllCaps="true"

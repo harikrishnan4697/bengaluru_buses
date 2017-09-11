@@ -4,7 +4,7 @@
     android:id="@+id/track_bus_fragment_root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/layout_background">
+    android:background="@color/layout_background_color">
 
     <LinearLayout
         android:id="@+id/bus_number_search_linear_layout"
@@ -41,7 +41,7 @@
             android:layout_gravity="center"
             android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
-            android:background="@drawable/orange_rounded_background_borderless"
+            android:background="@drawable/orange_rounded_border"
             android:src="@drawable/ic_search_white"/>
 
     </LinearLayout>

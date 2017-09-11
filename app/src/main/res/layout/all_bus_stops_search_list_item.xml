@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/item_background"
+    android:background="@color/list_item_background_color"
     android:padding="@dimen/layout_padding">
 
     <TextView
@@ -16,7 +16,7 @@
         android:ellipsize="end"
         android:maxLines="2"
         android:text="Dodda Nekkundi"
-        android:textColor="@color/text_color_black"
+        android:textColor="@color/standard_text_color"
         android:textSize="@dimen/text_size_big"/>
 
     <TextView
@@ -26,11 +26,11 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_below="@id/busStopNameTextView"
-        android:layout_marginTop="@dimen/layout_margin_top_reduced"
+        android:layout_marginTop="@dimen/layout_margin_reduced"
         android:ellipsize="end"
         android:maxLines="2"
         android:text="towards - Marathahalli Bridge"
-        android:textColor="@color/text_color_black"
+        android:textColor="@color/standard_text_color"
         android:textSize="@dimen/text_size_medium"/>
 
 </RelativeLayout>
