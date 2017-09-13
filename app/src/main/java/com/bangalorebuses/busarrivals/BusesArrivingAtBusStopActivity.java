@@ -5,6 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -39,7 +40,7 @@ import static com.bangalorebuses.utils.Constants.db;
  */
 
 public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements NetworkingHelper,
-        DbQueryHelper
+        DbQueryHelper, SwipeRefreshLayout.OnRefreshListener
 {
     ArrayList<BusRoute> busRoutesToDisplay = new ArrayList<>();
     ArrayList<BusRoute> busRoutesToGetTimingsOf = new ArrayList<>();
@@ -54,7 +55,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
     private TextView errorResolutionTextView;
 
     private int numberOfBusRouteTimingsFound = 0;
-    private LinearLayout updatingBusesProgressBarLinearLayout;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private boolean busStopHasTraceableBuses = false;
     private BusRoutesArrivingAtBusStopDbTask busRoutesArrivingAtBusStopDbTask;
     private ArrayList<BusETAsOnBusRouteTask> runningAsyncTasks = new ArrayList<>();
@@ -66,7 +67,10 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_buses_arriving_at_bus_stop);
 
         // Initialize some variables
-        updatingBusesProgressBarLinearLayout = (LinearLayout) findViewById(R.id.updatingBusesProgressBarLinearLayout);
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorOrdinaryServiceBus, R.color.colorACServiceBus,
+                R.color.colorSpecialServiceBus);
+        swipeRefreshLayout.setOnRefreshListener(this);
         listView = (ListView) findViewById(R.id.busesArrivingAtBusStopListView);
         TextView busStopDirectionInfoTextView = (TextView) findViewById(R.id.busStopDirectionNameTextView);
         errorLinearLayout = (LinearLayout) findViewById(R.id.errorLinearLayout);
@@ -104,7 +108,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
         // Get buses scheduled to arrive at the selected bus stop
         if (isNetworkAvailable())
         {
-            updatingBusesProgressBarLinearLayout.setVisibility(View.VISIBLE);
+            swipeRefreshLayout.setRefreshing(true);
             busStopHasTraceableBuses = false;
             busRoutesArrivingAtBusStopDbTask = new BusRoutesArrivingAtBusStopDbTask(this);
             busRoutesArrivingAtBusStopDbTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
@@ -112,7 +116,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
         }
         else
         {
-            updatingBusesProgressBarLinearLayout.setVisibility(View.GONE);
+            swipeRefreshLayout.setRefreshing(false);
             listView.setVisibility(View.GONE);
             setErrorLayoutContent(R.drawable.ic_cloud_off_black, "Uh oh! No data connection.", "Retry");
             errorLinearLayout.setVisibility(View.VISIBLE);
@@ -148,7 +152,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
                     if (isNetworkAvailable())
                     {
 
-                        updatingBusesProgressBarLinearLayout.setVisibility(View.VISIBLE);
+                        swipeRefreshLayout.setRefreshing(true);
                         busStopHasTraceableBuses = false;
                         busRoutesArrivingAtBusStopDbTask = new BusRoutesArrivingAtBusStopDbTask(this);
                         busRoutesArrivingAtBusStopDbTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
@@ -156,7 +160,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
                     }
                     else
                     {
-                        updatingBusesProgressBarLinearLayout.setVisibility(View.GONE);
+                        swipeRefreshLayout.setRefreshing(false);
                         listView.setVisibility(View.GONE);
                         setErrorLayoutContent(R.drawable.ic_cloud_off_black, "Uh oh! No data connection.", "Retry");
                         errorLinearLayout.setVisibility(View.VISIBLE);
@@ -166,6 +170,12 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
                 return super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    @Override
+    public void onRefresh()
+    {
+        fixError();
     }
 
     public void fixError()
@@ -180,14 +190,14 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
         if (isNetworkAvailable())
         {
 
-            updatingBusesProgressBarLinearLayout.setVisibility(View.VISIBLE);
+            swipeRefreshLayout.setRefreshing(true);
             busStopHasTraceableBuses = false;
             busRoutesArrivingAtBusStopDbTask = new BusRoutesArrivingAtBusStopDbTask(this);
             busRoutesArrivingAtBusStopDbTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, selectedBusStop.getBusStopId());
         }
         else
         {
-            updatingBusesProgressBarLinearLayout.setVisibility(View.GONE);
+            swipeRefreshLayout.setRefreshing(false);
             listView.setVisibility(View.GONE);
             setErrorLayoutContent(R.drawable.ic_cloud_off_black, "Uh oh! No data connection.", "Retry");
             errorLinearLayout.setVisibility(View.VISIBLE);
@@ -241,7 +251,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
             }
             else
             {
-                updatingBusesProgressBarLinearLayout.setVisibility(View.GONE);
+                swipeRefreshLayout.setRefreshing(false);
                 listView.setVisibility(View.GONE);
                 setErrorLayoutContent(R.drawable.ic_cloud_off_black, "Uh oh! No data connection.", "Retry");
                 errorLinearLayout.setVisibility(View.VISIBLE);
@@ -249,7 +259,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
         }
         else
         {
-            updatingBusesProgressBarLinearLayout.setVisibility(View.GONE);
+            swipeRefreshLayout.setRefreshing(false);
             listView.setVisibility(View.GONE);
             setErrorLayoutContent(R.drawable.ic_directions_bus_black_big, "Oh no! Looks like there aren't any buses arriving at this bus stop any time soon...", "Retry");
             errorLinearLayout.setVisibility(View.VISIBLE);
@@ -327,7 +337,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
                 }
                 else
                 {
-                    updatingBusesProgressBarLinearLayout.setVisibility(View.GONE);
+                    swipeRefreshLayout.setRefreshing(false);
                     listView.setVisibility(View.GONE);
                     setErrorLayoutContent(R.drawable.ic_cloud_off_black, "Uh oh! No data connection.", "Retry");
                     errorLinearLayout.setVisibility(View.VISIBLE);
@@ -338,10 +348,9 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
         // Check if all the bus timings have been calculated
         if (numberOfBusRouteTimingsFound == numberOfBusRouteTimingQueriesMade)
         {
-            updatingBusesProgressBarLinearLayout.setVisibility(View.GONE);
+            swipeRefreshLayout.setRefreshing(false);
             if (!busStopHasTraceableBuses)
             {
-                updatingBusesProgressBarLinearLayout.setVisibility(View.GONE);
                 listView.setVisibility(View.GONE);
                 setErrorLayoutContent(R.drawable.ic_directions_bus_black_big, "Oh no! Looks like there aren't any buses arriving at this bus stop any time soon...", "Retry");
                 errorLinearLayout.setVisibility(View.VISIBLE);

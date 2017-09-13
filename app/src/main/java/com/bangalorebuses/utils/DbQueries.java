@@ -14,7 +14,7 @@ public class DbQueries
 {
     public static ArrayList<String> getAllDistinctRouteNumbers(SQLiteDatabase db)
     {
-        Cursor cursor = db.rawQuery("select distinct Routes.RouteNumber from Routes", null);
+        Cursor cursor = db.rawQuery("select distinct Routes.RouteNumber from Routes order by Routes.RouteNumber asc", null);
         ArrayList<String> busRouteNumbers = new ArrayList<>();
         while (cursor.moveToNext())
         {
@@ -92,7 +92,7 @@ public class DbQueries
         Cursor cursor = db.rawQuery("select Routes.RouteId, Routes.RouteNumber, Routes.RouteServiceType," +
                 " Routes.RouteDirection, Routes.RouteDirectionName, RouteStops.StopRouteOrder" +
                 " from RouteStops join Routes where RouteStops.RouteId = Routes.RouteId and " +
-                "RouteStops.StopId = " + stopId, null);
+                "RouteStops.StopId = " + stopId + " order by Routes.RouteNumber asc", null);
         ArrayList<BusRoute> routes = new ArrayList<>();
         while (cursor.moveToNext())
         {
@@ -178,7 +178,7 @@ public class DbQueries
 
     public static ArrayList<BusStop> getAllStops(SQLiteDatabase db)
     {
-        Cursor cursor = db.rawQuery("select Stops.* from Stops", null);
+        Cursor cursor = db.rawQuery("select Stops.* from Stops order by Stops.StopName asc", null);
         ArrayList<BusStop> busStops = new ArrayList<>();
         while (cursor.moveToNext())
         {
@@ -196,7 +196,7 @@ public class DbQueries
 
     public static ArrayList<String> getAllDistinctStopNames(SQLiteDatabase db)
     {
-        Cursor cursor = db.rawQuery("select distinct Stops.StopName from Stops", null);
+        Cursor cursor = db.rawQuery("select distinct Stops.StopName from Stops order by Stops.StopName asc", null);
         ArrayList<String> stopNames = new ArrayList<>();
         while (cursor.moveToNext())
         {

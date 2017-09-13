@@ -4,28 +4,15 @@
     <string name="near_me_navigation_item_text">Nearby</string>
     <string name="track_buses_navigation_item_text">Bus tracker</string>
     <string name="trip_planner_navigation_item_text">Trip planner</string>
-    <string name="error_connecting_to_the_internet_text">Cannot connect to the Internet!</string>
-    <string name="error_connecting_to_the_internet_click_refresh_text">Cannot connect to the Internet! Please click the refresh button below to try again.</string>
-
-    <!-- Strings for GetBusesAtBusStopActivity -->
-    <string name="error_getting_buses_at_stop">Could not get buses arriving at this bus stop. Please try again later.</string>
 
     <!-- Strings for menus -->
     <string name="refresh_action_title">Refresh</string>
     <string name="track_entered_bus_action_title">Track entered bus number</string>
 
-    <!-- Strings for ChooseActivity -->
+    <!-- Strings for Nearby fragment -->
     <string name="bus_stops_nearby_label_text">Bus stops nearby</string>
-    <string name="track_bus_edit_text_hint">Enter a bus number or choose one below</string>
-    <string name="error_no_buses_arriving_at_stop_text">There are no buses arriving at this bus stop anytime soon!</string>
-    <string name="error_no_bus_stops_found_text">Could not find any Bengaluru City bus stops nearby!</string>
 
     <!-- Strings for TrackBusActivity -->
     <string name="direction_label_text">Direction</string>
     <string name="bus_stop_label_text">Bus stop</string>
-    <string name="image_content_description_text">Type of bus service</string>
-    <string name="error_invalid_route_text">This bus cannot be tracked.</string>
-    <string name="error_getting_stop_details_text">Error getting bus stop details! Please try again later.</string>
-    
-    <string name="please_select_a_direction_error">Please select a direction!</string>
 </resources>

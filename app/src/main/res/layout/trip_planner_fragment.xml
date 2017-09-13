@@ -76,35 +76,7 @@
             android:layout_marginStart="10dp"
             android:background="@drawable/orange_rounded_border"
             android:clickable="true"
-            android:src="@drawable/ic_swap_vert_white"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/updatingLinearLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/origin_destination_linear_layout"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:paddingBottom="10dp"
-        android:paddingTop="10dp"
-        android:visibility="gone">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Updating..."
-            android:textColor="#000000"
-            android:textSize="16sp"/>
-
-        <ProgressBar
-            android:id="@+id/updatingBusStopsProgressBar"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginStart="10dp"
-            android:visibility="visible"/>
+            android:src="@drawable/ic_swap_vert_black"/>
 
     </LinearLayout>
 
@@ -112,7 +84,7 @@
         android:id="@+id/errorLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/updatingLinearLayout"
+        android:layout_below="@id/origin_destination_linear_layout"
         android:animateLayoutChanges="true"
         android:gravity="center"
         android:orientation="vertical"
@@ -149,11 +121,18 @@
 
     </LinearLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerView"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/updatingLinearLayout"
-        android:orientation="vertical"/>
+        android:layout_height="wrap_content"
+        android:layout_below="@id/origin_destination_linear_layout">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"/>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </RelativeLayout>

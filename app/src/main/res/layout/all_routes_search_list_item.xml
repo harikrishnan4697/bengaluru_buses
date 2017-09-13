@@ -42,7 +42,7 @@
             android:maxLines="1"
             android:text="Metro Feeder"
             android:textColor="@color/standard_text_color"
-            android:textSize="@dimen/text_size_small"/>
+            android:textSize="@dimen/text_size_medium"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -63,7 +63,7 @@
                 android:maxLines="1"
                 android:text="MF-1"
                 android:textColor="@color/standard_text_color"
-                android:textSize="@dimen/text_size_medium"/>
+                android:textSize="@dimen/text_size_big"/>
 
         </LinearLayout>
 

@@ -28,7 +28,6 @@ public class AllBusRoutesSearchListCustomAdapter extends BaseAdapter implements 
     public AllBusRoutesSearchListCustomAdapter(Activity context, ArrayList<String> busRouteNumbers)
     {
         super();
-        Collections.sort(busRouteNumbers);
         this.context = context;
         this.busRouteNumbers = busRouteNumbers;
         this.filteredBusRouteNumbers = busRouteNumbers;

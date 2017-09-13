@@ -6,7 +6,7 @@
         android:id="@+id/busesArrivingAtBusStopRefresh"
         android:icon="@drawable/ic_refresh_white"
         android:title="Refresh"
-        app:showAsAction="ifRoom"
+        app:showAsAction="never"
         />
 
 </menu>

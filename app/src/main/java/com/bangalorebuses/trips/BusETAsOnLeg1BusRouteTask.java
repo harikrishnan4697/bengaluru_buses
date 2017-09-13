@@ -114,7 +114,12 @@ public class BusETAsOnLeg1BusRouteTask extends AsyncTask<Void, Void, Void>
                                 bus.setBusRegistrationNumber(jsonArray.getJSONArray(i + j).getString(0).replace("vehicleno:", ""));
                                 bus.setBusRouteOrder(Integer.parseInt(jsonArray.getJSONArray(i + j).getString(12).replace("routeorder:", "")));
                                 bus.setBusRoute(busRoute);
-                                buses.add(bus);
+
+                                if (bus.getBusRouteOrder() != 1 || busRoute.getTripPlannerOriginBusStop()
+                                        .getBusStopRouteOrder() == 1)
+                                {
+                                    buses.add(bus);
+                                }
                             }
                             else
                             {

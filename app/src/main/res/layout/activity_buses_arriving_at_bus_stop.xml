@@ -20,38 +20,18 @@
         android:textColor="@color/white_text_color"
         android:textSize="@dimen/text_size_big"/>
 
-    <LinearLayout
-        android:id="@+id/updatingBusesProgressBarLinearLayout"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/busStopDirectionNameTextView"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:paddingBottom="@dimen/layout_margin"
-        android:paddingTop="@dimen/layout_margin">
+        android:layout_below="@id/busStopDirectionNameTextView">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Updating..."
-            android:textColor="@color/standard_text_color"
-            android:textSize="@dimen/text_size_big"/>
+        <ListView
+            android:id="@+id/busesArrivingAtBusStopListView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 
-        <ProgressBar
-            android:id="@+id/updatingBusesProgressBar"
-            android:layout_width="@dimen/image_view_width"
-            android:layout_height="@dimen/image_view_height"
-            android:layout_marginLeft="@dimen/layout_margin"
-            android:layout_marginStart="@dimen/layout_margin"
-            android:visibility="visible"/>
-
-    </LinearLayout>
-
-    <ListView
-        android:id="@+id/busesArrivingAtBusStopListView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/updatingBusesProgressBarLinearLayout"/>
+    </android.support.v4.widget.SwipeRefreshLayout>
 
     <LinearLayout
         android:id="@+id/errorLinearLayout"
@@ -86,7 +66,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/layout_margin"
-            android:background="@drawable/white_rounded_background_borderless"
             android:padding="@dimen/layout_padding"
             android:text="Turn on GPS"
             android:textAllCaps="true"

@@ -25,7 +25,6 @@ public class AllBusStopSearchListCustomAdaptor extends BaseAdapter implements Fi
 
     public AllBusStopSearchListCustomAdaptor(Activity context, ArrayList<BusStop> busStops)
     {
-        super();
         this.context = context;
         this.busStops = busStops;
         this.filteredBusStops = busStops;

@@ -88,6 +88,12 @@ public class MainActivity extends AppCompatActivity
             {
                 setContentView(R.layout.activity_main);
 
+                //Configure the action bar
+                if (getSupportActionBar() != null)
+                {
+                    getSupportActionBar().show();
+                }
+
                 // Don't let the on-screen keyboard pop up for anything by default.
                 getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 

@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -30,6 +31,7 @@ import com.bangalorebuses.core.BusRoute;
 import com.bangalorebuses.core.BusStop;
 import com.bangalorebuses.search.SearchActivity;
 import com.bangalorebuses.utils.DbQueries;
+import com.bangalorebuses.utils.ErrorImageResIds;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -45,7 +47,8 @@ import static com.bangalorebuses.utils.Constants.SEARCH_START_BUS_STOP_REQUEST_C
 import static com.bangalorebuses.utils.Constants.SEARCH_TYPE_BUS_STOP;
 import static com.bangalorebuses.utils.Constants.db;
 
-public class TripPlannerFragment extends Fragment implements DirectTripHelper, IndirectTripHelper
+public class TripPlannerFragment extends Fragment implements DirectTripHelper, IndirectTripHelper,
+        SwipeRefreshLayout.OnRefreshListener
 {
     private Animation swapAnimation;
     private ImageView swapDirectionImageView;
@@ -56,7 +59,7 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
     private Button searchOriginButton;
     private Button searchDestinationButton;
 
-    private LinearLayout updatingLinearLayout;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     private RecyclerView recyclerView;
     private TripsRecyclerViewAdapter recyclerViewAdapter;
@@ -79,6 +82,11 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
     private int numberOfIndirectTripQueriesMade = 0;
     private int numberOfIndirectTripQueriesComplete = 0;
     private ArrayList<BusETAsOnLeg1BusRouteTask> busETAsOnLeg1BusRouteTasks = new ArrayList<>();
+    private TransitPointsWithNumberOfRoutesDbTask transitPointsWithNumberOfRoutesDbTask1;
+    private TransitPointsWithNumberOfRoutesDbTask transitPointsWithNumberOfRoutesDbTask2;
+    private ArrayList<BusRoutesToAndFromTransitPointDbTask> busRoutesToAndFromTransitPointDbTasks =
+            new ArrayList<>();
+
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -132,8 +140,10 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
             destinationBusStop = new BusStop();
         }
 
-        updatingLinearLayout = (LinearLayout) view.findViewById(R.id.updatingLinearLayout);
-        updatingLinearLayout.setVisibility(View.GONE);
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorOrdinaryServiceBus, R.color.colorACServiceBus,
+                R.color.colorSpecialServiceBus);
+        swipeRefreshLayout.setOnRefreshListener(this);
 
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         if (recyclerViewAdapter != null && !wasGettingDirectTrips)
@@ -318,6 +328,25 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
         {
             getDirectTripsBetweenStops.cancel(true);
         }
+
+        if (transitPointsWithNumberOfRoutesDbTask1 != null)
+        {
+            transitPointsWithNumberOfRoutesDbTask1.cancel(true);
+        }
+
+        if (transitPointsWithNumberOfRoutesDbTask2 != null)
+        {
+            transitPointsWithNumberOfRoutesDbTask2.cancel(true);
+        }
+
+        for (BusRoutesToAndFromTransitPointDbTask task :
+                busRoutesToAndFromTransitPointDbTasks)
+        {
+            if (task != null)
+            {
+                task.cancel(true);
+            }
+        }
     }
 
     // Everything to do with direct trips
@@ -327,7 +356,7 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
 
         errorLinearLayout.setVisibility(View.GONE);
         recyclerView.setVisibility(View.GONE);
-        updatingLinearLayout.setVisibility(View.VISIBLE);
+        swipeRefreshLayout.setRefreshing(true);
 
         getDirectTripsBetweenStops = new GetDirectTripsBetweenStops();
         getDirectTripsBetweenStops.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
@@ -374,18 +403,14 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
                 swapDirectionImageView.setEnabled(true);
                 searchOriginButton.setEnabled(true);
                 searchDestinationButton.setEnabled(true);
-                updatingLinearLayout.setVisibility(View.GONE);
-                setErrorLayoutContent(R.drawable.ic_cloud_off_black, "Uh oh! No data connection.", "Retry");
+                swipeRefreshLayout.setRefreshing(false);
+                setErrorLayoutContent(ErrorImageResIds.ERROR_IMAGE_NO_INTERNET, "Uh oh! No data connection.", "Retry");
                 errorLinearLayout.setVisibility(View.VISIBLE);
                 recyclerView.setVisibility(View.GONE);
             }
         }
         else
         {
-            Toast.makeText(getContext(), "There aren't any direct trips from " +
-                    originBusStop.getBusStopName() + " to " + destinationBusStop.getBusStopName() +
-                    " ! Getting indirect trips...", Toast.LENGTH_SHORT).show();
-
             findIndirectTrips(originBusStop.getBusStopName(), destinationBusStop.getBusStopName());
         }
     }
@@ -481,14 +506,11 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
         if (numberOfDirectTripRouteBusesFound == numberOfDirectTripQueriesMade)
         {
             wasGettingDirectTrips = false;
-            updatingLinearLayout.setVisibility(View.GONE);
+            swipeRefreshLayout.setRefreshing(false);
 
             if (tripsToDisplay.size() == 0)
             {
                 findIndirectTrips(originBusStop.getBusStopName(), destinationBusStop.getBusStopName());
-                Toast.makeText(getContext(), "There aren't any direct trips from " +
-                        originBusStop.getBusStopName() + " to " + destinationBusStop.getBusStopName() +
-                        " ! Getting indirect trips...", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -546,21 +568,23 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
     {
         errorLinearLayout.setVisibility(View.GONE);
         recyclerView.setVisibility(View.GONE);
-        updatingLinearLayout.setVisibility(View.VISIBLE);
+        swipeRefreshLayout.setRefreshing(true);
         transitPoints.clear();
 
         if (isNetworkAvailable())
         {
-            new TransitPointsWithNumberOfRoutesDbTask(this, originBusStopName, destinationBusStopName, NUMBER_OF_ROUTES_TYPE_ORIGIN_TO_TRANSIT_POINT)
-                    .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            transitPointsWithNumberOfRoutesDbTask1 = new TransitPointsWithNumberOfRoutesDbTask(this, originBusStopName,
+                    destinationBusStopName, NUMBER_OF_ROUTES_TYPE_ORIGIN_TO_TRANSIT_POINT);
+            transitPointsWithNumberOfRoutesDbTask1.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
-            new TransitPointsWithNumberOfRoutesDbTask(this, originBusStopName, destinationBusStopName, NUMBER_OF_ROUTES_TYPE_TRANSIT_POINT_TO_DESTINATION)
-                    .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            transitPointsWithNumberOfRoutesDbTask2 = new TransitPointsWithNumberOfRoutesDbTask(this, originBusStopName,
+                    destinationBusStopName, NUMBER_OF_ROUTES_TYPE_TRANSIT_POINT_TO_DESTINATION);
+            transitPointsWithNumberOfRoutesDbTask2.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
         else
         {
-            updatingLinearLayout.setVisibility(View.GONE);
-            setErrorLayoutContent(R.drawable.ic_cloud_off_black, "Uh oh! No data connection.", "Retry");
+            swipeRefreshLayout.setRefreshing(false);
+            setErrorLayoutContent(ErrorImageResIds.ERROR_IMAGE_NO_INTERNET, "Uh oh! No data connection.", "Retry");
             errorLinearLayout.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         }
@@ -573,7 +597,7 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
         // Make sure that there are transit points.
         if (transitPoints.size() == 0)
         {
-            updatingLinearLayout.setVisibility(View.GONE);
+            swipeRefreshLayout.setRefreshing(false);
             Toast.makeText(getContext(), "There aren't are direct or indirect trips...", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -610,7 +634,7 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
         // Make sure that there are transit points.
         if (transitPoints.size() == 0)
         {
-            updatingLinearLayout.setVisibility(View.GONE);
+            swipeRefreshLayout.setRefreshing(false);
             Toast.makeText(getContext(), "There aren't are direct or indirect trips...", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -688,11 +712,17 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
         tripsToDisplay.clear();
         numberOfIndirectTripQueriesMade = 0;
         numberOfIndirectTripQueriesComplete = 0;
+        busRoutesToAndFromTransitPointDbTasks.clear();
+        busETAsOnLeg1BusRouteTasks.clear();
 
         for (TransitPoint transitPoint : this.transitPoints)
         {
-            new BusRoutesToAndFromTransitPointDbTask(this, originBusStop.getBusStopName(), transitPoint, destinationBusStop.getBusStopName())
-                    .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            BusRoutesToAndFromTransitPointDbTask task = new BusRoutesToAndFromTransitPointDbTask(this,
+                    originBusStop.getBusStopName(), transitPoint, destinationBusStop.getBusStopName());
+
+            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+            busRoutesToAndFromTransitPointDbTasks.add(task);
         }
     }
 
@@ -705,8 +735,12 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
             {
                 numberOfIndirectTripQueriesMade++;
 
-                new BusETAsOnLeg1BusRouteTask(this, transitPoint.getBusRoutesToTransitPoint().get(i), transitPoint).executeOnExecutor(
-                        AsyncTask.THREAD_POOL_EXECUTOR);
+                BusETAsOnLeg1BusRouteTask task = new BusETAsOnLeg1BusRouteTask(this,
+                        transitPoint.getBusRoutesToTransitPoint().get(i), transitPoint);
+
+                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+                busETAsOnLeg1BusRouteTasks.add(task);
             }
             else
             {
@@ -740,9 +774,11 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
 
                     indirectTrip.setBusToTransitPoint(busRoute.getBusRouteBuses().get(0));
                     indirectTrip.setTransitPoint(transitPoint);
+
                     if (transitPoint.getBusRoutesFromTransitPoint().size() != 0)
                     {
-                        indirectTrip.setBusFromTransitPoint(transitPoint.getBusRoutesFromTransitPoint().get(0).getBusRouteBuses().get(0));
+                        indirectTrip.setBusFromTransitPoint(transitPoint.getBusRoutesFromTransitPoint().get(0)
+                                .getBusRouteBuses().get(0));
                     }
                     else
                     {
@@ -837,7 +873,7 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
 
             if (numberOfIndirectTripQueriesComplete == numberOfIndirectTripQueriesMade)
             {
-                updatingLinearLayout.setVisibility(View.GONE);
+                swipeRefreshLayout.setRefreshing(false);
 
                 if (tripsToDisplay.size() == 0)
                 {
@@ -855,6 +891,20 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
         errorImageView.setImageResource(drawableResId);
         errorTextView.setText(errorMessage);
         errorResolutionTextView.setText(resolutionButtonText);
+    }
+
+    @Override
+    public void onRefresh()
+    {
+        if (originBusStop.getBusStopName() != null && destinationBusStop.getBusStopName() != null)
+        {
+            findDirectTrips(originBusStop.getBusStopName(), destinationBusStop.getBusStopName());
+        }
+        else
+        {
+            Toast.makeText(getContext(), "Please select a starting and ending bus stop!", Toast.LENGTH_SHORT).show();
+            swipeRefreshLayout.setRefreshing(false);
+        }
     }
 
     @Override

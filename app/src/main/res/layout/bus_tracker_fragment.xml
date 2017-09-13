@@ -34,16 +34,6 @@
             android:textAlignment="viewStart"
             android:textSize="16sp"/>
 
-        <ImageView
-            android:id="@+id/busNumberSelectionImageView"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:layout_gravity="center"
-            android:layout_marginLeft="10dp"
-            android:layout_marginStart="10dp"
-            android:background="@drawable/orange_rounded_border"
-            android:src="@drawable/ic_search_white"/>
-
     </LinearLayout>
 
     <ScrollView

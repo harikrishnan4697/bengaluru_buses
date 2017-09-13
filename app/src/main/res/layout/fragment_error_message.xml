@@ -1,0 +1,39 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context=".ErrorMessageFragment">
+
+    <ImageView
+        android:id="@+id/error_image_view"
+        android:layout_width="@dimen/error_image_view_width"
+        android:layout_height="@dimen/error_image_view_height"
+        android:layout_margin="@dimen/layout_margin"
+        android:src="@drawable/ic_location_off_black"/>
+
+    <TextView
+        android:id="@+id/error_message_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/layout_margin"
+        android:layout_marginLeft="@dimen/layout_margin"
+        android:layout_marginRight="@dimen/layout_margin"
+        android:layout_marginStart="@dimen/layout_margin"
+        android:text="@string/error_message_location_access_denied"
+        android:textAlignment="center"
+        android:textColor="@color/standard_text_color"
+        android:textSize="@dimen/text_size_big"/>
+
+    <TextView
+        android:id="@+id/error_resolution_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/layout_margin"
+        android:text="@string/fix_error_allow_access"
+        android:textAllCaps="true"
+        android:textColor="@color/colorSpecialServiceBus"/>
+
+</LinearLayout>

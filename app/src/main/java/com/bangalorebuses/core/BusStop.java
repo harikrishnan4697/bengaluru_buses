@@ -1,6 +1,7 @@
 package com.bangalorebuses.core;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class BusStop implements Serializable
 {
@@ -11,8 +12,7 @@ public class BusStop implements Serializable
     private int busStopRouteOrder;
     private String busStopDirectionName;
     private String busStopDistance;
-    private boolean isAirportShuttleStop = false;
-    private boolean isMetroFeederStop = false;
+    private ArrayList<BusRoute> busesArrivingAtBusStop;
 
     public int getBusStopId()
     {
@@ -84,23 +84,13 @@ public class BusStop implements Serializable
         this.busStopDistance = busStopDistance;
     }
 
-    public boolean isAirportShuttleStop()
+    public ArrayList<BusRoute> getBusesArrivingAtBusStop()
     {
-        return isAirportShuttleStop;
+        return busesArrivingAtBusStop;
     }
 
-    public void setAirportShuttleStop(boolean airportShuttleStop)
+    public void setBusesArrivingAtBusStop(ArrayList<BusRoute> busesArrivingAtBusStop)
     {
-        isAirportShuttleStop = airportShuttleStop;
-    }
-
-    public boolean isMetroFeederStop()
-    {
-        return isMetroFeederStop;
-    }
-
-    public void setMetroFeederStop(boolean metroFeederStop)
-    {
-        isMetroFeederStop = metroFeederStop;
+        this.busesArrivingAtBusStop = busesArrivingAtBusStop;
     }
 }

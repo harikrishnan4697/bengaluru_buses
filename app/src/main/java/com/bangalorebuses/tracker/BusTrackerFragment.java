@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.bangalorebuses.R;
@@ -45,15 +44,6 @@ public class BusTrackerFragment extends Fragment
         View view = inflater.inflate(R.layout.bus_tracker_fragment, container, false);
         busNumberSelectionButton = (Button) view.findViewById(R.id.choose_bus_number_button);
         busNumberSelectionButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                searchBusNumber();
-            }
-        });
-        ImageView busNumberSelectionImageView = (ImageView) view.findViewById(R.id.busNumberSelectionImageView);
-        busNumberSelectionImageView.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)

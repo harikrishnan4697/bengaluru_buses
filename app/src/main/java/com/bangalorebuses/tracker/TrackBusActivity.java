@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -54,7 +55,8 @@ import static com.bangalorebuses.utils.Constants.db;
  * @since 18-6-2017
  */
 
-public class TrackBusActivity extends AppCompatActivity implements NetworkingHelper, AdapterView.OnItemSelectedListener
+public class TrackBusActivity extends AppCompatActivity implements NetworkingHelper, AdapterView.OnItemSelectedListener,
+        SwipeRefreshLayout.OnRefreshListener
 {
     private GetRoutesWithNumberTask getRoutesWithNumberTask;
     private GetStopsOnRouteTask getStopsOnRouteTask;
@@ -69,13 +71,12 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
     private BusRoute routeDown;
     private String currentlySelectedDirection = DIRECTION_UP;
     private boolean routeIsOnlyInOneDirection = false;
-    //private ProgressDialog progressDialog;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private BusStop currentlySelectedBusStop;
     private LinearLayout errorLinearLayout;
     private ImageView errorImageView;
     private TextView errorTextView;
     private TextView errorResolutionTextView;
-    private LinearLayout updatingLinearLayout;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
@@ -109,8 +110,12 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
             }
         });
         errorLinearLayout.setVisibility(View.GONE);
-        updatingLinearLayout = (LinearLayout) findViewById(R.id.updatingLinearLayout);
-        updatingLinearLayout.setVisibility(View.GONE);
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(this);
+
+        // Set the colors to be used for the swipe refresh layout
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorOrdinaryServiceBus, R.color.colorACServiceBus,
+                R.color.colorSpecialServiceBus);
 
         trackBusesOnRoute(getIntent().getStringExtra("ROUTE_NUMBER"));
     }
@@ -164,7 +169,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         {
             if (currentlySelectedDirection.equals(DIRECTION_UP))
             {
-                updatingLinearLayout.setVisibility(View.VISIBLE);
+                swipeRefreshLayout.setRefreshing(true);
                 currentlySelectedBusStop = routeUp.getBusRouteStops().get(position);
                 busETAsOnBusRouteTask = new BusETAsOnBusRouteTask(this, routeUp.getBusRouteStops()
                         .get(position).getBusStopRouteOrder(), routeUp);
@@ -173,7 +178,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
             }
             else if (currentlySelectedDirection.equals(DIRECTION_DOWN))
             {
-                updatingLinearLayout.setVisibility(View.VISIBLE);
+                swipeRefreshLayout.setRefreshing(true);
                 currentlySelectedBusStop = routeDown.getBusRouteStops().get(position);
                 busETAsOnBusRouteTask = new BusETAsOnBusRouteTask(this, routeDown.getBusRouteStops()
                         .get(position).getBusStopRouteOrder(), routeDown);
@@ -182,12 +187,12 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
             }
             else
             {
-                Toast.makeText(this, R.string.please_select_a_direction_error, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Please select a direction!", Toast.LENGTH_SHORT).show();
             }
         }
         else
         {
-            updatingLinearLayout.setVisibility(View.GONE);
+            swipeRefreshLayout.setRefreshing(false);
             setErrorLayoutContent(R.drawable.ic_cloud_off_black, "Uh oh! No data connection.", "Retry");
             errorLinearLayout.setVisibility(View.VISIBLE);
             listView.setVisibility(View.GONE);
@@ -206,16 +211,16 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         {
             cancelAllTasks();
             errorLinearLayout.setVisibility(View.GONE);
-            updatingLinearLayout.setVisibility(View.VISIBLE);
+            swipeRefreshLayout.setRefreshing(true);
             directionSwapImageView.startAnimation(directionSwapAnimation);
-            if (currentlySelectedDirection.equals(DIRECTION_UP))
+            if (currentlySelectedDirection.equals(DIRECTION_UP) && routeDown != null)
             {
                 directionTextView.setText(getBusRouteDestinationName(routeDown.getBusRouteDirectionName()));
                 currentlySelectedDirection = DIRECTION_DOWN;
                 getStopsOnRouteTask = new GetStopsOnRouteTask(routeDown);
                 getStopsOnRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, routeDown.getBusRouteId());
             }
-            else if (currentlySelectedDirection.equals(DIRECTION_DOWN))
+            else if (currentlySelectedDirection.equals(DIRECTION_DOWN) && routeUp != null)
             {
                 directionTextView.setText(getBusRouteDestinationName(routeUp.getBusRouteDirectionName()));
                 currentlySelectedDirection = DIRECTION_UP;
@@ -224,11 +229,12 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
             }
             else
             {
-                Toast.makeText(this, R.string.please_select_a_direction_error, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Loading directions...", Toast.LENGTH_SHORT).show();
             }
         }
         else
         {
+            Toast.makeText(this, "This bus is only in one direction...", Toast.LENGTH_SHORT).show();
             directionSwapImageView.startAnimation(directionSwapAnimation);
             new CountDownTimer(200, 200)
             {
@@ -244,14 +250,13 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
                     directionSwapImageView.startAnimation(directionSwapAnimationBackwards);
                 }
             }.start();
-            //Toast.makeText(this, "This bus runs only in one direction...", Toast.LENGTH_SHORT).show();
         }
     }
 
     private void trackBusesOnRoute(String routeNumber)
     {
         errorLinearLayout.setVisibility(View.GONE);
-        updatingLinearLayout.setVisibility(View.VISIBLE);
+        swipeRefreshLayout.setRefreshing(true);
         getRoutesWithNumberTask = new GetRoutesWithNumberTask();
         getRoutesWithNumberTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, routeNumber);
     }
@@ -339,12 +344,18 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         }
         else
         {
-            Toast.makeText(this, R.string.please_select_a_direction_error, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please select a direction!", Toast.LENGTH_SHORT).show();
         }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item, routeStopNames);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
+    }
+
+    @Override
+    public void onRefresh()
+    {
+        refresh();
     }
 
     @Override
@@ -371,7 +382,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
                     bus.setBusCurrentlyNearBusStop(currentlyNearBusStop);
                 }
 
-                updatingLinearLayout.setVisibility(View.GONE);
+                swipeRefreshLayout.setRefreshing(false);
                 TrackBusListCustomAdapter trackBusListCustomAdapter = new TrackBusListCustomAdapter(this, buses);
                 listView.setAdapter(trackBusListCustomAdapter);
                 errorLinearLayout.setVisibility(View.GONE);
@@ -379,7 +390,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
             }
             else
             {
-                updatingLinearLayout.setVisibility(View.GONE);
+                swipeRefreshLayout.setRefreshing(false);
                 setErrorLayoutContent(R.drawable.ic_directions_bus_black, "Whoops! There don't seem to be any buses arriving " +
                         "at this stop anytime soon.", "Retry");
                 errorLinearLayout.setVisibility(View.VISIBLE);
@@ -390,7 +401,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         {
             if (isNetworkAvailable())
             {
-                updatingLinearLayout.setVisibility(View.GONE);
+                swipeRefreshLayout.setRefreshing(false);
                 switch (errorMessage)
                 {
                     case NETWORK_QUERY_IO_EXCEPTION:
@@ -525,26 +536,26 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
                 if (currentlySelectedDirection.equals(DIRECTION_UP))
                 {
                     busETAsOnBusRouteTask = new BusETAsOnBusRouteTask(this, currentlySelectedBusStop.getBusStopRouteOrder(), routeUp);
-                    updatingLinearLayout.setVisibility(View.VISIBLE);
+                    swipeRefreshLayout.setRefreshing(true);
                     String requestParameters = "routeNO=" + routeUp.getBusRouteNumber() + "&" + "direction=" + DIRECTION_UP;
                     busETAsOnBusRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, requestParameters);
                 }
                 else if (currentlySelectedDirection.equals(DIRECTION_DOWN))
                 {
                     busETAsOnBusRouteTask = new BusETAsOnBusRouteTask(this, currentlySelectedBusStop.getBusStopRouteOrder(), routeDown);
-                    updatingLinearLayout.setVisibility(View.VISIBLE);
+                    swipeRefreshLayout.setRefreshing(true);
                     String requestParameters = "routeNO=" + routeDown.getBusRouteNumber() + "&" + "direction=" + DIRECTION_DOWN;
                     busETAsOnBusRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, requestParameters);
                 }
                 else
                 {
-                    Toast.makeText(this, R.string.please_select_a_direction_error, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Please select a direction!", Toast.LENGTH_SHORT).show();
                 }
             }
         }
         else
         {
-            updatingLinearLayout.setVisibility(View.GONE);
+            swipeRefreshLayout.setRefreshing(false);
             setErrorLayoutContent(R.drawable.ic_cloud_off_black, "Uh oh! No data connection.", "Retry");
             errorLinearLayout.setVisibility(View.VISIBLE);
             listView.setVisibility(View.GONE);
