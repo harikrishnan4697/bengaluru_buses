@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/white_rounded_background_borderless"
             android:enabled="false"
-            android:hint="Search"
+            android:hint="@string/search_activity_default_hint"
             android:inputType="text"
             android:maxLines="1"
             android:minHeight="40dp"

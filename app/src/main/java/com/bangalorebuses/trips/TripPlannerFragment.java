@@ -19,7 +19,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -30,6 +29,7 @@ import com.bangalorebuses.core.Bus;
 import com.bangalorebuses.core.BusRoute;
 import com.bangalorebuses.core.BusStop;
 import com.bangalorebuses.search.SearchActivity;
+import com.bangalorebuses.utils.Constants;
 import com.bangalorebuses.utils.DbQueries;
 import com.bangalorebuses.utils.ErrorImageResIds;
 
@@ -56,8 +56,8 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
     private BusStop originBusStop = new BusStop();
     private BusStop destinationBusStop = new BusStop();
 
-    private Button searchOriginButton;
-    private Button searchDestinationButton;
+    private TextView searchOriginButton;
+    private TextView searchDestinationButton;
 
     private SwipeRefreshLayout swipeRefreshLayout;
 
@@ -110,7 +110,7 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
             }
         });
 
-        searchOriginButton = (Button) view.findViewById(R.id.trip_planner_origin_button);
+        searchOriginButton = (TextView) view.findViewById(R.id.trip_planner_origin_button);
         searchOriginButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -120,7 +120,7 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
             }
         });
 
-        searchDestinationButton = (Button) view.findViewById(R.id.trip_planner_destination_button);
+        searchDestinationButton = (TextView) view.findViewById(R.id.trip_planner_destination_button);
         searchDestinationButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -200,10 +200,6 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
                 {
                     findDirectTrips(originBusStop.getBusStopName(), destinationBusStop.getBusStopName());
                 }
-                else
-                {
-                    Toast.makeText(getContext(), "Please select a starting and ending bus stop!", Toast.LENGTH_SHORT).show();
-                }
                 break;
             default:
                 return super.onOptionsItemSelected(item);
@@ -241,6 +237,7 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
     {
         Intent searchOriginIntent = new Intent(getContext(), SearchActivity.class);
         searchOriginIntent.putExtra("SEARCH_TYPE", SEARCH_TYPE_BUS_STOP);
+        searchOriginIntent.putExtra("EDIT_TEXT_HINT", Constants.ORIGIN_BUS_STOP_SEARCH_HINT);
         startActivityForResult(searchOriginIntent, SEARCH_START_BUS_STOP_REQUEST_CODE);
     }
 
@@ -248,6 +245,7 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
     {
         Intent searchDestinationIntent = new Intent(getContext(), SearchActivity.class);
         searchDestinationIntent.putExtra("SEARCH_TYPE", SEARCH_TYPE_BUS_STOP);
+        searchDestinationIntent.putExtra("EDIT_TEXT_HINT", Constants.DESTINATION_BUS_STOP_SEARCH_HINT);
         startActivityForResult(searchDestinationIntent, SEARCH_END_BUS_STOP_REQUEST_CODE);
     }
 
@@ -307,6 +305,8 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
 
     private void cancelAllPreviousTasks()
     {
+        swipeRefreshLayout.setRefreshing(false);
+
         // Iterate over all the previous GetBusesEnDirectTripTasks to cancel each one of them
         for (BusETAsOnDirectTripTask task : busETAsOnDirectTripTasks)
         {
@@ -355,7 +355,6 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
         cancelAllPreviousTasks();
 
         errorLinearLayout.setVisibility(View.GONE);
-        recyclerView.setVisibility(View.GONE);
         swipeRefreshLayout.setRefreshing(true);
 
         getDirectTripsBetweenStops = new GetDirectTripsBetweenStops();
@@ -400,18 +399,18 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
             }
             else
             {
-                swapDirectionImageView.setEnabled(true);
-                searchOriginButton.setEnabled(true);
-                searchDestinationButton.setEnabled(true);
+                recyclerView.setVisibility(View.GONE);
                 swipeRefreshLayout.setRefreshing(false);
                 setErrorLayoutContent(ErrorImageResIds.ERROR_IMAGE_NO_INTERNET, "Uh oh! No data connection.", "Retry");
                 errorLinearLayout.setVisibility(View.VISIBLE);
-                recyclerView.setVisibility(View.GONE);
             }
         }
         else
         {
-            findIndirectTrips(originBusStop.getBusStopName(), destinationBusStop.getBusStopName());
+            swipeRefreshLayout.setRefreshing(false);
+            Toast.makeText(getContext(), "Uh oh! There aren't any direct trips...", Toast.LENGTH_SHORT)
+                    .show();
+            //findIndirectTrips(originBusStop.getBusStopName(), destinationBusStop.getBusStopName());
         }
     }
 
@@ -510,7 +509,9 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
 
             if (tripsToDisplay.size() == 0)
             {
-                findIndirectTrips(originBusStop.getBusStopName(), destinationBusStop.getBusStopName());
+                Toast.makeText(getContext(), "Uh oh! There aren't any direct trips...", Toast.LENGTH_SHORT)
+                        .show();
+                //findIndirectTrips(originBusStop.getBusStopName(), destinationBusStop.getBusStopName());
             }
         }
     }
@@ -877,6 +878,7 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
 
                 if (tripsToDisplay.size() == 0)
                 {
+                    //TODO 'There aren't trips' message gets displayed and then displays trips...needs to be fixed
                     setErrorLayoutContent(R.drawable.ic_directions_bus_black, "Oh no! There aren't any trips right now...", "Retry");
                     errorLinearLayout.setVisibility(View.VISIBLE);
                     recyclerView.setVisibility(View.GONE);
@@ -902,7 +904,6 @@ public class TripPlannerFragment extends Fragment implements DirectTripHelper, I
         }
         else
         {
-            Toast.makeText(getContext(), "Please select a starting and ending bus stop!", Toast.LENGTH_SHORT).show();
             swipeRefreshLayout.setRefreshing(false);
         }
     }

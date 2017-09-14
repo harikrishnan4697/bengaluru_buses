@@ -33,7 +33,6 @@ public class SearchActivity extends AppCompatActivity
     ProgressBar progressBar;
     private EditText searchEditText;
     private ListView searchResultsListView;
-    private String searchType;
     private Intent resultIntent = new Intent();
     private GetAllStops getAllStops;
     private GetAllDistinctRouteNumbers getAllDistinctRouteNumbers;
@@ -56,7 +55,13 @@ public class SearchActivity extends AppCompatActivity
         searchEditText = (EditText) findViewById(R.id.search_edit_text);
         searchResultsListView = (ListView) findViewById(R.id.search_results_list_view);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        searchType = getIntent().getStringExtra("SEARCH_TYPE");
+        String searchType = getIntent().getStringExtra("SEARCH_TYPE");
+        String editTextHint = getIntent().getStringExtra("EDIT_TEXT_HINT");
+
+        if (editTextHint != null)
+        {
+            searchEditText.setHint(editTextHint);
+        }
 
         progressBar.setVisibility(View.VISIBLE);
         if (searchType.equals(SEARCH_TYPE_BUS_STOP))

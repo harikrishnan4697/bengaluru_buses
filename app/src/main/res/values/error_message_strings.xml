@@ -8,11 +8,11 @@
     <string name="error_message_location_access_denied">"Hold on! We need access to the GPS of your device to find bus stops nearby."</string>
     <string name="error_message_location_off">"Wait a minute! We can't find bus stops nearby because the GPS on your device is turned off."</string>
     <string name="error_message_update_google_play_services">"Can't get your current location! Please make sure you have the latest version of the Google Play Services...</string>
-    <string name="error_message_io_exception">"Sorry! We can't connect to BMTC at the moment. Please try again in a moment..."</string>
+    <string name="error_message_io_exception">"Sorry! We can't connect to BMTC at the moment. Please try again in a little bit..."</string>
 
     <!-- Nearby fragment error message strings -->
     <string name="error_message_no_bus_stops_nearby">"Uh oh! There aren't any Bengaluru City bus stops nearby..."</string>
-    
+
     <!-- Fix error button strings -->
     <string name="fix_error_retry">"Retry"</string>
     <string name="fix_error_allow_access">"Allow access"</string>

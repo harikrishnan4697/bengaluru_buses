@@ -62,7 +62,10 @@ public class BusRoutesArrivingAtBusStopDbTask extends AsyncTask<Integer, Void,
     {
         super.onPostExecute(busRoutes);
 
-        // Call the callback method so that the calling class can process the ArrayList.
-        dbQueryHelper.onBusRoutesArrivingAtBusStopFound(busRoutes);
+        if (!isCancelled())
+        {
+            // Call the callback method so that the calling class can process the ArrayList.
+            dbQueryHelper.onBusRoutesArrivingAtBusStopFound(busRoutes);
+        }
     }
 }

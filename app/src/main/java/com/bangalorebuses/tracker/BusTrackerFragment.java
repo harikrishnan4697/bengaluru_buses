@@ -8,8 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.bangalorebuses.R;
 import com.bangalorebuses.search.SearchActivity;
@@ -28,7 +28,7 @@ import static android.content.Context.MODE_APPEND;
 
 public class BusTrackerFragment extends Fragment
 {
-    private Button busNumberSelectionButton;
+    private TextView busNumberSelectionButton;
     private ListView recentSearchesListView;
     private ArrayList<String> recentSearches = new ArrayList<>();
 
@@ -42,7 +42,7 @@ public class BusTrackerFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         View view = inflater.inflate(R.layout.bus_tracker_fragment, container, false);
-        busNumberSelectionButton = (Button) view.findViewById(R.id.choose_bus_number_button);
+        busNumberSelectionButton = (TextView) view.findViewById(R.id.choose_bus_number_button);
         busNumberSelectionButton.setOnClickListener(new View.OnClickListener()
         {
             @Override

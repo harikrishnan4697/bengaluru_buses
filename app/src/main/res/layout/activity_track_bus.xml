@@ -26,7 +26,8 @@
             android:gravity="start"
             android:text="@string/direction_label_text"
             android:textColor="@color/white_text_color"
-            android:textSize="@dimen/text_size_small"/>
+            android:textSize="@dimen/text_size_small"
+            android:textStyle="bold"/>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -86,7 +87,8 @@
             android:layout_marginBottom="@dimen/layout_margin_reduced"
             android:text="@string/bus_stop_label_text"
             android:textColor="@color/white_text_color"
-            android:textSize="@dimen/text_size_small"/>
+            android:textSize="@dimen/text_size_small"
+            android:textStyle="bold"/>
 
         <RelativeLayout
             android:layout_width="wrap_content"

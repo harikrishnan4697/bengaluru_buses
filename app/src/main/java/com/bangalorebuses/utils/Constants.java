@@ -35,8 +35,17 @@ public class Constants
     public static final int SEARCH_REQUEST_CODE = 13;
     public static final int LOCATION_PERMISSION_REQUEST_CODE = 36;
     public static final String ROUTE_SEARCH_HISTORY_FILENAME = "route_search_history";
+
     // Constants for db query tasks
     public static final String NUMBER_OF_ROUTES_TYPE_ORIGIN_TO_TRANSIT_POINT = "ORIGIN-TRANSIT_POINT";
     public static final String NUMBER_OF_ROUTES_TYPE_TRANSIT_POINT_TO_DESTINATION = "TRANSIT_POINT-DESTINATION";
+    // Constants for the Trip Planner Fragment
+    public static final String TRIP_PLANNER_TITLE = "Trip Planner (Beta)";
+    public static final String ORIGIN_BUS_STOP_SEARCH_HINT = "Starting bus stop";
+    public static final String DESTINATION_BUS_STOP_SEARCH_HINT = "Ending bus stop";
+    // Constants for the Bus Tracker Fragment
+    public static final String BUS_TRACKER_TITLE = "Bus Tracker";
+    // Constants for the Nearby Fragment
+    public static final String NEARBY_TITLE = "Bus Stops Nearby";
     public static SQLiteDatabase db;
 }

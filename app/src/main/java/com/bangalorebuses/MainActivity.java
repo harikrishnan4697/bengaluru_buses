@@ -5,13 +5,10 @@ import android.database.sqlite.SQLiteException;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,7 +17,6 @@ import com.bangalorebuses.nearby.NearbyFragment;
 import com.bangalorebuses.tracker.BusTrackerFragment;
 import com.bangalorebuses.trips.TripPlannerFragment;
 import com.bangalorebuses.utils.BengaluruBusesDbHelper;
-import com.bangalorebuses.utils.BottomNavigationBarHelper;
 import com.bangalorebuses.utils.Constants;
 
 /**
@@ -86,7 +82,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onFinish()
             {
-                setContentView(R.layout.activity_main);
+                setContentView(R.layout.activity_main_new);
 
                 //Configure the action bar
                 if (getSupportActionBar() != null)
@@ -97,25 +93,25 @@ public class MainActivity extends AppCompatActivity
                 // Don't let the on-screen keyboard pop up for anything by default.
                 getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-                bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
+                //bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
 
                 // Disable the default Android setting that makes icons on the bottom nav bar
                 // slide around annoyingly.
-                BottomNavigationBarHelper.disableShiftMode(bottomNavigationView);
+                //BottomNavigationBarHelper.disableShiftMode(bottomNavigationView);
 
                 initialiseDatabase();
 
                 // Manually displaying the first fragment - one time only
-                bottomNavigationView.setSelectedItemId(R.id.navigation_track_bus);
-                actionBar.setTitle("Bus tracker");
-                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                //bottomNavigationView.setSelectedItemId(R.id.navigation_track_bus);
+                //actionBar.setTitle(Constants.BUS_TRACKER_TITLE);
+                /*FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                 transaction.replace(R.id.frame_layout, busTrackerFragment);
                 transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-                transaction.commitNow();
+                transaction.commitNow();*/
 
                 wasDisplayingSplashScreen = false;
 
-                bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener()
+                /*bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener()
                 {
                     @Override
                     public boolean onNavigationItemSelected(@NonNull MenuItem item)
@@ -124,15 +120,15 @@ public class MainActivity extends AppCompatActivity
                         {
                             case R.id.navigation_near_me:
                                 selectedFragment = nearbyFragment;
-                                actionBar.setTitle("Bus stops nearby");
+                                actionBar.setTitle(Constants.NEARBY_TITLE);
                                 break;
                             case R.id.navigation_track_bus:
                                 selectedFragment = busTrackerFragment;
-                                actionBar.setTitle("Bus tracker");
+                                actionBar.setTitle(Constants.BUS_TRACKER_TITLE);
                                 break;
                             case R.id.navigation_trip_planner:
                                 selectedFragment = tripPlannerFragment;
-                                actionBar.setTitle("Trip planner");
+                                actionBar.setTitle(Constants.TRIP_PLANNER_TITLE);
                                 break;
                         }
 
@@ -142,16 +138,16 @@ public class MainActivity extends AppCompatActivity
                         transaction.commitNow();
                         return true;
                     }
-                });
+                });*/
 
-                bottomNavigationView.setOnNavigationItemReselectedListener(new BottomNavigationView.OnNavigationItemReselectedListener()
+                /*bottomNavigationView.setOnNavigationItemReselectedListener(new BottomNavigationView.OnNavigationItemReselectedListener()
                 {
                     @Override
                     public void onNavigationItemReselected(@NonNull MenuItem item)
                     {
 
                     }
-                });
+                });*/
             }
         }.start();
     }

@@ -200,7 +200,7 @@ public class BusRoutesToAndFromTransitPointDbTask extends AsyncTask<Void, Void, 
                     busRoute.getBusRouteId(), 1, busRoute.getTripPlannerOriginBusStop().getBusStopRouteOrder()), busRoute.getBusRouteNumber());
 
             Date date = new Date();
-            // TODO Use calendar class
+
             int busETA = timeOfDayBusWillArrive - ((date.getHours() * 60) + date.getMinutes());
 
             if (busETA > -1)

@@ -5,14 +5,26 @@
     <string name="track_buses_navigation_item_text">Bus tracker</string>
     <string name="trip_planner_navigation_item_text">Trip planner</string>
 
-    <!-- Strings for menus -->
-    <string name="refresh_action_title">Refresh</string>
-    <string name="track_entered_bus_action_title">Track entered bus number</string>
-
-    <!-- Strings for Nearby fragment -->
-    <string name="bus_stops_nearby_label_text">Bus stops nearby</string>
-
-    <!-- Strings for TrackBusActivity -->
+    <!-- Strings for Track Bus Activity -->
     <string name="direction_label_text">Direction</string>
     <string name="bus_stop_label_text">Bus stop</string>
+
+    <!-- Search Activity strings -->
+    <string name="search_activity_default_hint">Search"</string>
+
+    <!-- Strings for Trip Planner Fragment -->
+    <string name="trip_planner_origin_label">Starting bus stop</string>
+    <string name="trip_planner_destination_label">Ending bus stop</string>
+
+    <!-- Strings for Bus Tracker Fragment -->
+    <string name="bus_tracker_edit_text_hint">"Bus number"</string>
+    
+    <!-- Main Activity Strings -->
+    <string name="trip_planner_text_view_hint">"Let's plan a trip..."</string>
+    <string name="other_options_title">"More options"</string>
+
+    <string name="nearby_title">"Nearby"</string>
+    <string name="bus_stops_title">"Bus Stops"</string>
+    <string name="buses_title">"Buses"</string>
+
 </resources>

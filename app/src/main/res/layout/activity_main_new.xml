@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/trip_planner_linear_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/layout_margin"
+            android:background="@drawable/white_rounded_background_borderless"
+            android:gravity="start"
+            android:orientation="horizontal"
+            android:padding="@dimen/layout_padding">
+
+            <ImageView
+                android:layout_width="@dimen/image_view_width"
+                android:layout_height="@dimen/image_view_height"
+                android:layout_gravity="center"
+                android:layout_marginEnd="@dimen/layout_margin_reduced"
+                android:layout_marginRight="@dimen/layout_margin_reduced"
+                android:src="@drawable/ic_search_black"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@drawable/white_rounded_background_borderless"
+                android:clickable="true"
+                android:hint="@string/trip_planner_text_view_hint"
+                android:textColor="@color/standard_text_color"
+                android:textSize="@dimen/text_size_big"/>
+
+        </LinearLayout>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/more_options_card_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/trip_planner_linear_layout"
+            android:layout_margin="@dimen/layout_margin"
+            android:orientation="vertical"
+            app:cardCornerRadius="@dimen/card_view_corner_radius">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/layout_padding">
+
+                <TextView
+                    android:id="@+id/other_options_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:gravity="center"
+                    android:text="@string/other_options_title"
+                    android:textColor="@color/standard_text_color"
+                    android:textSize="@dimen/text_size_big"
+                    android:textStyle="bold"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/other_options_text_view"
+                    android:layout_marginTop="@dimen/layout_margin"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="85dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/layout_margin_reduced"
+                        android:background="@drawable/green_rounded_background_borderless"
+                        android:clickable="true"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="@dimen/layout_padding">
+
+                        <ImageView
+                            android:layout_width="@dimen/image_view_width"
+                            android:layout_height="@dimen/image_view_height"
+                            android:src="@drawable/ic_near_me_white"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/layout_margin_reduced"
+                            android:ellipsize="end"
+                            android:gravity="center"
+                            android:maxLines="2"
+                            android:minLines="2"
+                            android:text="@string/nearby_title"
+                            android:textColor="@color/white_text_color"
+                            android:textStyle="bold"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="85dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/layout_margin_reduced"
+                        android:background="@drawable/blue_rounded_background_borderless"
+                        android:clickable="true"
+                        android:gravity="center"
+                        android:minWidth="80dp"
+                        android:orientation="vertical"
+                        android:padding="@dimen/layout_padding">
+
+                        <ImageView
+                            android:layout_width="@dimen/image_view_width"
+                            android:layout_height="@dimen/image_view_height"
+                            android:background="@drawable/white_circle_background_borderless"
+                            android:src="@drawable/ic_location_on_black"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/layout_margin_reduced"
+                            android:ellipsize="end"
+                            android:gravity="center"
+                            android:maxLines="2"
+                            android:minLines="2"
+                            android:text="@string/bus_stops_title"
+                            android:textColor="@color/white_text_color"
+                            android:textStyle="bold"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="85dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/layout_margin_reduced"
+                        android:background="@drawable/orange_rounded_background_borderless"
+                        android:clickable="true"
+                        android:gravity="center"
+                        android:minWidth="80dp"
+                        android:orientation="vertical"
+                        android:padding="@dimen/layout_padding">
+
+                        <ImageView
+                            android:layout_width="@dimen/image_view_width"
+                            android:layout_height="@dimen/image_view_height"
+                            android:src="@drawable/ic_directions_bus_white"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/layout_margin_reduced"
+                            android:ellipsize="end"
+                            android:gravity="center"
+                            android:maxLines="2"
+                            android:minLines="2"
+                            android:text="@string/buses_title"
+                            android:textColor="@color/white_text_color"
+                            android:textStyle="bold"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+        </android.support.v7.widget.CardView>
+
+    </RelativeLayout>
+
+</ScrollView>
