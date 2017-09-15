@@ -18,13 +18,19 @@
 
     <!-- Strings for Bus Tracker Fragment -->
     <string name="bus_tracker_edit_text_hint">"Bus number"</string>
-    
-    <!-- Main Activity Strings -->
-    <string name="trip_planner_text_view_hint">"Let's plan a trip..."</string>
-    <string name="other_options_title">"More options"</string>
 
-    <string name="nearby_title">"Nearby"</string>
-    <string name="bus_stops_title">"Bus Stops"</string>
+    <!-- Main Activity Strings -->
+    <string name="trip_planner_text_view_hint">"Where would you like to go?"</string>
+    <string name="other_options_title">"More Information"</string>
+
+    <string name="trip_planner_title">"Trip Planner (Beta)</string>
+
+    <!-- Buses Activity Strings -->
+    <string name="bus_search_edit_text_hint">"Search for a bus..."</string>
     <string name="buses_title">"Buses"</string>
+
+    <!-- Bus Stops Activity Strings -->
+    <string name="bus_stops_title">"Bus Stops"</string>
+    <string name="bus_stops_search_edit_text_hint">"Search for a bus stop..."</string>
 
 </resources>

@@ -247,6 +247,10 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
                         busETAsOnBusRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, requestBody);
                         runningAsyncTasks.add(busETAsOnBusRouteTask);
                     }
+                    else
+                    {
+                        break;
+                    }
                 }
             }
             else

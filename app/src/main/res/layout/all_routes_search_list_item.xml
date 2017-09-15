@@ -49,6 +49,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
+            android:layout_marginEnd="@dimen/layout_margin"
+            android:layout_marginRight="@dimen/layout_margin"
             android:layout_toLeftOf="@id/routeServiceTypeTextView"
             android:layout_toStartOf="@id/routeServiceTypeTextView"
             android:orientation="horizontal">

@@ -1,0 +1,62 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    tools:context=".busstops.AllBusStopsFragment">
+
+    <LinearLayout
+        android:id="@+id/bus_stops_search_linear_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/action_bar_relative_layout"
+        android:layout_margin="@dimen/layout_margin"
+        android:layout_marginLeft="@dimen/layout_margin"
+        android:layout_marginRight="@dimen/layout_margin"
+        android:layout_marginTop="@dimen/layout_margin"
+        android:background="@drawable/white_rounded_background_borderless"
+        android:gravity="start"
+        android:orientation="horizontal"
+        android:padding="@dimen/layout_padding">
+
+        <ImageView
+            android:layout_width="@dimen/image_view_width"
+            android:layout_height="@dimen/image_view_height"
+            android:layout_gravity="center"
+            android:layout_marginEnd="@dimen/layout_margin_reduced"
+            android:layout_marginRight="@dimen/layout_margin_reduced"
+            android:src="@drawable/ic_search_black"/>
+
+        <EditText
+            android:id="@+id/edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/white_rounded_background_borderless"
+            android:clickable="true"
+            android:hint="@string/bus_stops_search_edit_text_hint"
+            android:inputType="text"
+            android:maxLines="1"
+            android:textColor="@color/standard_text_color"
+            android:textSize="@dimen/text_size_big"/>
+
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/list_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/bus_stops_search_linear_layout"
+        android:layout_marginBottom="@dimen/layout_margin"
+        android:layout_marginLeft="@dimen/layout_margin"
+        android:layout_marginRight="@dimen/layout_margin"
+        android:background="@drawable/white_rounded_background_borderless"/>
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"/>
+
+</RelativeLayout>

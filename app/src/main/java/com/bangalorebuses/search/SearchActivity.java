@@ -18,6 +18,7 @@ import android.widget.ProgressBar;
 
 import com.bangalorebuses.R;
 import com.bangalorebuses.core.BusStop;
+import com.bangalorebuses.tracker.AllBusRoutesSearchListCustomAdapter;
 import com.bangalorebuses.utils.DbQueries;
 
 import java.util.ArrayList;

@@ -44,6 +44,12 @@
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait">
         </activity>
+        <activity android:name=".tracker.BusesActivity">
+        </activity>
+        <activity android:name=".busstops.BusStopsActivity">
+        </activity>
+        <activity android:name=".trips.TripPlannerActivity">
+        </activity>
     </application>
 
 </manifest>

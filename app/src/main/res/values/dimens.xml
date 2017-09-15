@@ -6,6 +6,7 @@
     <!-- Layout padding dimensions -->
     <dimen name="layout_padding">10dp</dimen>
     <dimen name="layout_padding_reduced">5dp</dimen>
+    <dimen name="action_bar_padding">16dp</dimen>
 
     <!-- ImageView dimensions -->
     <dimen name="image_view_height">25dp</dimen>

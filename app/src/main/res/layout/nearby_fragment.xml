@@ -4,12 +4,14 @@
     android:id="@+id/containerRelativeLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/layout_background_color">
+    android:background="@color/colorPrimary">
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/layout_margin"
+        android:layout_marginRight="@dimen/layout_margin">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/nearbyBusStopsRecyclerView"
@@ -25,7 +27,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
+        android:layout_margin="@dimen/layout_margin"
         android:animateLayoutChanges="true"
+        android:background="@drawable/white_rounded_background_borderless"
         android:gravity="center"
         android:orientation="vertical"
         android:visibility="visible">
@@ -44,8 +48,8 @@
             android:layout_marginLeft="@dimen/layout_margin"
             android:layout_marginRight="@dimen/layout_margin"
             android:textAlignment="center"
-            android:textColor="#000000"
-            android:textSize="16sp"/>
+            android:textColor="@color/standard_text_color"
+            android:textSize="@dimen/text_size_big"/>
 
         <TextView
             android:id="@+id/errorResolutionTextView"

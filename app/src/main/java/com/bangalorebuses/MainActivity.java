@@ -5,17 +5,17 @@ import android.database.sqlite.SQLiteException;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.support.design.widget.BottomNavigationView;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bangalorebuses.nearby.NearbyFragment;
-import com.bangalorebuses.tracker.BusTrackerFragment;
-import com.bangalorebuses.trips.TripPlannerFragment;
+import com.bangalorebuses.busstops.BusStopsActivity;
+import com.bangalorebuses.tracker.BusesActivity;
+import com.bangalorebuses.trips.TripPlannerActivity;
 import com.bangalorebuses.utils.BengaluruBusesDbHelper;
 import com.bangalorebuses.utils.Constants;
 
@@ -34,11 +34,14 @@ public class MainActivity extends AppCompatActivity
     private CountDownTimer countDownTimer;
     private boolean wasDisplayingSplashScreen = false;
     private boolean activityWasPaused = false;
-    private Fragment selectedFragment = null;
+    /*private Fragment selectedFragment = null;
     private NearbyFragment nearbyFragment = new NearbyFragment();
     private BusTrackerFragment busTrackerFragment = new BusTrackerFragment();
     private TripPlannerFragment tripPlannerFragment = new TripPlannerFragment();
-    private BottomNavigationView bottomNavigationView;
+    private BottomNavigationView bottomNavigationView;*/
+    private LinearLayout busesLinearLayout;
+    private LinearLayout busStopsLinearLayout;
+    private LinearLayout tripPlannerLinearLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -84,10 +87,16 @@ public class MainActivity extends AppCompatActivity
             {
                 setContentView(R.layout.activity_main_new);
 
+                TextView appNameTextView = (TextView) findViewById(R.id.app_name_text_view);
+
+                // Change the font of "Bengaluru Buses" to a custom font.
+                Typeface typeFace = Typeface.createFromAsset(getAssets(), "fonts/Righteous-Regular.ttf");
+                appNameTextView.setTypeface(typeFace);
+
                 //Configure the action bar
                 if (getSupportActionBar() != null)
                 {
-                    getSupportActionBar().show();
+                    //getSupportActionBar().show();
                 }
 
                 // Don't let the on-screen keyboard pop up for anything by default.
@@ -110,6 +119,36 @@ public class MainActivity extends AppCompatActivity
                 transaction.commitNow();*/
 
                 wasDisplayingSplashScreen = false;
+
+                busesLinearLayout = (LinearLayout) findViewById(R.id.buses_linear_layout);
+                busesLinearLayout.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        onBusesLinearLayoutClicked();
+                    }
+                });
+
+                busStopsLinearLayout = (LinearLayout) findViewById(R.id.bus_stops_linear_layout);
+                busStopsLinearLayout.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        onBusStopsLinearLayoutClicked();
+                    }
+                });
+
+                tripPlannerLinearLayout = (LinearLayout) findViewById(R.id.trip_planner_linear_layout);
+                tripPlannerLinearLayout.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        onTripPlannerLinearLayoutClicked();
+                    }
+                });
 
                 /*bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener()
                 {
@@ -173,19 +212,37 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    private void onBusStopsLinearLayoutClicked()
+    {
+        Intent busStopsActivityIntent = new Intent(this, BusStopsActivity.class);
+        startActivity(busStopsActivityIntent);
+    }
+
+    private void onBusesLinearLayoutClicked()
+    {
+        Intent busesActivityIntent = new Intent(this, BusesActivity.class);
+        startActivity(busesActivityIntent);
+    }
+
+    private void onTripPlannerLinearLayoutClicked()
+    {
+        Intent busesActivityIntent = new Intent(this, TripPlannerActivity.class);
+        startActivity(busesActivityIntent);
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         // Pass on the result of an activity launched by a fragment back
         // to the fragment.
-        if (requestCode == 1 && selectedFragment != null)
+        /*if (requestCode == 1 && selectedFragment != null)
         {
             selectedFragment.onActivityResult(requestCode, resultCode, data);
         }
         else
         {
             super.onActivityResult(requestCode, resultCode, data);
-        }
+        }*/
     }
 
     @Override

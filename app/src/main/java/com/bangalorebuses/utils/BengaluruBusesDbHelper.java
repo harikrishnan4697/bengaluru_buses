@@ -15,7 +15,7 @@ import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
 public class BengaluruBusesDbHelper extends SQLiteAssetHelper
 {
-    private static final int DATABASE_VERSION = 124;
+    private static final int DATABASE_VERSION = 125;
     private static final String DATABASE_NAME = "BengaluruBuses.db";
 
     public BengaluruBusesDbHelper(Context context)
