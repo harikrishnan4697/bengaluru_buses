@@ -21,7 +21,14 @@
 
     <!-- Main Activity Strings -->
     <string name="trip_planner_text_view_hint">"Where would you like to go?"</string>
-    <string name="other_options_title">"More Information"</string>
+    <string name="other_options_title">"Transport Info"</string>
+    <string name="favourites_title">"Favourites"</string>
+    <string name="help_title">"Help"</string>
+    <string name="help_website_title">" BMTC Website"</string>
+    <string name="help_helpline_title">"BMTC Helpline"</string>
+    <string name="favourites_home_title">"Home"</string>
+    <string name="favourites_work_title">"Work"</string>
+    <string name="tips_title">"Things to know"</string>
 
     <string name="trip_planner_title">"Trip Planner (Beta)</string>
 

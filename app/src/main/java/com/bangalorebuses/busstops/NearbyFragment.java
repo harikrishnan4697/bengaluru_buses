@@ -237,6 +237,7 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
      */
     protected void createLocationRequest()
     {
+        errorLinearLayout.setVisibility(View.GONE);
         swipeRefreshLayout.setRefreshing(true);
         final int REQUEST_CHECK_SETTINGS = 0x1;
         locationRequest = new LocationRequest();

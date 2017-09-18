@@ -2,6 +2,7 @@
     <!-- Layout margin dimensions -->
     <dimen name="layout_margin">10dp</dimen>
     <dimen name="layout_margin_reduced">5dp</dimen>
+    <dimen name="action_bar_margin">16dp</dimen>
 
     <!-- Layout padding dimensions -->
     <dimen name="layout_padding">10dp</dimen>

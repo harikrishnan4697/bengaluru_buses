@@ -29,9 +29,15 @@ import com.bangalorebuses.core.Bus;
 import com.bangalorebuses.core.BusRoute;
 import com.bangalorebuses.core.BusStop;
 import com.bangalorebuses.utils.BusETAsOnBusRouteTask;
+import com.bangalorebuses.utils.Constants;
 import com.bangalorebuses.utils.DbQueries;
 import com.bangalorebuses.utils.NetworkingHelper;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -77,6 +83,8 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
     private ImageView errorImageView;
     private TextView errorTextView;
     private TextView errorResolutionTextView;
+    private ImageView favoriteImageView;
+    private boolean isFavorite = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
@@ -85,12 +93,34 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
 
         if (getSupportActionBar() != null)
         {
-            getSupportActionBar().setElevation(0);
-            getSupportActionBar().setTitle("Tracking " + getIntent().getStringExtra("ROUTE_NUMBER"));
+            getSupportActionBar().hide();
         }
         setContentView(R.layout.activity_track_bus);
 
         // Initialise XML elements
+        TextView titleTextView = (TextView) findViewById(R.id.title_text_view);
+        titleTextView.setText("Tracking " + getIntent().getStringExtra("ROUTE_NUMBER"));
+
+        ImageView backButtonImageView = (ImageView) findViewById(R.id.back_button_image_view);
+        backButtonImageView.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                finish();
+            }
+        });
+
+        favoriteImageView = (ImageView) findViewById(R.id.favorite_image_view);
+        favoriteImageView.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                favoriteBusRoute();
+            }
+        });
+
         listView = (ListView) findViewById(R.id.listView);
         spinner = (Spinner) findViewById(R.id.route_stop_list_spinner);
         directionTextView = (TextView) findViewById(R.id.directionNameTextView);
@@ -261,6 +291,134 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         getRoutesWithNumberTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, routeNumber);
     }
 
+    private void initialiseFavorites()
+    {
+        try
+        {
+            FileInputStream fileInputStream = openFileInput(Constants.FAVOURITES_FILE_NAME);
+            InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+            ArrayList<String> favorites = new ArrayList<>();
+            String line;
+
+            while ((line = bufferedReader.readLine()) != null)
+            {
+                favorites.add(line);
+            }
+
+            if (currentlySelectedDirection.equals(DIRECTION_UP))
+            {
+                isFavorite = favorites.contains("^%b" + routeUp.getBusRouteNumber());
+            }
+            else
+            {
+                isFavorite = favorites.contains("^%b" + routeDown.getBusRouteNumber());
+            }
+
+            favorites.trimToSize();
+            fileInputStream.close();
+            inputStreamReader.close();
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        if (isFavorite)
+        {
+            favoriteImageView.setImageResource(R.drawable.ic_favorite_white);
+        }
+        else
+        {
+            favoriteImageView.setImageResource(R.drawable.ic_favorite_border_white);
+        }
+    }
+
+    private void favoriteBusRoute()
+    {
+        if (!isFavorite)
+        {
+            try
+            {
+                FileOutputStream fileOutputStream = openFileOutput(Constants.FAVOURITES_FILE_NAME, MODE_APPEND);
+
+                if (currentlySelectedDirection.equals(DIRECTION_UP))
+                {
+                    fileOutputStream.write(("^%b" + routeUp.getBusRouteNumber() + "\n").getBytes());
+                    Toast.makeText(this, "Added " + routeUp.getBusRouteNumber() + " to favourites.", Toast.LENGTH_SHORT)
+                            .show();
+                }
+                else
+                {
+                    fileOutputStream.write(("^%b" + routeDown.getBusRouteNumber() + "\n").getBytes());
+                    Toast.makeText(this, "Added " + routeDown.getBusRouteNumber() + " to favourites.", Toast.LENGTH_SHORT)
+                            .show();
+                }
+                fileOutputStream.close();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+                Toast.makeText(this, "Unknown error occurred! Couldn't favourite this bus...", Toast.LENGTH_SHORT).show();
+            }
+
+            favoriteImageView.setImageResource(R.drawable.ic_favorite_white);
+            isFavorite = true;
+        }
+        else
+        {
+            try
+            {
+                FileInputStream fileInputStream = openFileInput(Constants.FAVOURITES_FILE_NAME);
+                InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+                ArrayList<String> favorites = new ArrayList<>();
+                String line;
+
+                while ((line = bufferedReader.readLine()) != null)
+                {
+                    favorites.add(line);
+                }
+
+                if (currentlySelectedDirection.equals(DIRECTION_UP))
+                {
+                    favorites.remove("^%b" + routeUp.getBusRouteNumber());
+                    Toast.makeText(this, "Removed " + routeUp.getBusRouteNumber() + " from favourites.", Toast.LENGTH_SHORT)
+                            .show();
+                }
+                else
+                {
+                    favorites.remove("^%b" + routeDown.getBusRouteNumber());
+                    Toast.makeText(this, "Removed " + routeDown.getBusRouteNumber() + " from favourites.", Toast.LENGTH_SHORT)
+                            .show();
+                }
+
+                favorites.trimToSize();
+                fileInputStream.close();
+                inputStreamReader.close();
+
+                FileOutputStream fileOutputStream = openFileOutput(Constants.FAVOURITES_FILE_NAME, MODE_PRIVATE);
+                for (String favorite : favorites)
+                {
+                    fileOutputStream.write((favorite + "\n").getBytes());
+                }
+                fileOutputStream.close();
+
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                Toast.makeText(this, "Unknown error occurred! Couldn't un-favourite this bus...", Toast.LENGTH_SHORT).show();
+            }
+
+            favoriteImageView.setImageResource(R.drawable.ic_favorite_border_white);
+            isFavorite = false;
+        }
+    }
+
     @Override
     public void onBusStopsNearbyFound(String errorMessage, ArrayList<BusStop> busStops)
     {
@@ -307,6 +465,8 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
                 getStopsOnRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, routeDown.getBusRouteId());
             }
         }
+
+        initialiseFavorites();
 
     }
 

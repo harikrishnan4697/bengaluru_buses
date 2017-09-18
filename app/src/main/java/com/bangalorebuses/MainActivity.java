@@ -3,6 +3,7 @@ package com.bangalorebuses;
 import android.content.Intent;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v7.app.ActionBar;
@@ -10,14 +11,25 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bangalorebuses.busarrivals.BusesArrivingAtBusStopActivity;
 import com.bangalorebuses.busstops.BusStopsActivity;
+import com.bangalorebuses.favorites.FavoritesHelper;
+import com.bangalorebuses.favorites.FavoritesListCustomAdapter;
 import com.bangalorebuses.tracker.BusesActivity;
+import com.bangalorebuses.tracker.TrackBusActivity;
 import com.bangalorebuses.trips.TripPlannerActivity;
 import com.bangalorebuses.utils.BengaluruBusesDbHelper;
 import com.bangalorebuses.utils.Constants;
+
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 /**
  * This is the main activity of the app. It displays the
@@ -28,20 +40,17 @@ import com.bangalorebuses.utils.Constants;
  * @since 5-9-2017
  */
 
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends AppCompatActivity implements FavoritesHelper
 {
     private ActionBar actionBar;
     private CountDownTimer countDownTimer;
     private boolean wasDisplayingSplashScreen = false;
     private boolean activityWasPaused = false;
-    /*private Fragment selectedFragment = null;
-    private NearbyFragment nearbyFragment = new NearbyFragment();
-    private BusTrackerFragment busTrackerFragment = new BusTrackerFragment();
-    private TripPlannerFragment tripPlannerFragment = new TripPlannerFragment();
-    private BottomNavigationView bottomNavigationView;*/
     private LinearLayout busesLinearLayout;
     private LinearLayout busStopsLinearLayout;
     private LinearLayout tripPlannerLinearLayout;
+
+    private ListView favoritesListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -93,30 +102,10 @@ public class MainActivity extends AppCompatActivity
                 Typeface typeFace = Typeface.createFromAsset(getAssets(), "fonts/Righteous-Regular.ttf");
                 appNameTextView.setTypeface(typeFace);
 
-                //Configure the action bar
-                if (getSupportActionBar() != null)
-                {
-                    //getSupportActionBar().show();
-                }
-
                 // Don't let the on-screen keyboard pop up for anything by default.
                 getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-                //bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
-
-                // Disable the default Android setting that makes icons on the bottom nav bar
-                // slide around annoyingly.
-                //BottomNavigationBarHelper.disableShiftMode(bottomNavigationView);
-
                 initialiseDatabase();
-
-                // Manually displaying the first fragment - one time only
-                //bottomNavigationView.setSelectedItemId(R.id.navigation_track_bus);
-                //actionBar.setTitle(Constants.BUS_TRACKER_TITLE);
-                /*FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.frame_layout, busTrackerFragment);
-                transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-                transaction.commitNow();*/
 
                 wasDisplayingSplashScreen = false;
 
@@ -150,43 +139,31 @@ public class MainActivity extends AppCompatActivity
                     }
                 });
 
-                /*bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener()
+                LinearLayout bmtcWebsiteLinearLayout = (LinearLayout) findViewById(R.id.website_linear_layout);
+                bmtcWebsiteLinearLayout.setOnClickListener(new View.OnClickListener()
                 {
                     @Override
-                    public boolean onNavigationItemSelected(@NonNull MenuItem item)
+                    public void onClick(View v)
                     {
-                        switch (item.getItemId())
-                        {
-                            case R.id.navigation_near_me:
-                                selectedFragment = nearbyFragment;
-                                actionBar.setTitle(Constants.NEARBY_TITLE);
-                                break;
-                            case R.id.navigation_track_bus:
-                                selectedFragment = busTrackerFragment;
-                                actionBar.setTitle(Constants.BUS_TRACKER_TITLE);
-                                break;
-                            case R.id.navigation_trip_planner:
-                                selectedFragment = tripPlannerFragment;
-                                actionBar.setTitle(Constants.TRIP_PLANNER_TITLE);
-                                break;
-                        }
-
-                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                        transaction.replace(R.id.frame_layout, selectedFragment);
-                        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-                        transaction.commitNow();
-                        return true;
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(
+                                "http://www.mybmtc.com/en"));
+                        startActivity(browserIntent);
                     }
-                });*/
+                });
 
-                /*bottomNavigationView.setOnNavigationItemReselectedListener(new BottomNavigationView.OnNavigationItemReselectedListener()
+                LinearLayout bmtcHelplineLinearLayout = (LinearLayout) findViewById(R.id.helpline_linear_layout);
+                bmtcHelplineLinearLayout.setOnClickListener(new View.OnClickListener()
                 {
                     @Override
-                    public void onNavigationItemReselected(@NonNull MenuItem item)
+                    public void onClick(View v)
                     {
-
+                        Intent callIntent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:18004251663"));
+                        startActivity(callIntent);
                     }
-                });*/
+                });
+
+                favoritesListView = (ListView) findViewById(R.id.favourites_list_view);
+                initialiseFavorites();
             }
         }.start();
     }
@@ -210,6 +187,108 @@ public class MainActivity extends AppCompatActivity
                     " Error code: 1", Toast.LENGTH_LONG).show();
             finish();
         }
+    }
+
+    private void initialiseFavorites()
+    {
+        if (favoritesListView != null)
+        {
+            try
+            {
+                FileInputStream fileInputStream = openFileInput(Constants.FAVOURITES_FILE_NAME);
+                InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+                ArrayList<String> favorites = new ArrayList<>();
+                String line;
+
+                while ((line = bufferedReader.readLine()) != null)
+                {
+                    favorites.add(line);
+                }
+
+                FavoritesListCustomAdapter adapter = new FavoritesListCustomAdapter(this, this,
+                        favorites);
+                favoritesListView.setAdapter(adapter);
+                favoritesListView.setVisibility(View.VISIBLE);
+
+                favorites.trimToSize();
+                fileInputStream.close();
+                inputStreamReader.close();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void onFavoriteClicked(String favorite)
+    {
+        if (favorite.substring(0, 3).equals("^%b"))
+        {
+            Intent busTrackerIntent = new Intent(this, TrackBusActivity.class);
+            busTrackerIntent.putExtra("ROUTE_NUMBER", favorite.substring(3,
+                    favorite.length()));
+            startActivity(busTrackerIntent);
+        }
+        else if (favorite.substring(0, 3).equals("^%s"))
+        {
+            // TODO
+            Intent busesArrivingAtBusStopIntent = new Intent(this, BusesArrivingAtBusStopActivity.class);
+        }
+        else
+        {
+            // TODO
+            Intent tripPlannerIntent = new Intent(this, TripPlannerActivity.class);
+        }
+    }
+
+    @Override
+    public void onFavoriteDeleted(String favorite)
+    {
+        try
+        {
+            FileInputStream fileInputStream = openFileInput(Constants.FAVOURITES_FILE_NAME);
+            InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream,
+                    "UTF-8");
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+            ArrayList<String> favorites = new ArrayList<>();
+            String line;
+
+            while ((line = bufferedReader.readLine()) != null)
+            {
+                favorites.add(line);
+            }
+
+            favorites.remove(favorite);
+
+            favorites.trimToSize();
+            fileInputStream.close();
+            inputStreamReader.close();
+
+            FileOutputStream fileOutputStream = openFileOutput(Constants.FAVOURITES_FILE_NAME,
+                    MODE_PRIVATE);
+            for (String aFavorite : favorites)
+            {
+                fileOutputStream.write((aFavorite + "\n").getBytes());
+            }
+            fileOutputStream.close();
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Toast.makeText(this, "Unknown error occurred! Couldn't un-favourite this bus...", Toast
+                    .LENGTH_SHORT).show();
+        }
+
+        initialiseFavorites();
+
+        Toast.makeText(this, "Removed " + favorite.substring(3, favorite.length()) + " from favourites.",
+                Toast.LENGTH_SHORT).show();
     }
 
     private void onBusStopsLinearLayoutClicked()
@@ -257,6 +336,8 @@ public class MainActivity extends AppCompatActivity
             initializeActivity();
         }
         activityWasPaused = false;
+
+        initialiseFavorites();
     }
 
     @Override

@@ -33,8 +33,8 @@ public class BusStopsActivity extends AppCompatActivity
 
         // Create the two tabs
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-        tabLayout.addTab(tabLayout.newTab().setText("Nearby Bus Stops"));
-        tabLayout.addTab(tabLayout.newTab().setText("All Bus Stops"));
+        tabLayout.addTab(tabLayout.newTab().setText("Nearby"));
+        tabLayout.addTab(tabLayout.newTab().setText("All"));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         // Use a ViewPager to allow the user to swipe between the tabs

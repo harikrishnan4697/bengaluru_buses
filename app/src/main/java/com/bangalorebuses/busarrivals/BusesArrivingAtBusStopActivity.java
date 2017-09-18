@@ -15,16 +15,23 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bangalorebuses.R;
 import com.bangalorebuses.core.Bus;
 import com.bangalorebuses.core.BusRoute;
 import com.bangalorebuses.core.BusStop;
 import com.bangalorebuses.utils.BusETAsOnBusRouteTask;
+import com.bangalorebuses.utils.Constants;
 import com.bangalorebuses.utils.DbQueries;
 import com.bangalorebuses.utils.DbQueryHelper;
 import com.bangalorebuses.utils.NetworkingHelper;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -59,12 +66,19 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
     private boolean busStopHasTraceableBuses = false;
     private BusRoutesArrivingAtBusStopDbTask busRoutesArrivingAtBusStopDbTask;
     private ArrayList<BusETAsOnBusRouteTask> runningAsyncTasks = new ArrayList<>();
+    private boolean isFavorite = false;
+    private ImageView favoriteImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_buses_arriving_at_bus_stop);
+
+        if (getSupportActionBar() != null)
+        {
+            getSupportActionBar().hide();
+        }
 
         // Initialize some variables
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
@@ -97,12 +111,32 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
         {
             selectedBusStop.setBusStopDirectionName(busStopDirectionName);
         }
-        if (getSupportActionBar() != null)
+
+        TextView titleTextView = (TextView) findViewById(R.id.title_text_view);
+        titleTextView.setText(selectedBusStop.getBusStopName());
+
+        ImageView backButtonImageView = (ImageView) findViewById(R.id.back_button_image_view);
+        backButtonImageView.setOnClickListener(new View.OnClickListener()
         {
-            getSupportActionBar().setElevation(0);
-            getSupportActionBar().setTitle(selectedBusStop.getBusStopName());
-            busStopDirectionInfoTextView.setText(selectedBusStop.getBusStopDirectionName());
-        }
+            @Override
+            public void onClick(View v)
+            {
+                finish();
+            }
+        });
+
+        favoriteImageView = (ImageView) findViewById(R.id.favorite_image_view);
+        favoriteImageView.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                favoriteBusStop();
+            }
+        });
+
+        busStopDirectionInfoTextView.setText(selectedBusStop.getBusStopDirectionName());
+
         selectedBusStop.setBusStopId(getIntent().getIntExtra("BUS_STOP_ID", 0));
 
         // Get buses scheduled to arrive at the selected bus stop
@@ -121,6 +155,8 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
             setErrorLayoutContent(R.drawable.ic_cloud_off_black, "Uh oh! No data connection.", "Retry");
             errorLinearLayout.setVisibility(View.VISIBLE);
         }
+
+        initialiseFavorites();
     }
 
     @Override
@@ -201,6 +237,116 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
             listView.setVisibility(View.GONE);
             setErrorLayoutContent(R.drawable.ic_cloud_off_black, "Uh oh! No data connection.", "Retry");
             errorLinearLayout.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void initialiseFavorites()
+    {
+        try
+        {
+            FileInputStream fileInputStream = openFileInput(Constants.FAVOURITES_FILE_NAME);
+            InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+            ArrayList<String> favorites = new ArrayList<>();
+            String line;
+
+            while ((line = bufferedReader.readLine()) != null)
+            {
+                favorites.add(line);
+            }
+
+            isFavorite = favorites.contains("^%s" + selectedBusStop.getBusStopId() + "^%sn" +
+                    selectedBusStop.getBusStopName() + "^%sd" + selectedBusStop.getBusStopDirectionName());
+
+            favorites.trimToSize();
+            fileInputStream.close();
+            inputStreamReader.close();
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        if (isFavorite)
+        {
+            favoriteImageView.setImageResource(R.drawable.ic_favorite_white);
+        }
+        else
+        {
+            favoriteImageView.setImageResource(R.drawable.ic_favorite_border_white);
+        }
+    }
+
+    private void favoriteBusStop()
+    {
+        if (!isFavorite)
+        {
+            try
+            {
+                FileOutputStream fileOutputStream = openFileOutput(Constants.FAVOURITES_FILE_NAME, MODE_APPEND);
+
+                fileOutputStream.write(("^%s" + selectedBusStop.getBusStopId() + "^%sn" +
+                        selectedBusStop.getBusStopName() + "^%sd" + selectedBusStop.getBusStopDirectionName()
+                        + "\n").getBytes());
+
+                Toast.makeText(this, "Added " + selectedBusStop.getBusStopName() + " to favourites.", Toast.LENGTH_SHORT)
+                        .show();
+
+                fileOutputStream.close();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+                Toast.makeText(this, "Unknown error occurred! Couldn't favourite this bus stop...", Toast.LENGTH_SHORT).show();
+            }
+
+            favoriteImageView.setImageResource(R.drawable.ic_favorite_white);
+            isFavorite = true;
+        }
+        else
+        {
+            try
+            {
+                FileInputStream fileInputStream = openFileInput(Constants.FAVOURITES_FILE_NAME);
+                InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+                ArrayList<String> favorites = new ArrayList<>();
+                String line;
+
+                while ((line = bufferedReader.readLine()) != null)
+                {
+                    favorites.add(line);
+                }
+
+                favorites.remove("^%s" + selectedBusStop.getBusStopId() + "^%sn" +
+                        selectedBusStop.getBusStopName() + "^%sd" + selectedBusStop.getBusStopDirectionName());
+
+                Toast.makeText(this, "Removed " + selectedBusStop.getBusStopName() + " from favourites.", Toast.LENGTH_SHORT)
+                        .show();
+
+                favorites.trimToSize();
+                fileInputStream.close();
+                inputStreamReader.close();
+
+                FileOutputStream fileOutputStream = openFileOutput(Constants.FAVOURITES_FILE_NAME, MODE_PRIVATE);
+                for (String favorite : favorites)
+                {
+                    fileOutputStream.write((favorite + "\n").getBytes());
+                }
+                fileOutputStream.close();
+
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                Toast.makeText(this, "Unknown error occurred! Couldn't un-favourite this bus stop...", Toast.LENGTH_SHORT).show();
+            }
+
+            favoriteImageView.setImageResource(R.drawable.ic_favorite_border_white);
+            isFavorite = false;
         }
     }
 

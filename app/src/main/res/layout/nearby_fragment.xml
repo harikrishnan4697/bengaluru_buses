@@ -9,9 +9,7 @@
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/layout_margin"
-        android:layout_marginRight="@dimen/layout_margin">
+        android:layout_height="wrap_content">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/nearbyBusStopsRecyclerView"
@@ -26,7 +24,7 @@
         android:id="@+id/errorLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
+        android:layout_alignParentTop="true"
         android:layout_margin="@dimen/layout_margin"
         android:animateLayoutChanges="true"
         android:background="@drawable/white_rounded_background_borderless"

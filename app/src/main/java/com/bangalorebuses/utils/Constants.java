@@ -48,4 +48,7 @@ public class Constants
     // Constants for the Nearby Fragment
     public static final String NEARBY_TITLE = "Bus Stops Nearby";
     public static SQLiteDatabase db;
+
+    // Favourites constants
+    public static String FAVOURITES_FILE_NAME = "Favourites.txt";
 }

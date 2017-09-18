@@ -4,23 +4,68 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/layout_background_color"
+    android:background="@color/colorPrimary"
     tools:context="com.bangalorebuses.tracker.TrackBusActivity">
+
+    <RelativeLayout
+        android:id="@+id/action_bar_relative_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:padding="@dimen/action_bar_padding">
+
+        <ImageView
+            android:id="@+id/back_button_image_view"
+            android:layout_width="@dimen/image_view_width"
+            android:layout_height="@dimen/image_view_height"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="@dimen/action_bar_margin"
+            android:layout_marginRight="@dimen/action_bar_margin"
+            android:clickable="true"
+            android:src="@drawable/ic_arrow_back_white"/>
+
+        <TextView
+            android:id="@+id/title_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@id/back_button_image_view"
+            android:layout_toRightOf="@id/back_button_image_view"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/buses_title"
+            android:textColor="@color/white_text_color"
+            android:textSize="20sp"/>
+
+        <ImageView
+            android:id="@+id/favorite_image_view"
+            android:layout_width="@dimen/image_view_width"
+            android:layout_height="@dimen/image_view_height"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/layout_margin"
+            android:layout_marginStart="@dimen/layout_margin"
+            android:clickable="true"
+            android:src="@drawable/ic_favorite_border_white"/>
+
+    </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/directionSelectionLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
+        android:layout_below="@id/action_bar_relative_layout"
         android:background="@color/colorPrimary"
         android:orientation="vertical"
         android:paddingLeft="@dimen/layout_padding"
         android:paddingRight="@dimen/layout_padding">
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/layout_margin_reduced"
             android:gravity="start"
@@ -41,7 +86,6 @@
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:layout_gravity="center"
-                android:layout_marginBottom="@dimen/layout_margin"
                 android:layout_marginLeft="@dimen/layout_margin"
                 android:layout_marginStart="@dimen/layout_margin"
                 android:background="@drawable/orange_rounded_border"
@@ -113,13 +157,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_below="@id/bus_stop_selection_linear_layout">
+        android:layout_below="@id/bus_stop_selection_linear_layout"
+        android:layout_margin="@dimen/layout_margin"
+        android:background="@drawable/white_rounded_background_borderless">
 
         <ListView
             android:id="@+id/listView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:animateLayoutChanges="true"/>
+            android:animateLayoutChanges="true"
+            android:scrollbars="none"/>
 
     </android.support.v4.widget.SwipeRefreshLayout>
 
@@ -128,7 +175,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/bus_stop_selection_linear_layout"
+        android:layout_margin="@dimen/layout_margin"
         android:animateLayoutChanges="true"
+        android:background="@drawable/white_rounded_background_borderless"
         android:gravity="center"
         android:orientation="vertical"
         android:visibility="visible">
@@ -146,8 +195,9 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/layout_margin"
             android:layout_marginRight="@dimen/layout_margin"
+            android:text="An error occurred!"
             android:textAlignment="center"
-            android:textColor="#000000"
+            android:textColor="@color/standard_text_color"
             android:textSize="16sp"/>
 
         <TextView

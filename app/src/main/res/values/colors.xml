@@ -19,4 +19,6 @@
     <color name="white_text_color">#FFFFFF</color>
     <color name="orange_text_color">#FF9800</color>
 
+    <color name="standard_divider_color">#000000</color>
+
 </resources>

@@ -4,14 +4,61 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/layout_background_color"
+    android:background="@color/colorPrimary"
     tools:context="com.bangalorebuses.busarrivals.BusesArrivingAtBusStopActivity">
+
+    <RelativeLayout
+        android:id="@+id/action_bar_relative_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:padding="@dimen/action_bar_padding">
+
+        <ImageView
+            android:id="@+id/back_button_image_view"
+            android:layout_width="@dimen/image_view_width"
+            android:layout_height="@dimen/image_view_height"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="@dimen/action_bar_margin"
+            android:layout_marginRight="@dimen/action_bar_margin"
+            android:clickable="true"
+            android:src="@drawable/ic_arrow_back_white"/>
+
+        <TextView
+            android:id="@+id/title_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@id/back_button_image_view"
+            android:layout_toRightOf="@id/back_button_image_view"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/bus_stops_title"
+            android:textColor="@color/white_text_color"
+            android:textSize="20sp"/>
+
+        <ImageView
+            android:id="@+id/favorite_image_view"
+            android:layout_width="@dimen/image_view_width"
+            android:layout_height="@dimen/image_view_height"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/layout_margin"
+            android:layout_marginStart="@dimen/layout_margin"
+            android:clickable="true"
+            android:src="@drawable/ic_favorite_border_white"/>
+
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/busStopDirectionNameTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:layout_below="@id/action_bar_relative_layout"
         android:background="@color/colorPrimaryDark"
         android:ellipsize="end"
         android:maxLines="1"
@@ -24,12 +71,16 @@
         android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/busStopDirectionNameTextView">
+        android:layout_below="@id/busStopDirectionNameTextView"
+        android:layout_margin="@dimen/layout_margin"
+        android:background="@drawable/white_rounded_background_borderless">
 
         <ListView
             android:id="@+id/busesArrivingAtBusStopListView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:animateLayoutChanges="false"
+            android:scrollbars="none"/>
 
     </android.support.v4.widget.SwipeRefreshLayout>
 
@@ -37,8 +88,9 @@
         android:id="@+id/errorLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:animateLayoutChanges="true"
+        android:layout_below="@id/busStopDirectionNameTextView"
+        android:layout_margin="@dimen/layout_margin"
+        android:background="@drawable/white_rounded_background_borderless"
         android:gravity="center"
         android:orientation="vertical"
         android:visibility="visible">
