@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="@dimen/layout_margin_reduced"
+    android:layout_marginTop="@dimen/layout_margin_small"
     android:background="@drawable/white_rounded_background_borderless"
-    android:padding="@dimen/layout_padding">
+    android:padding="@dimen/layout_padding_small"
+    app:layout_goneMarginBottom="@dimen/layout_margin_small">
 
     <ImageView
         android:id="@+id/delete_favorite_image_view"

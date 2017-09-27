@@ -30,6 +30,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Stack;
 
 /**
  * This is the main activity of the app. It displays the
@@ -51,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
     private LinearLayout tripPlannerLinearLayout;
 
     private ListView favoritesListView;
+    private LinearLayout noFavoritesLinearLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -163,6 +165,8 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
                 });
 
                 favoritesListView = (ListView) findViewById(R.id.favourites_list_view);
+                noFavoritesLinearLayout = (LinearLayout) findViewById(R.id
+                        .no_favorites_linear_layout);
                 initialiseFavorites();
             }
         }.start();
@@ -195,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
         {
             try
             {
-                FileInputStream fileInputStream = openFileInput(Constants.FAVOURITES_FILE_NAME);
+                FileInputStream fileInputStream = openFileInput(Constants.FAVORITES_FILE_NAME);
                 InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 
@@ -207,12 +211,33 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
                     favorites.add(line);
                 }
 
-                FavoritesListCustomAdapter adapter = new FavoritesListCustomAdapter(this, this,
-                        favorites);
-                favoritesListView.setAdapter(adapter);
-                favoritesListView.setVisibility(View.VISIBLE);
+                Stack<String> favoritesBackwards = new Stack<>();
+                ArrayList<String> favoritesForwards = new ArrayList<>();
 
-                favorites.trimToSize();
+                for (String favorite : favorites)
+                {
+                    favoritesBackwards.push(favorite);
+                }
+
+                while (!favoritesBackwards.isEmpty())
+                {
+                    favoritesForwards.add(favoritesBackwards.pop());
+                }
+
+                if (favoritesForwards.size() > 0)
+                {
+                    FavoritesListCustomAdapter adapter = new FavoritesListCustomAdapter(this, this,
+                            favoritesForwards, true);
+                    favoritesListView.setAdapter(adapter);
+                    favoritesListView.setVisibility(View.VISIBLE);
+                    noFavoritesLinearLayout.setVisibility(View.GONE);
+                }
+                else
+                {
+                    favoritesListView.setVisibility(View.GONE);
+                    noFavoritesLinearLayout.setVisibility(View.VISIBLE);
+                }
+
                 fileInputStream.close();
                 inputStreamReader.close();
             }
@@ -235,13 +260,18 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
         }
         else if (favorite.substring(0, 3).equals("^%s"))
         {
-            // TODO
             Intent busesArrivingAtBusStopIntent = new Intent(this, BusesArrivingAtBusStopActivity.class);
-        }
-        else
-        {
-            // TODO
-            Intent tripPlannerIntent = new Intent(this, TripPlannerActivity.class);
+
+            busesArrivingAtBusStopIntent.putExtra("BUS_STOP_ID", Integer.parseInt(favorite.substring(3,
+                    favorite.indexOf("^%sn"))));
+
+            busesArrivingAtBusStopIntent.putExtra("BUS_STOP_NAME", favorite.substring(favorite
+                    .indexOf("^%sn") + 4, favorite.indexOf("^%sd")));
+
+            busesArrivingAtBusStopIntent.putExtra("BUS_STOP_DIRECTION_NAME", favorite.substring(favorite
+                    .indexOf("^%sd") + 4, favorite.length()));
+
+            startActivity(busesArrivingAtBusStopIntent);
         }
     }
 
@@ -250,7 +280,7 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
     {
         try
         {
-            FileInputStream fileInputStream = openFileInput(Constants.FAVOURITES_FILE_NAME);
+            FileInputStream fileInputStream = openFileInput(Constants.FAVORITES_FILE_NAME);
             InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream,
                     "UTF-8");
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
@@ -269,7 +299,7 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
             fileInputStream.close();
             inputStreamReader.close();
 
-            FileOutputStream fileOutputStream = openFileOutput(Constants.FAVOURITES_FILE_NAME,
+            FileOutputStream fileOutputStream = openFileOutput(Constants.FAVORITES_FILE_NAME,
                     MODE_PRIVATE);
             for (String aFavorite : favorites)
             {
@@ -286,9 +316,6 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
         }
 
         initialiseFavorites();
-
-        Toast.makeText(this, "Removed " + favorite.substring(3, favorite.length()) + " from favourites.",
-                Toast.LENGTH_SHORT).show();
     }
 
     private void onBusStopsLinearLayoutClicked()
@@ -307,21 +334,6 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
     {
         Intent busesActivityIntent = new Intent(this, TripPlannerActivity.class);
         startActivity(busesActivityIntent);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
-        // Pass on the result of an activity launched by a fragment back
-        // to the fragment.
-        /*if (requestCode == 1 && selectedFragment != null)
-        {
-            selectedFragment.onActivityResult(requestCode, resultCode, data);
-        }
-        else
-        {
-            super.onActivityResult(requestCode, resultCode, data);
-        }*/
     }
 
     @Override

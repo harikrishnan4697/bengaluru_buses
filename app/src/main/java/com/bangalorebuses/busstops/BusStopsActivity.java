@@ -1,8 +1,10 @@
 package com.bangalorebuses.busstops;
 
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -76,5 +78,32 @@ public class BusStopsActivity extends AppCompatActivity
                 finish();
             }
         });
+    }
+
+    /*@Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        // Pass on the result of an activity launched by a fragment back
+        // to the fragment.
+        /*if (requestCode == 1 && selectedFragment != null)
+        {
+            selectedFragment.onActivityResult(requestCode, resultCode, data);
+        }
+        else
+        {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }*/
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id
+                .nearbyFragmentContainerRelativeLayout);
+        if (fragment != null)
+        {
+            fragment.onActivityResult(requestCode, resultCode, data);
+        }
     }
 }

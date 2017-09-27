@@ -18,11 +18,14 @@ public class FavoritesListCustomAdapter extends BaseAdapter
     private FavoritesHelper caller;
     private ArrayList<String> favorites;
     private LayoutInflater inflater;
+    private boolean shouldAllowFavoriteDeletion;
 
-    public FavoritesListCustomAdapter(Activity context, FavoritesHelper caller, ArrayList<String> favorites)
+    public FavoritesListCustomAdapter(Activity context, FavoritesHelper caller, ArrayList<String> favorites,
+                                      boolean shouldAllowFavoriteDeletion)
     {
         this.caller = caller;
         this.favorites = favorites;
+        this.shouldAllowFavoriteDeletion = shouldAllowFavoriteDeletion;
         this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
@@ -66,17 +69,33 @@ public class FavoritesListCustomAdapter extends BaseAdapter
         if (favorites.get(position).substring(0, 3).equals("^%b"))
         {
             holder.favoriteTypeImageView.setImageResource(R.drawable.ic_directions_bus_black);
+            holder.favoriteNameTextView.setText(favorites.get(position).substring(3, favorites.get(position).length()));
         }
         else if (favorites.get(position).substring(0, 3).equals("^%s"))
         {
             holder.favoriteTypeImageView.setImageResource(R.drawable.ic_location_on_black);
+
+            String favoriteBusStopName = favorites.get(position).substring(favorites.get(position)
+                    .indexOf("^%sn") + 4, favorites.get(position).indexOf("^%sd"));
+
+            String favoriteBusStopDirectionName = favorites.get(position).substring(favorites
+                    .get(position).indexOf("^%sd") + 4, favorites.get(position).length());
+
+            if (!favoriteBusStopDirectionName.equals(""))
+            {
+                holder.favoriteNameTextView.setText(favoriteBusStopName + " (" +
+                        favoriteBusStopDirectionName + ")");
+            }
+            else
+            {
+                holder.favoriteNameTextView.setText(favoriteBusStopName);
+            }
         }
         else
         {
             holder.favoriteTypeImageView.setImageResource(R.drawable.ic_directions_black);
         }
 
-        holder.favoriteNameTextView.setText(favorites.get(position).substring(3, favorites.get(position).length()));
         holder.favoriteNameTextView.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -86,15 +105,23 @@ public class FavoritesListCustomAdapter extends BaseAdapter
             }
         });
 
-        holder.deleteFavoriteImageView.setImageResource(R.drawable.ic_delete_black);
-        holder.deleteFavoriteImageView.setOnClickListener(new View.OnClickListener()
+        if (shouldAllowFavoriteDeletion)
         {
-            @Override
-            public void onClick(View v)
+            holder.deleteFavoriteImageView.setImageResource(R.drawable.ic_delete_black);
+            holder.deleteFavoriteImageView.setOnClickListener(new View.OnClickListener()
             {
-                caller.onFavoriteDeleted(favorites.get(position));
-            }
-        });
+                @Override
+                public void onClick(View v)
+                {
+                    caller.onFavoriteDeleted(favorites.get(position));
+                }
+            });
+            holder.deleteFavoriteImageView.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            holder.deleteFavoriteImageView.setVisibility(View.GONE);
+        }
 
         return convertView;
     }

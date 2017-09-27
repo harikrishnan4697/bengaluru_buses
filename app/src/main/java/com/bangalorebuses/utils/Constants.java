@@ -14,14 +14,12 @@ public class Constants
 {
     // Constants for networking tasks
     public static final int NETWORK_QUERY_CONNECT_TIMEOUT = 10000;
-    public static final int NETWORK_QUERY_READ_TIMEOUT = 35000;
+    public static final int NETWORK_QUERY_READ_TIMEOUT = 25000;
     public static final String NETWORK_QUERY_NO_ERROR = "NO_ERROR_OCCURRED";
     public static final String NETWORK_QUERY_URL_EXCEPTION = "ERROR_MALFORMED_URL";
     public static final String NETWORK_QUERY_REQUEST_TIMEOUT_EXCEPTION = "ERROR_REQUEST_TIMED_OUT";
     public static final String NETWORK_QUERY_IO_EXCEPTION = "ERROR_IO_EXCEPTION";
     public static final String NETWORK_QUERY_JSON_EXCEPTION = "ERROR_JSON_EXCEPTION";
-    public static final String ROUTE_TYPE_ORIGIN_TO_TRANSIT_POINT = "ORIGIN_TO_TRANSIT_POINT";
-    public static final String ROUTE_TYPE_TRANSIT_POINT_TO_DESTINATION = "TRANSIT_POINT_TO_DESTINATION";
     public static final String DIRECTION_UP = "UP";
     public static final String DIRECTION_DOWN = "DN";
 
@@ -34,7 +32,6 @@ public class Constants
     public static final int SEARCH_END_BUS_STOP_REQUEST_CODE = 47;
     public static final int SEARCH_REQUEST_CODE = 13;
     public static final int LOCATION_PERMISSION_REQUEST_CODE = 36;
-    public static final String ROUTE_SEARCH_HISTORY_FILENAME = "route_search_history";
 
     // Constants for db query tasks
     public static final String NUMBER_OF_ROUTES_TYPE_ORIGIN_TO_TRANSIT_POINT = "ORIGIN-TRANSIT_POINT";
@@ -47,8 +44,15 @@ public class Constants
     public static final String BUS_TRACKER_TITLE = "Bus Tracker";
     // Constants for the Nearby Fragment
     public static final String NEARBY_TITLE = "Bus Stops Nearby";
-    public static SQLiteDatabase db;
-
     // Favourites constants
-    public static String FAVOURITES_FILE_NAME = "Favourites.txt";
+    public static final String FAVORITES_FILE_NAME = "Favourites.txt";
+    public static final String FAVORITES_TYPE_BUS_ROUTE = "FAVORITE_BUS_ROUTE";
+    public static final String FAVORITES_TYPE_BUS_STOP = "FAVORITE_BUS_STOP";
+    public static final String FAVORITES_TYPE_NONE = "NO_FAVORITES";
+    public static final String FAVORITES_TYPE_ALL = "FAVORITE_All";
+    public static final String FAVORITES_TYPE = "FAVORITES_TYPE";
+    public static final int FAVORITES_REQUEST_CODE = 4;
+    public static final String BUS_STOP_NAME = "BUS_STOP_NAME";
+    public static final String BUS_ROUTE_NUMBER = "BUS_ROUTE_NUMBER";
+    public static SQLiteDatabase db;
 }

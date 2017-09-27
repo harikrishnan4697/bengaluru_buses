@@ -27,7 +27,11 @@ class AllBusRoutesDbTask extends AsyncTask<Void, Void, ArrayList<String>>
         while (cursor.moveToNext())
         {
             String busRouteNumber = cursor.getString(0);
-            busRouteNumbers.add(busRouteNumber);
+
+            if (!(busRouteNumber.contains("CS-") || busRouteNumber.contains("cs-")))
+            {
+                busRouteNumbers.add(busRouteNumber);
+            }
         }
 
         cursor.close();

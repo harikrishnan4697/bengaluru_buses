@@ -20,7 +20,7 @@
     <string name="bus_tracker_edit_text_hint">"Bus number"</string>
 
     <!-- Main Activity Strings -->
-    <string name="trip_planner_text_view_hint">"Where would you like to go?"</string>
+    <string name="trip_planner_text_view_hint">"Let's plan a trip..."</string>
     <string name="other_options_title">"Transport Info"</string>
     <string name="favourites_title">"Favourites"</string>
     <string name="help_title">"Help"</string>
@@ -29,8 +29,15 @@
     <string name="favourites_home_title">"Home"</string>
     <string name="favourites_work_title">"Work"</string>
     <string name="tips_title">"Things to know"</string>
-
+    <string name="no_favorites_text">"No favourites"</string>
     <string name="trip_planner_title">"Trip Planner (Beta)</string>
+
+    <!-- Trip Planner Activity Strings -->
+    <string name="swap_action_text">"Swap"</string>
+    <string name="refresh_text">"Refresh"</string>
+    <string name="favorite_action_text">"Favorite"</string>
+    <string name="starting_bus_stop_label">"Start"</string>
+    <string name="ending_bus_stop_label">"End"</string>
 
     <!-- Buses Activity Strings -->
     <string name="bus_search_edit_text_hint">"Search for a bus..."</string>

@@ -4,11 +4,143 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary"
-    android:paddingBottom="@dimen/layout_padding"
+    android:background="@color/layout_background_color"
     tools:context="com.bangalorebuses.trips.TripPlannerActivity">
 
-    <RelativeLayout
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:background="@color/colorPrimary"
+        android:paddingBottom="@dimen/layout_padding"
+        android:paddingTop="@dimen/layout_padding">
+
+        <RelativeLayout
+            android:id="@+id/origin_destination_selection_relative_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="visible">
+
+            <ImageView
+                android:id="@+id/back_button"
+                android:layout_width="@dimen/image_view_width"
+                android:layout_height="@dimen/image_view_height"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginEnd="@dimen/layout_margin"
+                android:layout_marginRight="@dimen/layout_margin"
+                android:background="?selectableItemBackground"
+                android:src="@drawable/ic_arrow_back_white"/>
+
+            <ImageView
+                android:id="@+id/swap_button"
+                android:layout_width="@dimen/action_image_view_width"
+                android:layout_height="@dimen/action_image_view_height"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="@dimen/layout_margin_small"
+                android:layout_marginLeft="@dimen/layout_margin_small"
+                android:layout_marginRight="@dimen/layout_margin_small"
+                android:layout_marginStart="@dimen/layout_margin_small"
+                android:background="@drawable/white_circle_background_borderless"
+                android:src="@drawable/ic_swap_vert_black"/>
+
+            <LinearLayout
+                android:id="@+id/origin_linear_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_toEndOf="@id/back_button"
+                android:layout_toLeftOf="@id/swap_button"
+                android:layout_toRightOf="@id/back_button"
+                android:layout_toStartOf="@id/swap_button"
+                android:background="@drawable/white_rounded_background_borderless"
+                android:clickable="true"
+                android:gravity="start"
+                android:orientation="horizontal"
+                android:padding="@dimen/layout_margin_tiny">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginEnd="@dimen/layout_margin_tiny"
+                    android:layout_marginLeft="@dimen/layout_margin_tiny"
+                    android:layout_marginRight="@dimen/layout_margin_tiny"
+                    android:layout_marginStart="@dimen/layout_margin_tiny"
+                    android:text="@string/starting_bus_stop_label"
+                    android:textAllCaps="true"
+                    android:textColor="@color/sub_text_color"
+                    android:textSize="@dimen/text_size_small"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/origin_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@drawable/white_rounded_background_borderless"
+                    android:ellipsize="end"
+                    android:hint="@string/trip_planner_origin_label"
+                    android:maxLines="1"
+                    android:textColor="@color/standard_text_color"
+                    android:textSize="@dimen/text_size_medium"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/destination_linear_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/origin_linear_layout"
+                android:layout_marginTop="@dimen/layout_margin_small"
+                android:layout_toEndOf="@id/back_button"
+                android:layout_toLeftOf="@id/swap_button"
+                android:layout_toRightOf="@id/back_button"
+                android:layout_toStartOf="@id/swap_button"
+                android:background="@drawable/white_rounded_background_borderless"
+                android:clickable="true"
+                android:gravity="start"
+                android:orientation="horizontal"
+                android:padding="@dimen/layout_padding_tiny">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginEnd="@dimen/layout_margin_tiny"
+                    android:layout_marginLeft="@dimen/layout_margin_tiny"
+                    android:layout_marginRight="@dimen/layout_margin_tiny"
+                    android:layout_marginStart="@dimen/layout_margin_tiny"
+                    android:text="@string/ending_bus_stop_label"
+                    android:textAllCaps="true"
+                    android:textColor="@color/sub_text_color"
+                    android:textSize="@dimen/text_size_small"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/destination_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@drawable/white_rounded_background_borderless"
+                    android:ellipsize="end"
+                    android:hint="@string/trip_planner_destination_label"
+                    android:maxLines="1"
+                    android:textColor="@color/standard_text_color"
+                    android:textSize="@dimen/text_size_medium"/>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.Toolbar>
+
+    <!-- <RelativeLayout
         android:id="@+id/action_bar_relative_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -38,116 +170,17 @@
             android:textColor="@color/white_text_color"
             android:textSize="24sp"/>
 
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/origin_destination_selection_relative_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/action_bar_relative_layout"
-        android:paddingLeft="@dimen/layout_padding"
-        android:paddingRight="@dimen/layout_padding">
-
-        <ImageView
-            android:id="@+id/swap_direction_image_view"
-            android:layout_width="@dimen/action_image_view_width"
-            android:layout_height="@dimen/action_image_view_height"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:background="@drawable/orange_rounded_border"
-            android:src="@drawable/ic_swap_vert_black"/>
-
-        <LinearLayout
-            android:id="@+id/origin_linear_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginEnd="@dimen/layout_margin"
-            android:layout_marginRight="@dimen/layout_margin"
-            android:layout_toLeftOf="@id/swap_direction_image_view"
-            android:layout_toStartOf="@id/swap_direction_image_view"
-            android:background="@drawable/white_rounded_background_borderless"
-            android:clickable="true"
-            android:gravity="start"
-            android:orientation="horizontal"
-            android:padding="@dimen/layout_padding_reduced">
-
-            <ImageView
-                android:layout_width="@dimen/image_view_width"
-                android:layout_height="@dimen/image_view_height"
-                android:layout_gravity="center"
-                android:layout_marginEnd="@dimen/layout_margin_reduced"
-                android:layout_marginRight="@dimen/layout_margin_reduced"
-                android:src="@drawable/ic_location_on_black"/>
-
-            <TextView
-                android:id="@+id/origin_text_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:background="@drawable/white_rounded_background_borderless"
-                android:hint="@string/trip_planner_origin_label"
-                android:textColor="@color/standard_text_color"
-                android:textSize="@dimen/text_size_big"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/destination_linear_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_below="@id/origin_linear_layout"
-            android:layout_marginEnd="@dimen/layout_margin"
-            android:layout_marginRight="@dimen/layout_margin"
-            android:layout_marginTop="@dimen/layout_margin_reduced"
-            android:layout_toLeftOf="@id/swap_direction_image_view"
-            android:layout_toStartOf="@id/swap_direction_image_view"
-            android:background="@drawable/white_rounded_background_borderless"
-            android:clickable="true"
-            android:gravity="start"
-            android:orientation="horizontal"
-            android:padding="@dimen/layout_padding_reduced">
-
-            <ImageView
-                android:layout_width="@dimen/image_view_width"
-                android:layout_height="@dimen/image_view_height"
-                android:layout_gravity="center"
-                android:layout_marginEnd="@dimen/layout_margin_reduced"
-                android:layout_marginRight="@dimen/layout_margin_reduced"
-                android:src="@drawable/ic_flag_black"/>
-
-            <TextView
-                android:id="@+id/destination_text_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:background="@drawable/white_rounded_background_borderless"
-                android:hint="@string/trip_planner_destination_label"
-                android:textColor="@color/standard_text_color"
-                android:textSize="@dimen/text_size_big"/>
-
-        </LinearLayout>
-
-    </RelativeLayout>
-
-    <View
-        android:id="@+id/divider"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_below="@id/origin_destination_selection_relative_layout"
-        android:layout_marginTop="@dimen/layout_margin"
-        android:background="@color/standard_divider_color"/>
+    </RelativeLayout> -->
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/divider">
+        android:layout_below="@id/toolbar"
+        android:layout_marginBottom="@dimen/layout_margin"
+        android:layout_marginLeft="@dimen/layout_margin"
+        android:layout_marginRight="@dimen/layout_margin"
+        android:visibility="gone">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_view"
@@ -160,13 +193,14 @@
         android:id="@+id/errorLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/divider"
-        android:layout_margin="@dimen/layout_margin"
+        android:layout_below="@id/toolbar"
+        android:layout_marginLeft="@dimen/layout_margin"
+        android:layout_marginRight="@dimen/layout_margin"
         android:animateLayoutChanges="true"
         android:background="@drawable/white_rounded_background_borderless"
         android:gravity="center"
         android:orientation="vertical"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <ImageView
             android:id="@+id/errorImageView"

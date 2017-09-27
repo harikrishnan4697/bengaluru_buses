@@ -100,7 +100,17 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
             }
         });
         errorLinearLayout.setVisibility(View.GONE);
-        selectedBusStop.setBusStopName(getIntent().getStringExtra("BUS_STOP_NAME"));
+
+        String busStopName = getIntent().getStringExtra("BUS_STOP_NAME");
+        if (busStopName.substring(busStopName.length() - 1, busStopName.length()).equals(" "))
+        {
+            selectedBusStop.setBusStopName(busStopName.substring(0, busStopName.length() - 1));
+        }
+        else
+        {
+            selectedBusStop.setBusStopName(busStopName);
+        }
+
         String busStopDirectionName = getIntent().getStringExtra("BUS_STOP_DIRECTION_NAME");
         if (busStopDirectionName.contains("(") && busStopDirectionName.contains(")"))
         {
@@ -244,7 +254,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
     {
         try
         {
-            FileInputStream fileInputStream = openFileInput(Constants.FAVOURITES_FILE_NAME);
+            FileInputStream fileInputStream = openFileInput(Constants.FAVORITES_FILE_NAME);
             InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 
@@ -285,7 +295,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
         {
             try
             {
-                FileOutputStream fileOutputStream = openFileOutput(Constants.FAVOURITES_FILE_NAME, MODE_APPEND);
+                FileOutputStream fileOutputStream = openFileOutput(Constants.FAVORITES_FILE_NAME, MODE_APPEND);
 
                 fileOutputStream.write(("^%s" + selectedBusStop.getBusStopId() + "^%sn" +
                         selectedBusStop.getBusStopName() + "^%sd" + selectedBusStop.getBusStopDirectionName()
@@ -309,7 +319,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
         {
             try
             {
-                FileInputStream fileInputStream = openFileInput(Constants.FAVOURITES_FILE_NAME);
+                FileInputStream fileInputStream = openFileInput(Constants.FAVORITES_FILE_NAME);
                 InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 
@@ -331,7 +341,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
                 fileInputStream.close();
                 inputStreamReader.close();
 
-                FileOutputStream fileOutputStream = openFileOutput(Constants.FAVOURITES_FILE_NAME, MODE_PRIVATE);
+                FileOutputStream fileOutputStream = openFileOutput(Constants.FAVORITES_FILE_NAME, MODE_PRIVATE);
                 for (String favorite : favorites)
                 {
                     fileOutputStream.write((favorite + "\n").getBytes());

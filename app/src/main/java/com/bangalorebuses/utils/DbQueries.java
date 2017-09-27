@@ -12,18 +12,6 @@ import java.util.ArrayList;
 
 public class DbQueries
 {
-    public static ArrayList<String> getAllDistinctRouteNumbers(SQLiteDatabase db)
-    {
-        Cursor cursor = db.rawQuery("select distinct Routes.RouteNumber from Routes order by Routes.RouteNumber asc", null);
-        ArrayList<String> busRouteNumbers = new ArrayList<>();
-        while (cursor.moveToNext())
-        {
-            busRouteNumbers.add(cursor.getString(0));
-        }
-        cursor.close();
-        return busRouteNumbers;
-    }
-
     public static BusRoute getRouteDetails(SQLiteDatabase db, int routeId)
     {
         BusRoute route = new BusRoute();
@@ -174,24 +162,6 @@ public class DbQueries
             cursor.close();
             return null;
         }
-    }
-
-    public static ArrayList<BusStop> getAllStops(SQLiteDatabase db)
-    {
-        Cursor cursor = db.rawQuery("select Stops.* from Stops order by Stops.StopName asc", null);
-        ArrayList<BusStop> busStops = new ArrayList<>();
-        while (cursor.moveToNext())
-        {
-            BusStop busStop = new BusStop();
-            busStop.setBusStopId(cursor.getInt(0));
-            busStop.setBusStopName(cursor.getString(1));
-            busStop.setBusStopLat(cursor.getString(2));
-            busStop.setBusStopLong(cursor.getString(3));
-            busStop.setBusStopDirectionName(cursor.getString(4));
-            busStops.add(busStop);
-        }
-        cursor.close();
-        return busStops;
     }
 
     public static ArrayList<String> getAllDistinctStopNames(SQLiteDatabase db)

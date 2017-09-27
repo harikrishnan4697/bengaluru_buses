@@ -126,7 +126,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         directionTextView = (TextView) findViewById(R.id.directionNameTextView);
         directionSwapImageView = (ImageView) findViewById(R.id.changeDirectionImageView);
         directionSwapAnimation = AnimationUtils.loadAnimation(this, R.anim.rotate_once_forward);
-        directionSwapAnimationBackwards = AnimationUtils.loadAnimation(this, R.anim.rotate_once_backwards);
+        directionSwapAnimationBackwards = AnimationUtils.loadAnimation(this, R.anim.rotate_once_backward);
         errorLinearLayout = (LinearLayout) findViewById(R.id.errorLinearLayout);
         errorImageView = (ImageView) findViewById(R.id.errorImageView);
         errorTextView = (TextView) findViewById(R.id.errorTextView);
@@ -295,7 +295,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
     {
         try
         {
-            FileInputStream fileInputStream = openFileInput(Constants.FAVOURITES_FILE_NAME);
+            FileInputStream fileInputStream = openFileInput(Constants.FAVORITES_FILE_NAME);
             InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 
@@ -342,7 +342,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         {
             try
             {
-                FileOutputStream fileOutputStream = openFileOutput(Constants.FAVOURITES_FILE_NAME, MODE_APPEND);
+                FileOutputStream fileOutputStream = openFileOutput(Constants.FAVORITES_FILE_NAME, MODE_APPEND);
 
                 if (currentlySelectedDirection.equals(DIRECTION_UP))
                 {
@@ -371,7 +371,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         {
             try
             {
-                FileInputStream fileInputStream = openFileInput(Constants.FAVOURITES_FILE_NAME);
+                FileInputStream fileInputStream = openFileInput(Constants.FAVORITES_FILE_NAME);
                 InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 
@@ -400,7 +400,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
                 fileInputStream.close();
                 inputStreamReader.close();
 
-                FileOutputStream fileOutputStream = openFileOutput(Constants.FAVOURITES_FILE_NAME, MODE_PRIVATE);
+                FileOutputStream fileOutputStream = openFileOutput(Constants.FAVORITES_FILE_NAME, MODE_PRIVATE);
                 for (String favorite : favorites)
                 {
                     fileOutputStream.write((favorite + "\n").getBytes());

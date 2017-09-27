@@ -34,7 +34,11 @@ class AllBusStopsDbTask extends AsyncTask<Void, Void, ArrayList<BusStop>>
             busStop.setBusStopName(cursor.getString(1));
             busStop.setBusStopDirectionName(cursor.getString(2));
 
-            busStops.add(busStop);
+            if (!(busStop.getBusStopName().contains("CS-") ||
+                    busStop.getBusStopName().contains("cs-")))
+            {
+                busStops.add(busStop);
+            }
         }
 
         cursor.close();

@@ -2,7 +2,6 @@ package com.bangalorebuses.trips;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -11,6 +10,8 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -33,6 +34,8 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 
+import static com.bangalorebuses.utils.Constants.FAVORITES_TYPE;
+import static com.bangalorebuses.utils.Constants.FAVORITES_TYPE_BUS_STOP;
 import static com.bangalorebuses.utils.Constants.NETWORK_QUERY_NO_ERROR;
 import static com.bangalorebuses.utils.Constants.NUMBER_OF_ROUTES_TYPE_ORIGIN_TO_TRANSIT_POINT;
 import static com.bangalorebuses.utils.Constants.NUMBER_OF_ROUTES_TYPE_TRANSIT_POINT_TO_DESTINATION;
@@ -89,27 +92,14 @@ public class TripPlannerActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trip_planner);
 
-        if (getSupportActionBar() != null)
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        /*if (getSupportActionBar() != null)
         {
-            getSupportActionBar().hide();
-        }
-
-        TextView titleTextView = (TextView) findViewById(R.id.title_text_view);
-
-        // Change the font of "Buses" to a custom font.
-        Typeface typeFace = Typeface.createFromAsset(getAssets(), "fonts/Righteous-Regular.ttf");
-        titleTextView.setTypeface(typeFace);
-
-        // Initialise some variables
-        ImageView backButtonImageView = (ImageView) findViewById(R.id.back_button_image_view);
-        backButtonImageView.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                finish();
-            }
-        });
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }*/
 
         originSelectionTextView = (TextView) findViewById(R.id.origin_text_view);
         originSelectionTextView.setOnClickListener(new View.OnClickListener()
@@ -133,15 +123,15 @@ public class TripPlannerActivity extends AppCompatActivity implements
 
         rotateOnceForward = AnimationUtils.loadAnimation(this, R.anim.rotate_once_forward);
 
-        swapDirectionImageView = (ImageView) findViewById(R.id.swap_direction_image_view);
-        swapDirectionImageView.setOnClickListener(new View.OnClickListener()
+        //swapDirectionImageView = (ImageView) findViewById(R.id.swap_direction_image_view);
+        /*swapDirectionImageView.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
                 swapDirection();
             }
-        });
+        });*/
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorOrdinaryServiceBus,
@@ -171,6 +161,36 @@ public class TripPlannerActivity extends AppCompatActivity implements
             }
         });
         errorLinearLayout.setVisibility(View.GONE);
+
+        if (originBusStopName == null)
+        {
+            selectOriginBusStop();
+        }
+    }
+
+    /*@Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.trip_planner_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }*/
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case android.R.id.home:
+                finish();
+                break;
+            case R.id.action_favorite:
+                // TODO Favorite current trip
+                break;
+            default:
+                return false;
+        }
+        return true;
     }
 
     private void selectOriginBusStop()
@@ -178,6 +198,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
         Intent searchOriginIntent = new Intent(this, SearchActivity.class);
         searchOriginIntent.putExtra("SEARCH_TYPE", SEARCH_TYPE_BUS_STOP);
         searchOriginIntent.putExtra("EDIT_TEXT_HINT", Constants.ORIGIN_BUS_STOP_SEARCH_HINT);
+        searchOriginIntent.putExtra(FAVORITES_TYPE, FAVORITES_TYPE_BUS_STOP);
         startActivityForResult(searchOriginIntent, SEARCH_START_BUS_STOP_REQUEST_CODE);
     }
 
@@ -186,6 +207,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
         Intent searchDestinationIntent = new Intent(this, SearchActivity.class);
         searchDestinationIntent.putExtra("SEARCH_TYPE", SEARCH_TYPE_BUS_STOP);
         searchDestinationIntent.putExtra("EDIT_TEXT_HINT", Constants.DESTINATION_BUS_STOP_SEARCH_HINT);
+        searchDestinationIntent.putExtra(FAVORITES_TYPE, FAVORITES_TYPE_BUS_STOP);
         startActivityForResult(searchDestinationIntent, SEARCH_END_BUS_STOP_REQUEST_CODE);
     }
 
@@ -247,10 +269,22 @@ public class TripPlannerActivity extends AppCompatActivity implements
                 case SEARCH_START_BUS_STOP_REQUEST_CODE:
                     originBusStopName = data.getStringExtra("BUS_STOP_NAME");
                     originSelectionTextView.setText(originBusStopName);
+
+                    if (destinationBusStopName == null)
+                    {
+                        selectDestinationBusStop();
+                    }
+
                     break;
                 case SEARCH_END_BUS_STOP_REQUEST_CODE:
                     destinationBusStopName = data.getStringExtra("BUS_STOP_NAME");
                     destinationSelectionTextView.setText(destinationBusStopName);
+
+                    if (originBusStopName == null)
+                    {
+                        selectOriginBusStop();
+                    }
+
                     break;
                 default:
                     break;
@@ -464,9 +498,8 @@ public class TripPlannerActivity extends AppCompatActivity implements
 
             if (tripsToDisplay.size() == 0)
             {
-                Toast.makeText(this, "Uh oh! There aren't any direct trips...", Toast.LENGTH_SHORT)
-                        .show();
-                //findIndirectTrips(originBusStop.getBusStopName(), destinationBusStop.getBusStopName());
+                swipeRefreshLayout.setRefreshing(false);
+                findIndirectTrips(originBusStopName, destinationBusStopName);
             }
         }
     }

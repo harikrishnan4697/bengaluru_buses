@@ -13,31 +13,43 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
 import com.bangalorebuses.R;
-import com.bangalorebuses.core.BusStop;
-import com.bangalorebuses.tracker.AllBusRoutesSearchListCustomAdapter;
-import com.bangalorebuses.utils.DbQueries;
+import com.bangalorebuses.favorites.FavoritesActivity;
+import com.bangalorebuses.favorites.FavoritesHelper;
+import com.bangalorebuses.favorites.FavoritesListCustomAdapter;
+import com.bangalorebuses.utils.Constants;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Stack;
 
-import static com.bangalorebuses.utils.Constants.SEARCH_TYPE_BUS_ROUTE;
+import static com.bangalorebuses.utils.Constants.BUS_STOP_NAME;
+import static com.bangalorebuses.utils.Constants.FAVORITES_REQUEST_CODE;
+import static com.bangalorebuses.utils.Constants.FAVORITES_TYPE;
+import static com.bangalorebuses.utils.Constants.FAVORITES_TYPE_BUS_ROUTE;
+import static com.bangalorebuses.utils.Constants.FAVORITES_TYPE_BUS_STOP;
+import static com.bangalorebuses.utils.Constants.FAVORITES_TYPE_NONE;
 import static com.bangalorebuses.utils.Constants.SEARCH_TYPE_BUS_STOP;
-import static com.bangalorebuses.utils.Constants.SEARCH_TYPE_BUS_STOP_WITH_DIRECTION;
-import static com.bangalorebuses.utils.Constants.db;
 
-public class SearchActivity extends AppCompatActivity
+public class SearchActivity extends AppCompatActivity implements SearchDbQueriesHelper,
+        FavoritesHelper
 {
     ProgressBar progressBar;
     private EditText searchEditText;
     private ListView searchResultsListView;
     private Intent resultIntent = new Intent();
-    private GetAllStops getAllStops;
-    private GetAllDistinctRouteNumbers getAllDistinctRouteNumbers;
-    private GetAllDistinctStopNames getAllDistinctStopNames;
+    private RelativeLayout favoritesRelativeLayout;
+    private LinearLayout favoritesLinearLayout;
+    private AllBusStopNamesTask allBusStopNamesTask;
+    private ListView favoritesListView;
+    private String favoritesType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -56,8 +68,14 @@ public class SearchActivity extends AppCompatActivity
         searchEditText = (EditText) findViewById(R.id.search_edit_text);
         searchResultsListView = (ListView) findViewById(R.id.search_results_list_view);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        favoritesRelativeLayout = (RelativeLayout) findViewById(R.id
+                .favorites_relative_layout);
+        favoritesLinearLayout = (LinearLayout) findViewById(R.id.favorites_linear_layout);
+        favoritesListView = (ListView) findViewById(R.id.favorites_list_view);
+
         String searchType = getIntent().getStringExtra("SEARCH_TYPE");
         String editTextHint = getIntent().getStringExtra("EDIT_TEXT_HINT");
+        favoritesType = getIntent().getStringExtra(FAVORITES_TYPE);
 
         if (editTextHint != null)
         {
@@ -65,33 +83,34 @@ public class SearchActivity extends AppCompatActivity
         }
 
         progressBar.setVisibility(View.VISIBLE);
+        searchResultsListView.setVisibility(View.GONE);
+        favoritesRelativeLayout.setVisibility(View.GONE);
+        searchEditText.setEnabled(false);
+        favoritesLinearLayout.setVisibility(View.GONE);
+
         if (searchType.equals(SEARCH_TYPE_BUS_STOP))
         {
-            getAllDistinctStopNames = new GetAllDistinctStopNames();
-            getAllDistinctStopNames.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            allBusStopNamesTask = new AllBusStopNamesTask(this);
+            allBusStopNamesTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
-        else if (searchType.equals(SEARCH_TYPE_BUS_STOP_WITH_DIRECTION))
+
+        if (!favoritesType.equals(FAVORITES_TYPE_NONE))
         {
-            getAllStops = new GetAllStops();
-            getAllStops.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        }
-        else if (searchType.equals(SEARCH_TYPE_BUS_ROUTE))
-        {
-            getAllDistinctRouteNumbers = new GetAllDistinctRouteNumbers();
-            getAllDistinctRouteNumbers.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            initialiseFavorites();
         }
     }
 
-    private void onAllDistinctStopNamesFound(ArrayList<String> busStopNames)
+    @Override
+    public void onAllBusStopNamesFound(ArrayList<String> busStopNames)
     {
-        Collections.sort(busStopNames);
         final ArrayAdapter<String> listAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,
                 android.R.id.text1, busStopNames);
+
         searchResultsListView.setAdapter(listAdapter);
-        progressBar.setVisibility(View.GONE);
-        searchEditText.setEnabled(true);
+
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.showSoftInput(searchEditText, InputMethodManager.SHOW_IMPLICIT);
+
         searchResultsListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
         {
 
@@ -117,6 +136,17 @@ public class SearchActivity extends AppCompatActivity
             public void onTextChanged(CharSequence s, int start, int before, int count)
             {
                 listAdapter.getFilter().filter(s);
+
+                if (count == 0)
+                {
+                    searchResultsListView.setVisibility(View.GONE);
+                    favoritesLinearLayout.setVisibility(View.VISIBLE);
+                }
+                else
+                {
+                    searchResultsListView.setVisibility(View.VISIBLE);
+                    favoritesLinearLayout.setVisibility(View.GONE);
+                }
             }
 
             @Override
@@ -125,94 +155,142 @@ public class SearchActivity extends AppCompatActivity
 
             }
         });
-    }
 
-    private void onAllStopsFound(final ArrayList<BusStop> busStops)
-    {
-        final AllBusStopSearchListCustomAdaptor listAdapter = new AllBusStopSearchListCustomAdaptor(this, busStops);
-        searchResultsListView.setAdapter(listAdapter);
+        favoritesRelativeLayout.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                openFavoritesActivity(FAVORITES_TYPE_BUS_STOP);
+            }
+        });
+
         progressBar.setVisibility(View.GONE);
         searchEditText.setEnabled(true);
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(searchEditText, InputMethodManager.SHOW_IMPLICIT);
-        searchResultsListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
-        {
+    }
 
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+    private void initialiseFavorites()
+    {
+        if (favoritesListView != null)
+        {
+            try
             {
-                resultIntent.putExtra("BUS_STOP_NAME", ((BusStop) parent.getItemAtPosition(position)).getBusStopName());
-                resultIntent.putExtra("BUS_STOP_DIRECTION_NAME", ((BusStop) parent.getItemAtPosition(position)).getBusStopDirectionName());
-                resultIntent.putExtra("BUS_STOP_ID", ((BusStop) parent.getItemAtPosition(position)).getBusStopId());
+                FileInputStream fileInputStream = openFileInput(Constants.FAVORITES_FILE_NAME);
+                InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+                ArrayList<String> favorites = new ArrayList<>();
+                String line;
+
+                while ((line = bufferedReader.readLine()) != null)
+                {
+                    favorites.add(line);
+                }
+
+                Stack<String> favoritesBackwards = new Stack<>();
+                ArrayList<String> favoritesForwards = new ArrayList<>();
+
+                for (String favorite : favorites)
+                {
+                    favoritesBackwards.push(favorite);
+                }
+
+                if (favoritesType.equals(FAVORITES_TYPE_BUS_ROUTE))
+                {
+                    while (!favoritesBackwards.isEmpty())
+                    {
+                        String favorite = favoritesBackwards.pop();
+
+                        if (favorite.substring(0, 3).equals("^%b"))
+                        {
+                            favoritesForwards.add(favorite);
+                        }
+                    }
+                }
+                else if (favoritesType.equals(FAVORITES_TYPE_BUS_STOP))
+                {
+                    while (!favoritesBackwards.isEmpty())
+                    {
+                        String favorite = favoritesBackwards.pop();
+
+                        if (favorite.substring(0, 3).equals("^%s"))
+                        {
+                            favoritesForwards.add(favorite.substring(0, favorite.indexOf("^%sd") + 4));
+                        }
+                    }
+                }
+                else
+                {
+                    while (!favoritesBackwards.isEmpty())
+                    {
+                        favoritesForwards.add(favoritesBackwards.pop());
+                    }
+                }
+
+                if (favoritesForwards.size() > 0)
+                {
+                    FavoritesListCustomAdapter adapter = new FavoritesListCustomAdapter(this, this,
+                            favoritesForwards, false);
+                    favoritesListView.setAdapter(adapter);
+                    favoritesLinearLayout.setVisibility(View.VISIBLE);
+                }
+                else
+                {
+                    favoritesLinearLayout.setVisibility(View.GONE);
+                }
+
+                fileInputStream.close();
+                inputStreamReader.close();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void onFavoriteClicked(String favorite)
+    {
+        String favoriteBusStopName = favorite.substring(favorite
+                .indexOf("^%sn") + 4, favorite.indexOf("^%sd"));
+
+        resultIntent.putExtra(BUS_STOP_NAME, favoriteBusStopName);
+        setResult(RESULT_OK, resultIntent);
+        finish();
+    }
+
+    @Override
+    public void onFavoriteDeleted(String favorite)
+    {
+
+    }
+
+    private void openFavoritesActivity(String favoriteType)
+    {
+        Intent favoritesActivityIntent = new Intent(this,
+                FavoritesActivity.class);
+
+        favoritesActivityIntent.putExtra(FAVORITES_TYPE, favoriteType);
+
+        startActivityForResult(favoritesActivityIntent, FAVORITES_REQUEST_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK)
+        {
+            if (requestCode == FAVORITES_REQUEST_CODE)
+            {
+                resultIntent.putExtra(BUS_STOP_NAME,
+                        data.getStringExtra(BUS_STOP_NAME));
                 setResult(RESULT_OK, resultIntent);
                 finish();
             }
-        });
-
-        searchEditText.addTextChangedListener(new TextWatcher()
-        {
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after)
-            {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count)
-            {
-                listAdapter.getFilter().filter(s);
-            }
-
-            @Override
-            public void afterTextChanged(Editable s)
-            {
-
-            }
-        });
-    }
-
-    private void onAllDistinctRouteNumbersFound(ArrayList<String> routeNumbers)
-    {
-        final AllBusRoutesSearchListCustomAdapter listAdapter = new AllBusRoutesSearchListCustomAdapter(this, routeNumbers);
-        searchResultsListView.setAdapter(listAdapter);
-        progressBar.setVisibility(View.GONE);
-        searchEditText.setEnabled(true);
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(searchEditText, InputMethodManager.SHOW_IMPLICIT);
-        searchResultsListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
-        {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-            {
-                resultIntent.putExtra("ROUTE_NUMBER", ((String) parent.getItemAtPosition(position)));
-                setResult(RESULT_OK, resultIntent);
-                finish();
-            }
-        });
-
-        searchEditText.addTextChangedListener(new TextWatcher()
-        {
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after)
-            {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count)
-            {
-                listAdapter.getFilter().filter(s);
-            }
-
-            @Override
-            public void afterTextChanged(Editable s)
-            {
-
-            }
-        });
+        }
     }
 
     /**
@@ -229,66 +307,10 @@ public class SearchActivity extends AppCompatActivity
     protected void onDestroy()
     {
         super.onDestroy();
-        if (getAllDistinctRouteNumbers != null)
-        {
-            getAllDistinctRouteNumbers.cancel(true);
-        }
-        if (getAllStops != null)
-        {
-            getAllStops.cancel(true);
-        }
-        if (getAllDistinctStopNames != null)
-        {
-            getAllDistinctStopNames.cancel(true);
-        }
-    }
 
-    private class GetAllDistinctRouteNumbers extends AsyncTask<Void, Void, ArrayList<String>>
-    {
-        @Override
-        protected ArrayList<String> doInBackground(Void... params)
+        if (allBusStopNamesTask != null)
         {
-            return DbQueries.getAllDistinctRouteNumbers(db);
+            allBusStopNamesTask.cancel(true);
         }
-
-        @Override
-        protected void onPostExecute(ArrayList<String> routeNumbers)
-        {
-            super.onPostExecute(routeNumbers);
-            onAllDistinctRouteNumbersFound(routeNumbers);
-        }
-    }
-
-    private class GetAllStops extends AsyncTask<Void, Void, ArrayList<BusStop>>
-    {
-        @Override
-        protected ArrayList<BusStop> doInBackground(Void... params)
-        {
-            return DbQueries.getAllStops(db);
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<BusStop> busStops)
-        {
-            super.onPostExecute(busStops);
-            onAllStopsFound(busStops);
-        }
-    }
-
-    private class GetAllDistinctStopNames extends AsyncTask<Void, Void, ArrayList<String>>
-    {
-        @Override
-        protected ArrayList<String> doInBackground(Void... params)
-        {
-            return DbQueries.getAllDistinctStopNames(db);
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<String> busStopNames)
-        {
-            super.onPostExecute(busStopNames);
-            onAllDistinctStopNamesFound(busStopNames);
-        }
-
     }
 }

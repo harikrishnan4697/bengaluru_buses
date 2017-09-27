@@ -18,59 +18,52 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
-
             <intent-filter>
-
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
-
             </intent-filter>
-
         </activity>
-
         <activity
             android:name=".tracker.TrackBusActivity"
             android:label="Track a bus"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait">
         </activity>
-
         <activity
             android:name=".search.SearchActivity"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait">
         </activity>
-
         <activity
             android:name=".busarrivals.BusesArrivingAtBusStopActivity"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait">
         </activity>
-
         <activity
             android:name=".tracker.BusesActivity"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait">
         </activity>
-
         <activity
             android:name=".busstops.BusStopsActivity"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait">
         </activity>
-
         <activity
             android:name=".trips.TripPlannerActivity"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait">
         </activity>
-
+        <activity
+            android:name=".favorites.FavoritesActivity"
+            android:parentActivityName=".search.SearchActivity"
+            android:screenOrientation="portrait">
+        </activity>
     </application>
 
 </manifest>

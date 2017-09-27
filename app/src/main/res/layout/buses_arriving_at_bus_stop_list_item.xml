@@ -33,10 +33,10 @@
             android:id="@+id/realTimeImageView"
             android:layout_width="@dimen/real_time_image_view_width"
             android:layout_height="@dimen/real_time_image_view_height"
-            android:layout_marginEnd="@dimen/layout_margin_reduced"
-            android:layout_marginLeft="@dimen/layout_margin_reduced"
-            android:layout_marginRight="@dimen/layout_margin_reduced"
-            android:layout_marginStart="@dimen/layout_margin_reduced"
+            android:layout_marginEnd="@dimen/layout_margin_small"
+            android:layout_marginLeft="@dimen/layout_margin_small"
+            android:layout_marginRight="@dimen/layout_margin_small"
+            android:layout_marginStart="@dimen/layout_margin_small"
             app:srcCompat="@drawable/ic_rss_feed_orange"/>
 
         <TextView
