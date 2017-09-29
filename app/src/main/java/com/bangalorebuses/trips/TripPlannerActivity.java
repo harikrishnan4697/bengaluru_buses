@@ -11,6 +11,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
@@ -66,6 +68,8 @@ public class TripPlannerActivity extends AppCompatActivity implements
     private TextView errorResolutionTextView;
 
     private ArrayList<Trip> tripsToDisplay = new ArrayList<>();
+    private ArrayList<TransitPoint> transitPointsToDisplay =
+            new ArrayList<>();
     private ArrayList<Trip> tripsToQuery = new ArrayList<>();
 
     // Direct trip related variables
@@ -95,12 +99,6 @@ public class TripPlannerActivity extends AppCompatActivity implements
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        /*if (getSupportActionBar() != null)
-        {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-        }*/
-
         originSelectionTextView = (TextView) findViewById(R.id.origin_text_view);
         originSelectionTextView.setOnClickListener(new View.OnClickListener()
         {
@@ -123,20 +121,30 @@ public class TripPlannerActivity extends AppCompatActivity implements
 
         rotateOnceForward = AnimationUtils.loadAnimation(this, R.anim.rotate_once_forward);
 
-        //swapDirectionImageView = (ImageView) findViewById(R.id.swap_direction_image_view);
-        /*swapDirectionImageView.setOnClickListener(new View.OnClickListener()
+        swapDirectionImageView = (ImageView) findViewById(R.id.swap_direction_image_view);
+        swapDirectionImageView.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
                 swapDirection();
             }
-        });*/
+        });
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorOrdinaryServiceBus,
                 R.color.colorACServiceBus, R.color.colorSpecialServiceBus);
         swipeRefreshLayout.setOnRefreshListener(this);
+
+        ImageView backButtonImageView = (ImageView) findViewById(R.id.back_button_image_view);
+        backButtonImageView.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                finish();
+            }
+        });
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
@@ -694,11 +702,8 @@ public class TripPlannerActivity extends AppCompatActivity implements
 
         this.transitPoints = tempTransitPoints;
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerViewAdapter = new TripsRecyclerViewAdapter(tripsToDisplay);
-        recyclerView.setAdapter(recyclerViewAdapter);
         tripsToDisplay.clear();
+        transitPointsToDisplay.clear();
         numberOfIndirectTripQueriesMade = 0;
         numberOfIndirectTripQueriesComplete = 0;
         numberOfTransitPointQueriesMade = 0;
@@ -815,44 +820,29 @@ public class TripPlannerActivity extends AppCompatActivity implements
                         indirectTrip.setTripDuration(indirectTrip.getBusToTransitPoint().getBusETAToTransitPoint() + (indirectTrip.getBusFromTransitPoint()
                                 .getBusETA() - indirectTrip.getBusToTransitPoint().getBusETAToTransitPoint()) + travelTimeFromTPToDest);
 
-                        tripsToDisplay.add(indirectTrip);
+                        transitPoint.addIndirectTrip(indirectTrip);
 
-                        Collections.sort(tripsToDisplay, new Comparator<Trip>()
+                        boolean alreadyHasTransitPoint = false;
+                        for (TransitPoint transitPointToDisplay : transitPointsToDisplay)
                         {
-                            @Override
-                            public int compare(Trip o1, Trip o2)
+                            if (transitPointToDisplay.getTransitPointName()
+                                    .equals(transitPoint.getTransitPointName()))
                             {
-                                return ((IndirectTrip) o1).getTripDuration() - ((IndirectTrip) o2).getTripDuration();
-                            }
-                        });
-
-                        ArrayList<Trip> tempTripsToDisplay = new ArrayList<>();
-                        for (int i = 0; i < 3; i++)
-                        {
-                            if (i < tripsToDisplay.size())
-                            {
-                                tempTripsToDisplay.add(tripsToDisplay.get(i));
-                            }
-                            else
-                            {
-                                break;
+                                transitPointToDisplay.addIndirectTrip(indirectTrip);
+                                alreadyHasTransitPoint = true;
                             }
                         }
 
-                        tripsToDisplay.clear();
-                        for (int i = 0; i < 5; i++)
+                        if (!alreadyHasTransitPoint)
                         {
-                            if (i < tempTripsToDisplay.size())
-                            {
-                                tripsToDisplay.add(tempTripsToDisplay.get(i));
-                            }
-                            else
-                            {
-                                break;
-                            }
+                            transitPointsToDisplay.add(transitPoint);
                         }
 
-                        recyclerViewAdapter.notifyDataSetChanged();
+                        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+                        recyclerView.setLayoutManager(linearLayoutManager);
+                        IndirectTripsRecyclerViewAdapter adapter = new
+                                IndirectTripsRecyclerViewAdapter(this, transitPointsToDisplay);
+                        recyclerView.setAdapter(adapter);
                         recyclerView.setVisibility(View.VISIBLE);
                     }
                 }
@@ -874,9 +864,9 @@ public class TripPlannerActivity extends AppCompatActivity implements
                 if (tripsToDisplay.size() == 0)
                 {
                     //TODO 'There aren't trips' message gets displayed and then displays trips...needs to be fixed
-                    setErrorLayoutContent(R.drawable.ic_directions_bus_black, "Oh no! There aren't any trips right now...", "Retry");
+                    /*setErrorLayoutContent(R.drawable.ic_directions_bus_black, "Oh no! There aren't any trips right now...", "Retry");
                     errorLinearLayout.setVisibility(View.VISIBLE);
-                    recyclerView.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.GONE);*/
                 }
             }
         }

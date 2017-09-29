@@ -7,6 +7,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -21,17 +22,8 @@ public class BusStopsActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bus_stops);
 
-        TextView titleTextView = (TextView) findViewById(R.id.title_text_view);
-
-        // Change the font of "Buses" to a custom font.
-        Typeface typeFace = Typeface.createFromAsset(getAssets(), "fonts/Righteous-Regular.ttf");
-        titleTextView.setTypeface(typeFace);
-
-        // Hide the action bar
-        if (getSupportActionBar() != null)
-        {
-            getSupportActionBar().hide();
-        }
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         // Create the two tabs
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);

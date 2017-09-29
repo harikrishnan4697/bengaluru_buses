@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -11,8 +11,6 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:background="@color/colorPrimary"
         android:paddingBottom="@dimen/layout_padding"
@@ -25,18 +23,19 @@
             android:visibility="visible">
 
             <ImageView
-                android:id="@+id/back_button"
+                android:id="@+id/back_button_image_view"
                 android:layout_width="@dimen/image_view_width"
                 android:layout_height="@dimen/image_view_height"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
                 android:layout_marginEnd="@dimen/layout_margin"
                 android:layout_marginRight="@dimen/layout_margin"
-                android:background="?selectableItemBackground"
-                android:src="@drawable/ic_arrow_back_white"/>
+                android:background="?selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_arrow_back_white" />
 
             <ImageView
-                android:id="@+id/swap_button"
+                android:id="@+id/swap_direction_image_view"
                 android:layout_width="@dimen/action_image_view_width"
                 android:layout_height="@dimen/action_image_view_height"
                 android:layout_alignParentEnd="true"
@@ -47,17 +46,17 @@
                 android:layout_marginRight="@dimen/layout_margin_small"
                 android:layout_marginStart="@dimen/layout_margin_small"
                 android:background="@drawable/white_circle_background_borderless"
-                android:src="@drawable/ic_swap_vert_black"/>
+                android:src="@drawable/ic_swap_vert_black" />
 
             <LinearLayout
                 android:id="@+id/origin_linear_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
-                android:layout_toEndOf="@id/back_button"
-                android:layout_toLeftOf="@id/swap_button"
-                android:layout_toRightOf="@id/back_button"
-                android:layout_toStartOf="@id/swap_button"
+                android:layout_toEndOf="@id/back_button_image_view"
+                android:layout_toLeftOf="@id/swap_direction_image_view"
+                android:layout_toRightOf="@id/back_button_image_view"
+                android:layout_toStartOf="@id/swap_direction_image_view"
                 android:background="@drawable/white_rounded_background_borderless"
                 android:clickable="true"
                 android:gravity="start"
@@ -75,8 +74,7 @@
                     android:text="@string/starting_bus_stop_label"
                     android:textAllCaps="true"
                     android:textColor="@color/sub_text_color"
-                    android:textSize="@dimen/text_size_small"
-                    android:textStyle="bold"/>
+                    android:textSize="@dimen/text_size_small" />
 
                 <TextView
                     android:id="@+id/origin_text_view"
@@ -84,11 +82,12 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:background="@drawable/white_rounded_background_borderless"
+                    android:clickable="true"
                     android:ellipsize="end"
                     android:hint="@string/trip_planner_origin_label"
                     android:maxLines="1"
                     android:textColor="@color/standard_text_color"
-                    android:textSize="@dimen/text_size_medium"/>
+                    android:textSize="@dimen/text_size_medium" />
 
             </LinearLayout>
 
@@ -98,10 +97,10 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/origin_linear_layout"
                 android:layout_marginTop="@dimen/layout_margin_small"
-                android:layout_toEndOf="@id/back_button"
-                android:layout_toLeftOf="@id/swap_button"
-                android:layout_toRightOf="@id/back_button"
-                android:layout_toStartOf="@id/swap_button"
+                android:layout_toEndOf="@id/back_button_image_view"
+                android:layout_toLeftOf="@id/swap_direction_image_view"
+                android:layout_toRightOf="@id/back_button_image_view"
+                android:layout_toStartOf="@id/swap_direction_image_view"
                 android:background="@drawable/white_rounded_background_borderless"
                 android:clickable="true"
                 android:gravity="start"
@@ -119,8 +118,7 @@
                     android:text="@string/ending_bus_stop_label"
                     android:textAllCaps="true"
                     android:textColor="@color/sub_text_color"
-                    android:textSize="@dimen/text_size_small"
-                    android:textStyle="bold"/>
+                    android:textSize="@dimen/text_size_small" />
 
                 <TextView
                     android:id="@+id/destination_text_view"
@@ -128,11 +126,12 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:background="@drawable/white_rounded_background_borderless"
+                    android:clickable="true"
                     android:ellipsize="end"
                     android:hint="@string/trip_planner_destination_label"
                     android:maxLines="1"
                     android:textColor="@color/standard_text_color"
-                    android:textSize="@dimen/text_size_medium"/>
+                    android:textSize="@dimen/text_size_medium" />
 
             </LinearLayout>
 
@@ -177,15 +176,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/toolbar"
-        android:layout_marginBottom="@dimen/layout_margin"
-        android:layout_marginLeft="@dimen/layout_margin"
-        android:layout_marginRight="@dimen/layout_margin"
-        android:visibility="gone">
+        android:layout_marginLeft="@dimen/layout_margin_small"
+        android:layout_marginRight="@dimen/layout_margin_small"
+        android:layout_marginTop="@dimen/layout_margin">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent" />
 
     </android.support.v4.widget.SwipeRefreshLayout>
 
@@ -207,7 +205,7 @@
             android:layout_width="@dimen/error_image_view_width"
             android:layout_height="@dimen/error_image_view_height"
             android:layout_margin="@dimen/layout_margin"
-            android:src="@drawable/ic_sad_face"/>
+            android:src="@drawable/ic_sad_face" />
 
         <TextView
             android:id="@+id/errorTextView"
@@ -217,7 +215,7 @@
             android:layout_marginRight="@dimen/layout_margin"
             android:textAlignment="center"
             android:textColor="@color/standard_text_color"
-            android:textSize="@dimen/text_size_big"/>
+            android:textSize="@dimen/text_size_big" />
 
         <TextView
             android:id="@+id/errorResolutionTextView"
@@ -227,8 +225,18 @@
             android:padding="@dimen/layout_padding"
             android:text="@string/fix_error_retry"
             android:textAllCaps="true"
-            android:textColor="@color/colorSpecialServiceBus"/>
+            android:textColor="@color/colorSpecialServiceBus" />
 
     </LinearLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="@dimen/layout_margin"
+        android:src="@drawable/ic_favorite_border_white"
+        app:fabSize="mini" />
 
 </RelativeLayout>

@@ -159,19 +159,10 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
     {
         switch (item.getItemId())
         {
-            case R.id.nearby_search:
-                Intent searchActivityIntent = new Intent(getContext(), SearchActivity.class);
-                searchActivityIntent.putExtra("SEARCH_TYPE", Constants.SEARCH_TYPE_BUS_STOP_WITH_DIRECTION);
-                startActivityForResult(searchActivityIntent, Constants.SEARCH_NEARBY_BUS_STOP_REQUEST_CODE);
-                break;
-            case R.id.nearby_refresh:
-                cancelAllTasks();
-                createLocationRequest();
-                break;
             default:
                 return super.onOptionsItemSelected(item);
         }
-        return true;
+        //return true;
     }
 
     /**

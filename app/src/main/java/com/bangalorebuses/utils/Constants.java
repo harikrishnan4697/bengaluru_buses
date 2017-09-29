@@ -55,4 +55,9 @@ public class Constants
     public static final String BUS_STOP_NAME = "BUS_STOP_NAME";
     public static final String BUS_ROUTE_NUMBER = "BUS_ROUTE_NUMBER";
     public static SQLiteDatabase db;
+
+    // Constants for IndirectTripDetailsActivity
+    public static final String ORIGIN_BUS_STOP_NAME = "PARAM_ORIGIN_BUS_STOP_NAME";
+    public static final String TRANSIT_POINT_BUS_STOP_NAME = "PARAM_TRANSIT_POINT_BUS_STOP_NAME";
+    public static final String DESTINATION_BUS_STOP_NAME = "PARAM_DESTINATION_BUS_STOP_NAME";
 }

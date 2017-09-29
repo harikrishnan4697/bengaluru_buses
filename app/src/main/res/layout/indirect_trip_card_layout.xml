@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/indirect_trip_card_layout"
+    android:layout_marginBottom="@dimen/layout_margin"
+    android:layout_marginLeft="@dimen/layout_margin"
+    android:layout_marginRight="@dimen/layout_margin">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:padding="@dimen/layout_padding_small"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:id="@+id/trip_info_relative_layout"
+            android:layout_width="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/indirect_trip_duration_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/grey_rounded_background_borderless"
+                android:text="1 hr 17 mins"
+                android:textColor="@color/standard_text_color"
+                android:textSize="@dimen/text_size_medium" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:textAllCaps="true"
+                android:textStyle="bold"
+                android:text="Indirect trip"
+                android:textColor="@color/standard_text_color"
+                android:textSize="@dimen/text_size_medium" />
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/trip_linear_layout"
+            android:layout_width="match_parent"
+            android:layout_below="@id/trip_info_relative_layout"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="@dimen/layout_margin_small"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/segment1_bus_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/text_size_medium"
+                android:textColor="@color/white_text_color"
+                android:text="V-500D"
+                android:textStyle="bold"
+                android:background="@drawable/blue_rounded_background_borderless"
+                android:layout_margin="@dimen/layout_margin_tiny"/>
+
+            <ImageView
+                android:layout_width="@dimen/image_view_width"
+                android:layout_height="@dimen/image_view_height"
+                android:layout_margin="@dimen/layout_margin_tiny"
+                android:src="@drawable/ic_keyboard_arrow_right_black"/>
+
+            <ImageView
+                android:layout_width="@dimen/image_view_width"
+                android:layout_height="@dimen/image_view_height"
+                android:layout_margin="@dimen/layout_margin_tiny"
+                android:src="@drawable/ic_transfer_within_a_station_black"/>
+
+            <ImageView
+                android:layout_width="@dimen/image_view_width"
+                android:layout_height="@dimen/image_view_height"
+                android:layout_margin="@dimen/layout_margin_tiny"
+                android:src="@drawable/ic_keyboard_arrow_right_black"/>
+
+            <TextView
+                android:id="@+id/segment2_bus_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/text_size_medium"
+                android:textColor="@color/white_text_color"
+                android:text="300-E"
+                android:textStyle="bold"
+                android:background="@drawable/green_rounded_background_borderless"
+                android:layout_margin="@dimen/layout_margin_tiny"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_below="@id/trip_linear_layout"
+            android:layout_marginTop="@dimen/layout_margin_small"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/text_size_medium"
+                android:textColor="@color/standard_text_color"
+                android:text="Change at:"
+                android:textStyle="bold"
+                android:layout_margin="@dimen/layout_margin_tiny"/>
+
+            <TextView
+                android:id="@+id/transit_point_name_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/text_size_medium"
+                android:textColor="@color/standard_text_color"
+                android:text="B Channasandra Bridge"
+                android:layout_margin="@dimen/layout_margin_tiny"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

@@ -1,5 +1,6 @@
 package com.bangalorebuses.trips;
 
+import com.bangalorebuses.core.Bus;
 import com.bangalorebuses.core.BusRoute;
 
 import java.util.ArrayList;
@@ -10,8 +11,12 @@ public class TransitPoint
     private int numberOfRoutesBetweenOriginAndTransitPoint;
     private int numberOfRoutesBetweenTransitPointAndDestination;
     private int transitPointScore;
+    private Bus fastestBusToTransitPoint;
+    private Bus fastestBusFromTransitPoint;
     private ArrayList<BusRoute> busRoutesToTransitPoint;
     private ArrayList<BusRoute> busRoutesFromTransitPoint;
+    private ArrayList<IndirectTrip> indirectTrips = new ArrayList<>();
+    private int shortestTripDuration;
 
     public String getTransitPointName()
     {
@@ -71,5 +76,50 @@ public class TransitPoint
     public void setBusRoutesFromTransitPoint(ArrayList<BusRoute> busRoutesFromTransitPoint)
     {
         this.busRoutesFromTransitPoint = busRoutesFromTransitPoint;
+    }
+
+    public Bus getFastestBusToTransitPoint()
+    {
+        return fastestBusToTransitPoint;
+    }
+
+    public void setFastestBusToTransitPoint(Bus fastestBusToTransitPoint)
+    {
+        this.fastestBusToTransitPoint = fastestBusToTransitPoint;
+    }
+
+    public Bus getFastestBusFromTransitPoint()
+    {
+        return fastestBusFromTransitPoint;
+    }
+
+    public void setFastestBusFromTransitPoint(Bus fastestBusFromTransitPoint)
+    {
+        this.fastestBusFromTransitPoint = fastestBusFromTransitPoint;
+    }
+
+    public ArrayList<IndirectTrip> getIndirectTrips()
+    {
+        return indirectTrips;
+    }
+
+    public void setIndirectTrips(ArrayList<IndirectTrip> indirectTrips)
+    {
+        this.indirectTrips = indirectTrips;
+    }
+
+    public void addIndirectTrip(IndirectTrip indirectTrip)
+    {
+        indirectTrips.add(indirectTrip);
+    }
+
+    public int getShortestTripDuration()
+    {
+        return shortestTripDuration;
+    }
+
+    public void setShortestTripDuration(int shortestTripDuration)
+    {
+        this.shortestTripDuration = shortestTripDuration;
     }
 }
