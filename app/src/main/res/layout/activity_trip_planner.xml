@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/layout_background_color"
-    tools:context="com.bangalorebuses.trips.TripPlannerActivity">
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/layout_background_color"
+                tools:context="com.bangalorebuses.trips.TripPlannerActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
@@ -32,7 +32,7 @@
                 android:layout_marginEnd="@dimen/layout_margin"
                 android:layout_marginRight="@dimen/layout_margin"
                 android:background="?selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_arrow_back_white" />
+                android:src="@drawable/ic_arrow_back_white"/>
 
             <ImageView
                 android:id="@+id/swap_direction_image_view"
@@ -46,7 +46,7 @@
                 android:layout_marginRight="@dimen/layout_margin_small"
                 android:layout_marginStart="@dimen/layout_margin_small"
                 android:background="@drawable/white_circle_background_borderless"
-                android:src="@drawable/ic_swap_vert_black" />
+                android:src="@drawable/ic_swap_vert_black"/>
 
             <LinearLayout
                 android:id="@+id/origin_linear_layout"
@@ -74,7 +74,7 @@
                     android:text="@string/starting_bus_stop_label"
                     android:textAllCaps="true"
                     android:textColor="@color/sub_text_color"
-                    android:textSize="@dimen/text_size_small" />
+                    android:textSize="@dimen/text_size_small"/>
 
                 <TextView
                     android:id="@+id/origin_text_view"
@@ -87,7 +87,7 @@
                     android:hint="@string/trip_planner_origin_label"
                     android:maxLines="1"
                     android:textColor="@color/standard_text_color"
-                    android:textSize="@dimen/text_size_medium" />
+                    android:textSize="@dimen/text_size_medium"/>
 
             </LinearLayout>
 
@@ -118,7 +118,7 @@
                     android:text="@string/ending_bus_stop_label"
                     android:textAllCaps="true"
                     android:textColor="@color/sub_text_color"
-                    android:textSize="@dimen/text_size_small" />
+                    android:textSize="@dimen/text_size_small"/>
 
                 <TextView
                     android:id="@+id/destination_text_view"
@@ -131,7 +131,7 @@
                     android:hint="@string/trip_planner_destination_label"
                     android:maxLines="1"
                     android:textColor="@color/standard_text_color"
-                    android:textSize="@dimen/text_size_medium" />
+                    android:textSize="@dimen/text_size_medium"/>
 
             </LinearLayout>
 
@@ -139,51 +139,17 @@
 
     </android.support.v7.widget.Toolbar>
 
-    <!-- <RelativeLayout
-        android:id="@+id/action_bar_relative_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:padding="@dimen/action_bar_padding">
-
-        <ImageView
-            android:id="@+id/back_button_image_view"
-            android:layout_width="@dimen/image_view_width"
-            android:layout_height="@dimen/image_view_height"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:clickable="true"
-            android:src="@drawable/ic_arrow_back_white"/>
-
-        <TextView
-            android:id="@+id/title_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="@string/trip_planner_title"
-            android:textColor="@color/white_text_color"
-            android:textSize="24sp"/>
-
-    </RelativeLayout> -->
-
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/toolbar"
-        android:layout_marginLeft="@dimen/layout_margin_small"
-        android:layout_marginRight="@dimen/layout_margin_small"
-        android:layout_marginTop="@dimen/layout_margin">
+        android:layout_marginTop="@dimen/layout_margin_small">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"/>
 
     </android.support.v4.widget.SwipeRefreshLayout>
 
@@ -205,7 +171,7 @@
             android:layout_width="@dimen/error_image_view_width"
             android:layout_height="@dimen/error_image_view_height"
             android:layout_margin="@dimen/layout_margin"
-            android:src="@drawable/ic_sad_face" />
+            android:src="@drawable/ic_sad_face"/>
 
         <TextView
             android:id="@+id/errorTextView"
@@ -215,7 +181,7 @@
             android:layout_marginRight="@dimen/layout_margin"
             android:textAlignment="center"
             android:textColor="@color/standard_text_color"
-            android:textSize="@dimen/text_size_big" />
+            android:textSize="@dimen/text_size_big"/>
 
         <TextView
             android:id="@+id/errorResolutionTextView"
@@ -225,7 +191,7 @@
             android:padding="@dimen/layout_padding"
             android:text="@string/fix_error_retry"
             android:textAllCaps="true"
-            android:textColor="@color/colorSpecialServiceBus" />
+            android:textColor="@color/colorSpecialServiceBus"/>
 
     </LinearLayout>
 
@@ -237,6 +203,6 @@
         android:layout_alignParentRight="true"
         android:layout_margin="@dimen/layout_margin"
         android:src="@drawable/ic_favorite_border_white"
-        app:fabSize="mini" />
+        app:fabSize="mini"/>
 
 </RelativeLayout>

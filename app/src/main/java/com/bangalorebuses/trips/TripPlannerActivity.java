@@ -11,8 +11,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
@@ -60,14 +58,13 @@ public class TripPlannerActivity extends AppCompatActivity implements
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recyclerView;
-    private TripsRecyclerViewAdapter recyclerViewAdapter;
 
     private LinearLayout errorLinearLayout;
     private ImageView errorImageView;
     private TextView errorTextView;
     private TextView errorResolutionTextView;
 
-    private ArrayList<Trip> tripsToDisplay = new ArrayList<>();
+    private ArrayList<DirectTrip> directTripsToDisplay = new ArrayList<>();
     private ArrayList<TransitPoint> transitPointsToDisplay =
             new ArrayList<>();
     private ArrayList<Trip> tripsToQuery = new ArrayList<>();
@@ -372,14 +369,12 @@ public class TripPlannerActivity extends AppCompatActivity implements
         {
             numberOfDirectTripQueriesMade = 0;
             numberOfDirectTripRouteBusesFound = 0;
-            tripsToDisplay.clear();
+            directTripsToDisplay.clear();
             tripsToQuery = trips;
             busETAsOnDirectTripTasks.clear();
 
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
             recyclerView.setLayoutManager(linearLayoutManager);
-            recyclerViewAdapter = new TripsRecyclerViewAdapter(tripsToDisplay);
-            recyclerView.setAdapter(recyclerViewAdapter);
 
             if (isNetworkAvailable())
             {
@@ -446,8 +441,8 @@ public class TripPlannerActivity extends AppCompatActivity implements
                                         directTrip.getBusRoute().getTripPlannerDestinationBusStop().getBusStopRouteOrder()),
                         directTrip.getBusRoute().getBusRouteNumber()));
 
-                tripsToDisplay.add(directTrip);
-                Collections.sort(tripsToDisplay, new Comparator<Trip>()
+                directTripsToDisplay.add(directTrip);
+                Collections.sort(directTripsToDisplay, new Comparator<Trip>()
                 {
                     @Override
                     public int compare(Trip o1, Trip o2)
@@ -457,12 +452,12 @@ public class TripPlannerActivity extends AppCompatActivity implements
                     }
                 });
 
-                ArrayList<Trip> tempTripsToDisplay = new ArrayList<>();
+                ArrayList<DirectTrip> tempTripsToDisplay = new ArrayList<>();
                 for (int i = 0; i < 5; i++)
                 {
-                    if (i < tripsToDisplay.size())
+                    if (i < directTripsToDisplay.size())
                     {
-                        tempTripsToDisplay.add(tripsToDisplay.get(i));
+                        tempTripsToDisplay.add(directTripsToDisplay.get(i));
                     }
                     else
                     {
@@ -470,12 +465,12 @@ public class TripPlannerActivity extends AppCompatActivity implements
                     }
                 }
 
-                tripsToDisplay.clear();
+                directTripsToDisplay.clear();
                 for (int i = 0; i < 3; i++)
                 {
                     if (i < tempTripsToDisplay.size())
                     {
-                        tripsToDisplay.add(tempTripsToDisplay.get(i));
+                        directTripsToDisplay.add(tempTripsToDisplay.get(i));
                     }
                     else
                     {
@@ -483,7 +478,11 @@ public class TripPlannerActivity extends AppCompatActivity implements
                     }
                 }
 
-                recyclerViewAdapter.notifyDataSetChanged();
+                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+                recyclerView.setLayoutManager(linearLayoutManager);
+                DirectTripsRecyclerViewAdapter adapter = new
+                        DirectTripsRecyclerViewAdapter(this, directTripsToDisplay);
+                recyclerView.setAdapter(adapter);
                 recyclerView.setVisibility(View.VISIBLE);
             }
         }
@@ -504,7 +503,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
         {
             swipeRefreshLayout.setRefreshing(false);
 
-            if (tripsToDisplay.size() == 0)
+            if (directTripsToDisplay.size() == 0)
             {
                 swipeRefreshLayout.setRefreshing(false);
                 findIndirectTrips(originBusStopName, destinationBusStopName);
@@ -702,7 +701,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
 
         this.transitPoints = tempTransitPoints;
 
-        tripsToDisplay.clear();
+        directTripsToDisplay.clear();
         transitPointsToDisplay.clear();
         numberOfIndirectTripQueriesMade = 0;
         numberOfIndirectTripQueriesComplete = 0;
@@ -861,7 +860,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
             {
                 swipeRefreshLayout.setRefreshing(false);
 
-                if (tripsToDisplay.size() == 0)
+                if (directTripsToDisplay.size() == 0)
                 {
                     //TODO 'There aren't trips' message gets displayed and then displays trips...needs to be fixed
                     /*setErrorLayoutContent(R.drawable.ic_directions_bus_black, "Oh no! There aren't any trips right now...", "Retry");

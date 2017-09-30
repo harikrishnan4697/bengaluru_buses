@@ -4,16 +4,63 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary"
     tools:context="com.bangalorebuses.search.SearchActivity">
 
-    <LinearLayout
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="@color/colorPrimary">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/back_button_image_view"
+                android:layout_width="@dimen/image_view_width"
+                android:layout_height="@dimen/image_view_height"
+                android:layout_alignParentLeft="true"
+                android:layout_marginTop="@dimen/layout_margin_small"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginEnd="@dimen/layout_margin"
+                android:layout_marginRight="@dimen/layout_margin"
+                android:background="?selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_arrow_back_white"/>
+
+            <EditText
+                android:id="@+id/search_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/layout_margin_small"
+                android:layout_marginRight="@dimen/layout_margin_small"
+                android:layout_marginTop="@dimen/layout_margin_small"
+                android:layout_marginBottom="@dimen/layout_margin_small"
+                android:layout_toEndOf="@id/back_button_image_view"
+                android:layout_toRightOf="@id/back_button_image_view"
+                android:background="@drawable/white_rounded_background_borderless"
+                android:enabled="false"
+                android:textSize="@dimen/text_size_big"
+                android:hint="@string/search_activity_default_hint"
+                android:inputType="text"
+                android:maxLines="1"
+                android:padding="@dimen/layout_padding_small"
+                />
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.Toolbar>
+
+    <!--<LinearLayout
         android:id="@+id/search_and_back_linear_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:background="@color/colorPrimary"
         android:orientation="horizontal"
+        android:visibility="gone"
         android:paddingBottom="@dimen/layout_padding"
         android:paddingLeft="@dimen/action_bar_padding"
         android:paddingRight="@dimen/action_bar_padding"
@@ -41,13 +88,13 @@
             android:padding="@dimen/layout_padding"
             />
 
-    </LinearLayout>
+    </LinearLayout>-->
 
     <RelativeLayout
         android:id="@+id/favorites_relative_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/search_and_back_linear_layout"
+        android:layout_below="@id/toolbar"
         android:layout_marginBottom="@dimen/layout_margin"
         android:layout_marginLeft="@dimen/layout_margin"
         android:layout_marginRight="@dimen/layout_margin"
@@ -94,7 +141,7 @@
         android:id="@+id/favorites_linear_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/search_and_back_linear_layout"
+        android:layout_below="@id/toolbar"
         android:layout_marginBottom="@dimen/layout_margin"
         android:layout_marginLeft="@dimen/layout_margin"
         android:layout_marginRight="@dimen/layout_margin"

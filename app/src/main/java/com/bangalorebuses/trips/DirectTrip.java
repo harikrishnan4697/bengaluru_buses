@@ -11,6 +11,7 @@ import static com.bangalorebuses.utils.Constants.db;
 public class DirectTrip extends Trip
 {
     private BusRoute busRoute;
+    private int tripDuration;
 
     public BusRoute getBusRoute()
     {
@@ -99,5 +100,15 @@ public class DirectTrip extends Trip
             travelTime = travelTimeInMinutes + " min";
         }
         return travelTime;
+    }
+
+    public int getTripDuration()
+    {
+        return tripDuration;
+    }
+
+    public void setTripDuration(int tripDuration)
+    {
+        this.tripDuration = tripDuration;
     }
 }

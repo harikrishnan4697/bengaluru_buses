@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -13,6 +14,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -56,11 +58,9 @@ public class SearchActivity extends AppCompatActivity implements SearchDbQueries
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
-        // Hides the default actionbar
-        if (getSupportActionBar() != null)
-        {
-            getSupportActionBar().hide();
-        }
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         // Hide the soft keyboard by default when the activity is started
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
@@ -72,6 +72,16 @@ public class SearchActivity extends AppCompatActivity implements SearchDbQueries
                 .favorites_relative_layout);
         favoritesLinearLayout = (LinearLayout) findViewById(R.id.favorites_linear_layout);
         favoritesListView = (ListView) findViewById(R.id.favorites_list_view);
+
+        ImageView backButtonImageView = (ImageView) findViewById(R.id.back_button_image_view);
+        backButtonImageView.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                finish();
+            }
+        });
 
         String searchType = getIntent().getStringExtra("SEARCH_TYPE");
         String editTextHint = getIntent().getStringExtra("EDIT_TEXT_HINT");
