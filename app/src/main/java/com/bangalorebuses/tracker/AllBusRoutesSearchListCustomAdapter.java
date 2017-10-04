@@ -74,22 +74,30 @@ public class AllBusRoutesSearchListCustomAdapter extends BaseAdapter implements 
         {
             holder.imageView.setImageResource(R.drawable.ic_flight_blue);
             holder.routeServiceTypeNameTextView.setText("Airport Shuttle");
+            holder.routeNumberTextView.setBackgroundResource(R.drawable
+                    .blue_rounded_background_borderless);
         }
         else if (filteredBusRouteNumbers.get(position).length() > 2 &&
                 filteredBusRouteNumbers.get(position).substring(0, 2).equals("V-"))
         {
             holder.imageView.setImageResource(R.drawable.ic_directions_bus_ac);
             holder.routeServiceTypeNameTextView.setText("A/C");
+            holder.routeNumberTextView.setBackgroundResource(R.drawable
+                    .blue_rounded_background_borderless);
         }
         else if (filteredBusRouteNumbers.get(position).contains("MF-"))
         {
             holder.imageView.setImageResource(R.drawable.ic_directions_bus_special);
             holder.routeServiceTypeNameTextView.setText("Metro Feeder");
+            holder.routeNumberTextView.setBackgroundResource(R.drawable
+                    .orange_rounded_background_borderless);
         }
         else
         {
             holder.imageView.setImageResource(R.drawable.ic_directions_bus_ordinary);
             holder.routeServiceTypeNameTextView.setText("Non A/C");
+            holder.routeNumberTextView.setBackgroundResource(R.drawable
+                    .green_rounded_background_borderless);
         }
 
         holder.routeNumberTextView.setText(filteredBusRouteNumbers.get(position));

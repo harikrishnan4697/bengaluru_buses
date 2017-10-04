@@ -36,8 +36,8 @@
 
             <ImageView
                 android:id="@+id/swap_direction_image_view"
-                android:layout_width="@dimen/action_image_view_width"
-                android:layout_height="@dimen/action_image_view_height"
+                android:layout_width="@dimen/swap_image_view_width"
+                android:layout_height="@dimen/swap_image_view_height"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/colorPrimary">
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/colorPrimary">
 
     <TextView
         android:id="@+id/app_name_text_view"
@@ -13,10 +13,10 @@
         android:ellipsize="end"
         android:gravity="center"
         android:maxLines="1"
-        android:padding="@dimen/action_bar_padding"
+        android:padding="@dimen/layout_padding"
         android:text="@string/app_name"
         android:textColor="@color/white_text_color"
-        android:textSize="24sp" />
+        android:textSize="24sp"/>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -47,7 +47,7 @@
                     android:layout_gravity="center"
                     android:layout_marginEnd="@dimen/layout_margin_small"
                     android:layout_marginRight="@dimen/layout_margin_small"
-                    android:src="@drawable/ic_search_black" />
+                    android:src="@drawable/ic_search_black"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -56,7 +56,7 @@
                     android:background="@drawable/white_rounded_background_borderless"
                     android:hint="@string/trip_planner_text_view_hint"
                     android:textColor="@color/standard_text_color"
-                    android:textSize="@dimen/text_size_big" />
+                    android:textSize="@dimen/text_size_big"/>
 
             </LinearLayout>
 
@@ -95,7 +95,7 @@
                                 android:layout_width="@dimen/image_view_width"
                                 android:layout_height="@dimen/image_view_height"
                                 android:background="@drawable/white_circle_background_borderless"
-                                android:src="@drawable/ic_location_on_black" />
+                                android:src="@drawable/ic_location_on_black"/>
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -108,7 +108,7 @@
                                 android:text="@string/bus_stops_title"
                                 android:textAllCaps="true"
                                 android:textColor="@color/white_text_color"
-                                android:textStyle="bold" />
+                                android:textStyle="bold"/>
 
                         </LinearLayout>
 
@@ -127,7 +127,7 @@
                                 android:layout_width="@dimen/image_view_width"
                                 android:layout_height="@dimen/image_view_height"
                                 android:background="@drawable/white_circle_background_borderless"
-                                android:src="@drawable/ic_directions_bus_black" />
+                                android:src="@drawable/ic_directions_bus_black"/>
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -140,7 +140,7 @@
                                 android:text="@string/buses_title"
                                 android:textAllCaps="true"
                                 android:textColor="@color/white_text_color"
-                                android:textStyle="bold" />
+                                android:textStyle="bold"/>
 
                         </LinearLayout>
 
@@ -176,7 +176,7 @@
                         android:textAllCaps="true"
                         android:textColor="@color/standard_text_color"
                         android:textSize="@dimen/text_size_medium"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"/>
 
                     <ListView
                         android:id="@+id/favourites_list_view"
@@ -184,7 +184,7 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/favourites_text_view"
                         android:scrollbars="none"
-                        android:visibility="gone" />
+                        android:visibility="gone"/>
 
                     <LinearLayout
                         android:id="@+id/no_favorites_linear_layout"
@@ -196,9 +196,9 @@
                         android:orientation="vertical">
 
                         <ImageView
-                            android:layout_width="@dimen/action_image_view_width"
-                            android:layout_height="@dimen/action_image_view_height"
-                            android:src="@drawable/ic_favorite_border_black" />
+                            android:layout_width="@dimen/image_view_width"
+                            android:layout_height="@dimen/image_view_height"
+                            android:src="@drawable/ic_favorite_border_black"/>
 
                         <TextView
                             android:layout_width="match_parent"
@@ -211,7 +211,7 @@
                             android:textAllCaps="true"
                             android:textColor="@color/sub_text_color"
                             android:textSize="@dimen/text_size_medium"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"/>
 
                     </LinearLayout>
 
@@ -245,7 +245,7 @@
                         android:textAllCaps="true"
                         android:textColor="@color/standard_text_color"
                         android:textSize="@dimen/text_size_medium"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"/>
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -270,7 +270,7 @@
                                 android:layout_width="@dimen/image_view_width"
                                 android:layout_height="@dimen/image_view_height"
                                 android:background="@drawable/white_circle_background_borderless"
-                                android:src="@drawable/ic_web_black" />
+                                android:src="@drawable/ic_web_black"/>
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -283,7 +283,7 @@
                                 android:text="@string/help_website_title"
                                 android:textAllCaps="true"
                                 android:textColor="@color/white_text_color"
-                                android:textStyle="bold" />
+                                android:textStyle="bold"/>
 
                         </LinearLayout>
 
@@ -302,7 +302,7 @@
                                 android:layout_width="@dimen/image_view_width"
                                 android:layout_height="@dimen/image_view_height"
                                 android:background="@drawable/white_circle_background_borderless"
-                                android:src="@drawable/ic_call_black" />
+                                android:src="@drawable/ic_call_black"/>
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -315,7 +315,7 @@
                                 android:text="@string/help_helpline_title"
                                 android:textAllCaps="true"
                                 android:textColor="@color/white_text_color"
-                                android:textStyle="bold" />
+                                android:textStyle="bold"/>
 
                         </LinearLayout>
 

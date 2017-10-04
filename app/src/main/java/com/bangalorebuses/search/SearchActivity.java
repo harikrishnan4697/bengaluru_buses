@@ -43,7 +43,7 @@ import static com.bangalorebuses.utils.Constants.SEARCH_TYPE_BUS_STOP;
 public class SearchActivity extends AppCompatActivity implements SearchDbQueriesHelper,
         FavoritesHelper
 {
-    ProgressBar progressBar;
+    private ProgressBar progressBar;
     private EditText searchEditText;
     private ListView searchResultsListView;
     private Intent resultIntent = new Intent();
@@ -52,6 +52,7 @@ public class SearchActivity extends AppCompatActivity implements SearchDbQueries
     private AllBusStopNamesTask allBusStopNamesTask;
     private ListView favoritesListView;
     private String favoritesType;
+    private boolean hasFavorites = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -149,8 +150,11 @@ public class SearchActivity extends AppCompatActivity implements SearchDbQueries
 
                 if (count == 0)
                 {
-                    searchResultsListView.setVisibility(View.GONE);
-                    favoritesLinearLayout.setVisibility(View.VISIBLE);
+                    if (hasFavorites)
+                    {
+                        searchResultsListView.setVisibility(View.GONE);
+                        favoritesLinearLayout.setVisibility(View.VISIBLE);
+                    }
                 }
                 else
                 {
@@ -243,10 +247,14 @@ public class SearchActivity extends AppCompatActivity implements SearchDbQueries
                             favoritesForwards, false);
                     favoritesListView.setAdapter(adapter);
                     favoritesLinearLayout.setVisibility(View.VISIBLE);
+                    searchResultsListView.setVisibility(View.GONE);
+                    hasFavorites = true;
                 }
                 else
                 {
                     favoritesLinearLayout.setVisibility(View.GONE);
+                    searchResultsListView.setVisibility(View.VISIBLE);
+                    hasFavorites = false;
                 }
 
                 fileInputStream.close();
@@ -301,16 +309,6 @@ public class SearchActivity extends AppCompatActivity implements SearchDbQueries
                 finish();
             }
         }
-    }
-
-    /**
-     * This method is called by the on screen back button.
-     *
-     * @param view Not used.
-     */
-    public void exit(View view)
-    {
-        finish();
     }
 
     @Override

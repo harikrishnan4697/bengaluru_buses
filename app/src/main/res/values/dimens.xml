@@ -3,25 +3,23 @@
     <dimen name="layout_margin">16dp</dimen>
     <dimen name="layout_margin_small">8dp</dimen>
     <dimen name="layout_margin_tiny">4dp</dimen>
-    <dimen name="action_bar_margin">16dp</dimen>
 
     <!-- Layout padding dimensions -->
     <dimen name="layout_padding">16dp</dimen>
     <dimen name="layout_padding_small">8dp</dimen>
     <dimen name="layout_padding_tiny">4dp</dimen>
-    <dimen name="action_bar_padding">16dp</dimen>
 
     <!-- ImageView dimensions -->
     <dimen name="image_view_height">25dp</dimen>
     <dimen name="image_view_width">25dp</dimen>
-    <dimen name="action_image_view_width">30dp</dimen>
-    <dimen name="action_image_view_height">30dp</dimen>
+    <dimen name="bus_image_view_width">30dp</dimen>
+    <dimen name="bus_image_view_height">30dp</dimen>
+    <dimen name="swap_image_view_width">30dp</dimen>
+    <dimen name="swap_image_view_height">30dp</dimen>
     <dimen name="error_image_view_height">60dp</dimen>
     <dimen name="error_image_view_width">60dp</dimen>
     <dimen name="real_time_image_view_height">15dp</dimen>
     <dimen name="real_time_image_view_width">15dp</dimen>
-    <dimen name="back_button_width">30dp</dimen>
-    <dimen name="back_button_height">30dp</dimen>
 
     <!-- Default text sizes -->
     <dimen name="text_size_big">16sp</dimen>

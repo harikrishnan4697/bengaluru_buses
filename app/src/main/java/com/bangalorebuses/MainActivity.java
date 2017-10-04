@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        overridePendingTransition(0, 0);
         initializeActivity();
     }
 

@@ -6,6 +6,7 @@ import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -37,17 +38,8 @@ public class BusesActivity extends AppCompatActivity implements BusesDbQueriesHe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_buses);
 
-        // Hide the action bar
-        if (getSupportActionBar() != null)
-        {
-            getSupportActionBar().hide();
-        }
-
-        TextView titleTextView = (TextView) findViewById(R.id.title_text_view);
-
-        // Change the font of "Buses" to a custom font.
-        Typeface typeFace = Typeface.createFromAsset(getAssets(), "fonts/Righteous-Regular.ttf");
-        titleTextView.setTypeface(typeFace);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         // Hide the soft keyboard by default when the activity is started
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
@@ -57,7 +49,7 @@ public class BusesActivity extends AppCompatActivity implements BusesDbQueriesHe
 
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
 
-        editText = (EditText) findViewById(R.id.edit_text);
+        editText = (EditText) findViewById(R.id.bus_search_edit_text);
 
         ImageView backButtonImageView = (ImageView) findViewById(R.id.back_button_image_view);
         backButtonImageView.setOnClickListener(new View.OnClickListener()
