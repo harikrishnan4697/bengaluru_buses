@@ -6,7 +6,7 @@
     <string name="trip_planner_navigation_item_text">Trip planner</string>
 
     <!-- Strings for Track Bus Activity -->
-    <string name="direction_label_text">Direction</string>
+    <string name="direction_label_text">Towards</string>
     <string name="bus_stop_label_text">Bus stop</string>
 
     <!-- Search Activity strings -->

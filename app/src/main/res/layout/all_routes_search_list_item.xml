@@ -4,13 +4,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/list_item_background_color"
+    android:background="?selectableItemBackground"
     android:padding="@dimen/layout_padding">
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="@dimen/bus_image_view_width"
-        android:layout_height="@dimen/bus_image_view_height"
+        android:layout_width="@dimen/image_view_width"
+        android:layout_height="@dimen/image_view_height"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
@@ -42,7 +42,7 @@
             android:maxLines="1"
             android:text="Metro Feeder"
             android:textColor="@color/standard_text_color"
-            android:textSize="@dimen/text_size_medium"/>
+            android:textSize="@dimen/text_size_small"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -65,7 +65,7 @@
                 android:maxLines="1"
                 android:text="MF-1"
                 android:textColor="@color/white_text_color"
-                android:textSize="@dimen/text_size_big"/>
+                android:textSize="@dimen/text_size_medium"/>
 
         </LinearLayout>
 

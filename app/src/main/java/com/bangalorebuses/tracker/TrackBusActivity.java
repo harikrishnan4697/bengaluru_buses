@@ -9,6 +9,7 @@ import android.os.CountDownTimer;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -90,16 +91,14 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
-        if (getSupportActionBar() != null)
-        {
-            getSupportActionBar().hide();
-        }
         setContentView(R.layout.activity_track_bus);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         // Initialise XML elements
         TextView titleTextView = (TextView) findViewById(R.id.title_text_view);
-        titleTextView.setText("Tracking " + getIntent().getStringExtra("ROUTE_NUMBER"));
+        titleTextView.setText(getIntent().getStringExtra("ROUTE_NUMBER") + " Buses");
 
         ImageView backButtonImageView = (ImageView) findViewById(R.id.back_button_image_view);
         backButtonImageView.setOnClickListener(new View.OnClickListener()
@@ -111,7 +110,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
             }
         });
 
-        favoriteImageView = (ImageView) findViewById(R.id.favorite_image_view);
+        /*favoriteImageView = (ImageView) findViewById(R.id.favorite_image_view);
         favoriteImageView.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -119,7 +118,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
             {
                 favoriteBusRoute();
             }
-        });
+        });*/
 
         listView = (ListView) findViewById(R.id.listView);
         spinner = (Spinner) findViewById(R.id.route_stop_list_spinner);
@@ -150,13 +149,13 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         trackBusesOnRoute(getIntent().getStringExtra("ROUTE_NUMBER"));
     }
 
-    @Override
+    /*@Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.track_bus_activity_menu, menu);
         return super.onCreateOptionsMenu(menu);
-    }
+    }*/
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
@@ -465,9 +464,6 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
                 getStopsOnRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, routeDown.getBusRouteId());
             }
         }
-
-        initialiseFavorites();
-
     }
 
     private void onBusStopsOnRouteFound(BusRoute busRoute)
@@ -748,11 +744,11 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         String busRouteDestinationName = directionName;
         if (busRouteDestinationName.contains(" To "))
         {
-            busRouteDestinationName = busRouteDestinationName.substring(busRouteDestinationName.indexOf("To "), busRouteDestinationName.length());
+            busRouteDestinationName = busRouteDestinationName.substring(busRouteDestinationName.indexOf("To ") + 3, busRouteDestinationName.length());
         }
         else if (busRouteDestinationName.contains(" to "))
         {
-            busRouteDestinationName = busRouteDestinationName.substring(busRouteDestinationName.indexOf("to "), busRouteDestinationName.length());
+            busRouteDestinationName = busRouteDestinationName.substring(busRouteDestinationName.indexOf("to ") + 3, busRouteDestinationName.length());
         }
         return busRouteDestinationName;
     }

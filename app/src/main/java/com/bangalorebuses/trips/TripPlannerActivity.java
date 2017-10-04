@@ -6,6 +6,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -47,6 +48,8 @@ import static com.bangalorebuses.utils.Constants.db;
 public class TripPlannerActivity extends AppCompatActivity implements
         SwipeRefreshLayout.OnRefreshListener, DirectTripHelper, IndirectTripHelper
 {
+    private FloatingActionButton favoritesFloatingActionButton;
+
     private TextView originSelectionTextView;
     private TextView destinationSelectionTextView;
 
@@ -95,6 +98,18 @@ public class TripPlannerActivity extends AppCompatActivity implements
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        favoritesFloatingActionButton = (FloatingActionButton) findViewById(R.id
+                .favorites_floating_action_button);
+        favoritesFloatingActionButton.setVisibility(View.GONE);
+        favoritesFloatingActionButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                favoriteTrip(originBusStopName, destinationBusStopName);
+            }
+        });
 
         originSelectionTextView = (TextView) findViewById(R.id.origin_text_view);
         originSelectionTextView.setOnClickListener(new View.OnClickListener()
@@ -298,6 +313,11 @@ public class TripPlannerActivity extends AppCompatActivity implements
             if (originBusStopName != null && destinationBusStopName != null)
             {
                 findDirectTrips();
+                favoritesFloatingActionButton.setVisibility(View.VISIBLE);
+            }
+            else
+            {
+                favoritesFloatingActionButton.setVisibility(View.GONE);
             }
         }
     }
@@ -872,6 +892,28 @@ public class TripPlannerActivity extends AppCompatActivity implements
     }
 
     // Other stuff
+
+    private void checkTripIsFavorite(String originBusStopName, String destinationBusStopName)
+    {
+        boolean tripsIsFavorite = false;
+
+        //TODO Check if trip is a favorite trip or not
+
+        if (tripsIsFavorite)
+        {
+            favoritesFloatingActionButton.setImageResource(R.drawable.ic_favorite_white);
+        }
+        else
+        {
+            favoritesFloatingActionButton.setImageResource(R.drawable.ic_favorite_border_white);
+        }
+    }
+
+    private void favoriteTrip(String originBusStopName, String destinationBusStopName)
+    {
+
+    }
+
     private void setErrorLayoutContent(int drawableResId, String errorMessage, String resolutionButtonText)
     {
         errorImageView.setImageResource(drawableResId);
