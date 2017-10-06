@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import com.bangalorebuses.core.Bus;
 import com.bangalorebuses.core.BusRoute;
 import com.bangalorebuses.core.BusStop;
+import com.bangalorebuses.utils.CommonMethods;
 import com.bangalorebuses.utils.DbQueries;
 
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class BusRoutesToAndFromTransitPointDbTask extends AsyncTask<Void, Void, 
     private IndirectTripHelper caller;
 
     public BusRoutesToAndFromTransitPointDbTask(IndirectTripHelper caller, String originBusStopName, TransitPoint transitPoint,
-                                         String destinationBusStopName)
+                                                String destinationBusStopName)
     {
         this.caller = caller;
         this.originBusStopName = originBusStopName;
@@ -196,8 +197,9 @@ public class BusRoutesToAndFromTransitPointDbTask extends AsyncTask<Void, Void, 
         {
             Bus bus = new Bus();
 
-            int timeOfDayBusWillArrive = cursor.getInt(0) + calculateTravelTime(DbQueries.getNumberOfStopsBetweenRouteOrders(db,
-                    busRoute.getBusRouteId(), 1, busRoute.getTripPlannerOriginBusStop().getBusStopRouteOrder()), busRoute.getBusRouteNumber());
+            int timeOfDayBusWillArrive = cursor.getInt(0) + CommonMethods
+                    .calculateTravelTime(busRoute.getBusRouteId(), busRoute.getBusRouteNumber(),
+                            1, busRoute.getTripPlannerOriginBusStop().getBusStopRouteOrder());
 
             Date date = new Date();
 
@@ -225,56 +227,6 @@ public class BusRoutesToAndFromTransitPointDbTask extends AsyncTask<Void, Void, 
         });
 
         return busesOnBusRoute;
-    }
-
-    // TODO Create a utils class and put this method there
-    // Calculates how long it would take to travel a certain number of bus stops on a particular bus route
-    private int calculateTravelTime(int numberOfBusStopsToTravel, String routeNumber)
-    {
-        Calendar calendar = Calendar.getInstance();
-        int travelTime;
-
-        if ((calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) || (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY))
-        {
-            // Check if the bus is an airport shuttle (airport shuttles take longer to travel
-            // from one bus stop to another as they don't stop at all bus stops)
-            if (routeNumber.contains("KIAS-"))
-            {
-                travelTime = numberOfBusStopsToTravel * 4;  // 4 Minutes to get from a bus stop to another for the airport shuttle weekends
-            }
-            else
-            {
-                travelTime = numberOfBusStopsToTravel * 2;  // 2 Minutes to get from a bus stop to another for other buses during weekends
-            }
-        }
-        else if ((calendar.get(Calendar.HOUR_OF_DAY) > 7 && calendar.get(Calendar.HOUR_OF_DAY) < 11) || (calendar.get(Calendar.HOUR_OF_DAY) > 16 && calendar.get(Calendar.HOUR_OF_DAY) < 21))
-        {
-            // Check if the bus is an airport shuttle (airport shuttles take longer to travel
-            // from one bus stop to another as they don't stop at all bus stops)
-            if (routeNumber.contains("KIAS-"))
-            {
-                travelTime = numberOfBusStopsToTravel * 5;  // 5 Minutes to get from a bus stop to another for the airport shuttle in peak-time
-            }
-            else
-            {
-                travelTime = numberOfBusStopsToTravel * 3;  // 3 Minutes to get from a bus stop to another for other buses in peak-time
-            }
-        }
-        else
-        {
-            // Check if the bus is an airport shuttle (airport shuttles take longer to travel
-            // from one bus stop to another as they don't stop at all bus stops)
-            if (routeNumber.contains("KIAS-"))
-            {
-                travelTime = numberOfBusStopsToTravel * 4;  // 4 Minutes to get from a bus stop to another for the airport shuttle
-            }
-            else
-            {
-                travelTime = (int) (numberOfBusStopsToTravel * 2.5);  // 2.5 Minutes to get from a bus stop to another for other buses
-            }
-        }
-
-        return travelTime;
     }
 
     @Override

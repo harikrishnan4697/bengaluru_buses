@@ -26,10 +26,16 @@ import com.bangalorebuses.core.Bus;
 import com.bangalorebuses.core.BusRoute;
 import com.bangalorebuses.core.BusStop;
 import com.bangalorebuses.search.SearchActivity;
+import com.bangalorebuses.utils.CommonMethods;
 import com.bangalorebuses.utils.Constants;
 import com.bangalorebuses.utils.DbQueries;
 import com.bangalorebuses.utils.ErrorImageResIds;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -49,6 +55,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
         SwipeRefreshLayout.OnRefreshListener, DirectTripHelper, IndirectTripHelper
 {
     private FloatingActionButton favoritesFloatingActionButton;
+    private boolean isFavorite = false;
 
     private TextView originSelectionTextView;
     private TextView destinationSelectionTextView;
@@ -182,9 +189,38 @@ public class TripPlannerActivity extends AppCompatActivity implements
         });
         errorLinearLayout.setVisibility(View.GONE);
 
+        if (getIntent().getStringExtra(Constants.TRIP_ORIGIN_BUS_STOP_NAME) != null)
+        {
+            originBusStopName = getIntent().getStringExtra(Constants
+                    .TRIP_ORIGIN_BUS_STOP_NAME);
+            originSelectionTextView.setText(originBusStopName);
+        }
+
+        if (getIntent().getStringExtra(Constants.TRIP_DESTINATION_BUS_STOP_NAME) != null)
+        {
+            destinationBusStopName = getIntent().getStringExtra(Constants
+                    .TRIP_DESTINATION_BUS_STOP_NAME);
+            destinationSelectionTextView.setText(destinationBusStopName);
+        }
+
         if (originBusStopName == null)
         {
             selectOriginBusStop();
+        }
+        else if (destinationBusStopName == null)
+        {
+            selectDestinationBusStop();
+        }
+
+        if (originBusStopName != null && destinationBusStopName != null)
+        {
+            findDirectTrips();
+            checkIfTripIsFavorite(originBusStopName, destinationBusStopName);
+            favoritesFloatingActionButton.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            favoritesFloatingActionButton.setVisibility(View.GONE);
         }
     }
 
@@ -246,6 +282,12 @@ public class TripPlannerActivity extends AppCompatActivity implements
         if (originBusStopName != null && destinationBusStopName != null)
         {
             findDirectTrips();
+            checkIfTripIsFavorite(originBusStopName, destinationBusStopName);
+            favoritesFloatingActionButton.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            favoritesFloatingActionButton.setVisibility(View.GONE);
         }
     }
 
@@ -313,6 +355,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
             if (originBusStopName != null && destinationBusStopName != null)
             {
                 findDirectTrips();
+                checkIfTripIsFavorite(originBusStopName, destinationBusStopName);
                 favoritesFloatingActionButton.setVisibility(View.VISIBLE);
             }
             else
@@ -439,10 +482,8 @@ public class TripPlannerActivity extends AppCompatActivity implements
             {
                 for (Bus bus : directTrip.getBusRoute().getBusRouteBuses())
                 {
-                    bus.setBusETA(calculateTravelTime(DbQueries.getNumberOfStopsBetweenRouteOrders
-                                    (db, directTrip.getBusRoute().getBusRouteId(), bus.getBusRouteOrder(),
-                                            directTrip.getBusRoute().getTripPlannerOriginBusStop().getBusStopRouteOrder()),
-                            directTrip.getBusRoute().getBusRouteNumber()));
+                    bus.setBusETA(CommonMethods.calculateTravelTime(directTrip.getBusRoute().getBusRouteId(), directTrip.getBusRoute().getBusRouteNumber(), bus.getBusRouteOrder(),
+                                            directTrip.getBusRoute().getTripPlannerOriginBusStop().getBusStopRouteOrder()));
                 }
 
                 Collections.sort(directTrip.getBusRoute().getBusRouteBuses(), new Comparator<Bus>()
@@ -455,11 +496,9 @@ public class TripPlannerActivity extends AppCompatActivity implements
                 });
 
                 directTrip.getBusRoute().setShortestOriginToDestinationTravelTime(directTrip.getBusRoute()
-                        .getBusRouteBuses().get(0).getBusETA() + calculateTravelTime(DbQueries
-                                .getNumberOfStopsBetweenRouteOrders(db, directTrip.getBusRoute().getBusRouteId(),
-                                        directTrip.getBusRoute().getTripPlannerOriginBusStop().getBusStopRouteOrder(),
-                                        directTrip.getBusRoute().getTripPlannerDestinationBusStop().getBusStopRouteOrder()),
-                        directTrip.getBusRoute().getBusRouteNumber()));
+                        .getBusRouteBuses().get(0).getBusETA() + CommonMethods.calculateTravelTime(directTrip.getBusRoute().getBusRouteId(),
+                        directTrip.getBusRoute().getBusRouteNumber(), directTrip.getBusRoute().getTripPlannerOriginBusStop().getBusStopRouteOrder(),
+                                        directTrip.getBusRoute().getTripPlannerDestinationBusStop().getBusStopRouteOrder()));
 
                 directTripsToDisplay.add(directTrip);
                 Collections.sort(directTripsToDisplay, new Comparator<Trip>()
@@ -529,54 +568,6 @@ public class TripPlannerActivity extends AppCompatActivity implements
                 findIndirectTrips(originBusStopName, destinationBusStopName);
             }
         }
-    }
-
-    private int calculateTravelTime(int numberOfBusStopsToTravel, String routeNumber)
-    {
-        Calendar calendar = Calendar.getInstance();
-        int travelTime;
-
-        if ((calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) || (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY))
-        {
-            // Check if the bus is an airport shuttle (airport shuttles take longer to travel
-            // from one bus stop to another as they don't stop at all bus stops)
-            if (routeNumber.contains("KIAS-"))
-            {
-                travelTime = numberOfBusStopsToTravel * 4;  // 4 Minutes to get from a bus stop to another for the airport shuttle weekends
-            }
-            else
-            {
-                travelTime = numberOfBusStopsToTravel * 2;  // 2 Minutes to get from a bus stop to another for other buses during weekends
-            }
-        }
-        else if ((calendar.get(Calendar.HOUR_OF_DAY) > 7 && calendar.get(Calendar.HOUR_OF_DAY) < 11) || (calendar.get(Calendar.HOUR_OF_DAY) > 16 && calendar.get(Calendar.HOUR_OF_DAY) < 21))
-        {
-            // Check if the bus is an airport shuttle (airport shuttles take longer to travel
-            // from one bus stop to another as they don't stop at all bus stops)
-            if (routeNumber.contains("KIAS-"))
-            {
-                travelTime = numberOfBusStopsToTravel * 5;  // 5 Minutes to get from a bus stop to another for the airport shuttle in peak-time
-            }
-            else
-            {
-                travelTime = numberOfBusStopsToTravel * 3;  // 3 Minutes to get from a bus stop to another for other buses in peak-time
-            }
-        }
-        else
-        {
-            // Check if the bus is an airport shuttle (airport shuttles take longer to travel
-            // from one bus stop to another as they don't stop at all bus stops)
-            if (routeNumber.contains("KIAS-"))
-            {
-                travelTime = numberOfBusStopsToTravel * 4;  // 4 Minutes to get from a bus stop to another for the airport shuttle
-            }
-            else
-            {
-                travelTime = (int) (numberOfBusStopsToTravel * 2.5);  // 2.5 Minutes to get from a bus stop to another for other buses
-            }
-        }
-
-        return travelTime;
     }
 
     // Everything to do with indirect trips
@@ -754,12 +745,12 @@ public class TripPlannerActivity extends AppCompatActivity implements
             {
                 numberOfIndirectTripQueriesMade++;
 
-                BusETAsOnLeg1BusRouteTask task = new BusETAsOnLeg1BusRouteTask(this,
-                        transitPoint.getBusRoutesToTransitPoint().get(i), transitPoint);
+                /*BusETAsOnLeg1BusRouteTask task = new BusETAsOnLeg1BusRouteTask(this,
+                        transitPoint.getBusRoutesToTransitPoint().get(i), transitPoint);*/
 
-                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                //task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
-                busETAsOnLeg1BusRouteTasks.add(task);
+                //busETAsOnLeg1BusRouteTasks.add(task);
             }
             else
             {
@@ -783,21 +774,21 @@ public class TripPlannerActivity extends AppCompatActivity implements
                     indirectTrip.setOriginBusStop(busRoute.getTripPlannerOriginBusStop());
                     indirectTrip.setDestinationBusStopName(destinationBusStopName);
 
-                    busRoute.getBusRouteBuses().get(0).setBusETA(calculateTravelTime(DbQueries.getNumberOfStopsBetweenRouteOrders(db,
+                    /*busRoute.getBusRouteBuses().get(0).setBusETA(calculateTravelTime(DbQueries.getNumberOfStopsBetweenRouteOrders(db,
                             busRoute.getBusRouteId(), busRoute.getBusRouteBuses().get(0).getBusRouteOrder(), busRoute.getTripPlannerOriginBusStop()
-                                    .getBusStopRouteOrder()), busRoute.getBusRouteNumber()));
+                                    .getBusStopRouteOrder()), busRoute.getBusRouteNumber()));*/
 
-                    busRoute.getBusRouteBuses().get(0).setBusETAToTransitPoint(calculateTravelTime(DbQueries.getNumberOfStopsBetweenRouteOrders(db,
+                    /*busRoute.getBusRouteBuses().get(0).setBusETAToTransitPoint(calculateTravelTime(DbQueries.getNumberOfStopsBetweenRouteOrders(db,
                             busRoute.getBusRouteId(), busRoute.getBusRouteBuses().get(0).getBusRouteOrder(), busRoute.getTripPlannerDestinationBusStop()
-                                    .getBusStopRouteOrder()), busRoute.getBusRouteNumber()));
+                                    .getBusStopRouteOrder()), busRoute.getBusRouteNumber()));*/
 
-                    indirectTrip.setBusToTransitPoint(busRoute.getBusRouteBuses().get(0));
+                    //indirectTrip.setBusToTransitPoint(busRoute.getBusRouteBuses().get(0));
                     indirectTrip.setTransitPoint(transitPoint);
 
                     if (transitPoint.getBusRoutesFromTransitPoint().size() != 0)
                     {
-                        indirectTrip.setBusFromTransitPoint(transitPoint.getBusRoutesFromTransitPoint().get(0)
-                                .getBusRouteBuses().get(0));
+                        //indirectTrip.setBusFromTransitPoint(transitPoint.getBusRoutesFromTransitPoint().get(0)
+                                //.getBusRouteBuses().get(0));
                     }
                     else
                     {
@@ -809,7 +800,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
                     {
                         for (Bus busFromTP : busRouteFromTP.getBusRouteBuses())
                         {
-                            if (busFromTP.getBusETA() > (indirectTrip.getBusToTransitPoint().getBusETAToTransitPoint() + 2))
+                            /*if (busFromTP.getBusETA() > (indirectTrip.getBusToTransitPoint().getBusETAToTransitPoint() + 2))
                             {
                                 if (bus != null)
                                 {
@@ -822,13 +813,13 @@ public class TripPlannerActivity extends AppCompatActivity implements
                                 {
                                     bus = busFromTP;
                                 }
-                            }
+                            }*/
                         }
                     }
 
-                    indirectTrip.setBusFromTransitPoint(bus);
+                    //indirectTrip.setBusFromTransitPoint(bus);
 
-                    if (indirectTrip.getBusToTransitPoint() != null && indirectTrip.getBusFromTransitPoint() != null)
+                    /*if (indirectTrip.getBusToTransitPoint() != null && indirectTrip.getBusFromTransitPoint() != null)
                     {
                         int travelTimeFromTPToDest = calculateTravelTime(DbQueries.getNumberOfStopsBetweenRouteOrders(db,
                                 indirectTrip.getBusFromTransitPoint().getBusRoute().getBusRouteId(), indirectTrip.getBusFromTransitPoint()
@@ -863,7 +854,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
                                 IndirectTripsRecyclerViewAdapter(this, transitPointsToDisplay);
                         recyclerView.setAdapter(adapter);
                         recyclerView.setVisibility(View.VISIBLE);
-                    }
+                    }*/
                 }
                 else
                 {
@@ -893,13 +884,36 @@ public class TripPlannerActivity extends AppCompatActivity implements
 
     // Other stuff
 
-    private void checkTripIsFavorite(String originBusStopName, String destinationBusStopName)
+    private void checkIfTripIsFavorite(String originBusStopName, String destinationBusStopName)
     {
-        boolean tripsIsFavorite = false;
+        try
+        {
+            FileInputStream fileInputStream = openFileInput(Constants.FAVORITES_FILE_NAME);
+            InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 
-        //TODO Check if trip is a favorite trip or not
+            ArrayList<String> favorites = new ArrayList<>();
+            String line;
 
-        if (tripsIsFavorite)
+            while ((line = bufferedReader.readLine()) != null)
+            {
+                favorites.add(line);
+            }
+
+            isFavorite = favorites.contains("^%t" + originBusStopName + "^%td" +
+                    destinationBusStopName);
+
+            favorites.trimToSize();
+            fileInputStream.close();
+            inputStreamReader.close();
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        if (isFavorite)
         {
             favoritesFloatingActionButton.setImageResource(R.drawable.ic_favorite_white);
         }
@@ -911,7 +925,76 @@ public class TripPlannerActivity extends AppCompatActivity implements
 
     private void favoriteTrip(String originBusStopName, String destinationBusStopName)
     {
+        if (!isFavorite)
+        {
+            try
+            {
+                FileOutputStream fileOutputStream = openFileOutput(Constants.FAVORITES_FILE_NAME,
+                        MODE_APPEND);
 
+                fileOutputStream.write(("^%t" + originBusStopName + "^%td" + destinationBusStopName +
+                        "\n").getBytes());
+
+                Toast.makeText(this, "Added trip to favourites.", Toast.LENGTH_SHORT)
+                        .show();
+
+                fileOutputStream.close();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+                Toast.makeText(this, "Unknown error occurred! Couldn't favourite this trip...",
+                        Toast.LENGTH_SHORT).show();
+            }
+
+            favoritesFloatingActionButton.setImageResource(R.drawable.ic_favorite_white);
+            isFavorite = true;
+        }
+        else
+        {
+            try
+            {
+                FileInputStream fileInputStream = openFileInput(Constants.FAVORITES_FILE_NAME);
+                InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream,
+                        "UTF-8");
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+                ArrayList<String> favorites = new ArrayList<>();
+                String line;
+
+                while ((line = bufferedReader.readLine()) != null)
+                {
+                    favorites.add(line);
+                }
+
+                favorites.remove("^%t" + originBusStopName + "^%td" + destinationBusStopName);
+
+                Toast.makeText(this, "Removed trip from favourites.", Toast.LENGTH_SHORT)
+                        .show();
+
+                favorites.trimToSize();
+                fileInputStream.close();
+                inputStreamReader.close();
+
+                FileOutputStream fileOutputStream = openFileOutput(Constants.FAVORITES_FILE_NAME,
+                        MODE_PRIVATE);
+                for (String favorite : favorites)
+                {
+                    fileOutputStream.write((favorite + "\n").getBytes());
+                }
+                fileOutputStream.close();
+
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                Toast.makeText(this, "Unknown error occurred! Couldn't un-favourite this trip...",
+                        Toast.LENGTH_SHORT).show();
+            }
+
+            favoritesFloatingActionButton.setImageResource(R.drawable.ic_favorite_border_white);
+            isFavorite = false;
+        }
     }
 
     private void setErrorLayoutContent(int drawableResId, String errorMessage, String resolutionButtonText)

@@ -1,86 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary"
     tools:context="com.bangalorebuses.busarrivals.BusesArrivingAtBusStopActivity">
 
-    <RelativeLayout
-        android:id="@+id/action_bar_relative_layout"
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:padding="@dimen/layout_padding">
+        android:background="@color/colorPrimary">
 
-        <ImageView
-            android:id="@+id/back_button_image_view"
-            android:layout_width="@dimen/image_view_width"
-            android:layout_height="@dimen/image_view_height"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="@dimen/layout_margin"
-            android:layout_marginRight="@dimen/layout_margin"
-            android:clickable="true"
-            android:src="@drawable/ic_arrow_back_white"/>
-
-        <TextView
-            android:id="@+id/title_text_view"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:layout_toEndOf="@id/back_button_image_view"
-            android:layout_toRightOf="@id/back_button_image_view"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="@string/bus_stops_title"
-            android:textColor="@color/white_text_color"
-            android:textSize="20sp"/>
+            android:paddingBottom="@dimen/layout_padding"
+            android:paddingTop="@dimen/layout_padding">
 
-        <ImageView
-            android:id="@+id/favorite_image_view"
-            android:layout_width="@dimen/image_view_width"
-            android:layout_height="@dimen/image_view_height"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="@dimen/layout_margin"
-            android:layout_marginStart="@dimen/layout_margin"
-            android:clickable="true"
-            android:src="@drawable/ic_favorite_border_white"/>
+            <ImageView
+                android:id="@+id/back_button_image_view"
+                android:layout_width="@dimen/image_view_width"
+                android:layout_height="@dimen/image_view_height"
+                android:layout_alignParentTop="true"
+                android:layout_marginEnd="@dimen/layout_margin"
+                android:layout_marginRight="@dimen/layout_margin"
+                android:background="?selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_arrow_back_white"/>
 
-    </RelativeLayout>
+            <TextView
+                android:id="@+id/bus_stop_name_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_toEndOf="@id/back_button_image_view"
+                android:layout_toRightOf="@id/back_button_image_view"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Dodda Nekkundi"
+                android:textColor="@color/white_text_color"
+                android:textSize="@dimen/text_size_big"
+                android:textStyle="bold"/>
 
-    <TextView
-        android:id="@+id/busStopDirectionNameTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/action_bar_relative_layout"
-        android:background="@color/colorPrimaryDark"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:padding="@dimen/layout_padding"
-        android:textAlignment="center"
-        android:textColor="@color/white_text_color"
-        android:textSize="@dimen/text_size_big"/>
+            <TextView
+                android:id="@+id/bus_stop_direction_name_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/bus_stop_name_text_view"
+                android:layout_toEndOf="@id/back_button_image_view"
+                android:layout_toRightOf="@id/back_button_image_view"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="towards - Marathahalli Bridge"
+                android:textColor="@color/white_text_color"
+                android:textSize="@dimen/text_size_medium"/>
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.Toolbar>
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/busStopDirectionNameTextView"
-        android:layout_margin="@dimen/layout_margin"
-        android:background="@drawable/white_rounded_background_borderless">
+        android:layout_below="@id/toolbar">
 
         <ListView
             android:id="@+id/busesArrivingAtBusStopListView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:animateLayoutChanges="false"
-            android:scrollbars="none"/>
+            android:layout_height="wrap_content"/>
 
     </android.support.v4.widget.SwipeRefreshLayout>
 
@@ -88,9 +77,8 @@
         android:id="@+id/errorLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/busStopDirectionNameTextView"
+        android:layout_below="@id/toolbar"
         android:layout_margin="@dimen/layout_margin"
-        android:background="@drawable/white_rounded_background_borderless"
         android:gravity="center"
         android:orientation="vertical"
         android:visibility="visible">
@@ -124,5 +112,16 @@
             android:textColor="@color/colorSpecialServiceBus"/>
 
     </LinearLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/favorites_floating_action_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="@dimen/layout_margin"
+        android:src="@drawable/ic_favorite_border_white"
+        app:fabSize="mini"/>
 
 </RelativeLayout>

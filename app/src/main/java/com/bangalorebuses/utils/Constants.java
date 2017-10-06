@@ -1,6 +1,8 @@
 package com.bangalorebuses.utils;
 
 import android.database.sqlite.SQLiteDatabase;
+import android.os.StrictMode;
+import android.util.StringBuilderPrinter;
 
 /**
  * This class is used to store all the constant values in the app.
@@ -54,10 +56,18 @@ public class Constants
     public static final int FAVORITES_REQUEST_CODE = 4;
     public static final String BUS_STOP_NAME = "BUS_STOP_NAME";
     public static final String BUS_ROUTE_NUMBER = "BUS_ROUTE_NUMBER";
+    public static final String TRIP_ORIGIN_BUS_STOP_NAME = "FAV_ORIGIN_BUS_STOP_NAME";
+    public static final String TRIP_DESTINATION_BUS_STOP_NAME = "FAV_DESTINATION_BUS_STOP_NAME";
     public static SQLiteDatabase db;
 
     // Constants for IndirectTripDetailsActivity
     public static final String ORIGIN_BUS_STOP_NAME = "PARAM_ORIGIN_BUS_STOP_NAME";
     public static final String TRANSIT_POINT_BUS_STOP_NAME = "PARAM_TRANSIT_POINT_BUS_STOP_NAME";
     public static final String DESTINATION_BUS_STOP_NAME = "PARAM_DESTINATION_BUS_STOP_NAME";
+
+    // BusRoute service type constants
+    public static final String SERVICE_TYPE_NON_AC = "ORDINARY_SERVICE";
+    public static final String SERVICE_TYPE_AC = "VAJRA_SERVICE";
+    public static final String SERVICE_TYPE__NON_AC_METRO_FEEDER = "METRO_FEEDER_SERVICE";
+    public static final String SERVICE_TYPE_AIRPORT_SHUTTLE = "VAYU_VAJRA_SERVICE";
 }

@@ -4,7 +4,9 @@ import android.os.AsyncTask;
 
 import com.bangalorebuses.core.Bus;
 import com.bangalorebuses.core.BusRoute;
+import com.bangalorebuses.utils.CommonMethods;
 import com.bangalorebuses.utils.Constants;
+import com.bangalorebuses.utils.DbQueries;
 
 import org.json.JSONArray;
 
@@ -20,21 +22,23 @@ import static com.bangalorebuses.utils.Constants.NETWORK_QUERY_JSON_EXCEPTION;
 import static com.bangalorebuses.utils.Constants.NETWORK_QUERY_NO_ERROR;
 import static com.bangalorebuses.utils.Constants.NETWORK_QUERY_REQUEST_TIMEOUT_EXCEPTION;
 import static com.bangalorebuses.utils.Constants.NETWORK_QUERY_URL_EXCEPTION;
+import static com.bangalorebuses.utils.Constants.db;
 
 public class BusETAsOnLeg1BusRouteTask extends AsyncTask<Void, Void, Void>
 {
     private IndirectTripHelper caller;
+    private IndirectTrip indirectTrip;
     private String errorMessage = NETWORK_QUERY_NO_ERROR;
     private ArrayList<Bus> buses = new ArrayList<>();
     private BusRoute busRoute;
     private TransitPoint transitPoint;
 
 
-    public BusETAsOnLeg1BusRouteTask(IndirectTripHelper caller, BusRoute busRoute, TransitPoint transitPoint)
+    public BusETAsOnLeg1BusRouteTask(IndirectTripHelper caller, IndirectTrip indirectTrip)
     {
         this.caller = caller;
-        this.busRoute = busRoute;
-        this.transitPoint = transitPoint;
+        this.busRoute = indirectTrip.getBusRouteOnFirstLeg();
+        this.indirectTrip = indirectTrip;
     }
 
     @Override
@@ -118,6 +122,9 @@ public class BusETAsOnLeg1BusRouteTask extends AsyncTask<Void, Void, Void>
                                 if (bus.getBusRouteOrder() != 1 || busRoute.getTripPlannerOriginBusStop()
                                         .getBusStopRouteOrder() == 1)
                                 {
+                                    bus.setBusETA(CommonMethods.calculateTravelTime(busRoute.getBusRouteId(),
+                                            busRoute.getBusRouteServiceType(), bus.getBusRouteOrder(),
+                                            busRoute.getTripPlannerOriginBusStop().getBusStopRouteOrder()));
                                     buses.add(bus);
                                 }
                             }
@@ -147,6 +154,7 @@ public class BusETAsOnLeg1BusRouteTask extends AsyncTask<Void, Void, Void>
     protected void onPostExecute(Void param)
     {
         super.onPostExecute(param);
+
         if (!isCancelled())
         {
             caller.onBusETAsOnLeg1BusRouteFound(errorMessage, busRoute, transitPoint);

@@ -143,13 +143,13 @@
         android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/toolbar"
-        android:layout_marginTop="@dimen/layout_margin_small">
+        android:layout_below="@id/toolbar">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:paddingTop="@dimen/layout_padding_small"/>
 
     </android.support.v4.widget.SwipeRefreshLayout>
 
@@ -196,12 +196,12 @@
     </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
+        android:id="@+id/favorites_floating_action_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:id="@+id/favorites_floating_action_button"
         android:layout_margin="@dimen/layout_margin"
         android:src="@drawable/ic_favorite_border_white"
         app:fabSize="mini"/>

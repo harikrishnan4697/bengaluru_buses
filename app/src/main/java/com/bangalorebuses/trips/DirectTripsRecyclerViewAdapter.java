@@ -111,7 +111,7 @@ class DirectTripsRecyclerViewAdapter extends RecyclerView
 
         if (directTrips.get(position).getOriginBusStop().getBusStopDirectionName().contains(")"))
         {
-            holder.originBusStopNameTextView.setText("From " + directTrips.get(position)
+            holder.originBusStopNameTextView.setText(directTrips.get(position)
                     .getOriginBusStop().getBusStopName() + " " + directTrips.get(position)
                     .getOriginBusStop().getBusStopDirectionName().substring(0, directTrips
                             .get(position).getOriginBusStop().getBusStopDirectionName()
@@ -119,7 +119,7 @@ class DirectTripsRecyclerViewAdapter extends RecyclerView
         }
         else
         {
-            holder.originBusStopNameTextView.setText("From " + directTrips.get(position)
+            holder.originBusStopNameTextView.setText(directTrips.get(position)
                     .getOriginBusStop().getBusStopName() + " " + directTrips.get(position)
                     .getOriginBusStop().getBusStopDirectionName());
         }

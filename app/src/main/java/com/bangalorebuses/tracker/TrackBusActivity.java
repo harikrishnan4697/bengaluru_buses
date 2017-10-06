@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -30,6 +31,7 @@ import com.bangalorebuses.core.Bus;
 import com.bangalorebuses.core.BusRoute;
 import com.bangalorebuses.core.BusStop;
 import com.bangalorebuses.utils.BusETAsOnBusRouteTask;
+import com.bangalorebuses.utils.CommonMethods;
 import com.bangalorebuses.utils.Constants;
 import com.bangalorebuses.utils.DbQueries;
 import com.bangalorebuses.utils.NetworkingHelper;
@@ -84,7 +86,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
     private ImageView errorImageView;
     private TextView errorTextView;
     private TextView errorResolutionTextView;
-    private ImageView favoriteImageView;
+    private FloatingActionButton favoritesFloatingActionButton;
     private boolean isFavorite = false;
 
     @Override
@@ -98,7 +100,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
 
         // Initialise XML elements
         TextView titleTextView = (TextView) findViewById(R.id.title_text_view);
-        titleTextView.setText(getIntent().getStringExtra("ROUTE_NUMBER") + " Buses");
+        titleTextView.setText(getIntent().getStringExtra("ROUTE_NUMBER"));
 
         ImageView backButtonImageView = (ImageView) findViewById(R.id.back_button_image_view);
         backButtonImageView.setOnClickListener(new View.OnClickListener()
@@ -110,15 +112,17 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
             }
         });
 
-        /*favoriteImageView = (ImageView) findViewById(R.id.favorite_image_view);
-        favoriteImageView.setOnClickListener(new View.OnClickListener()
+        favoritesFloatingActionButton = (FloatingActionButton) findViewById(R.id
+                .favorites_floating_action_button);
+        favoritesFloatingActionButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
                 favoriteBusRoute();
             }
-        });*/
+        });
+        initialiseFavorites();
 
         listView = (ListView) findViewById(R.id.listView);
         spinner = (Spinner) findViewById(R.id.route_stop_list_spinner);
@@ -327,11 +331,11 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
 
         if (isFavorite)
         {
-            favoriteImageView.setImageResource(R.drawable.ic_favorite_white);
+            favoritesFloatingActionButton.setImageResource(R.drawable.ic_favorite_white);
         }
         else
         {
-            favoriteImageView.setImageResource(R.drawable.ic_favorite_border_white);
+            favoritesFloatingActionButton.setImageResource(R.drawable.ic_favorite_border_white);
         }
     }
 
@@ -363,7 +367,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
                 Toast.makeText(this, "Unknown error occurred! Couldn't favourite this bus...", Toast.LENGTH_SHORT).show();
             }
 
-            favoriteImageView.setImageResource(R.drawable.ic_favorite_white);
+            favoritesFloatingActionButton.setImageResource(R.drawable.ic_favorite_white);
             isFavorite = true;
         }
         else
@@ -413,7 +417,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
                 Toast.makeText(this, "Unknown error occurred! Couldn't un-favourite this bus...", Toast.LENGTH_SHORT).show();
             }
 
-            favoriteImageView.setImageResource(R.drawable.ic_favorite_border_white);
+            favoritesFloatingActionButton.setImageResource(R.drawable.ic_favorite_border_white);
             isFavorite = false;
         }
     }
@@ -523,8 +527,9 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
             {
                 for (Bus bus : buses)
                 {
-                    bus.setBusETA(calculateTravelTime(DbQueries.getNumberOfStopsBetweenRouteOrders(db, busRoute.getBusRouteId(),
-                            bus.getBusRouteOrder(), busStopRouteOrder), busRoute.getBusRouteNumber()));
+                    bus.setBusETA(CommonMethods.calculateTravelTime(busRoute.getBusRouteId(),
+                            busRoute.getBusRouteNumber(), bus.getBusRouteOrder(),
+                            busStopRouteOrder));
 
                     String currentlyNearBusStop = "Unknown";
                     for (BusStop busStop : busRoute.getBusRouteStops())
@@ -605,54 +610,6 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
                 listView.setVisibility(View.GONE);
             }
         }
-    }
-
-    private int calculateTravelTime(int numberOfBusStopsToTravel, String routeNumber)
-    {
-        Calendar calendar = Calendar.getInstance();
-        int travelTime;
-
-        if ((calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) || (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY))
-        {
-            // Check if the bus is an airport shuttle (airport shuttles take longer to travel
-            // from one bus stop to another as they don't stop at all bus stops)
-            if (routeNumber.contains("KIAS-"))
-            {
-                travelTime = numberOfBusStopsToTravel * 4;  // 4 Minutes to get from a bus stop to another for the airport shuttle weekends
-            }
-            else
-            {
-                travelTime = numberOfBusStopsToTravel * 2;  // 2 Minutes to get from a bus stop to another for other buses during weekends
-            }
-        }
-        else if ((calendar.get(Calendar.HOUR_OF_DAY) > 7 && calendar.get(Calendar.HOUR_OF_DAY) < 11) || (calendar.get(Calendar.HOUR_OF_DAY) > 16 && calendar.get(Calendar.HOUR_OF_DAY) < 21))
-        {
-            // Check if the bus is an airport shuttle (airport shuttles take longer to travel
-            // from one bus stop to another as they don't stop at all bus stops)
-            if (routeNumber.contains("KIAS-"))
-            {
-                travelTime = numberOfBusStopsToTravel * 5;  // 5 Minutes to get from a bus stop to another for the airport shuttle in peak-time
-            }
-            else
-            {
-                travelTime = numberOfBusStopsToTravel * 3;  // 3 Minutes to get from a bus stop to another for other buses in peak-time
-            }
-        }
-        else
-        {
-            // Check if the bus is an airport shuttle (airport shuttles take longer to travel
-            // from one bus stop to another as they don't stop at all bus stops)
-            if (routeNumber.contains("KIAS-"))
-            {
-                travelTime = numberOfBusStopsToTravel * 4;  // 4 Minutes to get from a bus stop to another for the airport shuttle
-            }
-            else
-            {
-                travelTime = (int) (numberOfBusStopsToTravel * 2.5);  // 2.5 Minutes to get from a bus stop to another for other buses
-            }
-        }
-
-        return travelTime;
     }
 
     private void setErrorLayoutContent(int drawableResId, String errorMessage, String resolutionButtonText)

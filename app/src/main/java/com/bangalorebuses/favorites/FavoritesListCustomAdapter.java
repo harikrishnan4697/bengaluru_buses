@@ -94,6 +94,13 @@ public class FavoritesListCustomAdapter extends BaseAdapter
         else
         {
             holder.favoriteTypeImageView.setImageResource(R.drawable.ic_directions_black);
+
+            String originBusStopName = favorites.get(position).substring(favorites.get(position)
+                    .indexOf("^%t") + 3, favorites.get(position).indexOf("^%td"));
+            String destinationBusStopName = favorites.get(position).substring(favorites.get(position)
+                    .indexOf("^%td") + 4, favorites.get(position).length());
+
+            holder.favoriteNameTextView.setText(originBusStopName + " to " + destinationBusStopName);
         }
 
         holder.favoriteNameTextView.setOnClickListener(new View.OnClickListener()

@@ -175,21 +175,4 @@ public class DbQueries
         cursor.close();
         return stopNames;
     }
-
-    public static int getNumberOfStopsBetweenRouteOrders(SQLiteDatabase db, int routeId, int routeOrder1, int routeOrder2)
-    {
-        Cursor cursor = db.rawQuery("select count(*) from RouteStops where RouteStops.RouteId = " + routeId +
-                " and RouteStops.StopRouteOrder > " + routeOrder1 + " and RouteStops.StopRouteOrder <= " + routeOrder2, null);
-        if (cursor.moveToNext())
-        {
-            int numberOfStopsBetweenRouteOrders = cursor.getInt(0);
-            cursor.close();
-            return numberOfStopsBetweenRouteOrders;
-        }
-        else
-        {
-            cursor.close();
-            return -1;
-        }
-    }
 }

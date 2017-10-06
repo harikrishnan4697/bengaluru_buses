@@ -73,11 +73,6 @@ public class DirectTrip extends Trip
         }
         holder.firstLegBusETAsTextView.setText(nextThreeBuses);
 
-        holder.firstLegRideTheBusTextView.setText("Ride the bus for " + String.valueOf
-                (DbQueries.getNumberOfStopsBetweenRouteOrders(db, busRoute.getBusRouteId(), busRoute.getTripPlannerOriginBusStop()
-                        .getBusStopRouteOrder(), busRoute.getTripPlannerDestinationBusStop()
-                        .getBusStopRouteOrder())) + " stops");
-
         holder.transitPointInfoLinearLayout.setVisibility(View.GONE);
         holder.secondLegInfoRelativeLayout.setVisibility(View.GONE);
     }

@@ -273,6 +273,22 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
 
             startActivity(busesArrivingAtBusStopIntent);
         }
+        else
+        {
+            Intent tripPlannerIntent = new Intent(this, TripPlannerActivity.class);
+
+            String originBusStopName = favorite.substring(favorite
+                    .indexOf("^%t") + 3, favorite.indexOf("^%td"));
+            String destinationBusStopName = favorite.substring(favorite
+                    .indexOf("^%td") + 4, favorite.length());
+
+            tripPlannerIntent.putExtra(Constants.TRIP_ORIGIN_BUS_STOP_NAME,
+                    originBusStopName);
+            tripPlannerIntent.putExtra(Constants.TRIP_DESTINATION_BUS_STOP_NAME,
+                    destinationBusStopName);
+
+            startActivity(tripPlannerIntent);
+        }
     }
 
     @Override
