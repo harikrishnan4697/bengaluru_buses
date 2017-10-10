@@ -11,6 +11,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark"
         android:layout_alignParentTop="true"
         android:background="@color/colorPrimary"
         android:paddingBottom="@dimen/layout_padding"
@@ -31,8 +32,9 @@
                 android:layout_alignParentTop="true"
                 android:layout_marginEnd="@dimen/layout_margin"
                 android:layout_marginRight="@dimen/layout_margin"
+                android:clickable="true"
                 android:background="?selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_arrow_back_white"/>
+                android:src="@drawable/ic_action_back"/>
 
             <ImageView
                 android:id="@+id/swap_direction_image_view"

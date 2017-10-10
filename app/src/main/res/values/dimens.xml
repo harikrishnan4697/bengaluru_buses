@@ -30,4 +30,7 @@
     <!-- CardView dimensions -->
     <dimen name="card_view_corner_radius">5dp</dimen>
 
+    <!-- Elevation dimentions -->
+    <dimen name="layout_elevation">4dp</dimen>
+
 </resources>

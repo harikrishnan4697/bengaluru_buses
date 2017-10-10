@@ -14,6 +14,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bangalorebuses.R;
+import com.bangalorebuses.utils.CommonMethods;
 import com.bangalorebuses.utils.Constants;
 
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ class IndirectTripsRecyclerViewAdapter extends RecyclerView
     }
 
     @Override
-    public void onBindViewHolder(final IndirectTripsViewHolder holder, int position)
+    public void onBindViewHolder(final IndirectTripsViewHolder holder, final int position)
     {
         holder.cardView.setOnClickListener(new View.OnClickListener()
         {
@@ -67,25 +68,25 @@ class IndirectTripsRecyclerViewAdapter extends RecyclerView
         holder.secondLegBusRouteNumberTextView.setText(transitPoints.get(position)
                 .getFastestBusFromTransitPoint().getBusRoute().getBusRouteNumber());*/
 
-        String travelTime;
-
-        if (transitPoints.get(position).getShortestTripDuration() >= 60)
-        {
-            int hours = transitPoints.get(position).getShortestTripDuration()
-                    / 60;
-            travelTime = hours + " hr " + transitPoints.get(position)
-                    .getShortestTripDuration() % 60 + " min";
-        }
-        else
-        {
-            travelTime = transitPoints.get(position).getShortestTripDuration()
-                    + " min";
-        }
-
-        holder.tripDurationTextView.setText(travelTime);
+        holder.tripDurationTextView.setText(CommonMethods.convertMinutesToHoursAndMinutes(
+                transitPoints.get(position).getShortestTripDuration()));
 
         holder.transitPointBusStopNameTextView.setText(transitPoints.get(position)
                 .getTransitPointName());
+
+        holder.cardView.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                Intent indirectTripDetailsActivityIntent = new Intent(
+                        context, IndirectTripDetailsActivity.class);
+                indirectTripDetailsActivityIntent.putExtra(Constants.ORIGIN_BUS_STOP_NAME, "");
+                indirectTripDetailsActivityIntent.putExtra(Constants.TRANSIT_POINT_BUS_STOP_NAME, "");
+                indirectTripDetailsActivityIntent.putExtra(Constants.DESTINATION_BUS_STOP_NAME, "");
+                context.startActivity(indirectTripDetailsActivityIntent);
+            }
+        });
     }
 
     @Override

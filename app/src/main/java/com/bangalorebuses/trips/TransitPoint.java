@@ -8,6 +8,7 @@ import java.util.ArrayList;
 public class TransitPoint
 {
     private String transitPointName;
+    private String transitPointDirectionName;
     private int numberOfRoutesBetweenOriginAndTransitPoint;
     private int numberOfRoutesBetweenTransitPointAndDestination;
     private int transitPointScore;
@@ -121,5 +122,15 @@ public class TransitPoint
     public void setShortestTripDuration(int shortestTripDuration)
     {
         this.shortestTripDuration = shortestTripDuration;
+    }
+
+    public String getTransitPointDirectionName()
+    {
+        return transitPointDirectionName;
+    }
+
+    public void setTransitPointDirectionName(String transitPointDirectionName)
+    {
+        this.transitPointDirectionName = transitPointDirectionName;
     }
 }

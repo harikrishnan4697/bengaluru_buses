@@ -17,36 +17,37 @@ import java.util.Date;
 
 import static com.bangalorebuses.utils.Constants.db;
 
-public class BusRoutesToAndFromTransitPointDbTask extends AsyncTask<Void, Void, Void>
+public class BusRoutesToAndFromTransitPointDbTask extends AsyncTask<Void, Void, TransitPoint>
 {
-    private TransitPoint transitPoint;
+    private String transitPointBusStopName;
     private String originBusStopName;
     private String destinationBusStopName;
     private IndirectTripHelper caller;
 
-    public BusRoutesToAndFromTransitPointDbTask(IndirectTripHelper caller, String originBusStopName, TransitPoint transitPoint,
-                                                String destinationBusStopName)
+    public BusRoutesToAndFromTransitPointDbTask(IndirectTripHelper caller, String originBusStopName,
+                                                String transitPointBusStopName, String destinationBusStopName)
     {
         this.caller = caller;
         this.originBusStopName = originBusStopName;
-        this.transitPoint = transitPoint;
+        this.transitPointBusStopName = transitPointBusStopName;
         this.destinationBusStopName = destinationBusStopName;
     }
 
     @Override
-    protected Void doInBackground(Void... params)
+    protected TransitPoint doInBackground(Void... params)
     {
+        TransitPoint transitPoint = new TransitPoint();
+        transitPoint.setTransitPointName(transitPointBusStopName);
         transitPoint.setBusRoutesToTransitPoint(getBusRoutesOnFirstLeg());
         transitPoint.setBusRoutesFromTransitPoint(getBusRoutesOnSecondLeg());
-
-        return null;
+        return transitPoint;
     }
 
     private ArrayList<BusRoute> getBusRoutesOnFirstLeg()
     {
         // Get all the bus routes from the origin bus stop to the transit point bus stop
         ArrayList<BusRoute> originToTransitPointBusRoutes = getBusRoutes(originBusStopName,
-                transitPoint.getTransitPointName());
+                transitPointBusStopName);
 
         // Create a temporary list to store only the bus routes that currently have buses in service
         ArrayList<BusRoute> tempOriginToTransitPointBuses = new ArrayList<>();
@@ -95,7 +96,7 @@ public class BusRoutesToAndFromTransitPointDbTask extends AsyncTask<Void, Void, 
     private ArrayList<BusRoute> getBusRoutesOnSecondLeg()
     {
         // Get all the bus routes from the transit point bus stop to the destination bus stop
-        ArrayList<BusRoute> transitPointToDestinationBusRoutes = getBusRoutes(transitPoint.getTransitPointName(),
+        ArrayList<BusRoute> transitPointToDestinationBusRoutes = getBusRoutes(transitPointBusStopName,
                 destinationBusStopName);
 
         // Create a temporary list to store only the bus routes that currently have buses in service
@@ -230,9 +231,9 @@ public class BusRoutesToAndFromTransitPointDbTask extends AsyncTask<Void, Void, 
     }
 
     @Override
-    protected void onPostExecute(Void param)
+    protected void onPostExecute(TransitPoint transitPoint)
     {
-        super.onPostExecute(param);
+        super.onPostExecute(transitPoint);
         caller.onBusRoutesToAndFromTransitPointFound(transitPoint);
     }
 }

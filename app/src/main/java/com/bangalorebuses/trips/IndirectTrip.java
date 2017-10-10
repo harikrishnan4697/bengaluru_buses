@@ -13,10 +13,12 @@ import static com.bangalorebuses.utils.Constants.db;
 public class IndirectTrip extends Trip
 {
     private int tripDuration;
+    private Bus busOnFirstLeg;
     private BusRoute busRouteOnFirstLeg;
+    private Bus busOnSecondLeg;
     private BusRoute busRouteOnSecondLeg;
-    private TransitPoint transitPoint;
     private BusStop originBusStop;
+    private TransitPoint transitPoint;
     private BusStop destinationBusStop;
 
     @Override
@@ -25,24 +27,24 @@ public class IndirectTrip extends Trip
 
     }
 
-    public BusRoute getBusRouteOnFirstLeg()
+    public Bus getBusOnFirstLeg()
     {
-        return busRouteOnFirstLeg;
+        return busOnFirstLeg;
     }
 
-    public void setBusRouteOnFirstLeg(BusRoute busRouteOnFirstLeg)
+    public void setBusOnFirstLeg(Bus busOnFirstLeg)
     {
-        this.busRouteOnFirstLeg = busRouteOnFirstLeg;
+        this.busOnFirstLeg = busOnFirstLeg;
     }
 
-    public BusRoute getBusRouteOnSecondLeg()
+    public Bus getBusOnSecondLeg()
     {
-        return busRouteOnSecondLeg;
+        return busOnSecondLeg;
     }
 
-    public void setBusRouteOnSecondLeg(BusRoute busRouteOnSecondLeg)
+    public void setBusOnSecondLeg(Bus busOnSecondLeg)
     {
-        this.busRouteOnSecondLeg = busRouteOnSecondLeg;
+        this.busOnSecondLeg = busOnSecondLeg;
     }
 
     public TransitPoint getTransitPoint()
@@ -85,5 +87,25 @@ public class IndirectTrip extends Trip
     public void setDestinationBusStop(BusStop destinationBusStop)
     {
         this.destinationBusStop = destinationBusStop;
+    }
+
+    public BusRoute getBusRouteOnFirstLeg()
+    {
+        return busRouteOnFirstLeg;
+    }
+
+    public void setBusRouteOnFirstLeg(BusRoute busRouteOnFirstLeg)
+    {
+        this.busRouteOnFirstLeg = busRouteOnFirstLeg;
+    }
+
+    public BusRoute getBusRouteOnSecondLeg()
+    {
+        return busRouteOnSecondLeg;
+    }
+
+    public void setBusRouteOnSecondLeg(BusRoute busRouteOnSecondLeg)
+    {
+        this.busRouteOnSecondLeg = busRouteOnSecondLeg;
     }
 }

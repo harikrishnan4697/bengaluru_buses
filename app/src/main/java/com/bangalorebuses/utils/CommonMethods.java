@@ -2,6 +2,10 @@ package com.bangalorebuses.utils;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.StringBuilderPrinter;
+
+import com.bangalorebuses.R;
+import com.bangalorebuses.core.BusStop;
 
 import java.util.Calendar;
 
@@ -9,16 +13,6 @@ import static com.bangalorebuses.utils.Constants.db;
 
 public class CommonMethods
 {
-    /**
-     * This method returns how long a bus on a particular bus route will
-     * take to travel a certain number of bus stops (in minutes).
-     *
-     * @param busRouteId          How many bus stops the travel time
-     *                            should be calculated for.
-     * @param busRouteServiceType The service type of the bus route.
-     * @return How many minutes traveling the specified number of bus
-     * stops will take for the specified bus route service type.
-     */
     public static int calculateTravelTime(int busRouteId, String busRouteNumber,
                                           int originBusStopRouteOrder, int destinationBusStopRouteOrder)
     {
@@ -98,5 +92,81 @@ public class CommonMethods
             cursor.close();
             return -1;
         }
+    }
+
+    public static String convertMinutesToHoursAndMinutes(int minutes)
+    {
+        if (minutes < 0)
+        {
+            return null;
+        }
+        else
+        {
+            String hoursAndMinutes;
+
+            if (minutes >= 60)
+            {
+                int hours = minutes / 60;
+                hoursAndMinutes = hours + " hr " + minutes % 60 + " min";
+            }
+            else
+            {
+                hoursAndMinutes = minutes + " min";
+            }
+
+            return hoursAndMinutes;
+        }
+    }
+
+    public static String getBusStopNameAndDirectionNameCombined(String busStopName,
+                                                                String busStopDirectionName)
+    {
+        if (busStopDirectionName == null)
+        {
+            return busStopName;
+        }
+        else
+        {
+            String busStopNameAndDirectionNameCombined;
+
+            if (busStopDirectionName.contains(")"))
+            {
+                busStopNameAndDirectionNameCombined = busStopName + " " +
+                        busStopDirectionName.substring(0, busStopDirectionName
+                                .indexOf(")") + 1);
+            }
+            else
+            {
+                busStopNameAndDirectionNameCombined = busStopName + " " +
+                        busStopDirectionName;
+            }
+
+            return busStopNameAndDirectionNameCombined;
+        }
+    }
+
+    public static int getBusRouteServiceTypeImageResId(String busRouteNumber)
+    {
+        int busRouteServiceTypeImageResId;
+
+        if (busRouteNumber.length() > 5 && busRouteNumber.contains("KIAS-"))
+        {
+            busRouteServiceTypeImageResId = R.drawable.ic_flight_blue;
+        }
+        else if (busRouteNumber.length() > 1 && busRouteNumber.substring(0, 2)
+                .equals("V-"))
+        {
+            busRouteServiceTypeImageResId = R.drawable.ic_directions_bus_ac;
+        }
+        else if (busRouteNumber.contains("MF-"))
+        {
+            busRouteServiceTypeImageResId = R.drawable.ic_directions_bus_special;
+        }
+        else
+        {
+            busRouteServiceTypeImageResId = R.drawable.ic_directions_bus_ordinary;
+        }
+
+        return busRouteServiceTypeImageResId;
     }
 }

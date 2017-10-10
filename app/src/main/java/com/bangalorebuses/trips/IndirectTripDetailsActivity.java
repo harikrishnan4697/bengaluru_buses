@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.bangalorebuses.R;
 import com.bangalorebuses.core.Bus;
 import com.bangalorebuses.core.BusRoute;
+import com.bangalorebuses.utils.CommonMethods;
 import com.bangalorebuses.utils.DbQueries;
 import com.bangalorebuses.utils.ErrorImageResIds;
 
@@ -57,7 +58,7 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recyclerView;
 
-    private ArrayList<IndirectTrip> indirectTrips = new ArrayList<>();
+    private ArrayList<IndirectTrip> indirectTripsToDisplay = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -116,13 +117,10 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
         if (originBusStopName != null && transitPointBusStopName != null
                 && destinationBusStopName != null)
         {
-            TransitPoint transitPoint = new TransitPoint();
-            transitPoint.setTransitPointName(transitPointBusStopName);
-
             // Execute the task that will query the db and return a list of bus routes
             // to the transit point and from the transit point.
             busRoutesToAndFromTransitPointDbTask = new BusRoutesToAndFromTransitPointDbTask(this,
-                    originBusStopName, transitPoint, destinationBusStopName);
+                    originBusStopName, transitPointBusStopName, destinationBusStopName);
             busRoutesToAndFromTransitPointDbTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
         else
@@ -134,17 +132,6 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
         }
     }
 
-    private void onTransitPointsFound()
-    {
-        TransitPoint transitPoint = new TransitPoint();
-        transitPoint.setTransitPointName(transitPointBusStopName);
-
-        BusRoutesToAndFromTransitPointDbTask task = new BusRoutesToAndFromTransitPointDbTask(this,
-                originBusStopName, transitPoint, destinationBusStopName);
-
-        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-    }
-
     @Override
     public void onBusRoutesToAndFromTransitPointFound(TransitPoint transitPoint)
     {
@@ -152,10 +139,9 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
         {
             if (i < transitPoint.getBusRoutesToTransitPoint().size())
             {
-                /*BusETAsOnLeg1BusRouteTask task = new BusETAsOnLeg1BusRouteTask(this,
-                        transitPoint.getBusRoutesToTransitPoint().get(i), transitPoint);*/
-
-                //task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                BusETAsOnLeg1BusRouteTask task = new BusETAsOnLeg1BusRouteTask(this,
+                        transitPoint, transitPoint.getBusRoutesToTransitPoint().get(i));
+                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             }
             else
             {
@@ -167,7 +153,7 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
     @Override
     public void onBusETAsOnLeg1BusRouteFound(String errorMessage, BusRoute busRoute, TransitPoint transitPoint)
     {
-        /*synchronized (this)
+        synchronized (this)
         {
             if (errorMessage.equals(NETWORK_QUERY_NO_ERROR))
             {
@@ -175,22 +161,21 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
                 {
                     IndirectTrip indirectTrip = new IndirectTrip();
                     indirectTrip.setOriginBusStop(busRoute.getTripPlannerOriginBusStop());
+                    indirectTrip.setTransitPoint(transitPoint);
                     indirectTrip.setDestinationBusStopName(destinationBusStopName);
 
-                    busRoute.getBusRouteBuses().get(0).setBusETA(calculateTravelTime(DbQueries.getNumberOfStopsBetweenRouteOrders(db,
-                            busRoute.getBusRouteId(), busRoute.getBusRouteBuses().get(0).getBusRouteOrder(), busRoute.getTripPlannerOriginBusStop()
-                                    .getBusStopRouteOrder()), busRoute.getBusRouteNumber()));
+                    busRoute.getBusRouteBuses().get(0).setBusETAToTransitPoint(
+                            CommonMethods.calculateTravelTime(busRoute.getBusRouteId(),
+                                    busRoute.getBusRouteNumber(), busRoute.getBusRouteBuses()
+                                            .get(0).getBusRouteOrder(), busRoute
+                                            .getTripPlannerDestinationBusStop()
+                                            .getBusStopRouteOrder()));
 
-                    busRoute.getBusRouteBuses().get(0).setBusETAToTransitPoint(calculateTravelTime(DbQueries.getNumberOfStopsBetweenRouteOrders(db,
-                            busRoute.getBusRouteId(), busRoute.getBusRouteBuses().get(0).getBusRouteOrder(), busRoute.getTripPlannerDestinationBusStop()
-                                    .getBusStopRouteOrder()), busRoute.getBusRouteNumber()));
-
-                    indirectTrip.setBusToTransitPoint(busRoute.getBusRouteBuses().get(0));
-                    indirectTrip.setTransitPoint(transitPoint);
+                    indirectTrip.setBusOnFirstLeg(busRoute.getBusRouteBuses().get(0));
 
                     if (transitPoint.getBusRoutesFromTransitPoint().size() != 0)
                     {
-                        indirectTrip.setBusFromTransitPoint(transitPoint.getBusRoutesFromTransitPoint().get(0)
+                        indirectTrip.setBusOnSecondLeg(transitPoint.getBusRoutesFromTransitPoint().get(0)
                                 .getBusRouteBuses().get(0));
                     }
                     else
@@ -203,7 +188,8 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
                     {
                         for (Bus busFromTP : busRouteFromTP.getBusRouteBuses())
                         {
-                            if (busFromTP.getBusETA() > (indirectTrip.getBusToTransitPoint().getBusETAToTransitPoint() + 2))
+                            if (busFromTP.getBusETA() > (indirectTrip.getBusOnFirstLeg()
+                                    .getBusETAToTransitPoint() + 2))
                             {
                                 if (bus != null)
                                 {
@@ -220,41 +206,30 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
                         }
                     }
 
-                    indirectTrip.setBusFromTransitPoint(bus);
+                    indirectTrip.setBusOnSecondLeg(bus);
 
-                    if (indirectTrip.getBusToTransitPoint() != null && indirectTrip.getBusFromTransitPoint() != null)
+                    if (indirectTrip.getBusOnFirstLeg() != null &&
+                            indirectTrip.getBusOnSecondLeg() != null)
                     {
-                        int travelTimeFromTPToDest = calculateTravelTime(DbQueries.getNumberOfStopsBetweenRouteOrders(db,
-                                indirectTrip.getBusFromTransitPoint().getBusRoute().getBusRouteId(), indirectTrip.getBusFromTransitPoint()
-                                        .getBusRoute().getTripPlannerOriginBusStop().getBusStopRouteOrder(), indirectTrip.getBusFromTransitPoint()
-                                        .getBusRoute().getTripPlannerDestinationBusStop().getBusStopRouteOrder()), indirectTrip.getBusFromTransitPoint()
-                                .getBusRoute().getBusRouteNumber());
+                        BusRoute busRouteOnSecondLeg = indirectTrip.getBusOnSecondLeg().getBusRoute();
 
-                        indirectTrip.setTripDuration(indirectTrip.getBusToTransitPoint().getBusETAToTransitPoint() + (indirectTrip.getBusFromTransitPoint()
-                                .getBusETA() - indirectTrip.getBusToTransitPoint().getBusETAToTransitPoint()) + travelTimeFromTPToDest);
+                        int travelTimeFromTPToDest = CommonMethods.calculateTravelTime(
+                                busRouteOnSecondLeg.getBusRouteId(), busRouteOnSecondLeg
+                                        .getBusRouteNumber(), busRouteOnSecondLeg
+                                        .getTripPlannerOriginBusStop().getBusStopRouteOrder(),
+                                busRouteOnSecondLeg.getTripPlannerDestinationBusStop()
+                                        .getBusStopRouteOrder());
 
-                        transitPoint.addIndirectTrip(indirectTrip);
+                        indirectTrip.setTripDuration(indirectTrip.getBusOnFirstLeg().getBusETAToTransitPoint() +
+                                (indirectTrip.getBusOnSecondLeg().getBusETA() - indirectTrip.getBusOnFirstLeg()
+                                        .getBusETAToTransitPoint()) + travelTimeFromTPToDest);
 
-                        boolean alreadyHasTransitPoint = false;
-                        for (TransitPoint transitPointToDisplay : transitPointsToDisplay)
-                        {
-                            if (transitPointToDisplay.getTransitPointName()
-                                    .equals(transitPoint.getTransitPointName()))
-                            {
-                                transitPointToDisplay.addIndirectTrip(indirectTrip);
-                                alreadyHasTransitPoint = true;
-                            }
-                        }
-
-                        if (!alreadyHasTransitPoint)
-                        {
-                            transitPointsToDisplay.add(transitPoint);
-                        }
+                        indirectTripsToDisplay.add(indirectTrip);
 
                         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
                         recyclerView.setLayoutManager(linearLayoutManager);
-                        IndirectTripsRecyclerViewAdapter adapter = new
-                                IndirectTripsRecyclerViewAdapter(this, transitPointsToDisplay);
+                        IndirectTripsDetailsRecyclerViewAdapter adapter = new
+                                IndirectTripsDetailsRecyclerViewAdapter(indirectTripsToDisplay);
                         recyclerView.setAdapter(adapter);
                         recyclerView.setVisibility(View.VISIBLE);
                     }
@@ -269,7 +244,7 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
                 //TODO Handle errors
             }
 
-            if (numberOfIndirectTripQueriesComplete == numberOfIndirectTripQueriesMade &&
+            /*if (numberOfIndirectTripQueriesComplete == numberOfIndirectTripQueriesMade &&
                     numberOfTransitPointQueriesComplete == numberOfTransitPointQueriesMade)
             {
                 swipeRefreshLayout.setRefreshing(false);
@@ -281,8 +256,8 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
                     errorLinearLayout.setVisibility(View.VISIBLE);
                     recyclerView.setVisibility(View.GONE);
                 }
-            }
-        }*/
+            }*/
+        }
     }
 
     @Override

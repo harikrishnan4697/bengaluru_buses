@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -24,6 +25,12 @@ public class BusStopsActivity extends AppCompatActivity
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        if (getSupportActionBar() != null)
+        {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setTitle("Bus stops");
+        }
 
         // Create the two tabs
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
@@ -61,7 +68,7 @@ public class BusStopsActivity extends AppCompatActivity
         });
 
         // Initialise some variables
-        ImageView backButtonImageView = (ImageView) findViewById(R.id.back_button_image_view);
+        /*ImageView backButtonImageView = (ImageView) findViewById(R.id.back_button_image_view);
         backButtonImageView.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -69,7 +76,21 @@ public class BusStopsActivity extends AppCompatActivity
             {
                 finish();
             }
-        });
+        });*/
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case android.R.id.home:
+                finish();
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return true;
     }
 
     /*@Override

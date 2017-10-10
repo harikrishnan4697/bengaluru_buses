@@ -27,18 +27,18 @@ import static com.bangalorebuses.utils.Constants.db;
 public class BusETAsOnLeg1BusRouteTask extends AsyncTask<Void, Void, Void>
 {
     private IndirectTripHelper caller;
-    private IndirectTrip indirectTrip;
     private String errorMessage = NETWORK_QUERY_NO_ERROR;
     private ArrayList<Bus> buses = new ArrayList<>();
-    private BusRoute busRoute;
     private TransitPoint transitPoint;
+    private BusRoute busRoute;
 
 
-    public BusETAsOnLeg1BusRouteTask(IndirectTripHelper caller, IndirectTrip indirectTrip)
+    public BusETAsOnLeg1BusRouteTask(IndirectTripHelper caller, TransitPoint transitPoint,
+                                     BusRoute busRoute)
     {
         this.caller = caller;
-        this.busRoute = indirectTrip.getBusRouteOnFirstLeg();
-        this.indirectTrip = indirectTrip;
+        this.transitPoint = transitPoint;
+        this.busRoute = busRoute;
     }
 
     @Override
@@ -123,7 +123,7 @@ public class BusETAsOnLeg1BusRouteTask extends AsyncTask<Void, Void, Void>
                                         .getBusStopRouteOrder() == 1)
                                 {
                                     bus.setBusETA(CommonMethods.calculateTravelTime(busRoute.getBusRouteId(),
-                                            busRoute.getBusRouteServiceType(), bus.getBusRouteOrder(),
+                                            busRoute.getBusRouteNumber(), bus.getBusRouteOrder(),
                                             busRoute.getTripPlannerOriginBusStop().getBusStopRouteOrder()));
                                     buses.add(bus);
                                 }
