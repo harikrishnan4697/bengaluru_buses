@@ -21,7 +21,6 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import com.bangalorebuses.R;
-import com.bangalorebuses.favorites.FavoritesActivity;
 import com.bangalorebuses.favorites.FavoritesHelper;
 import com.bangalorebuses.favorites.FavoritesListCustomAdapter;
 import com.bangalorebuses.utils.Constants;
@@ -170,15 +169,6 @@ public class SearchActivity extends AppCompatActivity implements SearchDbQueries
             }
         });
 
-        favoritesRelativeLayout.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                openFavoritesActivity(FAVORITES_TYPE_BUS_STOP);
-            }
-        });
-
         progressBar.setVisibility(View.GONE);
         searchEditText.setEnabled(true);
     }
@@ -282,16 +272,6 @@ public class SearchActivity extends AppCompatActivity implements SearchDbQueries
     public void onFavoriteDeleted(String favorite)
     {
 
-    }
-
-    private void openFavoritesActivity(String favoriteType)
-    {
-        Intent favoritesActivityIntent = new Intent(this,
-                FavoritesActivity.class);
-
-        favoritesActivityIntent.putExtra(FAVORITES_TYPE, favoriteType);
-
-        startActivityForResult(favoritesActivityIntent, FAVORITES_REQUEST_CODE);
     }
 
     @Override

@@ -34,7 +34,7 @@
                 android:layout_marginRight="@dimen/layout_margin"
                 android:clickable="true"
                 android:background="?selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_action_back"/>
+                android:src="@drawable/ic_arrow_back_white"/>
 
             <ImageView
                 android:id="@+id/swap_direction_image_view"

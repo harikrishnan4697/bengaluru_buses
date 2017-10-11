@@ -3,15 +3,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
     tools:context=".busstops.AllBusStopsFragment">
 
     <LinearLayout
         android:id="@+id/bus_stops_search_linear_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/layout_margin"
-        android:layout_marginRight="@dimen/layout_margin"
-        android:layout_marginTop="@dimen/layout_margin"
+        android:layout_marginLeft="@dimen/layout_margin_small"
+        android:layout_marginRight="@dimen/layout_margin_small"
+        android:layout_marginTop="@dimen/layout_margin_small"
+        android:background="@drawable/white_rounded_background_borderless"
         android:gravity="start"
         android:orientation="horizontal">
 
@@ -44,8 +46,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/bus_stops_search_linear_layout"
-        android:layout_marginTop="@dimen/layout_margin"
-        android:background="@drawable/white_rounded_background_borderless"/>
+        android:layout_marginTop="@dimen/layout_margin_small"
+        android:background="#FAFAFA"/>
 
     <ProgressBar
         android:id="@+id/progress_bar"

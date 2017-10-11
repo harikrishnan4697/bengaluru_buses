@@ -12,7 +12,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="150dp"
-        android:src="@drawable/web_hi_res"/>
+        android:src="@drawable/web_hi_res_512"/>
 
     <TextView
         android:id="@+id/appTitleTextView"
@@ -22,9 +22,8 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="60dp"
         android:gravity="center"
-        android:text="Bengaluru Buses"
         android:textAlignment="center"
         android:textColor="#FFFFFF"
-        android:textSize="35sp"/>
+        android:textSize="32sp"/>
 
 </RelativeLayout>

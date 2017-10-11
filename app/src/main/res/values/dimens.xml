@@ -28,9 +28,9 @@
     <dimen name="text_size_action_bar">24sp</dimen>
 
     <!-- CardView dimensions -->
-    <dimen name="card_view_corner_radius">5dp</dimen>
+    <dimen name="card_view_corner_radius">4dp</dimen>
 
-    <!-- Elevation dimentions -->
+    <!-- Elevation dimensions -->
     <dimen name="layout_elevation">4dp</dimen>
 
 </resources>

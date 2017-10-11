@@ -3,10 +3,8 @@ package com.bangalorebuses;
 import android.content.Intent;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Typeface;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
@@ -43,13 +41,9 @@ import java.util.Stack;
 
 public class MainActivity extends AppCompatActivity implements FavoritesHelper
 {
-    private ActionBar actionBar;
     private CountDownTimer countDownTimer;
     private boolean wasDisplayingSplashScreen = false;
     private boolean activityWasPaused = false;
-    private LinearLayout busesLinearLayout;
-    private LinearLayout busStopsLinearLayout;
-    private LinearLayout tripPlannerLinearLayout;
 
     private ListView favoritesListView;
     private LinearLayout noFavoritesLinearLayout;
@@ -58,31 +52,22 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        initializeActivity();
-    }
-
-    /**
-     * This method shows the app splash screen and then initialises some
-     * variables and fragments.
-     */
-    private void initializeActivity()
-    {
-        // Hide the action bar for the duration of the splash screen.
-        actionBar = getSupportActionBar();
-        if (actionBar != null)
-        {
-            actionBar.setElevation(0);
-            actionBar.hide();
-        }
 
         // Initialise some elements of the splash screen.
         setContentView(R.layout.splash_screen);
+
         TextView appTitleTextView = (TextView) findViewById(R.id.appTitleTextView);
+        appTitleTextView.setText(R.string.app_name);
 
         // Change the font of "Bengaluru Buses" to a custom font.
         Typeface typeFace = Typeface.createFromAsset(getAssets(), "fonts/Righteous-Regular.ttf");
         appTitleTextView.setTypeface(typeFace);
 
+        showSplashScreen();
+    }
+
+    private void showSplashScreen()
+    {
         wasDisplayingSplashScreen = true;
 
         countDownTimer = new CountDownTimer(2000, 2000)
@@ -96,85 +81,58 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
             @Override
             public void onFinish()
             {
-                setContentView(R.layout.activity_main_new);
-
-                TextView appNameTextView = (TextView) findViewById(R.id.app_name_text_view);
-
-                // Change the font of "Bengaluru Buses" to a custom font.
-                Typeface typeFace = Typeface.createFromAsset(getAssets(), "fonts/Righteous-Regular.ttf");
-                appNameTextView.setTypeface(typeFace);
-
-                // Don't let the on-screen keyboard pop up for anything by default.
-                getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-
-                initialiseDatabase();
-
                 wasDisplayingSplashScreen = false;
 
-                busesLinearLayout = (LinearLayout) findViewById(R.id.buses_linear_layout);
-                busesLinearLayout.setOnClickListener(new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View v)
-                    {
-                        onBusesLinearLayoutClicked();
-                    }
-                });
-
-                busStopsLinearLayout = (LinearLayout) findViewById(R.id.bus_stops_linear_layout);
-                busStopsLinearLayout.setOnClickListener(new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View v)
-                    {
-                        onBusStopsLinearLayoutClicked();
-                    }
-                });
-
-                tripPlannerLinearLayout = (LinearLayout) findViewById(R.id.trip_planner_linear_layout);
-                tripPlannerLinearLayout.setOnClickListener(new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View v)
-                    {
-                        onTripPlannerLinearLayoutClicked();
-                    }
-                });
-
-                LinearLayout bmtcWebsiteLinearLayout = (LinearLayout) findViewById(R.id.website_linear_layout);
-                bmtcWebsiteLinearLayout.setOnClickListener(new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View v)
-                    {
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(
-                                "http://www.mybmtc.com/en"));
-                        startActivity(browserIntent);
-                    }
-                });
-
-                LinearLayout bmtcHelplineLinearLayout = (LinearLayout) findViewById(R.id.helpline_linear_layout);
-                bmtcHelplineLinearLayout.setOnClickListener(new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View v)
-                    {
-                        Intent callIntent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:18004251663"));
-                        startActivity(callIntent);
-                    }
-                });
-
-                favoritesListView = (ListView) findViewById(R.id.favourites_list_view);
-                noFavoritesLinearLayout = (LinearLayout) findViewById(R.id
-                        .no_favorites_linear_layout);
-                initialiseFavorites();
+                initializeActivity();
             }
         }.start();
     }
 
-    /**
-     * This method initialises the SQLiteDatabase instance stored in the Constants class.
-     */
+    private void initializeActivity()
+    {
+        setContentView(R.layout.activity_main);
+
+        // Don't let the on-screen keyboard pop up for anything by default.
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+        initialiseDatabase();
+
+        LinearLayout busesLinearLayout = (LinearLayout) findViewById(R.id.buses_linear_layout);
+        busesLinearLayout.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                onBusesLinearLayoutClicked();
+            }
+        });
+
+        LinearLayout busStopsLinearLayout = (LinearLayout) findViewById(R.id.bus_stops_linear_layout);
+        busStopsLinearLayout.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                onBusStopsLinearLayoutClicked();
+            }
+        });
+
+        LinearLayout tripPlannerLinearLayout = (LinearLayout) findViewById(R.id.trip_planner_linear_layout);
+        tripPlannerLinearLayout.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                onTripPlannerLinearLayoutClicked();
+            }
+        });
+
+        favoritesListView = (ListView) findViewById(R.id.favourites_list_view);
+        noFavoritesLinearLayout = (LinearLayout) findViewById(R.id
+                .no_favorites_linear_layout);
+        initialiseFavorites();
+    }
+
     private void initialiseDatabase()
     {
         BengaluruBusesDbHelper bengaluruBusesDbHelper = new BengaluruBusesDbHelper(MainActivity.this);
