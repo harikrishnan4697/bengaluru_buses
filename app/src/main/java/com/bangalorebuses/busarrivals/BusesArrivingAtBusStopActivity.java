@@ -118,40 +118,26 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
         String busStopName = getIntent().getStringExtra("BUS_STOP_NAME");
         if (busStopName.substring(busStopName.length() - 1, busStopName.length()).equals(" "))
         {
-            selectedBusStop.setBusStopName(busStopName.substring(0, busStopName.length() - 1));
-        }
-        else
-        {
-            selectedBusStop.setBusStopName(busStopName);
+            busStopName = busStopName.substring(0, busStopName.length() - 1);
         }
 
-        TextView busStopNameTextView = (TextView) findViewById(R.id.bus_stop_name_text_view);
-        busStopNameTextView.setText(selectedBusStop.getBusStopName());
-
-        ImageView backButtonImageView = (ImageView) findViewById(R.id.back_button_image_view);
-        backButtonImageView.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                finish();
-            }
-        });
+        selectedBusStop.setBusStopName(busStopName);
 
         String busStopDirectionName = getIntent().getStringExtra("BUS_STOP_DIRECTION_NAME");
         if (busStopDirectionName.contains("(") && busStopDirectionName.contains(")"))
         {
-            selectedBusStop.setBusStopDirectionName(busStopDirectionName.substring(busStopDirectionName
-                    .indexOf("(") + 1, busStopDirectionName.indexOf(")")));
-        }
-        else
-        {
-            selectedBusStop.setBusStopDirectionName(busStopDirectionName);
+            busStopDirectionName = busStopDirectionName.substring(busStopDirectionName
+                    .indexOf("(") + 1, busStopDirectionName.indexOf(")"));
         }
 
-        TextView busStopDirectioNameTextView = (TextView) findViewById(R.id
-                .bus_stop_direction_name_text_view);
-        busStopDirectioNameTextView.setText(selectedBusStop.getBusStopDirectionName());
+        selectedBusStop.setBusStopDirectionName(busStopDirectionName);
+
+        if (getSupportActionBar() != null)
+        {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setTitle(busStopName);
+            getSupportActionBar().setSubtitle(busStopDirectionName);
+        }
 
         selectedBusStop.setBusStopId(getIntent().getIntExtra("BUS_STOP_ID", 0));
 
@@ -175,14 +161,6 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
         }
     }
 
-    /*@Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.buses_arriving_at_bus_stop_menu, menu);
-        return super.onCreateOptionsMenu(menu);
-    }*/
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
@@ -191,33 +169,6 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
             case android.R.id.home:
                 finish();
                 break;
-            case R.id.busesArrivingAtBusStopRefresh:
-                if (numberOfBusRouteTimingQueriesMade == busRoutesToGetTimingsOf.size() - 1)
-                {
-                    errorLinearLayout.setVisibility(View.GONE);
-                    if (busRoutesArrivingAtBusStopDbTask != null)
-                    {
-                        busRoutesArrivingAtBusStopDbTask.cancel(true);
-                    }
-
-                    // Get buses scheduled to arrive at the selected bus stop
-                    if (isNetworkAvailable())
-                    {
-
-                        swipeRefreshLayout.setRefreshing(true);
-                        busStopHasTraceableBuses = false;
-                        busRoutesArrivingAtBusStopDbTask = new BusRoutesArrivingAtBusStopDbTask(this);
-                        busRoutesArrivingAtBusStopDbTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
-                                selectedBusStop.getBusStopId());
-                    }
-                    else
-                    {
-                        swipeRefreshLayout.setRefreshing(false);
-                        listView.setVisibility(View.GONE);
-                        setErrorLayoutContent(R.drawable.ic_cloud_off_black, "Uh oh! No data connection.", "Retry");
-                        errorLinearLayout.setVisibility(View.VISIBLE);
-                    }
-                }
             default:
                 return super.onOptionsItemSelected(item);
         }

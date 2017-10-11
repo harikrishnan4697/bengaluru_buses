@@ -68,19 +68,28 @@ public class TrackBusListCustomAdapter extends BaseAdapter
                 buses.get(position).getBusRoute().getBusRouteNumber().contains("KIAS-"))
         {
             holder.routeTypeImageView.setImageResource(R.drawable.ic_flight_blue);
+            holder.busRouteNumberTextView.setBackgroundResource(R.drawable
+                    .blue_rounded_background_borderless);
         }
         else if (buses.get(position).getBusRoute().getBusRouteNumber().length() > 1 &&
                 buses.get(position).getBusRoute().getBusRouteNumber().substring(0, 2).equals("V-"))
         {
             holder.routeTypeImageView.setImageResource(R.drawable.ic_directions_bus_ac);
+            holder.busRouteNumberTextView.setBackgroundResource(R.drawable
+                    .blue_rounded_background_borderless);
+
         }
         else if (buses.get(position).getBusRoute().getBusRouteNumber().contains("MF-"))
         {
             holder.routeTypeImageView.setImageResource(R.drawable.ic_directions_bus_special);
+            holder.busRouteNumberTextView.setBackgroundResource(R.drawable
+                    .orange_rounded_background_borderless);
         }
         else
         {
             holder.routeTypeImageView.setImageResource(R.drawable.ic_directions_bus_ordinary);
+            holder.busRouteNumberTextView.setBackgroundResource(R.drawable
+                    .green_rounded_background_borderless);
         }
 
         holder.busRouteNumberTextView.setText(buses.get(position).getBusRoute().getBusRouteNumber());

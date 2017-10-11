@@ -1,138 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
     tools:context="com.bangalorebuses.search.SearchActivity">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:background="@color/colorPrimary">
+        app:theme="@style/AppTheme.AppBarOverlay">
 
-        <RelativeLayout
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="?actionBarSize"
+            android:background="@color/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay"/>
 
-            <ImageView
-                android:id="@+id/back_button_image_view"
-                android:layout_width="@dimen/image_view_width"
-                android:layout_height="@dimen/image_view_height"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginEnd="@dimen/layout_margin"
-                android:layout_marginRight="@dimen/layout_margin"
-                android:layout_marginTop="@dimen/layout_margin"
-                android:background="?selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_arrow_back_white"/>
+    </android.support.design.widget.AppBarLayout>
 
-            <LinearLayout
-                android:id="@+id/search_linear_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/layout_margin_small"
-                android:layout_marginEnd="@dimen/layout_margin_small"
-                android:layout_marginRight="@dimen/layout_margin_small"
-                android:layout_marginTop="@dimen/layout_margin_small"
-                android:layout_toEndOf="@id/back_button_image_view"
-                android:layout_toRightOf="@id/back_button_image_view"
-                android:background="@drawable/white_rounded_background_borderless"
-                android:clickable="true"
-                android:gravity="start"
-                android:orientation="horizontal"
-                android:paddingLeft="@dimen/layout_padding_small"
-                android:paddingRight="@dimen/layout_padding_small">
-
-                <ImageView
-                    android:layout_width="@dimen/image_view_width"
-                    android:layout_height="@dimen/image_view_height"
-                    android:layout_gravity="center"
-                    android:layout_marginEnd="@dimen/layout_margin_small"
-                    android:layout_marginRight="@dimen/layout_margin_small"
-                    android:src="@drawable/ic_search_black"/>
-
-                <EditText
-                    android:id="@+id/search_edit_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:background="@drawable/white_rounded_background_borderless"
-                    android:enabled="false"
-                    android:hint="@string/search_activity_default_hint"
-                    android:inputType="text"
-                    android:maxLines="1"
-                    android:padding="@dimen/layout_padding_small"
-                    android:textSize="@dimen/text_size_big"
-                    />
-
-            </LinearLayout>
-
-        </RelativeLayout>
-
-    </android.support.v7.widget.Toolbar>
-
-    <RelativeLayout
-        android:id="@+id/favorites_relative_layout"
+    <LinearLayout
+        android:id="@+id/bus_stop_search_linear_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/toolbar"
-        android:layout_marginBottom="@dimen/layout_margin"
-        android:layout_marginLeft="@dimen/layout_margin"
-        android:layout_marginRight="@dimen/layout_margin"
+        android:layout_below="@id/app_bar_layout"
+        android:layout_margin="@dimen/layout_margin_small"
         android:background="@drawable/white_rounded_background_borderless"
         android:clickable="true"
-        android:padding="@dimen/layout_padding"
-        android:visibility="gone">
+        android:gravity="start"
+        android:orientation="horizontal"
+        android:paddingLeft="@dimen/layout_padding_small"
+        android:paddingRight="@dimen/layout_padding_small">
 
         <ImageView
-            android:id="@+id/favorites_image_view"
             android:layout_width="@dimen/image_view_width"
             android:layout_height="@dimen/image_view_height"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:src="@drawable/ic_favorite_black"/>
+            android:layout_gravity="center"
+            android:layout_marginEnd="@dimen/layout_margin_small"
+            android:layout_marginRight="@dimen/layout_margin_small"
+            android:src="@drawable/ic_search_black"/>
 
-        <TextView
-            android:layout_width="wrap_content"
+        <EditText
+            android:id="@+id/bus_stop_search_edit_text"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="@dimen/layout_margin"
-            android:layout_marginStart="@dimen/layout_margin"
-            android:layout_toEndOf="@+id/favorites_image_view"
-            android:layout_toRightOf="@+id/favorites_image_view"
-            android:text="@string/favourites_title"
-            android:textAllCaps="true"
-            android:textColor="@color/standard_text_color"
-            android:textSize="@dimen/text_size_medium"
-            android:textStyle="bold"/>
+            android:layout_gravity="center"
+            android:background="@drawable/white_rounded_background_borderless"
+            android:enabled="false"
+            android:hint="@string/bus_search_edit_text_hint"
+            android:inputType="text"
+            android:maxLines="1"
+            android:padding="@dimen/layout_padding_small"
+            android:textSize="@dimen/text_size_big"
+            />
 
-        <ImageView
-            android:id="@+id/arrow_right_image_view"
-            android:layout_width="@dimen/image_view_width"
-            android:layout_height="@dimen/image_view_height"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:src="@drawable/ic_keyboard_arrow_right_black"/>
-
-    </RelativeLayout>
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/favorites_linear_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/toolbar"
-        android:layout_margin="@dimen/layout_margin_small"
-        android:background="@drawable/grey_rounded_background_borderless"
+        android:layout_below="@id/bus_stop_search_linear_layout"
+        android:layout_marginBottom="@dimen/layout_margin_small"
+        android:layout_marginLeft="@dimen/layout_margin_small"
+        android:layout_marginRight="@dimen/layout_margin_small"
+        android:background="@drawable/white_rounded_background_borderless"
         android:gravity="center"
         android:orientation="vertical"
-        android:paddingBottom="@dimen/layout_padding"
-        android:paddingTop="@dimen/layout_padding"
+        android:paddingTop="@dimen/layout_padding_small"
         android:visibility="visible">
 
         <TextView
@@ -150,9 +90,10 @@
             android:id="@+id/favorites_list_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/layout_margin_small"
-            android:layout_marginRight="@dimen/layout_margin_small"
-            android:dividerHeight="2dp"
+            android:dividerHeight="@dimen/layout_margin_small"
+            android:paddingBottom="@dimen/layout_padding_tiny"
+            android:paddingLeft="@dimen/layout_padding_tiny"
+            android:paddingRight="@dimen/layout_padding_tiny"
             android:scrollbars="none"
             />
 
@@ -162,9 +103,8 @@
         android:id="@+id/search_results_list_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/favorites_linear_layout"
-        android:layout_marginBottom="@dimen/layout_margin"
-        android:background="@drawable/white_rounded_background_borderless"
+        android:layout_below="@id/bus_stop_search_linear_layout"
+        android:background="#FAFAFA"
         android:visibility="gone"/>
 
     <ProgressBar

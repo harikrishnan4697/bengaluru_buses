@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -41,6 +42,12 @@ public class BusesActivity extends AppCompatActivity implements BusesDbQueriesHe
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        if (getSupportActionBar() != null)
+        {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setTitle(R.string.buses_title);
+        }
+
         // Hide the soft keyboard by default when the activity is started
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
@@ -51,22 +58,26 @@ public class BusesActivity extends AppCompatActivity implements BusesDbQueriesHe
 
         editText = (EditText) findViewById(R.id.bus_search_edit_text);
 
-        ImageView backButtonImageView = (ImageView) findViewById(R.id.back_button_image_view);
-        backButtonImageView.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                finish();
-            }
-        });
-
         progressBar.setVisibility(View.VISIBLE);
         editText.setEnabled(false);
 
 
         allBusRoutesDbTask = new AllBusRoutesDbTask(this);
         allBusRoutesDbTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case android.R.id.home:
+                finish();
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return true;
     }
 
     @Override

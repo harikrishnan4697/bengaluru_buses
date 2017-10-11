@@ -106,6 +106,12 @@ public class TripPlannerActivity extends AppCompatActivity implements
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        if (getSupportActionBar() != null)
+        {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setTitle(R.string.trip_planner_title);
+        }
+
         favoritesFloatingActionButton = (FloatingActionButton) findViewById(R.id
                 .favorites_floating_action_button);
         favoritesFloatingActionButton.setVisibility(View.GONE);
@@ -154,16 +160,6 @@ public class TripPlannerActivity extends AppCompatActivity implements
         swipeRefreshLayout.setColorSchemeResources(R.color.colorOrdinaryServiceBus,
                 R.color.colorACServiceBus, R.color.colorSpecialServiceBus);
         swipeRefreshLayout.setOnRefreshListener(this);
-
-        ImageView backButtonImageView = (ImageView) findViewById(R.id.back_button_image_view);
-        backButtonImageView.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                finish();
-            }
-        });
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
@@ -239,9 +235,6 @@ public class TripPlannerActivity extends AppCompatActivity implements
         {
             case android.R.id.home:
                 finish();
-                break;
-            case R.id.action_favorite:
-                // TODO Favorite current trip
                 break;
             default:
                 return false;

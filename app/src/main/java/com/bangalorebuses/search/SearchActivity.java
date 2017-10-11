@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -46,7 +47,6 @@ public class SearchActivity extends AppCompatActivity implements SearchDbQueries
     private EditText searchEditText;
     private ListView searchResultsListView;
     private Intent resultIntent = new Intent();
-    private RelativeLayout favoritesRelativeLayout;
     private LinearLayout favoritesLinearLayout;
     private AllBusStopNamesTask allBusStopNamesTask;
     private ListView favoritesListView;
@@ -58,30 +58,25 @@ public class SearchActivity extends AppCompatActivity implements SearchDbQueries
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        if (getSupportActionBar() != null)
+        {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setTitle(R.string.search_activity_default_hint);
+        }
 
         // Hide the soft keyboard by default when the activity is started
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         // Initialise some variables
-        searchEditText = (EditText) findViewById(R.id.search_edit_text);
+        searchEditText = (EditText) findViewById(R.id.bus_stop_search_edit_text);
         searchResultsListView = (ListView) findViewById(R.id.search_results_list_view);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        favoritesRelativeLayout = (RelativeLayout) findViewById(R.id
-                .favorites_relative_layout);
         favoritesLinearLayout = (LinearLayout) findViewById(R.id.favorites_linear_layout);
         favoritesListView = (ListView) findViewById(R.id.favorites_list_view);
-
-        ImageView backButtonImageView = (ImageView) findViewById(R.id.back_button_image_view);
-        backButtonImageView.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                finish();
-            }
-        });
 
         String searchType = getIntent().getStringExtra("SEARCH_TYPE");
         String editTextHint = getIntent().getStringExtra("EDIT_TEXT_HINT");
@@ -94,7 +89,6 @@ public class SearchActivity extends AppCompatActivity implements SearchDbQueries
 
         progressBar.setVisibility(View.VISIBLE);
         searchResultsListView.setVisibility(View.GONE);
-        favoritesRelativeLayout.setVisibility(View.GONE);
         searchEditText.setEnabled(false);
         favoritesLinearLayout.setVisibility(View.GONE);
 
@@ -108,6 +102,20 @@ public class SearchActivity extends AppCompatActivity implements SearchDbQueries
         {
             initialiseFavorites();
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case android.R.id.home:
+                finish();
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return true;
     }
 
     @Override

@@ -1,86 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
     tools:context="com.bangalorebuses.tracker.BusesActivity">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:background="@color/colorPrimary">
+        app:theme="@style/AppTheme.AppBarOverlay">
 
-        <RelativeLayout
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="?actionBarSize"
+            android:background="@color/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay"/>
 
-            <ImageView
-                android:id="@+id/back_button_image_view"
-                android:layout_width="@dimen/image_view_width"
-                android:layout_height="@dimen/image_view_height"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginEnd="@dimen/layout_margin"
-                android:layout_marginRight="@dimen/layout_margin"
-                android:layout_marginTop="@dimen/layout_margin"
-                android:background="?selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_arrow_back_white"/>
+    </android.support.design.widget.AppBarLayout>
 
-            <LinearLayout
-                android:id="@+id/bus_search_linear_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/layout_margin_small"
-                android:layout_marginEnd="@dimen/layout_margin_small"
-                android:layout_marginRight="@dimen/layout_margin_small"
-                android:layout_marginTop="@dimen/layout_margin_small"
-                android:layout_toEndOf="@id/back_button_image_view"
-                android:layout_toRightOf="@id/back_button_image_view"
-                android:background="@drawable/white_rounded_background_borderless"
-                android:clickable="true"
-                android:gravity="start"
-                android:orientation="horizontal"
-                android:paddingLeft="@dimen/layout_padding_small"
-                android:paddingRight="@dimen/layout_padding_small">
+    <LinearLayout
+        android:id="@+id/bus_search_linear_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/app_bar_layout"
+        android:layout_margin="@dimen/layout_margin_small"
+        android:background="@drawable/white_rounded_background_borderless"
+        android:clickable="true"
+        android:gravity="start"
+        android:orientation="horizontal"
+        android:paddingLeft="@dimen/layout_padding_small"
+        android:paddingRight="@dimen/layout_padding_small">
 
-                <ImageView
-                    android:layout_width="@dimen/image_view_width"
-                    android:layout_height="@dimen/image_view_height"
-                    android:layout_gravity="center"
-                    android:layout_marginEnd="@dimen/layout_margin_small"
-                    android:layout_marginRight="@dimen/layout_margin_small"
-                    android:src="@drawable/ic_search_black"/>
+        <ImageView
+            android:layout_width="@dimen/image_view_width"
+            android:layout_height="@dimen/image_view_height"
+            android:layout_gravity="center"
+            android:layout_marginEnd="@dimen/layout_margin_small"
+            android:layout_marginRight="@dimen/layout_margin_small"
+            android:src="@drawable/ic_search_black"/>
 
-                <EditText
-                    android:id="@+id/bus_search_edit_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:background="@drawable/white_rounded_background_borderless"
-                    android:enabled="false"
-                    android:hint="@string/bus_search_edit_text_hint"
-                    android:inputType="text"
-                    android:maxLines="1"
-                    android:padding="@dimen/layout_padding_small"
-                    android:textSize="@dimen/text_size_big"
-                    />
+        <EditText
+            android:id="@+id/bus_search_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/white_rounded_background_borderless"
+            android:enabled="false"
+            android:hint="@string/bus_search_edit_text_hint"
+            android:inputType="text"
+            android:maxLines="1"
+            android:padding="@dimen/layout_padding_small"
+            android:textSize="@dimen/text_size_big"
+            />
 
-            </LinearLayout>
-
-        </RelativeLayout>
-
-    </android.support.v7.widget.Toolbar>
+    </LinearLayout>
 
     <ListView
         android:id="@+id/list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/toolbar"
-        android:background="@drawable/white_rounded_background_borderless"/>
+        android:layout_below="@id/bus_search_linear_layout"
+        android:background="#FAFAFA"/>
 
     <ProgressBar
         android:id="@+id/progress_bar"

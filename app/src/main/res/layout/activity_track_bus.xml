@@ -7,62 +7,32 @@
     android:layout_height="match_parent"
     tools:context="com.bangalorebuses.tracker.TrackBusActivity">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:background="@color/colorPrimary">
+        app:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?actionBarSize"
+            android:background="@color/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay"/>
 
         <RelativeLayout
-            android:id="@+id/toolbar_relative_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="@dimen/layout_padding"
-            android:paddingTop="@dimen/layout_padding">
-
-            <RelativeLayout
-                android:id="@+id/title_relative_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true">
-
-                <ImageView
-                    android:id="@+id/back_button_image_view"
-                    android:layout_width="@dimen/image_view_width"
-                    android:layout_height="@dimen/image_view_height"
-                    android:layout_marginEnd="@dimen/layout_margin"
-                    android:layout_marginRight="@dimen/layout_margin"
-                    android:background="?selectableItemBackgroundBorderless"
-                    android:src="@drawable/ic_arrow_back_white"/>
-
-                <TextView
-                    android:id="@+id/title_text_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:layout_toEndOf="@id/back_button_image_view"
-                    android:layout_toRightOf="@id/back_button_image_view"
-                    android:ellipsize="end"
-                    android:gravity="start"
-                    android:maxLines="1"
-                    android:textColor="@color/white_text_color"
-                    android:textSize="@dimen/text_size_big"/>
-
-            </RelativeLayout>
+            android:paddingBottom="@dimen/layout_padding_small"
+            android:paddingLeft="@dimen/layout_padding_small"
+            android:paddingRight="@dimen/layout_padding_small">
 
             <RelativeLayout
                 android:id="@+id/directionSelectionRelativeLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/title_relative_layout"
-                android:layout_marginEnd="@dimen/layout_margin"
-                android:layout_marginRight="@dimen/layout_margin"
-                android:layout_marginTop="@dimen/layout_margin"
+                android:layout_alignParentTop="true"
                 android:background="@color/colorPrimary">
 
                 <ImageView
@@ -126,8 +96,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/directionSelectionRelativeLayout"
-                android:layout_marginEnd="@dimen/layout_margin"
-                android:layout_marginRight="@dimen/layout_margin"
                 android:layout_marginTop="@dimen/layout_margin_small"
                 android:background="@drawable/white_rounded_background_borderless">
 
@@ -154,20 +122,21 @@
                     android:layout_toRightOf="@id/bus_stop_hint_text_view"
                     android:clickable="true"
                     android:spinnerMode="dropdown"
-                    android:textAlignment="viewStart"/>
+                    android:textAlignment="viewStart"
+                    android:theme="@style/ThemeOverlay.AppCompat.Light"/>
 
             </RelativeLayout>
 
         </RelativeLayout>
 
-    </android.support.v7.widget.Toolbar>
+    </android.support.design.widget.AppBarLayout>
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_below="@id/toolbar">
+        android:layout_below="@id/app_bar_layout">
 
         <ListView
             android:id="@+id/listView"
@@ -181,7 +150,7 @@
         android:id="@+id/errorLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/toolbar"
+        android:layout_below="@id/app_bar_layout"
         android:layout_margin="@dimen/layout_margin"
         android:gravity="center"
         android:orientation="vertical"

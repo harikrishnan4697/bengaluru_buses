@@ -98,19 +98,12 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // Initialise XML elements
-        TextView titleTextView = (TextView) findViewById(R.id.title_text_view);
-        titleTextView.setText(getIntent().getStringExtra("ROUTE_NUMBER"));
-
-        ImageView backButtonImageView = (ImageView) findViewById(R.id.back_button_image_view);
-        backButtonImageView.setOnClickListener(new View.OnClickListener()
+        if (getSupportActionBar() != null)
         {
-            @Override
-            public void onClick(View v)
-            {
-                finish();
-            }
-        });
+            getSupportActionBar().setTitle(getIntent().getStringExtra(
+                    "ROUTE_NUMBER"));
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         favoritesFloatingActionButton = (FloatingActionButton) findViewById(R.id
                 .favorites_floating_action_button);
@@ -122,7 +115,6 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
                 favoriteBusRoute();
             }
         });
-        initialiseFavorites();
 
         listView = (ListView) findViewById(R.id.listView);
         spinner = (Spinner) findViewById(R.id.route_stop_list_spinner);
@@ -153,14 +145,6 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         trackBusesOnRoute(getIntent().getStringExtra("ROUTE_NUMBER"));
     }
 
-    /*@Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.track_bus_activity_menu, menu);
-        return super.onCreateOptionsMenu(menu);
-    }*/
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
@@ -168,9 +152,6 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         {
             case android.R.id.home:
                 finish();
-                break;
-            case R.id.trackBusActivityRefresh:
-                refresh();
                 break;
             default:
                 return super.onOptionsItemSelected(item);
@@ -468,6 +449,8 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
                 getStopsOnRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, routeDown.getBusRouteId());
             }
         }
+
+        initialiseFavorites();
     }
 
     private void onBusStopsOnRouteFound(BusRoute busRoute)

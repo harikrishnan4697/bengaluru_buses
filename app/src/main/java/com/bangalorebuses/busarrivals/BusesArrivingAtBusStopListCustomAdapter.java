@@ -70,19 +70,27 @@ public class BusesArrivingAtBusStopListCustomAdapter extends BaseAdapter
                 busRoutes.get(position).getBusRouteNumber().contains("KIAS-"))
         {
             holder.imgViewLogo.setImageResource(R.drawable.ic_flight_blue);
+            holder.txtViewRouteNumber.setBackgroundResource(R.drawable
+                    .blue_rounded_background_borderless);
         }
         else if (busRoutes.get(position).getBusRouteNumber().length() > 1 &&
                 busRoutes.get(position).getBusRouteNumber().substring(0, 2).equals("V-"))
         {
             holder.imgViewLogo.setImageResource(R.drawable.ic_directions_bus_ac);
+            holder.txtViewRouteNumber.setBackgroundResource(R.drawable
+                    .blue_rounded_background_borderless);
         }
         else if (busRoutes.get(position).getBusRouteNumber().contains("MF-"))
         {
             holder.imgViewLogo.setImageResource(R.drawable.ic_directions_bus_special);
+            holder.txtViewRouteNumber.setBackgroundResource(R.drawable
+                    .orange_rounded_background_borderless);
         }
         else
         {
             holder.imgViewLogo.setImageResource(R.drawable.ic_directions_bus_ordinary);
+            holder.txtViewRouteNumber.setBackgroundResource(R.drawable
+                    .green_rounded_background_borderless);
         }
 
         holder.txtViewRouteNumber.setText(busRoutes.get(position).getBusRouteNumber());
