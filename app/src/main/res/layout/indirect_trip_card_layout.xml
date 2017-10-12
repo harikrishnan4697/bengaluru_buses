@@ -37,12 +37,10 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:background="@drawable/orange_squared_border"
                 android:text="Indirect trip"
                 android:textAllCaps="true"
                 android:textColor="@color/standard_text_color"
-                android:textSize="@dimen/text_size_medium"
-                android:textStyle="bold"/>
+                android:textSize="@dimen/text_size_medium"/>
 
         </RelativeLayout>
 
@@ -51,7 +49,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/trip_info_relative_layout"
-            android:layout_marginTop="@dimen/layout_margin_small"
+            android:layout_marginTop="@dimen/layout_margin_tiny"
             android:background="@drawable/white_rounded_background_borderless"
             android:gravity="center"
             android:orientation="horizontal">
@@ -114,7 +112,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/trip_linear_layout"
-            android:layout_marginTop="@dimen/layout_margin_small"
+            android:layout_marginTop="@dimen/layout_margin_tiny"
             android:gravity="start"
             android:orientation="horizontal">
 
@@ -138,7 +136,7 @@
                 android:maxLines="1"
                 android:text="B Channasandra Bridge"
                 android:textColor="@color/standard_text_color"
-                android:textSize="@dimen/text_size_medium"/>
+                android:textSize="@dimen/text_size_small"/>
 
         </LinearLayout>
 

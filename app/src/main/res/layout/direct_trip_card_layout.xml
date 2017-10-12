@@ -8,10 +8,11 @@
     android:layout_marginLeft="@dimen/layout_margin_small"
     android:layout_marginRight="@dimen/layout_margin_small">
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="@dimen/layout_padding_small">
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/layout_padding_small">
 
         <RelativeLayout
             android:id="@+id/trip_info_relative_layout"
@@ -37,21 +38,52 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:background="@drawable/orange_squared_border"
                 android:text="Direct trip"
                 android:textAllCaps="true"
+                android:textColor="@color/standard_text_color"
+                android:textSize="@dimen/text_size_medium"/>
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/from_linear_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/trip_info_relative_layout"
+            android:layout_marginTop="@dimen/layout_margin_tiny"
+            android:gravity="start"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="@dimen/layout_margin_tiny"
+                android:text="From:"
                 android:textColor="@color/standard_text_color"
                 android:textSize="@dimen/text_size_medium"
                 android:textStyle="bold"/>
 
-        </RelativeLayout>
+            <TextView
+                android:id="@+id/origin_bus_stop_name_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="@dimen/layout_margin_tiny"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Dodda Nekkundi (Towards - Hebbala Bridge)"
+                android:textColor="@color/standard_text_color"
+                android:textSize="@dimen/text_size_small"/>
+
+        </LinearLayout>
 
         <RelativeLayout
             android:id="@+id/trip_linear_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/trip_info_relative_layout"
-            android:layout_marginTop="@dimen/layout_margin_small"
+            android:layout_below="@id/from_linear_layout"
+            android:layout_marginTop="@dimen/layout_margin_tiny"
             android:background="@drawable/white_rounded_background_borderless">
 
             <ImageView
@@ -106,38 +138,6 @@
                 android:textStyle="bold"/>
 
         </RelativeLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/trip_linear_layout"
-            android:layout_marginTop="@dimen/layout_margin_small"
-            android:gravity="start"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_margin="@dimen/layout_margin_tiny"
-                android:text="From:"
-                android:textColor="@color/standard_text_color"
-                android:textSize="@dimen/text_size_medium"
-                android:textStyle="bold"/>
-
-            <TextView
-                android:id="@+id/origin_bus_stop_name_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_margin="@dimen/layout_margin_tiny"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:text="Dodda Nekkundi (Towards - Hebbala Bridge)"
-                android:textColor="@color/standard_text_color"
-                android:textSize="@dimen/text_size_medium"/>
-
-        </LinearLayout>
 
     </RelativeLayout>
 

@@ -1,21 +1,14 @@
 package com.bangalorebuses.trips;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bangalorebuses.R;
 import com.bangalorebuses.utils.CommonMethods;
-import com.bangalorebuses.utils.Constants;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -73,25 +66,35 @@ class IndirectTripsDetailsRecyclerViewAdapter extends RecyclerView
         holder.firstLegBusRouteNumberTextView.setText(indirectTrips.get(position)
                 .getBusOnFirstLeg().getBusRoute().getBusRouteNumber());
 
-        // Set the second leg bus route number text view
-        holder.secondLegBusRouteNumberTextView.setText(indirectTrips.get(position)
-                .getBusOnSecondLeg().getBusRoute().getBusRouteNumber());
-
-        // Set the first leg bus ETA text view
-        /*holder.firstLegBusRouteETATextView.setText(indirectTrips.get(position)
-                .getBusOnFirstLeg().getBusETA());*/
-
-        // TODO Set the second leg bus ETA text view
+        holder.firstLegBusRouteNumberTextView.setBackgroundResource(CommonMethods
+                .getBusRouteNumberBackgroundResId(indirectTrips.get(position)
+                        .getBusOnFirstLeg().getBusRoute().getBusRouteNumber()));
 
         // Set the first leg bus route service type image view
         holder.firstLegBusRouteServiceTypeImageView.setImageResource(CommonMethods
                 .getBusRouteServiceTypeImageResId(indirectTrips.get(position)
                         .getBusOnFirstLeg().getBusRoute().getBusRouteNumber()));
 
+        // Set the first leg bus ETA text view
+        holder.firstLegBusRouteETATextView.setText(CommonMethods.convertMinutesToBusArrivalTimings(
+                indirectTrips.get(position).getBusOnFirstLeg().getBusETA()));
+
+        // Set the second leg bus route number text view
+        holder.secondLegBusRouteNumberTextView.setText(indirectTrips.get(position)
+                .getBusOnSecondLeg().getBusRoute().getBusRouteNumber());
+
+        holder.secondLegBusRouteNumberTextView.setBackgroundResource(CommonMethods
+                .getBusRouteNumberBackgroundResId(indirectTrips.get(position)
+                        .getBusOnSecondLeg().getBusRoute().getBusRouteNumber()));
+
         // Set the second leg bus route service type image view
         holder.secondLegBusRouteServiceTypeImageView.setImageResource(CommonMethods
                 .getBusRouteServiceTypeImageResId(indirectTrips.get(position)
                         .getBusOnSecondLeg().getBusRoute().getBusRouteNumber()));
+
+        // Set the second leg bus ETA text view
+        holder.secondLegBusRouteETATextView.setText(CommonMethods.convertMinutesToBusArrivalTimings(
+                indirectTrips.get(position).getBusOnSecondLeg().getBusETA()));
     }
 
     @Override
@@ -124,16 +127,18 @@ class IndirectTripsDetailsRecyclerViewAdapter extends RecyclerView
                     .first_leg_bus_number_text_view);
             firstLegBusRouteETATextView = (TextView) itemView.findViewById(R.id
                     .first_leg_bus_eta_text_view);
+
             secondLegBusRouteServiceTypeImageView = (ImageView) itemView.findViewById(R.id
                     .second_leg_bus_service_type_image_view);
             secondLegBusRouteNumberTextView = (TextView) itemView.findViewById(R.id
                     .second_leg_bus_number_text_view);
             secondLegBusRouteETATextView = (TextView) itemView.findViewById(R.id
                     .second_leg_bus_eta_text_view);
+
             originBusStopNameTextView = (TextView) itemView.findViewById(R.id
                     .origin_bus_stop_name_text_view);
             transitPointBusStopNameTextView = (TextView) itemView.findViewById(R.id
-                    .transit_point__bus_stop_name_text_view);
+                    .transit_point_bus_stop_name_text_view);
         }
     }
 }

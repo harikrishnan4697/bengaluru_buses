@@ -122,6 +122,34 @@ public class CommonMethods
         }
     }
 
+    public static String convertMinutesToBusArrivalTimings(int minutes)
+    {
+        if (minutes < 0)
+        {
+            return null;
+        }
+        else
+        {
+            String hoursAndMinutes;
+
+            if (minutes >= 60)
+            {
+                int hours = minutes / 60;
+                hoursAndMinutes = hours + " hr " + minutes % 60 + " min";
+            }
+            else if (minutes == 0)
+            {
+                hoursAndMinutes = "Due";
+            }
+            else
+            {
+                hoursAndMinutes = minutes + " min";
+            }
+
+            return hoursAndMinutes;
+        }
+    }
+
     public static String getBusStopNameAndDirectionNameCombined(String busStopName,
                                                                 String busStopDirectionName)
     {
@@ -172,6 +200,31 @@ public class CommonMethods
         }
 
         return busRouteServiceTypeImageResId;
+    }
+
+    public static int getBusRouteNumberBackgroundResId(String busRouteNumber)
+    {
+        int busRouteNumberBackgroundImageResId;
+
+        if (busRouteNumber.length() > 5 && busRouteNumber.contains("KIAS-"))
+        {
+            busRouteNumberBackgroundImageResId = R.drawable.blue_rounded_background_borderless;
+        }
+        else if (busRouteNumber.length() > 1 && busRouteNumber.substring(0, 2)
+                .equals("V-"))
+        {
+            busRouteNumberBackgroundImageResId = R.drawable.blue_rounded_background_borderless;
+        }
+        else if (busRouteNumber.contains("MF-"))
+        {
+            busRouteNumberBackgroundImageResId = R.drawable.orange_rounded_background_borderless;
+        }
+        else
+        {
+            busRouteNumberBackgroundImageResId = R.drawable.green_rounded_background_borderless;
+        }
+
+        return busRouteNumberBackgroundImageResId;
     }
 
     public static boolean checkNetworkConnectivity(Activity context)
