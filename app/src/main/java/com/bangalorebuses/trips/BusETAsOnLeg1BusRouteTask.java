@@ -26,14 +26,14 @@ import static com.bangalorebuses.utils.Constants.db;
 
 public class BusETAsOnLeg1BusRouteTask extends AsyncTask<Void, Void, Void>
 {
-    private IndirectTripHelper caller;
+    private IndirectTripDetailsHelper caller;
     private String errorMessage = NETWORK_QUERY_NO_ERROR;
     private ArrayList<Bus> buses = new ArrayList<>();
     private TransitPoint transitPoint;
     private BusRoute busRoute;
 
 
-    public BusETAsOnLeg1BusRouteTask(IndirectTripHelper caller, TransitPoint transitPoint,
+    public BusETAsOnLeg1BusRouteTask(IndirectTripDetailsHelper caller, TransitPoint transitPoint,
                                      BusRoute busRoute)
     {
         this.caller = caller;

@@ -22,9 +22,9 @@ public class BusRoutesToAndFromTransitPointDbTask extends AsyncTask<Void, Void, 
     private String transitPointBusStopName;
     private String originBusStopName;
     private String destinationBusStopName;
-    private IndirectTripHelper caller;
+    private IndirectTripDetailsHelper caller;
 
-    public BusRoutesToAndFromTransitPointDbTask(IndirectTripHelper caller, String originBusStopName,
+    public BusRoutesToAndFromTransitPointDbTask(IndirectTripDetailsHelper caller, String originBusStopName,
                                                 String transitPointBusStopName, String destinationBusStopName)
     {
         this.caller = caller;

@@ -48,25 +48,21 @@ class IndirectTripsRecyclerViewAdapter extends RecyclerView
     @Override
     public void onBindViewHolder(final IndirectTripsViewHolder holder, final int position)
     {
-        holder.cardView.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                Intent indirectTripDetailsActivityIntent = new Intent(context,
-                        IndirectTripDetailsActivity.class);
-                indirectTripDetailsActivityIntent.putExtra(Constants.ORIGIN_BUS_STOP_NAME,
-                        transitPoints.get(holder.getAdapterPosition()).getIndirectTrips().get(0)
-                                .getOriginBusStop().getBusStopName());
-                context.startActivity(indirectTripDetailsActivityIntent);
-            }
-        });
+        String mostFrequentBusRouteOnFirstLeg = transitPoints.get(position)
+                .getMostFrequentBusRouteToTransitPoint().getBusRouteNumber();
 
-        /*holder.firstLegBusRouteNumberTextView.setText(transitPoints.get(position)
-                .getFastestBusToTransitPoint().getBusRoute().getBusRouteNumber());
+        setTextViewBackgroundColor(holder.firstLegBusRouteNumberTextView,
+                mostFrequentBusRouteOnFirstLeg);
 
-        holder.secondLegBusRouteNumberTextView.setText(transitPoints.get(position)
-                .getFastestBusFromTransitPoint().getBusRoute().getBusRouteNumber());*/
+        holder.firstLegBusRouteNumberTextView.setText(mostFrequentBusRouteOnFirstLeg);
+
+        String mostFrequentBusRouteOnSecondLeg = transitPoints.get(position)
+                .getMostFrequentBusRouteFromTransitPoint().getBusRouteNumber();
+
+        setTextViewBackgroundColor(holder.secondLegBusRouteNumberTextView,
+                mostFrequentBusRouteOnSecondLeg);
+
+        holder.secondLegBusRouteNumberTextView.setText(mostFrequentBusRouteOnSecondLeg);
 
         holder.tripDurationTextView.setText(CommonMethods.convertMinutesToHoursAndMinutes(
                 transitPoints.get(position).getShortestTripDuration()));
@@ -87,6 +83,32 @@ class IndirectTripsRecyclerViewAdapter extends RecyclerView
                 context.startActivity(indirectTripDetailsActivityIntent);
             }
         });
+    }
+
+    private void setTextViewBackgroundColor(TextView textView,
+                                            String busRouteNumber)
+    {
+        if (busRouteNumber.length() > 5 && busRouteNumber.contains("KIAS-"))
+        {
+            textView.setBackgroundResource(R.drawable
+                    .blue_rounded_background_borderless);
+        }
+        else if (busRouteNumber.length() > 1 &&
+                busRouteNumber.substring(0, 2).equals("V-"))
+        {
+            textView.setBackgroundResource(R.drawable
+                    .blue_rounded_background_borderless);
+        }
+        else if (busRouteNumber.contains("MF-"))
+        {
+            textView.setBackgroundResource(R.drawable
+                    .orange_rounded_background_borderless);
+        }
+        else
+        {
+            textView.setBackgroundResource(R.drawable
+                    .green_rounded_background_borderless);
+        }
     }
 
     @Override

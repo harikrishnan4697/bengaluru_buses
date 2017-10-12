@@ -56,46 +56,35 @@ public class TripPlannerActivity extends AppCompatActivity implements
 {
     private FloatingActionButton favoritesFloatingActionButton;
     private boolean isFavorite = false;
-
     private TextView originSelectionTextView;
     private TextView destinationSelectionTextView;
-
     private Animation rotateOnceForward;
     private ImageView swapDirectionImageView;
-
     private String originBusStopName;
     private String destinationBusStopName;
-
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recyclerView;
-
     private LinearLayout errorLinearLayout;
     private ImageView errorImageView;
     private TextView errorTextView;
     private TextView errorResolutionTextView;
 
-    private ArrayList<DirectTrip> directTripsToDisplay = new ArrayList<>();
-    private ArrayList<TransitPoint> transitPointsToDisplay =
-            new ArrayList<>();
-    private ArrayList<Trip> tripsToQuery = new ArrayList<>();
-
     // Direct trip related variables
+    private ArrayList<DirectTrip> directTripsToDisplay = new ArrayList<>();
+    private ArrayList<Trip> tripsToQuery = new ArrayList<>();
     private ArrayList<BusETAsOnDirectTripTask> busETAsOnDirectTripTasks = new ArrayList<>();
     private GetDirectTripsBetweenStops getDirectTripsBetweenStops;
     private int numberOfDirectTripQueriesMade = 0;
     private int numberOfDirectTripRouteBusesFound = 0;
 
     // Indirect trip related variables
+    private int numberOfMostFrequentBusRouteQueriesMade = 0;
+    private int numberOfMostFrequentBusRouteQueriesComplete = 0;
+    private ArrayList<TransitPoint> transitPointsToDisplay =
+            new ArrayList<>();
     private ArrayList<TransitPoint> transitPoints = new ArrayList<>();
-    private int numberOfTransitPointQueriesMade = 0;
-    private int numberOfTransitPointQueriesComplete = 0;
-    private int numberOfIndirectTripQueriesMade = 0;
-    private int numberOfIndirectTripQueriesComplete = 0;
-    private ArrayList<BusETAsOnLeg1BusRouteTask> busETAsOnLeg1BusRouteTasks = new ArrayList<>();
     private TransitPointsWithNumberOfRoutesDbTask transitPointsWithNumberOfRoutesDbTask1;
     private TransitPointsWithNumberOfRoutesDbTask transitPointsWithNumberOfRoutesDbTask2;
-    private ArrayList<BusRoutesToAndFromTransitPointDbTask> busRoutesToAndFromTransitPointDbTasks =
-            new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -220,14 +209,6 @@ public class TripPlannerActivity extends AppCompatActivity implements
         }
     }
 
-    /*@Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.trip_planner_menu, menu);
-        return super.onCreateOptionsMenu(menu);
-    }*/
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
@@ -282,20 +263,6 @@ public class TripPlannerActivity extends AppCompatActivity implements
         {
             favoritesFloatingActionButton.setVisibility(View.GONE);
         }
-    }
-
-    /**
-     * This method is used to check if the user's device
-     * has a Wi-Fi or Cellular data connection.
-     *
-     * @return boolean This returns true or false based on the status
-     * of the Wi-Fi and Cellular data connection.
-     */
-    private boolean isNetworkAvailable()
-    {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null;
     }
 
     @Override
@@ -371,14 +338,6 @@ public class TripPlannerActivity extends AppCompatActivity implements
             }
         }
 
-        for (BusETAsOnLeg1BusRouteTask task : busETAsOnLeg1BusRouteTasks)
-        {
-            if (task != null)
-            {
-                task.cancel(true);
-            }
-        }
-
         if (getDirectTripsBetweenStops != null)
         {
             getDirectTripsBetweenStops.cancel(true);
@@ -392,15 +351,6 @@ public class TripPlannerActivity extends AppCompatActivity implements
         if (transitPointsWithNumberOfRoutesDbTask2 != null)
         {
             transitPointsWithNumberOfRoutesDbTask2.cancel(true);
-        }
-
-        for (BusRoutesToAndFromTransitPointDbTask task :
-                busRoutesToAndFromTransitPointDbTasks)
-        {
-            if (task != null)
-            {
-                task.cancel(true);
-            }
         }
     }
 
@@ -432,7 +382,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
             recyclerView.setLayoutManager(linearLayoutManager);
 
-            if (isNetworkAvailable())
+            if (CommonMethods.checkNetworkConnectivity(this))
             {
                 for (; numberOfDirectTripQueriesMade < 10; numberOfDirectTripQueriesMade++)
                 {
@@ -571,7 +521,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
         swipeRefreshLayout.setRefreshing(true);
         transitPoints.clear();
 
-        if (isNetworkAvailable())
+        if (CommonMethods.checkNetworkConnectivity(this))
         {
             transitPointsWithNumberOfRoutesDbTask1 = new TransitPointsWithNumberOfRoutesDbTask(this, originBusStopName,
                     destinationBusStopName, NUMBER_OF_ROUTES_TYPE_ORIGIN_TO_TRANSIT_POINT);
@@ -590,7 +540,6 @@ public class TripPlannerActivity extends AppCompatActivity implements
         }
     }
 
-    // TODO make separate/unique connections to the db
     @Override
     public void onTransitPointsAndRouteCountOriginToTPFound(ArrayList<TransitPoint> transitPoints)
     {
@@ -667,6 +616,17 @@ public class TripPlannerActivity extends AppCompatActivity implements
 
     private void onTransitPointsFound()
     {
+        if (transitPoints.size() == 0)
+        {
+            recyclerView.setVisibility(View.GONE);
+
+            setErrorLayoutContent(ErrorImageResIds.ERROR_IMAGE_NO_BUSES_IN_SERVICE,
+                    "Sorry! There aren't any direct or indirect trips.", "Retry");
+            errorLinearLayout.setVisibility(View.VISIBLE);
+
+            return;
+        }
+
         // For each transit point, set the score to the smaller number of routes
         // of the two legs.
         for (TransitPoint transitPoint : this.transitPoints)
@@ -705,29 +665,86 @@ public class TripPlannerActivity extends AppCompatActivity implements
 
         this.transitPoints = tempTransitPoints;
 
-        directTripsToDisplay.clear();
         transitPointsToDisplay.clear();
-        numberOfIndirectTripQueriesMade = 0;
-        numberOfIndirectTripQueriesComplete = 0;
-        numberOfTransitPointQueriesMade = 0;
-        numberOfTransitPointQueriesComplete = 0;
-        busRoutesToAndFromTransitPointDbTasks.clear();
-        busETAsOnLeg1BusRouteTasks.clear();
+        numberOfMostFrequentBusRouteQueriesMade = 0;
+        numberOfMostFrequentBusRouteQueriesComplete = 0;
 
         for (TransitPoint transitPoint : this.transitPoints)
         {
-            numberOfTransitPointQueriesMade++;
+            new MostFrequentBusRouteDbTask(this, originBusStopName, transitPoint
+                    .getTransitPointName(), destinationBusStopName).executeOnExecutor(
+                    AsyncTask.THREAD_POOL_EXECUTOR);
 
-            BusRoutesToAndFromTransitPointDbTask task = new BusRoutesToAndFromTransitPointDbTask(this,
-                    originBusStopName, transitPoint.getTransitPointName(), destinationBusStopName);
-
-            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-
-            busRoutesToAndFromTransitPointDbTasks.add(task);
+            numberOfMostFrequentBusRouteQueriesMade++;
         }
     }
 
     @Override
+    public void onMostFrequentBusRouteFound(String transitPointBusStopName,
+                                            BusRoute mostFrequentBusRouteOnFirstLeg,
+                                            BusRoute mostFrequentBusRouteOnSecondLeg)
+    {
+        numberOfMostFrequentBusRouteQueriesComplete++;
+
+        int estimatedTotalWaitTimeForTrip = 15;
+
+        int travelTimeOnFirstLeg = CommonMethods.calculateTravelTime(
+                mostFrequentBusRouteOnFirstLeg.getBusRouteId(), mostFrequentBusRouteOnFirstLeg
+                        .getBusRouteNumber(), mostFrequentBusRouteOnFirstLeg
+                        .getTripPlannerOriginBusStop().getBusStopRouteOrder(),
+                mostFrequentBusRouteOnFirstLeg.getTripPlannerDestinationBusStop()
+                        .getBusStopRouteOrder());
+
+        int travelTimeOnSecondLeg = CommonMethods.calculateTravelTime(
+                mostFrequentBusRouteOnSecondLeg.getBusRouteId(), mostFrequentBusRouteOnSecondLeg
+                        .getBusRouteNumber(), mostFrequentBusRouteOnSecondLeg
+                        .getTripPlannerOriginBusStop().getBusStopRouteOrder(),
+                mostFrequentBusRouteOnSecondLeg.getTripPlannerDestinationBusStop()
+                        .getBusStopRouteOrder());
+
+        TransitPoint transitPoint = new TransitPoint();
+        transitPoint.setTransitPointName(transitPointBusStopName);
+        transitPoint.setMostFrequentBusRouteToTransitPoint(mostFrequentBusRouteOnFirstLeg);
+        transitPoint.setMostFrequentBusRouteFromTransitPoint(mostFrequentBusRouteOnSecondLeg);
+        transitPoint.setShortestTripDuration(estimatedTotalWaitTimeForTrip + travelTimeOnFirstLeg
+                + travelTimeOnSecondLeg);
+
+        transitPointsToDisplay.add(transitPoint);
+        transitPointsToDisplay.trimToSize();
+
+        Collections.sort(transitPointsToDisplay, new Comparator<TransitPoint>()
+        {
+            @Override
+            public int compare(TransitPoint t1, TransitPoint t2)
+            {
+                return t1.getShortestTripDuration() - t2.getShortestTripDuration();
+            }
+        });
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        IndirectTripsRecyclerViewAdapter adapter = new
+                IndirectTripsRecyclerViewAdapter(this, transitPointsToDisplay);
+        recyclerView.setAdapter(adapter);
+        recyclerView.setVisibility(View.VISIBLE);
+
+        if (numberOfMostFrequentBusRouteQueriesComplete ==
+                numberOfMostFrequentBusRouteQueriesMade)
+        {
+            swipeRefreshLayout.setRefreshing(false);
+
+            if (transitPointsToDisplay.size() == 0)
+            {
+                recyclerView.setVisibility(View.GONE);
+
+                setErrorLayoutContent(ErrorImageResIds.ERROR_IMAGE_NO_BUSES_IN_SERVICE,
+                        "Sorry! There aren't any direct or indirect trips.", "Retry");
+                errorLinearLayout.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    /*@Override
     public void onBusRoutesToAndFromTransitPointFound(TransitPoint transitPoint)
     {
         numberOfTransitPointQueriesComplete++;
@@ -867,13 +884,13 @@ public class TripPlannerActivity extends AppCompatActivity implements
                 if (directTripsToDisplay.size() == 0)
                 {
                     //TODO 'There aren't trips' message gets displayed and then displays trips...needs to be fixed
-                    /*setErrorLayoutContent(R.drawable.ic_directions_bus_black, "Oh no! There aren't any trips right now...", "Retry");
+                    setErrorLayoutContent(R.drawable.ic_directions_bus_black, "Oh no! There aren't any trips right now...", "Retry");
                     errorLinearLayout.setVisibility(View.VISIBLE);
-                    recyclerView.setVisibility(View.GONE);*/
+                    recyclerView.setVisibility(View.GONE);
                 }
             }
         }
-    }
+    }*/
 
     // Other stuff
 

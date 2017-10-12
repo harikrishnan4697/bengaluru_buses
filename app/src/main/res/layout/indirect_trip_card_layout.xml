@@ -27,7 +27,7 @@
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:background="@drawable/grey_rounded_background_borderless"
-                android:text="1 hr 17 mins"
+                android:text="1 hr 17 mins (Est.)"
                 android:textColor="@color/standard_text_color"
                 android:textSize="@dimen/text_size_medium"/>
 
@@ -47,12 +47,12 @@
         </RelativeLayout>
 
         <LinearLayout
-            android:background="@drawable/white_rounded_background_borderless"
             android:id="@+id/trip_linear_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/trip_info_relative_layout"
             android:layout_marginTop="@dimen/layout_margin_small"
+            android:background="@drawable/white_rounded_background_borderless"
             android:gravity="center"
             android:orientation="horizontal">
 
@@ -64,9 +64,9 @@
                 android:layout_marginEnd="@dimen/layout_margin_tiny"
                 android:layout_marginRight="@dimen/layout_margin_tiny"
                 android:background="@drawable/blue_rounded_background_borderless"
-                android:text="V-500D"
-                android:maxLines="1"
                 android:ellipsize="end"
+                android:maxLines="1"
+                android:text="V-500D"
                 android:textColor="@color/white_text_color"
                 android:textSize="@dimen/text_size_medium"
                 android:textStyle="bold"/>
@@ -101,9 +101,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:background="@drawable/green_rounded_background_borderless"
-                android:text="300-E"
-                android:maxLines="1"
                 android:ellipsize="end"
+                android:maxLines="1"
+                android:text="300-E"
                 android:textColor="@color/white_text_color"
                 android:textSize="@dimen/text_size_medium"
                 android:textStyle="bold"/>

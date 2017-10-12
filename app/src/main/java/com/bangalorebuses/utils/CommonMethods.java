@@ -1,7 +1,11 @@
 package com.bangalorebuses.utils;
 
+import android.app.Activity;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.StringBuilderPrinter;
 
 import com.bangalorebuses.R;
@@ -168,5 +172,13 @@ public class CommonMethods
         }
 
         return busRouteServiceTypeImageResId;
+    }
+
+    public static boolean checkNetworkConnectivity(Activity context)
+    {
+        ConnectivityManager connectivityManager = (ConnectivityManager)
+                context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null;
     }
 }

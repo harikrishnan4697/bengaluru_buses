@@ -37,7 +37,7 @@ import static com.bangalorebuses.utils.Constants.TRANSIT_POINT_BUS_STOP_NAME;
 import static com.bangalorebuses.utils.Constants.db;
 
 public class IndirectTripDetailsActivity extends AppCompatActivity implements
-        SwipeRefreshLayout.OnRefreshListener, IndirectTripHelper
+        SwipeRefreshLayout.OnRefreshListener, IndirectTripDetailsHelper
 {
     // Bus stop names
     private String originBusStopName;
@@ -258,18 +258,6 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
                 }
             }*/
         }
-    }
-
-    @Override
-    public void onTransitPointsAndRouteCountOriginToTPFound(ArrayList<TransitPoint> transitPoints)
-    {
-
-    }
-
-    @Override
-    public void onTransitPointsAndRouteCountTPToDestFound(ArrayList<TransitPoint> transitPoints)
-    {
-
     }
 
     private void cancelAllTasks()

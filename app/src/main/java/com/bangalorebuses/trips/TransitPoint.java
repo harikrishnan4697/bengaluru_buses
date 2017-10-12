@@ -1,6 +1,5 @@
 package com.bangalorebuses.trips;
 
-import com.bangalorebuses.core.Bus;
 import com.bangalorebuses.core.BusRoute;
 
 import java.util.ArrayList;
@@ -12,11 +11,10 @@ public class TransitPoint
     private int numberOfRoutesBetweenOriginAndTransitPoint;
     private int numberOfRoutesBetweenTransitPointAndDestination;
     private int transitPointScore;
-    private Bus fastestBusToTransitPoint;
-    private Bus fastestBusFromTransitPoint;
     private ArrayList<BusRoute> busRoutesToTransitPoint;
+    private BusRoute mostFrequentBusRouteToTransitPoint;
+    private BusRoute mostFrequentBusRouteFromTransitPoint;
     private ArrayList<BusRoute> busRoutesFromTransitPoint;
-    private ArrayList<IndirectTrip> indirectTrips = new ArrayList<>();
     private int shortestTripDuration;
 
     public String getTransitPointName()
@@ -79,41 +77,6 @@ public class TransitPoint
         this.busRoutesFromTransitPoint = busRoutesFromTransitPoint;
     }
 
-    public Bus getFastestBusToTransitPoint()
-    {
-        return fastestBusToTransitPoint;
-    }
-
-    public void setFastestBusToTransitPoint(Bus fastestBusToTransitPoint)
-    {
-        this.fastestBusToTransitPoint = fastestBusToTransitPoint;
-    }
-
-    public Bus getFastestBusFromTransitPoint()
-    {
-        return fastestBusFromTransitPoint;
-    }
-
-    public void setFastestBusFromTransitPoint(Bus fastestBusFromTransitPoint)
-    {
-        this.fastestBusFromTransitPoint = fastestBusFromTransitPoint;
-    }
-
-    public ArrayList<IndirectTrip> getIndirectTrips()
-    {
-        return indirectTrips;
-    }
-
-    public void setIndirectTrips(ArrayList<IndirectTrip> indirectTrips)
-    {
-        this.indirectTrips = indirectTrips;
-    }
-
-    public void addIndirectTrip(IndirectTrip indirectTrip)
-    {
-        indirectTrips.add(indirectTrip);
-    }
-
     public int getShortestTripDuration()
     {
         return shortestTripDuration;
@@ -132,5 +95,25 @@ public class TransitPoint
     public void setTransitPointDirectionName(String transitPointDirectionName)
     {
         this.transitPointDirectionName = transitPointDirectionName;
+    }
+
+    public BusRoute getMostFrequentBusRouteFromTransitPoint()
+    {
+        return mostFrequentBusRouteFromTransitPoint;
+    }
+
+    public void setMostFrequentBusRouteFromTransitPoint(BusRoute mostFrequentBusRouteFromTransitPoint)
+    {
+        this.mostFrequentBusRouteFromTransitPoint = mostFrequentBusRouteFromTransitPoint;
+    }
+
+    public BusRoute getMostFrequentBusRouteToTransitPoint()
+    {
+        return mostFrequentBusRouteToTransitPoint;
+    }
+
+    public void setMostFrequentBusRouteToTransitPoint(BusRoute mostFrequentBusRouteToTransitPoint)
+    {
+        this.mostFrequentBusRouteToTransitPoint = mostFrequentBusRouteToTransitPoint;
     }
 }
