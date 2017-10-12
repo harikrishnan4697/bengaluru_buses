@@ -362,6 +362,8 @@ public class TripPlannerActivity extends AppCompatActivity implements
 
         errorLinearLayout.setVisibility(View.GONE);
         swipeRefreshLayout.setRefreshing(true);
+        recyclerView.setVisibility(View.GONE);
+        transitPoints.clear();
 
         getDirectTripsBetweenStops = new GetDirectTripsBetweenStops();
         getDirectTripsBetweenStops.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
@@ -410,7 +412,6 @@ public class TripPlannerActivity extends AppCompatActivity implements
         }
         else
         {
-            swipeRefreshLayout.setRefreshing(false);
             findTransitPoints(originBusStopName, destinationBusStopName);
         }
     }
@@ -504,11 +505,13 @@ public class TripPlannerActivity extends AppCompatActivity implements
 
         if (numberOfDirectTripRouteBusesFound == numberOfDirectTripQueriesMade)
         {
-            swipeRefreshLayout.setRefreshing(false);
-
             if (directTripsToDisplay.size() == 0)
             {
                 findTransitPoints(originBusStopName, destinationBusStopName);
+            }
+            else
+            {
+                swipeRefreshLayout.setRefreshing(false);
             }
         }
     }
@@ -516,11 +519,6 @@ public class TripPlannerActivity extends AppCompatActivity implements
     // Everything to do with indirect trips
     private void findTransitPoints(String originBusStopName, String destinationBusStopName)
     {
-        errorLinearLayout.setVisibility(View.GONE);
-        recyclerView.setVisibility(View.GONE);
-        swipeRefreshLayout.setRefreshing(true);
-        transitPoints.clear();
-
         if (CommonMethods.checkNetworkConnectivity(this))
         {
             transitPointsWithNumberOfRoutesDbTask1 = new TransitPointsWithNumberOfRoutesDbTask(this, originBusStopName,
@@ -746,154 +744,6 @@ public class TripPlannerActivity extends AppCompatActivity implements
             }
         }
     }
-
-    /*@Override
-    public void onBusRoutesToAndFromTransitPointFound(TransitPoint transitPoint)
-    {
-        numberOfTransitPointQueriesComplete++;
-
-        for (int i = 0; i < 5; i++)
-        {
-            if (i < transitPoint.getBusRoutesToTransitPoint().size())
-            {
-                numberOfIndirectTripQueriesMade++;
-
-                BusETAsOnLeg1BusRouteTask task = new BusETAsOnLeg1BusRouteTask(this,
-                        transitPoint, transitPoint.getBusRoutesToTransitPoint().get(i));
-                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                busETAsOnLeg1BusRouteTasks.add(task);
-            }
-            else
-            {
-                break;
-            }
-        }
-    }
-
-    @Override
-    public void onBusETAsOnLeg1BusRouteFound(String errorMessage, BusRoute busRoute, TransitPoint transitPoint)
-    {
-        numberOfIndirectTripQueriesComplete++;
-
-        synchronized (this)
-        {
-            if (errorMessage.equals(NETWORK_QUERY_NO_ERROR))
-            {
-                if (busRoute.getBusRouteBuses().size() != 0)
-                {
-                    IndirectTrip indirectTrip = new IndirectTrip();
-                    indirectTrip.setOriginBusStop(busRoute.getTripPlannerOriginBusStop());
-                    indirectTrip.setTransitPoint(transitPoint);
-                    indirectTrip.setDestinationBusStopName(destinationBusStopName);
-
-                    busRoute.getBusRouteBuses().get(0).setBusETAToTransitPoint(CommonMethods.calculateTravelTime(
-                            busRoute.getBusRouteId(), busRoute.getBusRouteNumber(), busRoute
-                                    .getBusRouteBuses().get(0).getBusRouteOrder(), busRoute
-                                    .getTripPlannerDestinationBusStop().getBusStopRouteOrder()));
-
-                    indirectTrip.setBusOnFirstLeg(busRoute.getBusRouteBuses().get(0));
-
-                    if (transitPoint.getBusRoutesFromTransitPoint().size() != 0)
-                    {
-                        indirectTrip.setBusOnSecondLeg(transitPoint.getBusRoutesFromTransitPoint()
-                                .get(0).getBusRouteBuses().get(0));
-                    }
-                    else
-                    {
-                        return;
-                    }
-
-                    Bus bus = null;
-                    for (BusRoute busRouteFromTP : transitPoint.getBusRoutesFromTransitPoint())
-                    {
-                        for (Bus busFromTP : busRouteFromTP.getBusRouteBuses())
-                        {
-                            if (busFromTP.getBusETA() > (indirectTrip.getBusOnFirstLeg()
-                                    .getBusETAToTransitPoint() + 2))
-                            {
-                                if (bus != null)
-                                {
-                                    if (busFromTP.getBusETA() < bus.getBusETA())
-                                    {
-                                        bus = busFromTP;
-                                    }
-                                }
-                                else
-                                {
-                                    bus = busFromTP;
-                                }
-                            }
-                        }
-                    }
-
-                    indirectTrip.setBusOnSecondLeg(bus);
-
-                    if (indirectTrip.getBusOnFirstLeg() != null
-                            && indirectTrip.getBusOnSecondLeg() != null)
-                    {
-                        BusRoute busRouteOnSecondLeg = indirectTrip.getBusOnSecondLeg().getBusRoute();
-
-                        int travelTimeFromTPToDest = CommonMethods.calculateTravelTime(
-                                busRouteOnSecondLeg.getBusRouteId(), busRouteOnSecondLeg
-                                        .getBusRouteNumber(), busRouteOnSecondLeg.getTripPlannerOriginBusStop()
-                                        .getBusStopRouteOrder(), busRouteOnSecondLeg
-                                        .getTripPlannerDestinationBusStop().getBusStopRouteOrder());
-
-                        indirectTrip.setTripDuration(indirectTrip.getBusOnFirstLeg().getBusETAToTransitPoint() +
-                                (indirectTrip.getBusOnSecondLeg().getBusETA() - indirectTrip
-                                        .getBusOnFirstLeg().getBusETAToTransitPoint()) + travelTimeFromTPToDest);
-
-                        transitPoint.addIndirectTrip(indirectTrip);
-
-                        boolean alreadyHasTransitPoint = false;
-                        for (TransitPoint transitPointToDisplay : transitPointsToDisplay)
-                        {
-                            if (transitPointToDisplay.getTransitPointName()
-                                    .equals(transitPoint.getTransitPointName()))
-                            {
-                                transitPointToDisplay.addIndirectTrip(indirectTrip);
-                                alreadyHasTransitPoint = true;
-                            }
-                        }
-
-                        if (!alreadyHasTransitPoint)
-                        {
-                            transitPointsToDisplay.add(transitPoint);
-                        }
-
-                        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-                        recyclerView.setLayoutManager(linearLayoutManager);
-                        IndirectTripsRecyclerViewAdapter adapter = new
-                                IndirectTripsRecyclerViewAdapter(this, transitPointsToDisplay);
-                        recyclerView.setAdapter(adapter);
-                        recyclerView.setVisibility(View.VISIBLE);
-                    }
-                }
-                else
-                {
-                    //TODO
-                }
-            }
-            else
-            {
-                //TODO Handle errors
-            }
-
-            if (numberOfIndirectTripQueriesComplete == numberOfIndirectTripQueriesMade &&
-                    numberOfTransitPointQueriesComplete == numberOfTransitPointQueriesMade)
-            {
-                swipeRefreshLayout.setRefreshing(false);
-
-                if (directTripsToDisplay.size() == 0)
-                {
-                    //TODO 'There aren't trips' message gets displayed and then displays trips...needs to be fixed
-                    setErrorLayoutContent(R.drawable.ic_directions_bus_black, "Oh no! There aren't any trips right now...", "Retry");
-                    errorLinearLayout.setVisibility(View.VISIBLE);
-                    recyclerView.setVisibility(View.GONE);
-                }
-            }
-        }
-    }*/
 
     private void checkIfTripIsFavorite(String originBusStopName, String destinationBusStopName)
     {

@@ -247,10 +247,10 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
 
                 if (indirectTripsToDisplay.size() == 0)
                 {
-                    setErrorLayoutContent(R.drawable.ic_directions_bus_black,
-                            "Oh no! There aren't any trips right now...", "Retry");
+                    setErrorLayoutContent(ErrorImageResIds.ERROR_IMAGE_NO_BUSES_IN_SERVICE,
+                            "Uh oh! There don't seem to be any trips via " +
+                                    transitPointBusStopName + " right now.", "Retry");
                     errorLinearLayout.setVisibility(View.VISIBLE);
-                    recyclerView.setVisibility(View.GONE);
                 }
             }
         }

@@ -1,6 +1,7 @@
 package com.bangalorebuses.trips;
 
 import android.support.v7.widget.RecyclerView;
+import android.telecom.Call;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +11,10 @@ import android.widget.TextView;
 import com.bangalorebuses.R;
 import com.bangalorebuses.utils.CommonMethods;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
 
 class IndirectTripsDetailsRecyclerViewAdapter extends RecyclerView
         .Adapter<IndirectTripsDetailsRecyclerViewAdapter.IndirectTripsDetailsViewHolder>
@@ -92,9 +96,27 @@ class IndirectTripsDetailsRecyclerViewAdapter extends RecyclerView
                 .getBusRouteServiceTypeImageResId(indirectTrips.get(position)
                         .getBusOnSecondLeg().getBusRoute().getBusRouteNumber()));
 
+        Calendar calendar = Calendar.getInstance();
+
+        int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
+        int currentMinute = calendar.get(Calendar.MINUTE);
+        int currentTimeInMinutesSinceMidnight = (currentHour * 60) + currentMinute;
+
+        int secondLegBusETAInMinutesSinceMidnight = currentTimeInMinutesSinceMidnight
+                + indirectTrips.get(position).getBusOnSecondLeg().getBusETA();
+        int secondLegBusETAHour = secondLegBusETAInMinutesSinceMidnight / 60;
+        int secondLegBusETAMinute = secondLegBusETAInMinutesSinceMidnight % 60;
+
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, secondLegBusETAHour);
+        cal.set(Calendar.MINUTE, secondLegBusETAMinute);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        String secondLegBusETA = sdf.format(cal.getTime());
+
         // Set the second leg bus ETA text view
-        holder.secondLegBusRouteETATextView.setText(CommonMethods.convertMinutesToBusArrivalTimings(
-                indirectTrips.get(position).getBusOnSecondLeg().getBusETA()));
+        holder.secondLegBusRouteETATextView.setText(secondLegBusETA);
     }
 
     @Override

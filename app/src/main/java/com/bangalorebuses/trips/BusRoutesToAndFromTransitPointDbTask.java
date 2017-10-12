@@ -202,9 +202,10 @@ public class BusRoutesToAndFromTransitPointDbTask extends AsyncTask<Void, Void, 
                     .calculateTravelTime(busRoute.getBusRouteId(), busRoute.getBusRouteNumber(),
                             1, busRoute.getTripPlannerOriginBusStop().getBusStopRouteOrder());
 
-            Date date = new Date();
+            Calendar calendar = Calendar.getInstance();
 
-            int busETA = timeOfDayBusWillArrive - ((date.getHours() * 60) + date.getMinutes());
+            int busETA = timeOfDayBusWillArrive - ((calendar.get(Calendar.HOUR_OF_DAY) * 60) +
+                    calendar.get(Calendar.MINUTE));
 
             if (busETA > -1)
             {

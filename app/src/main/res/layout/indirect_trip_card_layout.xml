@@ -27,9 +27,21 @@
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:background="@drawable/grey_rounded_background_borderless"
-                android:text="1 hr 17 mins (Est.)"
+                android:text="1 hr 17 min"
                 android:textColor="@color/standard_text_color"
                 android:textSize="@dimen/text_size_medium"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/layout_margin_tiny"
+                android:layout_marginStart="@dimen/layout_margin_tiny"
+                android:layout_toEndOf="@id/indirect_trip_duration_text_view"
+                android:layout_toRightOf="@id/indirect_trip_duration_text_view"
+                android:text="(Est.)"
+                android:textColor="@color/sub_text_color"
+                android:textSize="@dimen/text_size_small"/>
 
             <TextView
                 android:layout_width="wrap_content"
