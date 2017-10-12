@@ -90,6 +90,7 @@
             android:id="@+id/favorites_list_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:divider="#FAFAFA"
             android:dividerHeight="@dimen/layout_margin_small"
             android:paddingBottom="@dimen/layout_padding_tiny"
             android:paddingLeft="@dimen/layout_padding_tiny"

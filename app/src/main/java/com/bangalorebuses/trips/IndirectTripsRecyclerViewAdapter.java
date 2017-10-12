@@ -25,11 +25,17 @@ class IndirectTripsRecyclerViewAdapter extends RecyclerView
 {
     private Activity context;
     private ArrayList<TransitPoint> transitPoints;
+    private String originBusStopName;
+    private String destinationBusStopName;
 
-    public IndirectTripsRecyclerViewAdapter(Activity context, ArrayList<TransitPoint> transitPoints)
+    public IndirectTripsRecyclerViewAdapter(Activity context, String originBusStopName,
+                                            String destinationBusStopName, ArrayList<TransitPoint>
+                                                    transitPoints)
     {
         this.context = context;
         this.transitPoints = transitPoints;
+        this.originBusStopName = originBusStopName;
+        this.destinationBusStopName = destinationBusStopName;
     }
 
     @Override
@@ -77,9 +83,15 @@ class IndirectTripsRecyclerViewAdapter extends RecyclerView
             {
                 Intent indirectTripDetailsActivityIntent = new Intent(
                         context, IndirectTripDetailsActivity.class);
-                indirectTripDetailsActivityIntent.putExtra(Constants.ORIGIN_BUS_STOP_NAME, "");
-                indirectTripDetailsActivityIntent.putExtra(Constants.TRANSIT_POINT_BUS_STOP_NAME, "");
-                indirectTripDetailsActivityIntent.putExtra(Constants.DESTINATION_BUS_STOP_NAME, "");
+                indirectTripDetailsActivityIntent.putExtra(Constants.ORIGIN_BUS_STOP_NAME,
+                        originBusStopName);
+
+                indirectTripDetailsActivityIntent.putExtra(Constants.TRANSIT_POINT_BUS_STOP_NAME,
+                        transitPoints.get(position).getTransitPointName());
+
+                indirectTripDetailsActivityIntent.putExtra(Constants.DESTINATION_BUS_STOP_NAME,
+                        destinationBusStopName);
+
                 context.startActivity(indirectTripDetailsActivityIntent);
             }
         });

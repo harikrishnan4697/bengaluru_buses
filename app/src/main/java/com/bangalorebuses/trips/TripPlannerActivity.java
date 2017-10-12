@@ -78,6 +78,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
     private int numberOfDirectTripRouteBusesFound = 0;
 
     // Indirect trip related variables
+    private IndirectTripsRecyclerViewAdapter indirectTripsAdapter;
     private int numberOfMostFrequentBusRouteQueriesMade = 0;
     private int numberOfMostFrequentBusRouteQueriesComplete = 0;
     private ArrayList<TransitPoint> transitPointsToDisplay =
@@ -410,7 +411,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
         else
         {
             swipeRefreshLayout.setRefreshing(false);
-            findIndirectTrips(originBusStopName, destinationBusStopName);
+            findTransitPoints(originBusStopName, destinationBusStopName);
         }
     }
 
@@ -507,14 +508,13 @@ public class TripPlannerActivity extends AppCompatActivity implements
 
             if (directTripsToDisplay.size() == 0)
             {
-                swipeRefreshLayout.setRefreshing(false);
-                findIndirectTrips(originBusStopName, destinationBusStopName);
+                findTransitPoints(originBusStopName, destinationBusStopName);
             }
         }
     }
 
     // Everything to do with indirect trips
-    private void findIndirectTrips(String originBusStopName, String destinationBusStopName)
+    private void findTransitPoints(String originBusStopName, String destinationBusStopName)
     {
         errorLinearLayout.setVisibility(View.GONE);
         recyclerView.setVisibility(View.GONE);
@@ -669,6 +669,13 @@ public class TripPlannerActivity extends AppCompatActivity implements
         numberOfMostFrequentBusRouteQueriesMade = 0;
         numberOfMostFrequentBusRouteQueriesComplete = 0;
 
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        indirectTripsAdapter = new
+                IndirectTripsRecyclerViewAdapter(this, originBusStopName,
+                destinationBusStopName, transitPointsToDisplay);
+        recyclerView.setAdapter(indirectTripsAdapter);
+
         for (TransitPoint transitPoint : this.transitPoints)
         {
             new MostFrequentBusRouteDbTask(this, originBusStopName, transitPoint
@@ -686,7 +693,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
     {
         numberOfMostFrequentBusRouteQueriesComplete++;
 
-        int estimatedTotalWaitTimeForTrip = 15;
+        int estimatedTotalWaitTimeForTrip = 20;
 
         int travelTimeOnFirstLeg = CommonMethods.calculateTravelTime(
                 mostFrequentBusRouteOnFirstLeg.getBusRouteId(), mostFrequentBusRouteOnFirstLeg
@@ -721,11 +728,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
             }
         });
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(linearLayoutManager);
-        IndirectTripsRecyclerViewAdapter adapter = new
-                IndirectTripsRecyclerViewAdapter(this, transitPointsToDisplay);
-        recyclerView.setAdapter(adapter);
+        indirectTripsAdapter.notifyDataSetChanged();
         recyclerView.setVisibility(View.VISIBLE);
 
         if (numberOfMostFrequentBusRouteQueriesComplete ==
@@ -891,8 +894,6 @@ public class TripPlannerActivity extends AppCompatActivity implements
             }
         }
     }*/
-
-    // Other stuff
 
     private void checkIfTripIsFavorite(String originBusStopName, String destinationBusStopName)
     {

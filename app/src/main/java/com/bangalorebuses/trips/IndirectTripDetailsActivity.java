@@ -9,6 +9,7 @@ import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -19,6 +20,7 @@ import com.bangalorebuses.R;
 import com.bangalorebuses.core.Bus;
 import com.bangalorebuses.core.BusRoute;
 import com.bangalorebuses.utils.CommonMethods;
+import com.bangalorebuses.utils.Constants;
 import com.bangalorebuses.utils.DbQueries;
 import com.bangalorebuses.utils.ErrorImageResIds;
 
@@ -47,6 +49,8 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
     // Tasks
     private BusRoutesToAndFromTransitPointDbTask
             busRoutesToAndFromTransitPointDbTask;
+    private BusETAsOnLeg1BusRouteTask
+            busETAsOnLeg1BusRouteTask;
 
     // Variable for displaying errors
     private LinearLayout errorLinearLayout;
@@ -58,7 +62,10 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recyclerView;
 
-    private ArrayList<IndirectTrip> indirectTripsToDisplay = new ArrayList<>();
+    private int numberOfIndirectTripQueriesMade = 0;
+    private int numberOfIndirectTripQueriesComplete = 0;
+    private ArrayList<IndirectTrip> indirectTripsToDisplay
+            = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -70,16 +77,12 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // Initialise the back button
-        ImageView backButtonImageView = (ImageView) findViewById(R.id.back_button_image_view);
-        backButtonImageView.setOnClickListener(new View.OnClickListener()
+        if (getSupportActionBar() != null)
         {
-            @Override
-            public void onClick(View v)
-            {
-                finish();
-            }
-        });
+            getSupportActionBar().setTitle(getIntent()
+                    .getStringExtra(Constants.TRANSIT_POINT_BUS_STOP_NAME));
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         errorLinearLayout = (LinearLayout) findViewById(R.id.errorLinearLayout);
@@ -95,6 +98,7 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
                 findTrips();
             }
         });
+        errorLinearLayout.setVisibility(View.GONE);
 
         // Initialise the trip details variables
         originBusStopName = getIntent().getStringExtra(ORIGIN_BUS_STOP_NAME);
@@ -106,19 +110,35 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
                 R.color.colorACServiceBus, R.color.colorSpecialServiceBus);
         swipeRefreshLayout.setOnRefreshListener(this);
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        recyclerView.setVisibility(View.GONE);
 
         findTrips();
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case android.R.id.home:
+                finish();
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return true;
+    }
+
     private void findTrips()
     {
+        errorLinearLayout.setVisibility(View.GONE);
+        recyclerView.setVisibility(View.GONE);
+
         swipeRefreshLayout.setRefreshing(true);
 
         if (originBusStopName != null && transitPointBusStopName != null
                 && destinationBusStopName != null)
         {
-            // Execute the task that will query the db and return a list of bus routes
-            // to the transit point and from the transit point.
             busRoutesToAndFromTransitPointDbTask = new BusRoutesToAndFromTransitPointDbTask(this,
                     originBusStopName, transitPointBusStopName, destinationBusStopName);
             busRoutesToAndFromTransitPointDbTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -135,13 +155,19 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
     @Override
     public void onBusRoutesToAndFromTransitPointFound(TransitPoint transitPoint)
     {
+        indirectTripsToDisplay.clear();
+        numberOfIndirectTripQueriesMade = 0;
+        numberOfIndirectTripQueriesComplete = 0;
+
         for (int i = 0; i < 5; i++)
         {
             if (i < transitPoint.getBusRoutesToTransitPoint().size())
             {
-                BusETAsOnLeg1BusRouteTask task = new BusETAsOnLeg1BusRouteTask(this,
+                busETAsOnLeg1BusRouteTask = new BusETAsOnLeg1BusRouteTask(this,
                         transitPoint, transitPoint.getBusRoutesToTransitPoint().get(i));
-                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                busETAsOnLeg1BusRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+                numberOfIndirectTripQueriesMade++;
             }
             else
             {
@@ -153,7 +179,9 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
     @Override
     public void onBusETAsOnLeg1BusRouteFound(String errorMessage, BusRoute busRoute, TransitPoint transitPoint)
     {
-        synchronized (this)
+        numberOfIndirectTripQueriesComplete++;
+
+        /*synchronized (this)
         {
             if (errorMessage.equals(NETWORK_QUERY_NO_ERROR))
             {
@@ -244,25 +272,37 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
                 //TODO Handle errors
             }
 
-            /*if (numberOfIndirectTripQueriesComplete == numberOfIndirectTripQueriesMade &&
-                    numberOfTransitPointQueriesComplete == numberOfTransitPointQueriesMade)
+
+        }*/
+
+        synchronized (this)
+        {
+            if (numberOfIndirectTripQueriesComplete == numberOfIndirectTripQueriesMade)
             {
                 swipeRefreshLayout.setRefreshing(false);
 
-                if (directTripsToDisplay.size() == 0)
+                if (indirectTripsToDisplay.size() == 0)
                 {
-                    //TODO 'There aren't trips' message gets displayed and then displays trips...needs to be fixed
-                    setErrorLayoutContent(R.drawable.ic_directions_bus_black, "Oh no! There aren't any trips right now...", "Retry");
+                    setErrorLayoutContent(R.drawable.ic_directions_bus_black,
+                            "Oh no! There aren't any trips right now...", "Retry");
                     errorLinearLayout.setVisibility(View.VISIBLE);
                     recyclerView.setVisibility(View.GONE);
                 }
-            }*/
+            }
         }
     }
 
     private void cancelAllTasks()
     {
-        busRoutesToAndFromTransitPointDbTask.cancel(true);
+        if (busRoutesToAndFromTransitPointDbTask != null)
+        {
+            busRoutesToAndFromTransitPointDbTask.cancel(true);
+        }
+
+        if (busETAsOnLeg1BusRouteTask != null)
+        {
+            busETAsOnLeg1BusRouteTask.cancel(true);
+        }
     }
 
     @Override

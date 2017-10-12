@@ -178,6 +178,18 @@ public class SearchActivity extends AppCompatActivity implements SearchDbQueries
         });
 
         progressBar.setVisibility(View.GONE);
+
+        if (!hasFavorites)
+        {
+            searchResultsListView.setVisibility(View.VISIBLE);
+            favoritesLinearLayout.setVisibility(View.GONE);
+        }
+        else
+        {
+            searchResultsListView.setVisibility(View.GONE);
+            favoritesLinearLayout.setVisibility(View.VISIBLE);
+        }
+
         searchEditText.setEnabled(true);
     }
 

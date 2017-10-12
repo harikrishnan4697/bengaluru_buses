@@ -39,7 +39,7 @@ class IndirectTripsDetailsRecyclerViewAdapter extends RecyclerView
     public IndirectTripsDetailsViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
     {
         return new IndirectTripsDetailsViewHolder(LayoutInflater.from(parent.getContext()).inflate(
-                R.layout.indirect_trip_card_layout, parent, false));
+                R.layout.indirect_trip_details_card_layout, parent, false));
     }
 
     @Override
@@ -78,8 +78,8 @@ class IndirectTripsDetailsRecyclerViewAdapter extends RecyclerView
                 .getBusOnSecondLeg().getBusRoute().getBusRouteNumber());
 
         // Set the first leg bus ETA text view
-        holder.firstLegBusRouteETATextView.setText(indirectTrips.get(position)
-                .getBusOnFirstLeg().getBusETA());
+        /*holder.firstLegBusRouteETATextView.setText(indirectTrips.get(position)
+                .getBusOnFirstLeg().getBusETA());*/
 
         // TODO Set the second leg bus ETA text view
 

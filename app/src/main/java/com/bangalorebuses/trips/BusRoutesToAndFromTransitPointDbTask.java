@@ -234,6 +234,10 @@ public class BusRoutesToAndFromTransitPointDbTask extends AsyncTask<Void, Void, 
     protected void onPostExecute(TransitPoint transitPoint)
     {
         super.onPostExecute(transitPoint);
-        caller.onBusRoutesToAndFromTransitPointFound(transitPoint);
+
+        if (!isCancelled())
+        {
+            caller.onBusRoutesToAndFromTransitPointFound(transitPoint);
+        }
     }
 }
