@@ -470,7 +470,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
                 }
 
                 directTripsToDisplay.clear();
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < 5; i++)
                 {
                     if (i < tempTripsToDisplay.size())
                     {

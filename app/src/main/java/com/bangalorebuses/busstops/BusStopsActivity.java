@@ -17,6 +17,8 @@ import com.bangalorebuses.R;
 
 public class BusStopsActivity extends AppCompatActivity
 {
+    private BusStopsPagerAdapter adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -40,7 +42,7 @@ public class BusStopsActivity extends AppCompatActivity
 
         // Use a ViewPager to allow the user to swipe between the tabs
         final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-        final BusStopsPagerAdapter adapter = new BusStopsPagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
+        adapter = new BusStopsPagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
         viewPager.setAdapter(adapter);
 
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
@@ -66,17 +68,6 @@ public class BusStopsActivity extends AppCompatActivity
 
             }
         });
-
-        // Initialise some variables
-        /*ImageView backButtonImageView = (ImageView) findViewById(R.id.back_button_image_view);
-        backButtonImageView.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                finish();
-            }
-        });*/
     }
 
     @Override
@@ -93,30 +84,14 @@ public class BusStopsActivity extends AppCompatActivity
         return true;
     }
 
-    /*@Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
-        // Pass on the result of an activity launched by a fragment back
-        // to the fragment.
-        /*if (requestCode == 1 && selectedFragment != null)
-        {
-            selectedFragment.onActivityResult(requestCode, resultCode, data);
-        }
-        else
-        {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }*/
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
-        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id
-                .nearbyFragmentContainerRelativeLayout);
-        if (fragment != null)
+        NearbyFragment nearbyFragment = adapter.getNearbyFragment();
+        if (nearbyFragment != null)
         {
-            fragment.onActivityResult(requestCode, resultCode, data);
+            nearbyFragment.onActivityResult(requestCode, resultCode, data);
         }
     }
 }

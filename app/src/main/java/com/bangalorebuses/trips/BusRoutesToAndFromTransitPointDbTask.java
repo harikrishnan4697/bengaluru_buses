@@ -45,52 +45,53 @@ public class BusRoutesToAndFromTransitPointDbTask extends AsyncTask<Void, Void, 
 
     private ArrayList<BusRoute> getBusRoutesOnFirstLeg()
     {
-        // Get all the bus routes from the origin bus stop to the transit point bus stop
-        ArrayList<BusRoute> originToTransitPointBusRoutes = getBusRoutes(originBusStopName,
+        return getBusRoutes(originBusStopName,
                 transitPointBusStopName);
+    }
 
-        // Create a temporary list to store only the bus routes that currently have buses in service
-        ArrayList<BusRoute> tempOriginToTransitPointBuses = new ArrayList<>();
+    private ArrayList<BusRoute> getBusRoutes(String originBusStopName,
+                                             String destinationBusStopName)
+    {
+        Cursor cursor = db.rawQuery("SELECT Routes.RouteId, Routes.RouteNumber, Routes.RouteDirection," +
+                " routesBetweenOriginAndTP.originBusStopDirectionName, routesBetweenOriginAndTP" +
+                ".originBusStopRouteOrder, routesBetweenOriginAndTP.destinationBusStopRouteOrder" +
+                " FROM Routes JOIN ( SELECT sub1.RouteId, sub1.StopId, sub1.StopDirectionName as" +
+                " originBusStopDirectionName, sub1.StopRouteOrder as originBusStopRouteOrder, sub2" +
+                ".StopRouteOrder as destinationBusStopRouteOrder FROM ( SELECT Stops.StopId, Stops" +
+                ".StopName, Stops.StopDirectionName, RouteStops.StopRouteOrder, RouteStops.RouteId" +
+                " FROM Stops JOIN RouteStops WHERE Stops.StopName = '" + originBusStopName + "' AND Stops.StopId" +
+                " = RouteStops.StopId) sub1 JOIN ( SELECT RouteStops.RouteId, RouteStops.StopRouteOrder" +
+                " FROM Stops JOIN RouteStops WHERE Stops.StopName = '" + destinationBusStopName + "' AND Stops.StopId =" +
+                " RouteStops.StopId) sub2 WHERE sub1.RouteId = sub2.RouteId AND sub1.StopRouteOrder < sub2" +
+                ".StopRouteOrder) routesBetweenOriginAndTP WHERE Routes.RouteId = routesBetweenOriginAndTP" +
+                ".RouteId order by Routes.RouteDeparturesPerDay desc", null);
 
-        for (BusRoute busRoute : originToTransitPointBusRoutes)
+        ArrayList<BusRoute> busRoutes = new ArrayList<>();
+
+        while (cursor.moveToNext())
         {
-            // Get the buses in service on each of the bus routes
-            busRoute.setBusRouteBuses(getScheduledBuses(busRoute));
+            BusRoute busRoute = new BusRoute();
+            busRoute.setBusRouteId(cursor.getInt(0));
+            busRoute.setBusRouteNumber(cursor.getString(1));
+            busRoute.setBusRouteDirection(cursor.getString(2));
 
-            // Add the bus route to the temporary list only if there are buses in service and if
-            // the list doesn't already contain it.
-            if (busRoute.getBusRouteBuses() != null && busRoute.getBusRouteBuses().size() != 0)
-            {
-                boolean busRouteIsAlreadyInTempList = false;
-                for (BusRoute busRouteAlreadyInTempList : tempOriginToTransitPointBuses)
-                {
-                    if (busRouteAlreadyInTempList.getBusRouteId() == busRoute.getBusRouteId())
-                    {
-                        busRouteIsAlreadyInTempList = true;
-                    }
-                }
+            BusStop originBusStop = new BusStop();
+            originBusStop.setBusStopName(originBusStopName);
+            originBusStop.setBusStopDirectionName(cursor.getString(3));
+            originBusStop.setBusStopRouteOrder(cursor.getInt(4));
 
-                if (!busRouteIsAlreadyInTempList)
-                {
-                    tempOriginToTransitPointBuses.add(busRoute);
-                }
-            }
+            BusStop transitPointBusStop = new BusStop();
+            transitPointBusStop.setBusStopName(transitPointBusStopName);
+            transitPointBusStop.setBusStopRouteOrder(cursor.getInt(5));
+
+            busRoute.setTripPlannerOriginBusStop(originBusStop);
+            busRoute.setTripPlannerDestinationBusStop(transitPointBusStop);
+
+            busRoutes.add(busRoute);
         }
 
-        originToTransitPointBusRoutes = tempOriginToTransitPointBuses;
-        originToTransitPointBusRoutes.trimToSize();
-
-        // Sort the list of bus routes based on when their first bus will arrive
-        Collections.sort(originToTransitPointBusRoutes, new Comparator<BusRoute>()
-        {
-            @Override
-            public int compare(BusRoute o1, BusRoute o2)
-            {
-                return o1.getBusRouteBuses().get(0).getBusETA() - o2.getBusRouteBuses().get(0).getBusETA();
-            }
-        });
-
-        return originToTransitPointBusRoutes;
+        cursor.close();
+        return busRoutes;
     }
 
     private ArrayList<BusRoute> getBusRoutesOnSecondLeg()
@@ -141,50 +142,6 @@ public class BusRoutesToAndFromTransitPointDbTask extends AsyncTask<Void, Void, 
         });
 
         return transitPointToDestinationBusRoutes;
-    }
-
-    private ArrayList<BusRoute> getBusRoutes(String originBusStopName, String destinationBusStopName)
-    {
-        Cursor cursor = db.rawQuery("SELECT DISTINCT Routes.RouteId, Routes.RouteNumber, Routes.RouteDirection, " +
-                "routesBetweenOriginAndTP.StopId, routesBetweenOriginAndTP.StopName, routesBetweenOriginAndTP.StopDirectionName," +
-                " routesBetweenOriginAndTP.originBusStopRouteOrder, routesBetweenOriginAndTP.destinationBusStopRouteOrder" +
-                " FROM Routes JOIN ( SELECT sub1.RouteId, sub1.StopId, sub1.StopName, sub1.StopDirectionName, sub1.StopRouteOrder" +
-                " as originBusStopRouteOrder, sub2.StopRouteOrder as destinationBusStopRouteOrder FROM ( SELECT Stops.StopId," +
-                " Stops.StopName, Stops.StopDirectionName, RouteStops.StopRouteOrder, RouteStops.RouteId FROM Stops JOIN RouteStops" +
-                " WHERE Stops.StopName = '" + originBusStopName + "' AND Stops.StopId = RouteStops.StopId) sub1 JOIN" +
-                " ( SELECT RouteStops.RouteId," +
-                " RouteStops.StopRouteOrder FROM Stops JOIN RouteStops WHERE Stops.StopName = '" + destinationBusStopName + "' AND" +
-                " Stops.StopId = RouteStops.StopId) sub2 WHERE sub1.RouteId = sub2.RouteId AND sub1.StopRouteOrder < sub2.StopRouteOrder)" +
-                " routesBetweenOriginAndTP WHERE Routes.RouteId = routesBetweenOriginAndTP.RouteId", null);
-
-        ArrayList<BusRoute> busRoutes = new ArrayList<>();
-
-        while (cursor.moveToNext())
-        {
-            BusRoute busRoute = new BusRoute();
-            BusStop originBusStop = new BusStop();
-            BusStop destinationBusStop = new BusStop();
-
-            busRoute.setBusRouteId(cursor.getInt(0));
-            busRoute.setBusRouteNumber(cursor.getString(1));
-            busRoute.setBusRouteDirection(cursor.getString(2));
-
-            originBusStop.setBusStopId(cursor.getInt(3));
-            originBusStop.setBusStopName(cursor.getString(4));
-            originBusStop.setBusStopDirectionName(cursor.getString(5));
-            originBusStop.setBusStopRouteOrder(cursor.getInt(6));
-
-            destinationBusStop.setBusStopName(destinationBusStopName);
-            destinationBusStop.setBusStopRouteOrder(cursor.getInt(7));
-
-            busRoute.setTripPlannerOriginBusStop(originBusStop);
-            busRoute.setTripPlannerDestinationBusStop(destinationBusStop);
-
-            busRoutes.add(busRoute);
-        }
-
-        cursor.close();
-        return busRoutes;
     }
 
     private ArrayList<Bus> getScheduledBuses(BusRoute busRoute)

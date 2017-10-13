@@ -38,7 +38,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:text="Direct trip"
+                android:text="Direct"
                 android:textAllCaps="true"
                 android:textColor="@color/standard_text_color"
                 android:textSize="@dimen/text_size_medium"/>
