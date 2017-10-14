@@ -68,8 +68,8 @@ class DirectTripsRecyclerViewAdapter extends RecyclerView
             holder.busNumberTextView.setBackgroundResource(R.drawable
                     .blue_rounded_background_borderless);
         }
-        else if (busRouteNumber.length() > 1 && busRouteNumber.substring(0, 2)
-                .equals("V-"))
+        else if (busRouteNumber.length() > 1 && (busRouteNumber.substring(0, 2)
+                .equals("V-") || busRouteNumber.substring(0, 2).equals("C-")))
         {
             holder.busServiceTypeImageView.setImageResource(R.drawable
                     .ic_directions_bus_ac);

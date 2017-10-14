@@ -492,6 +492,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item, routeStopNames);
         spinner.setAdapter(adapter);
+        spinner.setSelection(routeStopNames.size() - 1);
         spinner.setOnItemSelectedListener(this);
     }
 

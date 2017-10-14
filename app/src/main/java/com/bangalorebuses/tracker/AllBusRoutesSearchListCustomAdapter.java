@@ -78,7 +78,8 @@ public class AllBusRoutesSearchListCustomAdapter extends BaseAdapter implements 
                     .blue_rounded_background_borderless);
         }
         else if (filteredBusRouteNumbers.get(position).length() > 2 &&
-                filteredBusRouteNumbers.get(position).substring(0, 2).equals("V-"))
+                (filteredBusRouteNumbers.get(position).substring(0, 2).equals("V-")
+                        || filteredBusRouteNumbers.get(position).substring(0, 2).equals("C-")))
         {
             holder.imageView.setImageResource(R.drawable.ic_directions_bus_ac);
             holder.routeServiceTypeNameTextView.setText("A/C");

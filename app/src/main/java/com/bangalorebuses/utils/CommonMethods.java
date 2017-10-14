@@ -185,8 +185,8 @@ public class CommonMethods
         {
             busRouteServiceTypeImageResId = R.drawable.ic_flight_blue;
         }
-        else if (busRouteNumber.length() > 1 && busRouteNumber.substring(0, 2)
-                .equals("V-"))
+        else if (busRouteNumber.length() > 1 && (busRouteNumber.substring(0, 2)
+                .equals("V-") || busRouteNumber.substring(0, 2).equals("C-")))
         {
             busRouteServiceTypeImageResId = R.drawable.ic_directions_bus_ac;
         }

@@ -72,7 +72,8 @@ public class TrackBusListCustomAdapter extends BaseAdapter
                     .blue_rounded_background_borderless);
         }
         else if (buses.get(position).getBusRoute().getBusRouteNumber().length() > 1 &&
-                buses.get(position).getBusRoute().getBusRouteNumber().substring(0, 2).equals("V-"))
+                (buses.get(position).getBusRoute().getBusRouteNumber().substring(0, 2).equals("V-")
+                        || buses.get(position).getBusRoute().getBusRouteNumber().substring(0, 2).equals("C-")))
         {
             holder.routeTypeImageView.setImageResource(R.drawable.ic_directions_bus_ac);
             holder.busRouteNumberTextView.setBackgroundResource(R.drawable

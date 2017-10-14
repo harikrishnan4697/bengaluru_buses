@@ -74,7 +74,8 @@ public class BusesArrivingAtBusStopListCustomAdapter extends BaseAdapter
                     .blue_rounded_background_borderless);
         }
         else if (busRoutes.get(position).getBusRouteNumber().length() > 1 &&
-                busRoutes.get(position).getBusRouteNumber().substring(0, 2).equals("V-"))
+                (busRoutes.get(position).getBusRouteNumber().substring(0, 2).equals("V-")
+                        || busRoutes.get(position).getBusRouteNumber().substring(0, 2).equals("C-")))
         {
             holder.imgViewLogo.setImageResource(R.drawable.ic_directions_bus_ac);
             holder.txtViewRouteNumber.setBackgroundResource(R.drawable
