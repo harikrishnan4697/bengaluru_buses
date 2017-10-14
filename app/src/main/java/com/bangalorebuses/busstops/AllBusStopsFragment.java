@@ -82,10 +82,6 @@ public class AllBusStopsFragment extends Fragment implements BusStopsDbQueriesHe
         editText.setEnabled(true);
 
         editText.addTextChangedListener(this);
-
-        // TODO Decide weather the keyboard should auto open
-        /* InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);*/
     }
 
     @Override

@@ -83,6 +83,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
     private int numberOfMostFrequentBusRouteQueriesComplete = 0;
     private ArrayList<TransitPoint> transitPointsToDisplay =
             new ArrayList<>();
+    private ArrayList<MostFrequentBusRouteDbTask> mostFrequentBusRouteDbTasks = new ArrayList<>();
     private ArrayList<TransitPoint> transitPoints = new ArrayList<>();
     private TransitPointsWithNumberOfRoutesDbTask transitPointsWithNumberOfRoutesDbTask1;
     private TransitPointsWithNumberOfRoutesDbTask transitPointsWithNumberOfRoutesDbTask2;
@@ -332,6 +333,14 @@ public class TripPlannerActivity extends AppCompatActivity implements
 
         // Iterate over all the previous GetBusesEnDirectTripTasks to cancel each one of them
         for (BusETAsOnDirectTripTask task : busETAsOnDirectTripTasks)
+        {
+            if (task != null)
+            {
+                task.cancel(true);
+            }
+        }
+
+        for (MostFrequentBusRouteDbTask task : mostFrequentBusRouteDbTasks)
         {
             if (task != null)
             {
@@ -666,6 +675,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
         transitPointsToDisplay.clear();
         numberOfMostFrequentBusRouteQueriesMade = 0;
         numberOfMostFrequentBusRouteQueriesComplete = 0;
+        mostFrequentBusRouteDbTasks.clear();
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -676,10 +686,11 @@ public class TripPlannerActivity extends AppCompatActivity implements
 
         for (TransitPoint transitPoint : this.transitPoints)
         {
-            new MostFrequentBusRouteDbTask(this, originBusStopName, transitPoint
-                    .getTransitPointName(), destinationBusStopName).executeOnExecutor(
-                    AsyncTask.THREAD_POOL_EXECUTOR);
+            MostFrequentBusRouteDbTask task = new MostFrequentBusRouteDbTask(this,
+                    originBusStopName, transitPoint.getTransitPointName(), destinationBusStopName);
+            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
+            mostFrequentBusRouteDbTasks.add(task);
             numberOfMostFrequentBusRouteQueriesMade++;
         }
     }

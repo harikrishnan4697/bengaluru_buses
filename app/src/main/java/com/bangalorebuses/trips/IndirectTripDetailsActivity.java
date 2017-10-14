@@ -49,8 +49,8 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
     // Tasks
     private BusRoutesToAndFromTransitPointDbTask
             busRoutesToAndFromTransitPointDbTask;
-    private BusETAsOnLeg1BusRouteTask
-            busETAsOnLeg1BusRouteTask;
+    private ArrayList<BusETAsOnLeg1BusRouteTask> busETAsOnLeg1BusRouteTasks =
+            new ArrayList<>();
 
     // Variable for displaying errors
     private LinearLayout errorLinearLayout;
@@ -66,7 +66,7 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
     private int numberOfIndirectTripQueriesComplete = 0;
     private ArrayList<IndirectTrip> indirectTripsToDisplay
             = new ArrayList<>();
-    IndirectTripsDetailsRecyclerViewAdapter indirectTripsAdapter;
+    private IndirectTripsDetailsRecyclerViewAdapter indirectTripsAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -159,6 +159,7 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
         indirectTripsToDisplay.clear();
         numberOfIndirectTripQueriesMade = 0;
         numberOfIndirectTripQueriesComplete = 0;
+        busETAsOnLeg1BusRouteTasks.clear();
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -181,10 +182,11 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
         {
             if (i < transitPoint.getBusRoutesToTransitPoint().size())
             {
-                busETAsOnLeg1BusRouteTask = new BusETAsOnLeg1BusRouteTask(this,
+                BusETAsOnLeg1BusRouteTask task = new BusETAsOnLeg1BusRouteTask(this,
                         transitPoint, transitPoint.getBusRoutesToTransitPoint().get(i));
-                busETAsOnLeg1BusRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
+                busETAsOnLeg1BusRouteTasks.add(task);
                 numberOfIndirectTripQueriesMade++;
             }
             else
@@ -325,9 +327,12 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
             busRoutesToAndFromTransitPointDbTask.cancel(true);
         }
 
-        if (busETAsOnLeg1BusRouteTask != null)
+        for (BusETAsOnLeg1BusRouteTask task : busETAsOnLeg1BusRouteTasks)
         {
-            busETAsOnLeg1BusRouteTask.cancel(true);
+            if (task != null)
+            {
+                task.cancel(true);
+            }
         }
     }
 

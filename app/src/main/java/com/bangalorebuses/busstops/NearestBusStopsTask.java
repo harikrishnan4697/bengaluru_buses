@@ -77,7 +77,7 @@ public class NearestBusStopsTask extends AsyncTask<URL, Void, Void>
                     busStop.setBusStopId(jsonObject.getInt("StopId"));
                     busStop.setBusStopLat(jsonObject.getString("StopLat"));
                     busStop.setBusStopLong(jsonObject.getString("StopLong"));
-                    busStop.setBusStopDistance((int)(Double.parseDouble(jsonObject.getString("StopDist"))
+                    busStop.setBusStopDistance((int) (Double.parseDouble(jsonObject.getString("StopDist"))
                             * 1000) + " metres away");
 
                     String busStopName = jsonObject.getString("StopName");

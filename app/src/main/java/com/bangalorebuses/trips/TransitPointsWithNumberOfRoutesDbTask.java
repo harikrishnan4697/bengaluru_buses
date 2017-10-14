@@ -16,7 +16,7 @@ public class TransitPointsWithNumberOfRoutesDbTask extends AsyncTask<Void, Void,
     private String destinationBusStopName;
 
     public TransitPointsWithNumberOfRoutesDbTask(IndirectTripHelper caller, String originBusStopName, String destinationBusStopName,
-                                          String routeCountType)
+                                                 String routeCountType)
     {
         this.caller = caller;
         this.routeCountType = routeCountType;
@@ -110,13 +110,16 @@ public class TransitPointsWithNumberOfRoutesDbTask extends AsyncTask<Void, Void,
     {
         super.onPostExecute(transitPoints);
 
-        if (routeCountType.equals(NUMBER_OF_ROUTES_TYPE_ORIGIN_TO_TRANSIT_POINT))
+        if (!isCancelled())
         {
-            caller.onTransitPointsAndRouteCountOriginToTPFound(transitPoints);
-        }
-        else
-        {
-            caller.onTransitPointsAndRouteCountTPToDestFound(transitPoints);
+            if (routeCountType.equals(NUMBER_OF_ROUTES_TYPE_ORIGIN_TO_TRANSIT_POINT))
+            {
+                caller.onTransitPointsAndRouteCountOriginToTPFound(transitPoints);
+            }
+            else
+            {
+                caller.onTransitPointsAndRouteCountTPToDestFound(transitPoints);
+            }
         }
     }
 }
