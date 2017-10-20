@@ -30,6 +30,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Stack;
 
+import static com.bangalorebuses.utils.Constants.db;
+
 /**
  * This is the main activity of the app. It displays the
  * Nearby, BusTracker and TripPlanner fragments.
@@ -70,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
     {
         wasDisplayingSplashScreen = true;
 
-        countDownTimer = new CountDownTimer(2000, 2000)
+        countDownTimer = new CountDownTimer(1000, 1000)
         {
             @Override
             public void onTick(long millisUntilFinished)
@@ -95,7 +97,10 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
         // Don't let the on-screen keyboard pop up for anything by default.
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-        initialiseDatabase();
+        if (db == null)
+        {
+            initialiseDatabase();
+        }
 
         LinearLayout busesLinearLayout = (LinearLayout) findViewById(R.id.buses_linear_layout);
         busesLinearLayout.setOnClickListener(new View.OnClickListener()
@@ -140,13 +145,11 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
         // Try to initialise the db.
         try
         {
-            Constants.db = bengaluruBusesDbHelper.getReadableDatabase();
+            db = bengaluruBusesDbHelper.getReadableDatabase();
         }
-        catch (SQLiteException e)
+        catch (Exception e)
         {
-            e.printStackTrace();
-            Toast.makeText(this, "Something went wrong! Please re-install the app and try again." +
-                    " Error code: 1", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Unable to load database! Please try again later...", Toast.LENGTH_LONG).show();
             finish();
         }
     }
@@ -339,7 +342,7 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
     {
         super.onDestroy();
 
-        // Close the db when the app is destroyed
-        Constants.db.close();
+        // Close the db when this activity is destroyed
+        db.close();
     }
 }

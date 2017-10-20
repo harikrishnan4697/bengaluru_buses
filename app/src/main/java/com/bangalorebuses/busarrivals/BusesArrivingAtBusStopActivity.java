@@ -144,7 +144,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
         initialiseFavorites();
 
         // Get buses scheduled to arrive at the selected bus stop
-        if (isNetworkAvailable())
+        if (CommonMethods.checkNetworkConnectivity(this))
         {
             swipeRefreshLayout.setRefreshing(true);
             busStopHasTraceableBuses = false;
@@ -190,7 +190,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
         }
 
         // Get buses scheduled to arrive at the selected bus stop
-        if (isNetworkAvailable())
+        if (CommonMethods.checkNetworkConnectivity(this))
         {
 
             swipeRefreshLayout.setRefreshing(true);
@@ -317,20 +317,6 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
         }
     }
 
-    /**
-     * This method is used to check if the user's device
-     * has a Wi-Fi or Cellular data connection.
-     *
-     * @return boolean This returns true or false based on the status
-     * of the Wi-Fi and Cellular data connection.
-     */
-    private boolean isNetworkAvailable()
-    {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null;
-    }
-
     @Override
     public void onBusStopsNearbyFound(String errorMessage, ArrayList<BusStop> busStops)
     {
@@ -347,7 +333,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
         numberOfBusRouteTimingsFound = 0;
         if (busRoutes.size() != 0)
         {
-            if (isNetworkAvailable())
+            if (CommonMethods.checkNetworkConnectivity(this))
             {
                 for (; numberOfBusRouteTimingQueriesMade < 10; numberOfBusRouteTimingQueriesMade++)
                 {
@@ -442,7 +428,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
         {
             if (numberOfBusRouteTimingQueriesMade < busRoutesToGetTimingsOf.size())
             {
-                if (isNetworkAvailable())
+                if (CommonMethods.checkNetworkConnectivity(this))
                 {
                     BusStop busStop = new BusStop();
                     busStop.setBusStopRouteOrder(busRoutesToGetTimingsOf.get(numberOfBusRouteTimingQueriesMade).getSelectedBusStopRouteOrder());
