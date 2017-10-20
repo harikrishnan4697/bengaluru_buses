@@ -14,14 +14,11 @@ import java.io.Serializable;
 public class Bus implements Serializable
 {
     private String busRegistrationNumber;
-    private String busLat;
-    private String busLong;
     private int busETA;
     private int busRouteOrder;
     private boolean isDue;
     private BusRoute busRoute;
     private String busCurrentlyNearBusStop;
-    private int busETAToTransitPoint;
 
     public String getBusRegistrationNumber()
     {
@@ -31,26 +28,6 @@ public class Bus implements Serializable
     public void setBusRegistrationNumber(String busRegistrationNumber)
     {
         this.busRegistrationNumber = busRegistrationNumber;
-    }
-
-    public String getBusLat()
-    {
-        return busLat;
-    }
-
-    public void setBusLat(String busLat)
-    {
-        this.busLat = busLat;
-    }
-
-    public String getBusLong()
-    {
-        return busLong;
-    }
-
-    public void setBusLong(String busLong)
-    {
-        this.busLong = busLong;
     }
 
     public int getBusETA()
@@ -101,15 +78,5 @@ public class Bus implements Serializable
     public void setBusCurrentlyNearBusStop(String busCurrentlyNearBusStop)
     {
         this.busCurrentlyNearBusStop = busCurrentlyNearBusStop;
-    }
-
-    public int getBusETAToTransitPoint()
-    {
-        return busETAToTransitPoint;
-    }
-
-    public void setBusETAToTransitPoint(int busETAToTransitPoint)
-    {
-        this.busETAToTransitPoint = busETAToTransitPoint;
     }
 }

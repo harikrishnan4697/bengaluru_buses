@@ -1,111 +1,65 @@
 package com.bangalorebuses.trips;
 
-import android.view.View;
-
-import com.bangalorebuses.R;
-import com.bangalorebuses.core.Bus;
 import com.bangalorebuses.core.BusRoute;
-import com.bangalorebuses.core.BusStop;
-import com.bangalorebuses.utils.DbQueries;
 
-import static com.bangalorebuses.utils.Constants.db;
+import java.util.ArrayList;
 
-public class IndirectTrip extends Trip
+class IndirectTrip
 {
     private int tripDuration;
-    private Bus busOnFirstLeg;
-    private BusRoute busRouteOnFirstLeg;
-    private Bus busOnSecondLeg;
-    private BusRoute busRouteOnSecondLeg;
-    private BusStop originBusStop;
+    private DirectTrip directTripOnFirstLeg;
+    private DirectTrip directTripOnSecondLeg;
+    private ArrayList<DirectTrip> possibleDirectTripsOnSecondLeg =
+            new ArrayList<>();
     private TransitPoint transitPoint;
-    private BusStop destinationBusStop;
 
-    @Override
-    public void showTrip(TripsRecyclerViewAdapter.TripsViewHolder holder)
-    {
-
-    }
-
-    public Bus getBusOnFirstLeg()
-    {
-        return busOnFirstLeg;
-    }
-
-    public void setBusOnFirstLeg(Bus busOnFirstLeg)
-    {
-        this.busOnFirstLeg = busOnFirstLeg;
-    }
-
-    public Bus getBusOnSecondLeg()
-    {
-        return busOnSecondLeg;
-    }
-
-    public void setBusOnSecondLeg(Bus busOnSecondLeg)
-    {
-        this.busOnSecondLeg = busOnSecondLeg;
-    }
-
-    public TransitPoint getTransitPoint()
+    TransitPoint getTransitPoint()
     {
         return transitPoint;
     }
 
-    public void setTransitPoint(TransitPoint transitPoint)
+    void setTransitPoint(TransitPoint transitPoint)
     {
         this.transitPoint = transitPoint;
     }
 
-    public int getTripDuration()
+    int getTripDuration()
     {
         return tripDuration;
     }
 
-    public void setTripDuration(int tripDuration)
+    void setTripDuration(int tripDuration)
     {
         this.tripDuration = tripDuration;
     }
 
-    @Override
-    public BusStop getOriginBusStop()
+    DirectTrip getDirectTripOnFirstLeg()
     {
-        return originBusStop;
+        return directTripOnFirstLeg;
     }
 
-    @Override
-    public void setOriginBusStop(BusStop originBusStop)
+    void setDirectTripOnFirstLeg(DirectTrip directTripOnFirstLeg)
     {
-        this.originBusStop = originBusStop;
+        this.directTripOnFirstLeg = directTripOnFirstLeg;
     }
 
-    public BusStop getDestinationBusStop()
+    DirectTrip getDirectTripOnSecondLeg()
     {
-        return destinationBusStop;
+        return directTripOnSecondLeg;
     }
 
-    public void setDestinationBusStop(BusStop destinationBusStop)
+    void setDirectTripOnSecondLeg(DirectTrip directTripOnSecondLeg)
     {
-        this.destinationBusStop = destinationBusStop;
+        this.directTripOnSecondLeg = directTripOnSecondLeg;
     }
 
-    public BusRoute getBusRouteOnFirstLeg()
+    ArrayList<DirectTrip> getPossibleDirectTripsOnSecondLeg()
     {
-        return busRouteOnFirstLeg;
+        return possibleDirectTripsOnSecondLeg;
     }
 
-    public void setBusRouteOnFirstLeg(BusRoute busRouteOnFirstLeg)
+    void setPossibleDirectTripsOnSecondLeg(ArrayList<DirectTrip> possibleDirectTripsOnSecondLeg)
     {
-        this.busRouteOnFirstLeg = busRouteOnFirstLeg;
-    }
-
-    public BusRoute getBusRouteOnSecondLeg()
-    {
-        return busRouteOnSecondLeg;
-    }
-
-    public void setBusRouteOnSecondLeg(BusRoute busRouteOnSecondLeg)
-    {
-        this.busRouteOnSecondLeg = busRouteOnSecondLeg;
+        this.possibleDirectTripsOnSecondLeg = possibleDirectTripsOnSecondLeg;
     }
 }

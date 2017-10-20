@@ -10,12 +10,12 @@ import static com.bangalorebuses.utils.Constants.db;
 
 public class TransitPointsWithNumberOfRoutesDbTask extends AsyncTask<Void, Void, ArrayList<TransitPoint>>
 {
-    private IndirectTripHelper caller;
+    private TransitPointsHelper caller;
     private String routeCountType;
     private String originBusStopName;
     private String destinationBusStopName;
 
-    public TransitPointsWithNumberOfRoutesDbTask(IndirectTripHelper caller, String originBusStopName, String destinationBusStopName,
+    public TransitPointsWithNumberOfRoutesDbTask(TransitPointsHelper caller, String originBusStopName, String destinationBusStopName,
                                                  String routeCountType)
     {
         this.caller = caller;
@@ -59,7 +59,7 @@ public class TransitPointsWithNumberOfRoutesDbTask extends AsyncTask<Void, Void,
             while (cursor.moveToNext())
             {
                 TransitPoint transitPoint = new TransitPoint();
-                transitPoint.setTransitPointName(cursor.getString(0));
+                transitPoint.setBusStopName(cursor.getString(0));
                 transitPoint.setNumberOfRoutesBetweenOriginAndTransitPoint(cursor.getInt(1));
                 transitPoints.add(transitPoint);
             }
@@ -94,7 +94,7 @@ public class TransitPointsWithNumberOfRoutesDbTask extends AsyncTask<Void, Void,
             while (cursor.moveToNext())
             {
                 TransitPoint transitPoint = new TransitPoint();
-                transitPoint.setTransitPointName(cursor.getString(0));
+                transitPoint.setBusStopName(cursor.getString(0));
                 transitPoint.setNumberOfRoutesBetweenTransitPointAndDestination(cursor.getInt(1));
                 transitPoints.add(transitPoint);
             }

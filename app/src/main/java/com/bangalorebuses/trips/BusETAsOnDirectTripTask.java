@@ -3,6 +3,7 @@ package com.bangalorebuses.trips;
 import android.os.AsyncTask;
 
 import com.bangalorebuses.core.Bus;
+import com.bangalorebuses.utils.CommonMethods;
 import com.bangalorebuses.utils.Constants;
 
 import org.json.JSONArray;
@@ -24,10 +25,10 @@ public class BusETAsOnDirectTripTask extends AsyncTask<Void, Void, Void>
 {
     private DirectTrip directTrip;
     private String errorMessage = NETWORK_QUERY_NO_ERROR;
-    private DirectTripHelper caller;
+    private DirectTripsHelper caller;
     private ArrayList<Bus> buses = new ArrayList<>();
 
-    public BusETAsOnDirectTripTask(DirectTripHelper caller, DirectTrip directTrip)
+    public BusETAsOnDirectTripTask(DirectTripsHelper caller, DirectTrip directTrip)
     {
         this.directTrip = directTrip;
         this.caller = caller;
@@ -95,7 +96,7 @@ public class BusETAsOnDirectTripTask extends AsyncTask<Void, Void, Void>
                 if (!isCancelled())
                 {
                     if (Integer.parseInt(jsonArray.getJSONArray(i).getString(12).replace("routeorder:", "")) <=
-                            directTrip.getBusRoute().getTripPlannerOriginBusStop().getBusStopRouteOrder())
+                            directTrip.getOriginBusStop().getBusStopRouteOrder())
                     {
                         for (int j = 0; j < jsonArray.length(); j++)
                         {
@@ -103,20 +104,20 @@ public class BusETAsOnDirectTripTask extends AsyncTask<Void, Void, Void>
                             {
                                 Bus bus = new Bus();
                                 if (Integer.parseInt(jsonArray.getJSONArray(i + j).getString(12).replace("routeorder:", ""))
-                                        == directTrip.getBusRoute().getTripPlannerOriginBusStop().getBusStopRouteOrder())
+                                        == directTrip.getOriginBusStop().getBusStopRouteOrder())
                                 {
                                     bus.setDue(true);
                                 }
-                                String nearestLatLong = jsonArray.getJSONArray(i + j).getString(6).replace("nearestlatlng:", "");
-                                bus.setBusLat(nearestLatLong.substring(0, nearestLatLong.indexOf(",")));
-                                bus.setBusLong(nearestLatLong.substring(nearestLatLong.indexOf(",") + 1, nearestLatLong.length() - 1));
                                 bus.setBusRegistrationNumber(jsonArray.getJSONArray(i + j).getString(0).replace("vehicleno:", ""));
                                 bus.setBusRouteOrder(Integer.parseInt(jsonArray.getJSONArray(i + j).getString(12).replace("routeorder:", "")));
                                 bus.setBusRoute(directTrip.getBusRoute());
 
-                                if (bus.getBusRouteOrder() != 1 || directTrip.getBusRoute()
-                                        .getTripPlannerOriginBusStop().getBusStopRouteOrder() == 1)
+                                if (bus.getBusRouteOrder() != 1 || directTrip.getOriginBusStop()
+                                        .getBusStopRouteOrder() == 1)
                                 {
+                                    bus.setBusETA(CommonMethods.calculateTravelTime(directTrip.getBusRoute().getBusRouteId(),
+                                            directTrip.getBusRoute().getBusRouteNumber(), bus.getBusRouteOrder(),
+                                            directTrip.getOriginBusStop().getBusStopRouteOrder()));
                                     buses.add(bus);
                                 }
                             }

@@ -43,8 +43,7 @@ class DirectTripsRecyclerViewAdapter extends RecyclerView
     @Override
     public void onBindViewHolder(final DirectTripsViewHolder holder, int position)
     {
-        int travelTime = directTrips.get(position).getBusRoute()
-                .getShortestOriginToDestinationTravelTime();
+        int travelTime = directTrips.get(position).getTripDuration();
         String travelTimeAsText;
         if (travelTime >= 60)
         {

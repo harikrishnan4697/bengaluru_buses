@@ -30,6 +30,7 @@ import com.bangalorebuses.R;
 import com.bangalorebuses.core.Bus;
 import com.bangalorebuses.core.BusRoute;
 import com.bangalorebuses.core.BusStop;
+import com.bangalorebuses.utils.Animations;
 import com.bangalorebuses.utils.BusETAsOnBusRouteTask;
 import com.bangalorebuses.utils.CommonMethods;
 import com.bangalorebuses.utils.Constants;
@@ -74,8 +75,6 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
     private Spinner spinner;
     private TextView directionTextView;
     private ImageView directionSwapImageView;
-    private Animation directionSwapAnimation;
-    private Animation directionSwapAnimationBackwards;
     private BusRoute routeUp;
     private BusRoute routeDown;
     private String currentlySelectedDirection = DIRECTION_UP;
@@ -120,8 +119,6 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         spinner = (Spinner) findViewById(R.id.route_stop_list_spinner);
         directionTextView = (TextView) findViewById(R.id.directionNameTextView);
         directionSwapImageView = (ImageView) findViewById(R.id.changeDirectionImageView);
-        directionSwapAnimation = AnimationUtils.loadAnimation(this, R.anim.rotate_once_forward);
-        directionSwapAnimationBackwards = AnimationUtils.loadAnimation(this, R.anim.rotate_once_backward);
         errorLinearLayout = (LinearLayout) findViewById(R.id.errorLinearLayout);
         errorImageView = (ImageView) findViewById(R.id.errorImageView);
         errorTextView = (TextView) findViewById(R.id.errorTextView);
@@ -226,7 +223,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
             cancelAllTasks();
             errorLinearLayout.setVisibility(View.GONE);
             swipeRefreshLayout.setRefreshing(true);
-            directionSwapImageView.startAnimation(directionSwapAnimation);
+            directionSwapImageView.startAnimation(Animations.rotateForwardOnce(this));
             if (currentlySelectedDirection.equals(DIRECTION_UP) && routeDown != null)
             {
                 directionTextView.setText(getBusRouteDestinationName(routeDown.getBusRouteDirectionName()));
@@ -249,7 +246,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         else
         {
             Toast.makeText(this, "This bus is only in one direction...", Toast.LENGTH_SHORT).show();
-            directionSwapImageView.startAnimation(directionSwapAnimation);
+            directionSwapImageView.startAnimation(Animations.rotateForwardOnce(this));
             new CountDownTimer(200, 200)
             {
                 @Override
@@ -261,7 +258,8 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
                 @Override
                 public void onFinish()
                 {
-                    directionSwapImageView.startAnimation(directionSwapAnimationBackwards);
+                    directionSwapImageView.startAnimation(Animations
+                            .rotateBackwardOnce(TrackBusActivity.this));
                 }
             }.start();
         }

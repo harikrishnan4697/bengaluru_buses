@@ -1,5 +1,7 @@
 package com.bangalorebuses.trips;
 
+import java.util.ArrayList;
+
 /**
  * /**
  * This interface is used for call-back methods from direct trip related
@@ -10,13 +12,9 @@ package com.bangalorebuses.trips;
  * @since 5-9-2017
  */
 
-public interface DirectTripHelper
+public interface DirectTripsHelper
 {
-    /**
-     * This is a call-back method called by BusETAsOnDirectTripTask.
-     *
-     * @param errorMessage Message to convey if the task encountered an error.
-     * @param directTrip   The direct trip with bus ETAs
-     */
+    void onDirectTripsFound(ArrayList<DirectTrip> directTrips);
+
     void onBusETAsOnDirectTripFound(String errorMessage, DirectTrip directTrip);
 }

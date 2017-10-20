@@ -1,7 +1,6 @@
 package com.bangalorebuses.trips;
 
 import android.support.v7.widget.RecyclerView;
-import android.telecom.Call;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,12 +15,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 
-class IndirectTripsDetailsRecyclerViewAdapter extends RecyclerView
-        .Adapter<IndirectTripsDetailsRecyclerViewAdapter.IndirectTripsDetailsViewHolder>
+class IndirectTripDetailsRecyclerViewAdapter extends RecyclerView
+        .Adapter<IndirectTripDetailsRecyclerViewAdapter.IndirectTripsDetailsViewHolder>
 {
     private ArrayList<IndirectTrip> indirectTrips;
 
-    public IndirectTripsDetailsRecyclerViewAdapter(ArrayList<IndirectTrip> indirectTrips)
+    IndirectTripDetailsRecyclerViewAdapter(ArrayList<IndirectTrip> indirectTrips)
     {
         this.indirectTrips = indirectTrips;
     }
@@ -48,9 +47,9 @@ class IndirectTripsDetailsRecyclerViewAdapter extends RecyclerView
 
         // Set the origin bus stop name and direction name text view
         String originBusStopName = indirectTrips.get(position)
-                .getOriginBusStop().getBusStopName();
+                .getDirectTripOnFirstLeg().getOriginBusStop().getBusStopName();
         String originBusStopDirectionName = indirectTrips.get(position)
-                .getOriginBusStop().getBusStopDirectionName();
+                .getDirectTripOnFirstLeg().getOriginBusStop().getBusStopDirectionName();
 
         holder.originBusStopNameTextView.setText(CommonMethods
                 .getBusStopNameAndDirectionNameCombined(originBusStopName,
@@ -58,9 +57,9 @@ class IndirectTripsDetailsRecyclerViewAdapter extends RecyclerView
 
         // Set the transit point bus stop name and direction name text view
         String transitPointBusStopName = indirectTrips.get(position)
-                .getTransitPoint().getTransitPointName();
+                .getDirectTripOnSecondLeg().getOriginBusStop().getBusStopName();
         String transitPointBusStopDirectionName = indirectTrips.get(position)
-                .getTransitPoint().getTransitPointDirectionName();
+                .getDirectTripOnSecondLeg().getOriginBusStop().getBusStopDirectionName();
 
         holder.transitPointBusStopNameTextView.setText(CommonMethods
                 .getBusStopNameAndDirectionNameCombined(transitPointBusStopName,
@@ -68,33 +67,34 @@ class IndirectTripsDetailsRecyclerViewAdapter extends RecyclerView
 
         // Set the first leg bus route number text view
         holder.firstLegBusRouteNumberTextView.setText(indirectTrips.get(position)
-                .getBusOnFirstLeg().getBusRoute().getBusRouteNumber());
+                .getDirectTripOnFirstLeg().getBusRoute().getBusRouteNumber());
 
         holder.firstLegBusRouteNumberTextView.setBackgroundResource(CommonMethods
                 .getBusRouteNumberBackgroundResId(indirectTrips.get(position)
-                        .getBusOnFirstLeg().getBusRoute().getBusRouteNumber()));
+                        .getDirectTripOnFirstLeg().getBusRoute().getBusRouteNumber()));
 
         // Set the first leg bus route service type image view
         holder.firstLegBusRouteServiceTypeImageView.setImageResource(CommonMethods
                 .getBusRouteServiceTypeImageResId(indirectTrips.get(position)
-                        .getBusOnFirstLeg().getBusRoute().getBusRouteNumber()));
+                        .getDirectTripOnFirstLeg().getBusRoute().getBusRouteNumber()));
 
         // Set the first leg bus ETA text view
         holder.firstLegBusRouteETATextView.setText(CommonMethods.convertMinutesToBusArrivalTimings(
-                indirectTrips.get(position).getBusOnFirstLeg().getBusETA()));
+                indirectTrips.get(position).getDirectTripOnFirstLeg().getBusRoute().getBusRouteBuses()
+                        .get(0).getBusETA()));
 
         // Set the second leg bus route number text view
         holder.secondLegBusRouteNumberTextView.setText(indirectTrips.get(position)
-                .getBusOnSecondLeg().getBusRoute().getBusRouteNumber());
+                .getDirectTripOnSecondLeg().getBusRoute().getBusRouteNumber());
 
         holder.secondLegBusRouteNumberTextView.setBackgroundResource(CommonMethods
                 .getBusRouteNumberBackgroundResId(indirectTrips.get(position)
-                        .getBusOnSecondLeg().getBusRoute().getBusRouteNumber()));
+                        .getDirectTripOnSecondLeg().getBusRoute().getBusRouteNumber()));
 
         // Set the second leg bus route service type image view
         holder.secondLegBusRouteServiceTypeImageView.setImageResource(CommonMethods
                 .getBusRouteServiceTypeImageResId(indirectTrips.get(position)
-                        .getBusOnSecondLeg().getBusRoute().getBusRouteNumber()));
+                        .getDirectTripOnSecondLeg().getBusRoute().getBusRouteNumber()));
 
         Calendar calendar = Calendar.getInstance();
 
@@ -103,7 +103,8 @@ class IndirectTripsDetailsRecyclerViewAdapter extends RecyclerView
         int currentTimeInMinutesSinceMidnight = (currentHour * 60) + currentMinute;
 
         int secondLegBusETAInMinutesSinceMidnight = currentTimeInMinutesSinceMidnight
-                + indirectTrips.get(position).getBusOnSecondLeg().getBusETA();
+                + indirectTrips.get(position).getDirectTripOnSecondLeg().getBusRoute()
+                .getBusRouteBuses().get(0).getBusETA();
         int secondLegBusETAHour = secondLegBusETAInMinutesSinceMidnight / 60;
         int secondLegBusETAMinute = secondLegBusETAInMinutesSinceMidnight % 60;
 

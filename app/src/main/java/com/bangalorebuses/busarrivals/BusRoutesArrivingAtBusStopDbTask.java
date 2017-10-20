@@ -45,7 +45,6 @@ public class BusRoutesArrivingAtBusStopDbTask extends AsyncTask<Integer, Void,
             BusRoute route = new BusRoute();
             route.setBusRouteId(cursor.getInt(0));
             route.setBusRouteNumber(cursor.getString(1));
-            route.setBusRouteServiceType(cursor.getString(2));
             route.setBusRouteDirection(cursor.getString(3));
             route.setBusRouteDirectionName(cursor.getString(4));
             route.setSelectedBusStopRouteOrder(cursor.getInt(5));

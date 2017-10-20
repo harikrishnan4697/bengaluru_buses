@@ -34,10 +34,7 @@ import com.bangalorebuses.busarrivals.BusesArrivingAtBusStopActivity;
 import com.bangalorebuses.core.Bus;
 import com.bangalorebuses.core.BusRoute;
 import com.bangalorebuses.core.BusStop;
-import com.bangalorebuses.search.SearchActivity;
-import com.bangalorebuses.utils.Constants;
 import com.bangalorebuses.utils.DbQueries;
-import com.bangalorebuses.utils.ErrorImageResIds;
 import com.bangalorebuses.utils.NetworkingHelper;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -202,7 +199,7 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult)
     {
-        showError(ErrorImageResIds.ERROR_IMAGE_GOOGLE_PLAY_SERVICES_UPDATE_REQUIRED,
+        showError(R.drawable.ic_location_disabled_black,
                 R.string.error_message_update_google_play_services, R.string.fix_error_retry);
         nearbyBusStopsRecyclerView.setVisibility(View.GONE);
     }
@@ -216,7 +213,7 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
     @Override
     public void onConnectionSuspended(int i)
     {
-        showError(ErrorImageResIds.ERROR_IMAGE_SOMETHING_WENT_WRONG, R.string.error_message_something_went_wrong,
+        showError(R.drawable.ic_sad_face, R.string.error_message_something_went_wrong,
                 R.string.fix_error_retry);
         nearbyBusStopsRecyclerView.setVisibility(View.GONE);
     }
@@ -353,14 +350,14 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
             }
             else
             {
-                showError(ErrorImageResIds.ERROR_IMAGE_NO_INTERNET, R.string.error_message_no_data_connection,
+                showError(R.drawable.ic_cloud_off_black, R.string.error_message_no_data_connection,
                         R.string.fix_error_retry);
                 nearbyBusStopsRecyclerView.setVisibility(View.GONE);
             }
         }
         catch (MalformedURLException e)
         {
-            showError(ErrorImageResIds.ERROR_IMAGE_SOMETHING_WENT_WRONG, R.string.error_message_something_went_wrong,
+            showError(R.drawable.ic_sad_face, R.string.error_message_something_went_wrong,
                     R.string.fix_error_retry);
             nearbyBusStopsRecyclerView.setVisibility(View.GONE);
         }
@@ -385,7 +382,7 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
             }
             else
             {
-                showError(ErrorImageResIds.ERROR_IMAGE_LOCATION_ACCESS_DENIED, R.string.error_message_location_access_denied,
+                showError(R.drawable.ic_location_disabled_black, R.string.error_message_location_access_denied,
                         R.string.fix_error_allow_access);
                 nearbyBusStopsRecyclerView.setVisibility(View.GONE);
             }
@@ -407,7 +404,7 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
             }
             else
             {
-                showError(ErrorImageResIds.ERROR_IMAGE_LOCATION_OFF, R.string.error_message_location_off,
+                showError(R.drawable.ic_location_off_black, R.string.error_message_location_off,
                         R.string.fix_error_turn_on);
                 nearbyBusStopsRecyclerView.setVisibility(View.GONE);
             }
@@ -441,7 +438,7 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
         {
             if (busStops.size() == 0)
             {
-                showError(ErrorImageResIds.ERROR_IMAGE_NO_BUS_STOPS_NEARBY, R.string.error_message_no_bus_stops_nearby,
+                showError(R.drawable.ic_person_pin_circle_black, R.string.error_message_no_bus_stops_nearby,
                         R.string.fix_error_retry);
                 nearbyBusStopsRecyclerView.setVisibility(View.GONE);
             }
@@ -462,22 +459,22 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
             swipeRefreshLayout.setRefreshing(false);
             if (errorMessage.equals(NETWORK_QUERY_URL_EXCEPTION))
             {
-                showError(ErrorImageResIds.ERROR_IMAGE_SOMETHING_WENT_WRONG, R.string.error_message_something_went_wrong,
+                showError(R.drawable.ic_sad_face, R.string.error_message_something_went_wrong,
                         R.string.fix_error_retry);
             }
             else if (errorMessage.equals(NETWORK_QUERY_IO_EXCEPTION))
             {
-                showError(ErrorImageResIds.ERROR_IMAGE_NO_INTERNET, R.string.error_message_io_exception,
+                showError(R.drawable.ic_cloud_off_black, R.string.error_message_io_exception,
                         R.string.fix_error_retry);
             }
             else if (errorMessage.equals(NETWORK_QUERY_REQUEST_TIMEOUT_EXCEPTION))
             {
-                showError(ErrorImageResIds.ERROR_IMAGE_SLOW_NETWORK, R.string.error_message_request_timed_out,
+                showError(R.drawable.ic_cloud_off_black, R.string.error_message_request_timed_out,
                         R.string.fix_error_retry);
             }
             else if (errorMessage.equals(NETWORK_QUERY_JSON_EXCEPTION))
             {
-                showError(ErrorImageResIds.ERROR_IMAGE_NO_BUS_STOPS_NEARBY, R.string.error_message_no_bus_stops_nearby,
+                showError(R.drawable.ic_person_pin_circle_black, R.string.error_message_no_bus_stops_nearby,
                         R.string.fix_error_retry);
             }
         }

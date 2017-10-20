@@ -14,7 +14,7 @@ import java.util.ArrayList;
  * @since 5-9-2017
  */
 
-public interface IndirectTripHelper
+public interface TransitPointsHelper
 {
     /**
      * This call-back method is called by TransitPointsWithNumberOfRoutesDbTask
@@ -32,6 +32,5 @@ public interface IndirectTripHelper
      */
     void onTransitPointsAndRouteCountTPToDestFound(ArrayList<TransitPoint> transitPoints);
 
-    void onMostFrequentBusRouteFound(String transitPointBusStopName, BusRoute mostFrequentBusRouteOnFirstLeg,
-                                     BusRoute mostFrequentBusRouteOnSecondLeg);
+    void onIndirectTripFound(IndirectTrip indirectTrip);
 }

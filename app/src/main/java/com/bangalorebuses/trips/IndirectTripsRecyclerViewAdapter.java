@@ -1,16 +1,12 @@
 package com.bangalorebuses.trips;
 
 import android.app.Activity;
-import android.app.IntentService;
 import android.content.Intent;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bangalorebuses.R;
@@ -18,22 +14,21 @@ import com.bangalorebuses.utils.CommonMethods;
 import com.bangalorebuses.utils.Constants;
 
 import java.util.ArrayList;
-import java.util.List;
 
 class IndirectTripsRecyclerViewAdapter extends RecyclerView
         .Adapter<IndirectTripsRecyclerViewAdapter.IndirectTripsViewHolder>
 {
     private Activity context;
-    private ArrayList<TransitPoint> transitPoints;
+    private ArrayList<IndirectTrip> indirectTrips;
     private String originBusStopName;
     private String destinationBusStopName;
 
     public IndirectTripsRecyclerViewAdapter(Activity context, String originBusStopName,
-                                            String destinationBusStopName, ArrayList<TransitPoint>
-                                                    transitPoints)
+                                            String destinationBusStopName, ArrayList<IndirectTrip>
+                                                    indirectTrips)
     {
         this.context = context;
-        this.transitPoints = transitPoints;
+        this.indirectTrips = indirectTrips;
         this.originBusStopName = originBusStopName;
         this.destinationBusStopName = destinationBusStopName;
     }
@@ -54,27 +49,25 @@ class IndirectTripsRecyclerViewAdapter extends RecyclerView
     @Override
     public void onBindViewHolder(final IndirectTripsViewHolder holder, final int position)
     {
-        String mostFrequentBusRouteOnFirstLeg = transitPoints.get(position)
-                .getMostFrequentBusRouteToTransitPoint().getBusRouteNumber();
-
         setTextViewBackgroundColor(holder.firstLegBusRouteNumberTextView,
-                mostFrequentBusRouteOnFirstLeg);
+                indirectTrips.get(position).getDirectTripOnFirstLeg()
+                        .getBusRoute().getBusRouteNumber());
 
-        holder.firstLegBusRouteNumberTextView.setText(mostFrequentBusRouteOnFirstLeg);
-
-        String mostFrequentBusRouteOnSecondLeg = transitPoints.get(position)
-                .getMostFrequentBusRouteFromTransitPoint().getBusRouteNumber();
+        holder.firstLegBusRouteNumberTextView.setText(indirectTrips.get(position)
+                .getDirectTripOnFirstLeg().getBusRoute().getBusRouteNumber());
 
         setTextViewBackgroundColor(holder.secondLegBusRouteNumberTextView,
-                mostFrequentBusRouteOnSecondLeg);
+                indirectTrips.get(position).getDirectTripOnSecondLeg()
+                        .getBusRoute().getBusRouteNumber());
 
-        holder.secondLegBusRouteNumberTextView.setText(mostFrequentBusRouteOnSecondLeg);
+        holder.secondLegBusRouteNumberTextView.setText(indirectTrips.get(position)
+                .getDirectTripOnSecondLeg().getBusRoute().getBusRouteNumber());
 
         holder.tripDurationTextView.setText(CommonMethods.convertMinutesToHoursAndMinutes(
-                transitPoints.get(position).getShortestTripDuration()));
+                indirectTrips.get(position).getTripDuration()));
 
-        holder.transitPointBusStopNameTextView.setText(transitPoints.get(position)
-                .getTransitPointName());
+        holder.transitPointBusStopNameTextView.setText(indirectTrips.get(position)
+                .getTransitPoint().getBusStopName());
 
         holder.cardView.setOnClickListener(new View.OnClickListener()
         {
@@ -87,7 +80,7 @@ class IndirectTripsRecyclerViewAdapter extends RecyclerView
                         originBusStopName);
 
                 indirectTripDetailsActivityIntent.putExtra(Constants.TRANSIT_POINT_BUS_STOP_NAME,
-                        transitPoints.get(position).getTransitPointName());
+                        indirectTrips.get(position).getTransitPoint().getBusStopName());
 
                 indirectTripDetailsActivityIntent.putExtra(Constants.DESTINATION_BUS_STOP_NAME,
                         destinationBusStopName);
@@ -126,7 +119,7 @@ class IndirectTripsRecyclerViewAdapter extends RecyclerView
     @Override
     public int getItemCount()
     {
-        return transitPoints.size();
+        return indirectTrips.size();
     }
 
     class IndirectTripsViewHolder extends RecyclerView.ViewHolder

@@ -6,8 +6,6 @@ import java.util.ArrayList;
 public class BusStop implements Serializable
 {
     private String busStopName;
-    private String busStopLat;
-    private String busStopLong;
     private int busStopId;
     private int busStopRouteOrder;
     private String busStopDirectionName;
@@ -32,26 +30,6 @@ public class BusStop implements Serializable
     public void setBusStopName(String busStopName)
     {
         this.busStopName = busStopName;
-    }
-
-    public String getBusStopLat()
-    {
-        return busStopLat;
-    }
-
-    public void setBusStopLat(String busStopLat)
-    {
-        this.busStopLat = busStopLat;
-    }
-
-    public String getBusStopLong()
-    {
-        return busStopLong;
-    }
-
-    public void setBusStopLong(String busStopLong)
-    {
-        this.busStopLong = busStopLong;
     }
 
     public int getBusStopRouteOrder()

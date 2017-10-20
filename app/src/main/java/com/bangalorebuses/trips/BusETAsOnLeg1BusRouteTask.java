@@ -24,26 +24,26 @@ import static com.bangalorebuses.utils.Constants.NETWORK_QUERY_REQUEST_TIMEOUT_E
 import static com.bangalorebuses.utils.Constants.NETWORK_QUERY_URL_EXCEPTION;
 import static com.bangalorebuses.utils.Constants.db;
 
-public class BusETAsOnLeg1BusRouteTask extends AsyncTask<Void, Void, Void>
+class BusETAsOnLeg1BusRouteTask extends AsyncTask<Void, Void, Void>
 {
     private IndirectTripDetailsHelper caller;
     private String errorMessage = NETWORK_QUERY_NO_ERROR;
     private ArrayList<Bus> buses = new ArrayList<>();
-    private TransitPoint transitPoint;
-    private BusRoute busRoute;
+    private IndirectTrip indirectTrip;
 
 
-    public BusETAsOnLeg1BusRouteTask(IndirectTripDetailsHelper caller, TransitPoint transitPoint,
-                                     BusRoute busRoute)
+    BusETAsOnLeg1BusRouteTask(IndirectTripDetailsHelper caller, IndirectTrip indirectTrip)
     {
         this.caller = caller;
-        this.transitPoint = transitPoint;
-        this.busRoute = busRoute;
+        this.indirectTrip = indirectTrip;
     }
 
     @Override
     protected Void doInBackground(Void... voids)
     {
+        DirectTrip directTripOnFirstLeg = indirectTrip.getDirectTripOnFirstLeg();
+        BusRoute busRouteOnFirstLeg = directTripOnFirstLeg.getBusRoute();
+
         URL busesEnRouteURL;
         try
         {
@@ -55,7 +55,8 @@ public class BusETAsOnLeg1BusRouteTask extends AsyncTask<Void, Void, Void>
             return null;
         }
 
-        String requestParameters = "routeNO=" + busRoute.getBusRouteNumber() + "&" + "direction=" + busRoute.getBusRouteDirection();
+        String requestParameters = "routeNO=" + busRouteOnFirstLeg.getBusRouteNumber()
+                + "&" + "direction=" + busRouteOnFirstLeg.getBusRouteDirection();
 
         HttpURLConnection client;
         String line;
@@ -100,7 +101,7 @@ public class BusETAsOnLeg1BusRouteTask extends AsyncTask<Void, Void, Void>
                 if (!isCancelled())
                 {
                     if (Integer.parseInt(jsonArray.getJSONArray(i).getString(12).replace("routeorder:", "")) <=
-                            busRoute.getTripPlannerOriginBusStop().getBusStopRouteOrder())
+                            directTripOnFirstLeg.getOriginBusStop().getBusStopRouteOrder())
                     {
                         for (int j = 0; j < jsonArray.length(); j++)
                         {
@@ -108,23 +109,20 @@ public class BusETAsOnLeg1BusRouteTask extends AsyncTask<Void, Void, Void>
                             {
                                 Bus bus = new Bus();
                                 if (Integer.parseInt(jsonArray.getJSONArray(i + j).getString(12).replace("routeorder:", "")) ==
-                                        busRoute.getTripPlannerOriginBusStop().getBusStopRouteOrder())
+                                        directTripOnFirstLeg.getOriginBusStop().getBusStopRouteOrder())
                                 {
                                     bus.setDue(true);
                                 }
-                                String nearestLatLong = jsonArray.getJSONArray(i + j).getString(6).replace("nearestlatlng:", "");
-                                bus.setBusLat(nearestLatLong.substring(0, nearestLatLong.indexOf(",")));
-                                bus.setBusLong(nearestLatLong.substring(nearestLatLong.indexOf(",") + 1, nearestLatLong.length() - 1));
                                 bus.setBusRegistrationNumber(jsonArray.getJSONArray(i + j).getString(0).replace("vehicleno:", ""));
                                 bus.setBusRouteOrder(Integer.parseInt(jsonArray.getJSONArray(i + j).getString(12).replace("routeorder:", "")));
-                                bus.setBusRoute(busRoute);
+                                bus.setBusRoute(busRouteOnFirstLeg);
 
-                                if (bus.getBusRouteOrder() != 1 || busRoute.getTripPlannerOriginBusStop()
+                                if (bus.getBusRouteOrder() != 1 || directTripOnFirstLeg.getOriginBusStop()
                                         .getBusStopRouteOrder() == 1)
                                 {
-                                    bus.setBusETA(CommonMethods.calculateTravelTime(busRoute.getBusRouteId(),
-                                            busRoute.getBusRouteNumber(), bus.getBusRouteOrder(),
-                                            busRoute.getTripPlannerOriginBusStop().getBusStopRouteOrder()));
+                                    bus.setBusETA(CommonMethods.calculateTravelTime(busRouteOnFirstLeg.getBusRouteId(),
+                                            busRouteOnFirstLeg.getBusRouteNumber(), bus.getBusRouteOrder(),
+                                            directTripOnFirstLeg.getOriginBusStop().getBusStopRouteOrder()));
                                     buses.add(bus);
                                 }
                             }
@@ -146,7 +144,9 @@ public class BusETAsOnLeg1BusRouteTask extends AsyncTask<Void, Void, Void>
         {
             errorMessage = NETWORK_QUERY_JSON_EXCEPTION;
         }
-        busRoute.setBusRouteBuses(buses);
+        busRouteOnFirstLeg.setBusRouteBuses(buses);
+        directTripOnFirstLeg.setBusRoute(busRouteOnFirstLeg);
+        indirectTrip.setDirectTripOnFirstLeg(directTripOnFirstLeg);
         return null;
     }
 
@@ -157,7 +157,7 @@ public class BusETAsOnLeg1BusRouteTask extends AsyncTask<Void, Void, Void>
 
         if (!isCancelled())
         {
-            caller.onBusETAsOnLeg1BusRouteFound(errorMessage, busRoute, transitPoint);
+            caller.onBusETAsOnLeg1BusRouteFound(errorMessage, indirectTrip);
         }
     }
 }

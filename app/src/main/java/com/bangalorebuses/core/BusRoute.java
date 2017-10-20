@@ -16,17 +16,11 @@ public class BusRoute implements Serializable
 {
     private int busRouteId;
     private String busRouteNumber;
-    private String busRouteServiceType;
     private String busRouteDirection;
     private String busRouteDirectionName;
     private ArrayList<BusStop> busRouteStops;
-    private ArrayList<Date> busRouteDepartureTimings;
     private ArrayList<Bus> busRouteBuses;
     private int selectedBusStopRouteOrder;
-    private BusStop tripPlannerOriginBusStop;
-    private BusStop tripPlannerDestinationBusStop;
-    private int shortestOriginToDestinationTravelTime;
-    private int shortestETA;
 
     public int getBusRouteId()
     {
@@ -48,16 +42,6 @@ public class BusRoute implements Serializable
         this.busRouteNumber = busRouteNumber;
     }
 
-    public String getBusRouteServiceType()
-    {
-        return busRouteServiceType;
-    }
-
-    public void setBusRouteServiceType(String busRouteServiceType)
-    {
-        this.busRouteServiceType = busRouteServiceType;
-    }
-
     public String getBusRouteDirection()
     {
         return busRouteDirection;
@@ -76,16 +60,6 @@ public class BusRoute implements Serializable
     public void setBusRouteDirectionName(String busRouteDirectionName)
     {
         this.busRouteDirectionName = busRouteDirectionName;
-    }
-
-    public ArrayList<Date> getBusRouteDepartureTimings()
-    {
-        return busRouteDepartureTimings;
-    }
-
-    public void setBusRouteDepartureTimings(ArrayList<Date> busRouteDepartureTimings)
-    {
-        this.busRouteDepartureTimings = busRouteDepartureTimings;
     }
 
     public ArrayList<BusStop> getBusRouteStops()
@@ -116,45 +90,5 @@ public class BusRoute implements Serializable
     public void setSelectedBusStopRouteOrder(int selectedBusStopRouteOrder)
     {
         this.selectedBusStopRouteOrder = selectedBusStopRouteOrder;
-    }
-
-    public BusStop getTripPlannerOriginBusStop()
-    {
-        return tripPlannerOriginBusStop;
-    }
-
-    public void setTripPlannerOriginBusStop(BusStop tripPlannerOriginBusStop)
-    {
-        this.tripPlannerOriginBusStop = tripPlannerOriginBusStop;
-    }
-
-    public BusStop getTripPlannerDestinationBusStop()
-    {
-        return tripPlannerDestinationBusStop;
-    }
-
-    public void setTripPlannerDestinationBusStop(BusStop tripPlannerDestinationBusStop)
-    {
-        this.tripPlannerDestinationBusStop = tripPlannerDestinationBusStop;
-    }
-
-    public int getShortestOriginToDestinationTravelTime()
-    {
-        return shortestOriginToDestinationTravelTime;
-    }
-
-    public void setShortestOriginToDestinationTravelTime(int shortestOriginToDestinationTravelTime)
-    {
-        this.shortestOriginToDestinationTravelTime = shortestOriginToDestinationTravelTime;
-    }
-
-    public int getShortestETA()
-    {
-        return shortestETA;
-    }
-
-    public void setShortestETA(int shortestETA)
-    {
-        this.shortestETA = shortestETA;
     }
 }
