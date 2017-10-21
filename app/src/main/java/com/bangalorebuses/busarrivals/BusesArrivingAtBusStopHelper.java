@@ -1,4 +1,4 @@
-package com.bangalorebuses.utils;
+package com.bangalorebuses.busarrivals;
 
 import com.bangalorebuses.core.BusRoute;
 
@@ -12,7 +12,7 @@ import java.util.ArrayList;
  * @since 5-9-2017
  */
 
-public interface DbQueryHelper
+interface BusesArrivingAtBusStopHelper
 {
     /**
      * This is a call-back method called by BusRoutesArrivingAtBusStopTask.

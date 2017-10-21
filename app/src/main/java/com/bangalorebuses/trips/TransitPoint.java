@@ -2,7 +2,7 @@ package com.bangalorebuses.trips;
 
 import com.bangalorebuses.core.BusStop;
 
-public class TransitPoint extends BusStop
+class TransitPoint extends BusStop
 {
     private int numberOfRoutesBetweenOriginAndTransitPoint;
     private int numberOfRoutesBetweenTransitPointAndDestination;

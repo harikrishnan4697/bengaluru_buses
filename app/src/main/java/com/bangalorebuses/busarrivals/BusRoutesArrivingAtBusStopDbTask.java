@@ -4,7 +4,6 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 
 import com.bangalorebuses.core.BusRoute;
-import com.bangalorebuses.utils.DbQueryHelper;
 
 import java.util.ArrayList;
 
@@ -22,11 +21,11 @@ import static com.bangalorebuses.utils.Constants.db;
 public class BusRoutesArrivingAtBusStopDbTask extends AsyncTask<Integer, Void,
         ArrayList<BusRoute>>
 {
-    private DbQueryHelper dbQueryHelper;
+    private BusesArrivingAtBusStopHelper busesArrivingAtBusStopHelper;
 
-    public BusRoutesArrivingAtBusStopDbTask(DbQueryHelper dbQueryHelper)
+    public BusRoutesArrivingAtBusStopDbTask(BusesArrivingAtBusStopHelper busesArrivingAtBusStopHelper)
     {
-        this.dbQueryHelper = dbQueryHelper;
+        this.busesArrivingAtBusStopHelper = busesArrivingAtBusStopHelper;
     }
 
     @Override
@@ -72,7 +71,7 @@ public class BusRoutesArrivingAtBusStopDbTask extends AsyncTask<Integer, Void,
         if (!isCancelled())
         {
             // Call the callback method so that the calling class can process the ArrayList.
-            dbQueryHelper.onBusRoutesArrivingAtBusStopFound(busRoutes);
+            busesArrivingAtBusStopHelper.onBusRoutesArrivingAtBusStopFound(busRoutes);
         }
     }
 }

@@ -284,7 +284,6 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
         }
         catch (Exception e)
         {
-            e.printStackTrace();
             Toast.makeText(this, "Unknown error occurred! Couldn't un-favourite this bus...", Toast
                     .LENGTH_SHORT).show();
         }

@@ -10,7 +10,7 @@ import static com.bangalorebuses.utils.Constants.db;
 
 class AllBusStopNamesTask extends AsyncTask<Void, Void, ArrayList<String>>
 {
-    SearchDbQueriesHelper caller;
+    private SearchDbQueriesHelper caller;
 
     AllBusStopNamesTask(SearchDbQueriesHelper caller)
     {

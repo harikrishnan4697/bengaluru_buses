@@ -21,7 +21,6 @@ import com.bangalorebuses.core.BusStop;
 import com.bangalorebuses.utils.BusETAsOnBusRouteTask;
 import com.bangalorebuses.utils.CommonMethods;
 import com.bangalorebuses.utils.Constants;
-import com.bangalorebuses.utils.DbQueryHelper;
 import com.bangalorebuses.utils.NetworkingHelper;
 
 import java.io.BufferedReader;
@@ -42,7 +41,7 @@ import static com.bangalorebuses.utils.Constants.NETWORK_QUERY_NO_ERROR;
  */
 
 public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements NetworkingHelper,
-        DbQueryHelper, SwipeRefreshLayout.OnRefreshListener
+        BusesArrivingAtBusStopHelper, SwipeRefreshLayout.OnRefreshListener
 {
     ArrayList<BusRoute> busRoutesToDisplay = new ArrayList<>();
     ArrayList<BusRoute> busRoutesToGetTimingsOf = new ArrayList<>();

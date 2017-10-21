@@ -14,7 +14,7 @@ import java.util.ArrayList;
  * @since 5-9-2017
  */
 
-public interface TransitPointsHelper
+interface TransitPointsHelper
 {
     /**
      * This call-back method is called by TransitPointsWithNumberOfRoutesDbTask

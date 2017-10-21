@@ -266,7 +266,7 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
                                 }
                                 catch (IntentSender.SendIntentException e)
                                 {
-                                    Toast.makeText(getActivity(), "Failed to enable location services!", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getActivity(), "Failed to enable location services! Please try again later...", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         }
@@ -301,7 +301,9 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
         }
         catch (SecurityException e)
         {
-            e.printStackTrace();
+            Toast.makeText(getContext(), "Unable to get your current location!" +
+                    " Please enable the location permission in Settings > Apps " +
+                    "> Bengaluru Buses.", Toast.LENGTH_LONG).show();
         }
     }
 

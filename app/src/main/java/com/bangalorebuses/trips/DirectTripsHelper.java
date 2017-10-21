@@ -12,7 +12,7 @@ import java.util.ArrayList;
  * @since 5-9-2017
  */
 
-public interface DirectTripsHelper
+interface DirectTripsHelper
 {
     void onDirectTripsFound(ArrayList<DirectTrip> directTrips);
 

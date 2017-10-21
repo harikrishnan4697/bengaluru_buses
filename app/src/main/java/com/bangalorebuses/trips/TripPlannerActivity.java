@@ -709,7 +709,6 @@ public class TripPlannerActivity extends AppCompatActivity implements
             }
             catch (IOException e)
             {
-                e.printStackTrace();
                 Toast.makeText(this, "Unknown error occurred! Couldn't favourite this trip...",
                         Toast.LENGTH_SHORT).show();
             }
