@@ -96,8 +96,8 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
         destinationBusStopName = getIntent().getStringExtra(DESTINATION_BUS_STOP_NAME);
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
-        swipeRefreshLayout.setColorSchemeResources(R.color.colorOrdinaryServiceBus,
-                R.color.colorACServiceBus, R.color.colorSpecialServiceBus);
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorNonACBus,
+                R.color.colorACBus, R.color.colorMetroFeederBus);
         swipeRefreshLayout.setOnRefreshListener(this);
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerView.setVisibility(View.GONE);

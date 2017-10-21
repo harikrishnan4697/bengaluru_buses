@@ -70,7 +70,7 @@
                         android:layout_marginRight="@dimen/layout_margin_tiny"
                         android:text="@string/direction_label_text"
                         android:textAllCaps="true"
-                        android:textColor="@color/sub_text_color"
+                        android:textColor="@color/grey_text_color"
                         android:textSize="@dimen/text_size_small"/>
 
                     <TextView
@@ -85,7 +85,7 @@
                         android:maxLines="1"
                         android:onClick="swapDirection"
                         android:padding="@dimen/layout_padding_tiny"
-                        android:textColor="@color/standard_text_color"
+                        android:textColor="@color/black_text_color"
                         android:textSize="@dimen/text_size_medium"/>
 
                 </RelativeLayout>
@@ -110,7 +110,7 @@
                     android:layout_marginRight="@dimen/layout_margin_tiny"
                     android:text="@string/bus_stop_label_text"
                     android:textAllCaps="true"
-                    android:textColor="@color/sub_text_color"
+                    android:textColor="@color/grey_text_color"
                     android:textSize="@dimen/text_size_small"/>
 
                 <Spinner
@@ -171,7 +171,7 @@
             android:layout_marginRight="@dimen/layout_margin"
             android:text="An error occurred!"
             android:textAlignment="center"
-            android:textColor="@color/standard_text_color"
+            android:textColor="@color/black_text_color"
             android:textSize="16sp"/>
 
         <TextView
@@ -182,7 +182,7 @@
             android:padding="@dimen/layout_padding"
             android:text="@string/fix_error_retry"
             android:textAllCaps="true"
-            android:textColor="@color/colorSpecialServiceBus"/>
+            android:textColor="@color/colorMetroFeederBus"/>
 
     </LinearLayout>
 

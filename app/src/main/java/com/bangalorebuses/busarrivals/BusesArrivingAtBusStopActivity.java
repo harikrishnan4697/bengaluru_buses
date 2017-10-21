@@ -1,16 +1,11 @@
 package com.bangalorebuses.busarrivals;
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -26,11 +21,8 @@ import com.bangalorebuses.core.BusStop;
 import com.bangalorebuses.utils.BusETAsOnBusRouteTask;
 import com.bangalorebuses.utils.CommonMethods;
 import com.bangalorebuses.utils.Constants;
-import com.bangalorebuses.utils.DbQueries;
 import com.bangalorebuses.utils.DbQueryHelper;
 import com.bangalorebuses.utils.NetworkingHelper;
-
-import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -38,12 +30,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 
 import static com.bangalorebuses.utils.Constants.NETWORK_QUERY_NO_ERROR;
-import static com.bangalorebuses.utils.Constants.db;
 
 /**
  * @author Nihar Thakkar
@@ -96,8 +86,8 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
 
         // Initialize some variables
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
-        swipeRefreshLayout.setColorSchemeResources(R.color.colorOrdinaryServiceBus, R.color.colorACServiceBus,
-                R.color.colorSpecialServiceBus);
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorNonACBus, R.color.colorACBus,
+                R.color.colorMetroFeederBus);
         swipeRefreshLayout.setOnRefreshListener(this);
         listView = (ListView) findViewById(R.id.busesArrivingAtBusStopListView);
 

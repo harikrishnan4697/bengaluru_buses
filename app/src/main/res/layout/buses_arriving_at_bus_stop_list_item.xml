@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/list_item_background_color"
+    android:background="@color/item_layout_background_color"
     android:padding="@dimen/layout_padding_small">
 
     <ImageView
@@ -86,7 +86,7 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:text="To Kempegowda International Airport"
-        android:textColor="@color/standard_text_color"
+        android:textColor="@color/black_text_color"
         android:textSize="@dimen/text_size_small"/>
 
 </RelativeLayout>

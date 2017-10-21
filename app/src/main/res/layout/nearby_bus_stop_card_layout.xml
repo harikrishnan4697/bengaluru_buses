@@ -41,7 +41,7 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:text="Dodda Nekkundi"
-                android:textColor="@color/standard_text_color"
+                android:textColor="@color/black_text_color"
                 android:textSize="@dimen/text_size_medium"/>
 
             <TextView
@@ -52,7 +52,7 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:text="towards - Marathahalli Bridge"
-                android:textColor="@color/sub_text_color"
+                android:textColor="@color/grey_text_color"
                 android:textSize="@dimen/text_size_small"/>
 
         </LinearLayout>
@@ -68,7 +68,7 @@
             android:layout_toEndOf="@id/nearby_bus_stop_icon_image_view"
             android:layout_toRightOf="@id/nearby_bus_stop_icon_image_view"
             android:text="300 metres away"
-            android:textColor="@color/standard_text_color"
+            android:textColor="@color/black_text_color"
             android:textSize="@dimen/text_size_small"/>
 
         <LinearLayout

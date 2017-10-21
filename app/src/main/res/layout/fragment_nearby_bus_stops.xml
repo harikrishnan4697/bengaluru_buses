@@ -44,7 +44,7 @@
             android:layout_marginLeft="@dimen/layout_margin"
             android:layout_marginRight="@dimen/layout_margin"
             android:textAlignment="center"
-            android:textColor="@color/standard_text_color"
+            android:textColor="@color/black_text_color"
             android:textSize="@dimen/text_size_big"/>
 
         <TextView
@@ -55,7 +55,7 @@
             android:padding="@dimen/layout_padding"
             android:text="@string/fix_error_retry"
             android:textAllCaps="true"
-            android:textColor="@color/colorSpecialServiceBus"/>
+            android:textColor="@color/colorMetroFeederBus"/>
 
     </LinearLayout>
 

@@ -9,6 +9,6 @@
     android:gravity="center_vertical"
     android:maxLines="1"
     android:padding="@dimen/layout_padding_tiny"
-    android:textColor="@color/standard_text_color"
+    android:textColor="@color/black_text_color"
     android:textSize="@dimen/text_size_medium"
     />

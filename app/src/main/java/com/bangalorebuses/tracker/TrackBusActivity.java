@@ -11,12 +11,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -43,7 +39,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 
@@ -136,8 +131,8 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         swipeRefreshLayout.setOnRefreshListener(this);
 
         // Set the colors to be used for the swipe refresh layout
-        swipeRefreshLayout.setColorSchemeResources(R.color.colorOrdinaryServiceBus, R.color.colorACServiceBus,
-                R.color.colorSpecialServiceBus);
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorNonACBus, R.color.colorACBus,
+                R.color.colorMetroFeederBus);
 
         trackBusesOnRoute(getIntent().getStringExtra("ROUTE_NUMBER"));
     }

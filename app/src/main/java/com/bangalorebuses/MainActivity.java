@@ -94,9 +94,6 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
     {
         setContentView(R.layout.activity_main);
 
-        // Don't let the on-screen keyboard pop up for anything by default.
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-
         if (db == null)
         {
             initialiseDatabase();
@@ -149,7 +146,7 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
         }
         catch (Exception e)
         {
-            Toast.makeText(this, "Unable to load database! Please try again later...", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Unable to load data! Please try again later...", Toast.LENGTH_LONG).show();
             finish();
         }
     }
@@ -322,11 +319,16 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
         // re-initialise the activity.
         if (wasDisplayingSplashScreen && activityWasPaused)
         {
-            initializeActivity();
+            showSplashScreen();
         }
         activityWasPaused = false;
 
         initialiseFavorites();
+
+        if (db == null)
+        {
+            initialiseDatabase();
+        }
     }
 
     @Override
@@ -343,6 +345,10 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
         super.onDestroy();
 
         // Close the db when this activity is destroyed
-        db.close();
+        if (db != null)
+        {
+            db.close();
+            db = null;
+        }
     }
 }

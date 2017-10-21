@@ -61,7 +61,7 @@
             android:layout_marginRight="@dimen/layout_margin"
             android:text="Can't find bus stops nearby because GPS is off."
             android:textAlignment="center"
-            android:textColor="@color/standard_text_color"
+            android:textColor="@color/black_text_color"
             android:textSize="@dimen/text_size_big"/>
 
         <TextView
@@ -72,7 +72,7 @@
             android:padding="@dimen/layout_padding"
             android:text="Turn on GPS"
             android:textAllCaps="true"
-            android:textColor="@color/colorSpecialServiceBus"/>
+            android:textColor="@color/colorMetroFeederBus"/>
 
     </LinearLayout>
 

@@ -65,7 +65,7 @@
                     android:layout_marginStart="@dimen/layout_margin_tiny"
                     android:text="@string/starting_bus_stop_label"
                     android:textAllCaps="true"
-                    android:textColor="@color/sub_text_color"
+                    android:textColor="@color/grey_text_color"
                     android:textSize="@dimen/text_size_small"/>
 
                 <TextView
@@ -75,11 +75,11 @@
                     android:layout_gravity="center"
                     android:background="@drawable/white_rounded_background_borderless"
                     android:clickable="true"
-                    android:textColorHint="@color/sub_text_color"
+                    android:textColorHint="@color/grey_text_color"
                     android:ellipsize="end"
                     android:hint="@string/trip_planner_origin_label"
                     android:maxLines="1"
-                    android:textColor="@color/standard_text_color"
+                    android:textColor="@color/black_text_color"
                     android:textSize="@dimen/text_size_medium"/>
 
             </LinearLayout>
@@ -108,7 +108,7 @@
                     android:layout_marginStart="@dimen/layout_margin_tiny"
                     android:text="@string/ending_bus_stop_label"
                     android:textAllCaps="true"
-                    android:textColor="@color/sub_text_color"
+                    android:textColor="@color/grey_text_color"
                     android:textSize="@dimen/text_size_small"/>
 
                 <TextView
@@ -119,10 +119,10 @@
                     android:background="@drawable/white_rounded_background_borderless"
                     android:clickable="true"
                     android:ellipsize="end"
-                    android:textColorHint="@color/sub_text_color"
+                    android:textColorHint="@color/grey_text_color"
                     android:hint="@string/trip_planner_destination_label"
                     android:maxLines="1"
-                    android:textColor="@color/standard_text_color"
+                    android:textColor="@color/black_text_color"
                     android:textSize="@dimen/text_size_medium"/>
 
             </LinearLayout>
@@ -172,7 +172,7 @@
             android:layout_marginLeft="@dimen/layout_margin"
             android:layout_marginRight="@dimen/layout_margin"
             android:textAlignment="center"
-            android:textColor="@color/standard_text_color"
+            android:textColor="@color/black_text_color"
             android:textSize="@dimen/text_size_big"/>
 
         <TextView
@@ -183,7 +183,7 @@
             android:padding="@dimen/layout_padding"
             android:text="@string/fix_error_retry"
             android:textAllCaps="true"
-            android:textColor="@color/colorSpecialServiceBus"/>
+            android:textColor="@color/colorMetroFeederBus"/>
 
     </LinearLayout>
 

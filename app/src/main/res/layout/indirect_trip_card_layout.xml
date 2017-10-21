@@ -28,7 +28,7 @@
                 android:layout_centerVertical="true"
                 android:background="@drawable/grey_rounded_background_borderless"
                 android:text="1 hr 17 min"
-                android:textColor="@color/standard_text_color"
+                android:textColor="@color/black_text_color"
                 android:textSize="@dimen/text_size_medium"/>
 
             <TextView
@@ -40,7 +40,7 @@
                 android:layout_centerVertical="true"
                 android:text="Indirect"
                 android:textAllCaps="true"
-                android:textColor="@color/standard_text_color"
+                android:textColor="@color/black_text_color"
                 android:textSize="@dimen/text_size_medium"/>
 
             <TextView
@@ -57,7 +57,7 @@
                 android:gravity="start"
                 android:maxLines="1"
                 android:text="(Est. Click for real-time)"
-                android:textColor="@color/sub_text_color"
+                android:textColor="@color/grey_text_color"
                 android:textSize="@dimen/text_size_small"
                 android:textStyle="italic"/>
 
@@ -141,7 +141,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_margin="@dimen/layout_margin_tiny"
                 android:text="Change at:"
-                android:textColor="@color/standard_text_color"
+                android:textColor="@color/black_text_color"
                 android:textSize="@dimen/text_size_medium"
                 android:textStyle="bold"/>
 
@@ -154,7 +154,7 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:text="B Channasandra Bridge"
-                android:textColor="@color/standard_text_color"
+                android:textColor="@color/black_text_color"
                 android:textSize="@dimen/text_size_small"/>
 
         </LinearLayout>

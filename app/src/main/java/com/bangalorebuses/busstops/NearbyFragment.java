@@ -19,8 +19,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -92,11 +90,11 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        View view = inflater.inflate(R.layout.nearby_fragment, container, false);
+        View view = inflater.inflate(R.layout.fragment_nearby_bus_stops, container, false);
         nearbyBusStopsRecyclerView = (RecyclerView) view.findViewById(R.id.nearbyBusStopsRecyclerView);
         nearbyBusStopsRecyclerView.setVisibility(View.GONE);
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
-        swipeRefreshLayout.setColorSchemeResources(R.color.colorOrdinaryServiceBus, R.color.colorACServiceBus, R.color.colorSpecialServiceBus);
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorNonACBus, R.color.colorACBus, R.color.colorMetroFeederBus);
 
         errorLinearLayout = (LinearLayout) view.findViewById(R.id.errorLinearLayout);
         errorLinearLayout.setVisibility(View.GONE);
@@ -141,14 +139,6 @@ public class NearbyFragment extends Fragment implements NetworkingHelper, Google
             googleApiClient = new GoogleApiClient.Builder(getActivity()).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
             googleApiClient.connect();
         }
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
-    {
-        MenuInflater menuInflater = getActivity().getMenuInflater();
-        menuInflater.inflate(R.menu.nearby_fragment_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
