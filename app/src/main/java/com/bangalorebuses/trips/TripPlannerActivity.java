@@ -475,7 +475,8 @@ public class TripPlannerActivity extends AppCompatActivity implements
         if (transitPoints.size() == 0)
         {
             swipeRefreshLayout.setRefreshing(false);
-            Toast.makeText(this, "There aren't are direct or indirect trips...", Toast.LENGTH_SHORT).show();
+            showError(R.drawable.ic_directions_bus_black_big,
+                    R.string.error_message_no_trips, R.string.fix_error_retry);
             return;
         }
 
@@ -512,7 +513,8 @@ public class TripPlannerActivity extends AppCompatActivity implements
         if (transitPoints.size() == 0)
         {
             swipeRefreshLayout.setRefreshing(false);
-            Toast.makeText(this, "There aren't are direct or indirect trips...", Toast.LENGTH_SHORT).show();
+            showError(R.drawable.ic_directions_bus_black_big,
+                    R.string.error_message_no_trips, R.string.fix_error_retry);
             return;
         }
 
