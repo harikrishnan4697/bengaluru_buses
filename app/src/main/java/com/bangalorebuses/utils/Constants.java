@@ -16,7 +16,7 @@ public class Constants
 {
     // Constants for networking tasks
     public static final int NETWORK_QUERY_CONNECT_TIMEOUT = 10000;
-    public static final int NETWORK_QUERY_READ_TIMEOUT = 25000;
+    public static final int NETWORK_QUERY_READ_TIMEOUT = 15000;
     public static final String NETWORK_QUERY_NO_ERROR = "NO_ERROR_OCCURRED";
     public static final String NETWORK_QUERY_URL_EXCEPTION = "ERROR_MALFORMED_URL";
     public static final String NETWORK_QUERY_REQUEST_TIMEOUT_EXCEPTION = "ERROR_REQUEST_TIMED_OUT";

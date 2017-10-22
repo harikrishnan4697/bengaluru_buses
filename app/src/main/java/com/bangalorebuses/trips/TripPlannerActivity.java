@@ -54,7 +54,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
     private RecyclerView recyclerView;
     private LinearLayout errorLinearLayout;
     private ImageView errorImageView;
-    private TextView errorTextView;
+    private TextView errorMessageTextView;
     private TextView errorResolutionTextView;
 
     // Direct trip related variables
@@ -142,7 +142,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
 
         errorLinearLayout = (LinearLayout) findViewById(R.id.errorLinearLayout);
         errorImageView = (ImageView) findViewById(R.id.errorImageView);
-        errorTextView = (TextView) findViewById(R.id.errorTextView);
+        errorMessageTextView = (TextView) findViewById(R.id.errorTextView);
         errorResolutionTextView = (TextView) findViewById(R.id.errorResolutionTextView);
         errorResolutionTextView.setOnClickListener(new View.OnClickListener()
         {
@@ -394,8 +394,8 @@ public class TripPlannerActivity extends AppCompatActivity implements
             {
                 recyclerView.setVisibility(View.GONE);
                 swipeRefreshLayout.setRefreshing(false);
-                setErrorLayoutContent(R.drawable.ic_cloud_off_black, "Uh oh! No data connection.", "Retry");
-                errorLinearLayout.setVisibility(View.VISIBLE);
+                showError(R.drawable.ic_cloud_off_black,
+                        R.string.error_message_internet_unavailable, R.string.fix_error_retry);
             }
         }
         else
@@ -461,7 +461,8 @@ public class TripPlannerActivity extends AppCompatActivity implements
         else
         {
             swipeRefreshLayout.setRefreshing(false);
-            setErrorLayoutContent(R.drawable.ic_cloud_off_black, "Uh oh! No data connection.", "Retry");
+            showError(R.drawable.ic_cloud_off_black,
+                    R.string.error_message_internet_unavailable, R.string.fix_error_retry);
             errorLinearLayout.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         }
@@ -547,8 +548,8 @@ public class TripPlannerActivity extends AppCompatActivity implements
         {
             recyclerView.setVisibility(View.GONE);
 
-            setErrorLayoutContent(R.drawable.ic_directions_bus_black_big,
-                    "Sorry! There aren't any direct or indirect trips.", "Retry");
+            showError(R.drawable.ic_directions_bus_black_big,
+                    R.string.error_message_no_trips, R.string.fix_error_retry);
             errorLinearLayout.setVisibility(View.VISIBLE);
 
             return;
@@ -644,8 +645,8 @@ public class TripPlannerActivity extends AppCompatActivity implements
             {
                 recyclerView.setVisibility(View.GONE);
 
-                setErrorLayoutContent(R.drawable.ic_directions_bus_black_big,
-                        "Sorry! There aren't any direct or indirect trips.", "Retry");
+                showError(R.drawable.ic_directions_bus_black_big,
+                        R.string.error_message_no_trips, R.string.fix_error_retry);
                 errorLinearLayout.setVisibility(View.VISIBLE);
             }
         }
@@ -763,11 +764,13 @@ public class TripPlannerActivity extends AppCompatActivity implements
         }
     }
 
-    private void setErrorLayoutContent(int drawableResId, String errorMessage, String resolutionButtonText)
+    private void showError(int drawableResId, int errorMessageStringResId, int resolutionButtonStringResId)
     {
+        swipeRefreshLayout.setRefreshing(false);
         errorImageView.setImageResource(drawableResId);
-        errorTextView.setText(errorMessage);
-        errorResolutionTextView.setText(resolutionButtonText);
+        errorMessageTextView.setText(errorMessageStringResId);
+        errorResolutionTextView.setText(resolutionButtonStringResId);
+        errorLinearLayout.setVisibility(View.VISIBLE);
     }
 
     @Override

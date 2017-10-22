@@ -7,7 +7,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 public class BusStopsPagerAdapter extends FragmentStatePagerAdapter
 {
     int mNumOfTabs;
-    private NearbyFragment nearbyFragment;
+    private NearbyBusStopsFragment nearbyBusStopsFragment;
 
     public BusStopsPagerAdapter(FragmentManager fm, int NumOfTabs)
     {
@@ -15,9 +15,9 @@ public class BusStopsPagerAdapter extends FragmentStatePagerAdapter
         this.mNumOfTabs = NumOfTabs;
     }
 
-    public NearbyFragment getNearbyFragment()
+    public NearbyBusStopsFragment getNearbyBusStopsFragment()
     {
-        return nearbyFragment;
+        return nearbyBusStopsFragment;
     }
 
     @Override
@@ -27,8 +27,8 @@ public class BusStopsPagerAdapter extends FragmentStatePagerAdapter
         switch (position)
         {
             case 0:
-                nearbyFragment = new NearbyFragment();
-                return nearbyFragment;
+                nearbyBusStopsFragment = new NearbyBusStopsFragment();
+                return nearbyBusStopsFragment;
             case 1:
                 return new AllBusStopsFragment();
             default:

@@ -44,7 +44,7 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
     // Variable for displaying errors
     private LinearLayout errorLinearLayout;
     private ImageView errorImageView;
-    private TextView errorTextView;
+    private TextView errorMessageTextView;
     private TextView errorResolutionTextView;
 
     // Views to display the indirect trips
@@ -77,7 +77,7 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         errorLinearLayout = (LinearLayout) findViewById(R.id.errorLinearLayout);
         errorImageView = (ImageView) findViewById(R.id.errorImageView);
-        errorTextView = (TextView) findViewById(R.id.errorTextView);
+        errorMessageTextView = (TextView) findViewById(R.id.errorTextView);
         errorResolutionTextView = (TextView) findViewById(R.id.errorResolutionTextView);
 
         errorResolutionTextView.setOnClickListener(new View.OnClickListener()
@@ -136,9 +136,9 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
         else
         {
             swipeRefreshLayout.setRefreshing(false);
-            setErrorLayoutContent(R.drawable.ic_sad_face,
-                    "Sorry! Something went wrong. Please try again...", "Retry");
-            errorLinearLayout.setVisibility(View.VISIBLE);
+            swipeRefreshLayout.setVisibility(View.GONE);
+            showError(R.drawable.ic_sad_face,
+                    R.string.error_message_url_exception, R.string.fix_error_no_fix);
         }
     }
 
@@ -159,9 +159,8 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
         if (indirectTrips.size() == 0)
         {
             swipeRefreshLayout.setRefreshing(false);
-            setErrorLayoutContent(R.drawable.ic_directions_bus_black_big,
-                    "Uh oh! There don't seem to be any trips via " +
-                            transitPointBusStopName + " right now.", "Retry");
+            showError(R.drawable.ic_directions_bus_black_big,
+                    R.string.error_message_no_indirect_trips, R.string.fix_error_retry);
             errorLinearLayout.setVisibility(View.VISIBLE);
             return;
         }
@@ -228,10 +227,8 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
 
                 if (indirectTripsToDisplay.size() == 0)
                 {
-                    setErrorLayoutContent(R.drawable.ic_directions_bus_black_big,
-                            "Uh oh! There don't seem to be any trips via " +
-                                    transitPointBusStopName + " right now.", "Retry");
-                    errorLinearLayout.setVisibility(View.VISIBLE);
+                    showError(R.drawable.ic_directions_bus_black_big,
+                            R.string.error_message_no_indirect_trips, R.string.fix_error_retry);
                 }
             }
         }
@@ -268,6 +265,8 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
                     else
                     {
                         bestBusOnSecondLeg = busOnSecondLeg;
+                        bestDirectTripOnSecondLeg =
+                                directTripOnSecondLeg;
                     }
                 }
             }
@@ -347,12 +346,14 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
         findIndirectTrips();
     }
 
-    private void setErrorLayoutContent(int drawableResId, String errorMessage,
-                                       String resolutionButtonText)
+    private void showError(int drawableResId, int errorMessageStringResId,
+                           int resolutionButtonStringResId)
     {
+        swipeRefreshLayout.setRefreshing(false);
         errorImageView.setImageResource(drawableResId);
-        errorTextView.setText(errorMessage);
-        errorResolutionTextView.setText(resolutionButtonText);
+        errorMessageTextView.setText(errorMessageStringResId);
+        errorResolutionTextView.setText(resolutionButtonStringResId);
+        errorLinearLayout.setVisibility(View.VISIBLE);
     }
 
     @Override

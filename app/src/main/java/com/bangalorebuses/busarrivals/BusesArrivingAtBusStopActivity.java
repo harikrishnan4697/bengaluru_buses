@@ -52,7 +52,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
 
     private LinearLayout errorLinearLayout;
     private ImageView errorImageView;
-    private TextView errorTextView;
+    private TextView errorMessageTextView;
     private TextView errorResolutionTextView;
 
     private int numberOfBusRouteTimingsFound = 0;
@@ -92,7 +92,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
 
         errorLinearLayout = (LinearLayout) findViewById(R.id.errorLinearLayout);
         errorImageView = (ImageView) findViewById(R.id.errorImageView);
-        errorTextView = (TextView) findViewById(R.id.errorTextView);
+        errorMessageTextView = (TextView) findViewById(R.id.errorTextView);
         errorResolutionTextView = (TextView) findViewById(R.id.errorResolutionTextView);
         errorResolutionTextView.setOnClickListener(new View.OnClickListener()
         {
@@ -145,8 +145,9 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
         {
             swipeRefreshLayout.setRefreshing(false);
             listView.setVisibility(View.GONE);
-            setErrorLayoutContent(R.drawable.ic_cloud_off_black, "Uh oh! No data connection.", "Retry");
-            errorLinearLayout.setVisibility(View.VISIBLE);
+            showError(R.drawable.ic_cloud_off_black,
+                    R.string.error_message_internet_unavailable,
+                    R.string.fix_error_retry);
         }
     }
 
@@ -191,8 +192,9 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
         {
             swipeRefreshLayout.setRefreshing(false);
             listView.setVisibility(View.GONE);
-            setErrorLayoutContent(R.drawable.ic_cloud_off_black, "Uh oh! No data connection.", "Retry");
-            errorLinearLayout.setVisibility(View.VISIBLE);
+            showError(R.drawable.ic_cloud_off_black,
+                    R.string.error_message_internet_unavailable,
+                    R.string.fix_error_retry);
         }
     }
 
@@ -345,7 +347,8 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
             {
                 swipeRefreshLayout.setRefreshing(false);
                 listView.setVisibility(View.GONE);
-                setErrorLayoutContent(R.drawable.ic_cloud_off_black, "Uh oh! No data connection.", "Retry");
+                showError(R.drawable.ic_cloud_off_black,
+                        R.string.error_message_internet_unavailable, R.string.fix_error_retry);
                 errorLinearLayout.setVisibility(View.VISIBLE);
             }
         }
@@ -353,7 +356,8 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
         {
             swipeRefreshLayout.setRefreshing(false);
             listView.setVisibility(View.GONE);
-            setErrorLayoutContent(R.drawable.ic_directions_bus_black_big, "Oh no! Looks like there aren't any buses arriving at this bus stop any time soon...", "Retry");
+            showError(R.drawable.ic_directions_bus_black_big,
+                    R.string.error_message_no_buses_arriving_soon, R.string.fix_error_retry);
             errorLinearLayout.setVisibility(View.VISIBLE);
         }
     }
@@ -431,7 +435,8 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
                 {
                     swipeRefreshLayout.setRefreshing(false);
                     listView.setVisibility(View.GONE);
-                    setErrorLayoutContent(R.drawable.ic_cloud_off_black, "Uh oh! No data connection.", "Retry");
+                    showError(R.drawable.ic_cloud_off_black,
+                            R.string.error_message_internet_unavailable, R.string.fix_error_retry);
                     errorLinearLayout.setVisibility(View.VISIBLE);
                 }
             }
@@ -444,17 +449,20 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
             if (!busStopHasTraceableBuses)
             {
                 listView.setVisibility(View.GONE);
-                setErrorLayoutContent(R.drawable.ic_directions_bus_black_big, "Oh no! Looks like there aren't any buses arriving at this bus stop any time soon...", "Retry");
+                showError(R.drawable.ic_directions_bus_black_big,
+                        R.string.error_message_no_buses_arriving_soon, R.string.fix_error_retry);
                 errorLinearLayout.setVisibility(View.VISIBLE);
             }
         }
     }
 
-    private void setErrorLayoutContent(int drawableResId, String errorMessage, String resolutionButtonText)
+    private void showError(int drawableResId, int errorMessageStringResId, int resolutionButtonStringResId)
     {
+        swipeRefreshLayout.setRefreshing(false);
         errorImageView.setImageResource(drawableResId);
-        errorTextView.setText(errorMessage);
-        errorResolutionTextView.setText(resolutionButtonText);
+        errorMessageTextView.setText(errorMessageStringResId);
+        errorResolutionTextView.setText(resolutionButtonStringResId);
+        errorLinearLayout.setVisibility(View.VISIBLE);
     }
 
     @Override

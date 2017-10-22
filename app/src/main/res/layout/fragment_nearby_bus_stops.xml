@@ -25,7 +25,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_margin="@dimen/layout_margin"
-        android:animateLayoutChanges="true"
         android:gravity="center"
         android:orientation="vertical"
         android:visibility="visible">

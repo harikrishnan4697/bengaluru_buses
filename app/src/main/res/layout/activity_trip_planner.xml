@@ -75,11 +75,11 @@
                     android:layout_gravity="center"
                     android:background="@drawable/white_rounded_background_borderless"
                     android:clickable="true"
-                    android:textColorHint="@color/grey_text_color"
                     android:ellipsize="end"
                     android:hint="@string/trip_planner_origin_label"
                     android:maxLines="1"
                     android:textColor="@color/black_text_color"
+                    android:textColorHint="@color/grey_text_color"
                     android:textSize="@dimen/text_size_medium"/>
 
             </LinearLayout>
@@ -119,10 +119,10 @@
                     android:background="@drawable/white_rounded_background_borderless"
                     android:clickable="true"
                     android:ellipsize="end"
-                    android:textColorHint="@color/grey_text_color"
                     android:hint="@string/trip_planner_destination_label"
                     android:maxLines="1"
                     android:textColor="@color/black_text_color"
+                    android:textColorHint="@color/grey_text_color"
                     android:textSize="@dimen/text_size_medium"/>
 
             </LinearLayout>
@@ -150,13 +150,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/app_bar_layout"
-        android:layout_marginLeft="@dimen/layout_margin"
-        android:layout_marginRight="@dimen/layout_margin"
-        android:animateLayoutChanges="true"
-        android:background="@drawable/white_rounded_background_borderless"
+        android:layout_margin="@dimen/layout_margin"
         android:gravity="center"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:visibility="visible">
 
         <ImageView
             android:id="@+id/errorImageView"

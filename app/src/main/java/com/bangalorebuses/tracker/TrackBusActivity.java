@@ -1,8 +1,5 @@
 package com.bangalorebuses.tracker;
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -78,7 +75,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
     private BusStop currentlySelectedBusStop;
     private LinearLayout errorLinearLayout;
     private ImageView errorImageView;
-    private TextView errorTextView;
+    private TextView errorMessageTextView;
     private TextView errorResolutionTextView;
     private FloatingActionButton favoritesFloatingActionButton;
     private boolean isFavorite = false;
@@ -116,7 +113,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         directionSwapImageView = (ImageView) findViewById(R.id.changeDirectionImageView);
         errorLinearLayout = (LinearLayout) findViewById(R.id.errorLinearLayout);
         errorImageView = (ImageView) findViewById(R.id.errorImageView);
-        errorTextView = (TextView) findViewById(R.id.errorTextView);
+        errorMessageTextView = (TextView) findViewById(R.id.errorTextView);
         errorResolutionTextView = (TextView) findViewById(R.id.errorResolutionTextView);
         errorResolutionTextView.setOnClickListener(new View.OnClickListener()
         {
@@ -151,27 +148,13 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         return true;
     }
 
-    /**
-     * This method is used to check if the user's device
-     * has a Wi-Fi or Cellular data connection.
-     *
-     * @return boolean This returns true or false based on the status
-     * of the Wi-Fi and Cellular data connection.
-     */
-    private boolean isNetworkAvailable()
-    {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null;
-    }
-
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
     {
         cancelAllTasks();
         errorLinearLayout.setVisibility(View.GONE);
 
-        if (isNetworkAvailable())
+        if (CommonMethods.checkNetworkConnectivity(this))
         {
             if (currentlySelectedDirection.equals(DIRECTION_UP))
             {
@@ -199,7 +182,8 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         else
         {
             swipeRefreshLayout.setRefreshing(false);
-            setErrorLayoutContent(R.drawable.ic_cloud_off_black, "Uh oh! No data connection.", "Retry");
+            showError(R.drawable.ic_cloud_off_black,
+                    R.string.error_message_internet_unavailable, R.string.fix_error_retry);
             errorLinearLayout.setVisibility(View.VISIBLE);
             listView.setVisibility(View.GONE);
         }
@@ -496,7 +480,8 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
     }
 
     @Override
-    public void onBusETAsOnBusRouteFound(String errorMessage, int busStopRouteOrder, ArrayList<Bus> buses, BusRoute busRoute)
+    public void onBusETAsOnBusRouteFound(String errorMessage, int busStopRouteOrder,
+                                         ArrayList<Bus> buses, BusRoute busRoute)
     {
         if (errorMessage.equals(NETWORK_QUERY_NO_ERROR))
         {
@@ -529,52 +514,51 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
             else
             {
                 swipeRefreshLayout.setRefreshing(false);
-                setErrorLayoutContent(R.drawable.ic_directions_bus_black, "Whoops! There don't seem to be any buses arriving " +
-                        "at this stop anytime soon.", "Retry");
-                errorLinearLayout.setVisibility(View.VISIBLE);
+                showError(R.drawable.ic_directions_bus_black,
+                        R.string.error_message_track_bus_no_buses_arriving_soon, R.string.fix_error_retry);
                 listView.setVisibility(View.GONE);
             }
         }
         else
         {
-            if (isNetworkAvailable())
+            if (CommonMethods.checkNetworkConnectivity(this))
             {
                 swipeRefreshLayout.setRefreshing(false);
                 switch (errorMessage)
                 {
                     case NETWORK_QUERY_IO_EXCEPTION:
                     {
-                        setErrorLayoutContent(R.drawable.ic_sad_face, "Sorry! Something went wrong.", "Retry");
-                        errorLinearLayout.setVisibility(View.VISIBLE);
+                        showError(R.drawable.ic_cloud_off_black,
+                                R.string.error_message_io_exception, R.string.fix_error_retry);
                         listView.setVisibility(View.GONE);
                         break;
                     }
                     case NETWORK_QUERY_JSON_EXCEPTION:
                     {
-                        setErrorLayoutContent(R.drawable.ic_directions_bus_black, "Whoops! There don't seem to be any buses arriving " +
-                                "at this stop anytime soon.", "Retry");
-                        errorLinearLayout.setVisibility(View.VISIBLE);
+                        showError(R.drawable.ic_directions_bus_black,
+                                R.string.error_message_track_bus_no_buses_arriving_soon,
+                                R.string.fix_error_retry);
                         listView.setVisibility(View.GONE);
                         break;
                     }
                     case NETWORK_QUERY_REQUEST_TIMEOUT_EXCEPTION:
                     {
-                        setErrorLayoutContent(R.drawable.ic_cloud_off_black, "Uh oh! Data connection seems to be slow. Couldn't track buses.", "Retry");
-                        errorLinearLayout.setVisibility(View.VISIBLE);
+                        showError(R.drawable.ic_cloud_off_black,
+                                R.string.error_message_timeout_exception, R.string.fix_error_retry);
                         listView.setVisibility(View.GONE);
                         break;
                     }
                     case NETWORK_QUERY_URL_EXCEPTION:
                     {
-                        setErrorLayoutContent(R.drawable.ic_sad_face, "Sorry! Something went wrong.", "Retry");
-                        errorLinearLayout.setVisibility(View.VISIBLE);
+                        showError(R.drawable.ic_sad_face,
+                                R.string.error_message_url_exception, R.string.fix_error_retry);
                         listView.setVisibility(View.GONE);
                         break;
                     }
                     default:
                     {
-                        setErrorLayoutContent(R.drawable.ic_sad_face, "Sorry! Something went wrong.", "Retry");
-                        errorLinearLayout.setVisibility(View.VISIBLE);
+                        showError(R.drawable.ic_sad_face,
+                                R.string.error_message_url_exception, R.string.fix_error_retry);
                         listView.setVisibility(View.GONE);
                         break;
                     }
@@ -582,18 +566,22 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
             }
             else
             {
-                setErrorLayoutContent(R.drawable.ic_cloud_off_black, "Uh oh! No data connection.", "Retry");
+                showError(R.drawable.ic_cloud_off_black,
+                        R.string.error_message_internet_unavailable, R.string.fix_error_retry);
                 errorLinearLayout.setVisibility(View.VISIBLE);
                 listView.setVisibility(View.GONE);
             }
         }
     }
 
-    private void setErrorLayoutContent(int drawableResId, String errorMessage, String resolutionButtonText)
+    private void showError(int drawableResId, int errorMessageStringResId,
+                           int resolutionButtonStringResId)
     {
+        swipeRefreshLayout.setRefreshing(false);
         errorImageView.setImageResource(drawableResId);
-        errorTextView.setText(errorMessage);
-        errorResolutionTextView.setText(resolutionButtonText);
+        errorMessageTextView.setText(errorMessageStringResId);
+        errorResolutionTextView.setText(resolutionButtonStringResId);
+        errorLinearLayout.setVisibility(View.VISIBLE);
     }
 
     private void cancelAllTasks()
@@ -619,7 +607,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         cancelAllTasks();
         errorLinearLayout.setVisibility(View.GONE);
 
-        if (isNetworkAvailable())
+        if (CommonMethods.checkNetworkConnectivity(this))
         {
             if (currentlySelectedBusStop != null)
             {
@@ -646,7 +634,8 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         else
         {
             swipeRefreshLayout.setRefreshing(false);
-            setErrorLayoutContent(R.drawable.ic_cloud_off_black, "Uh oh! No data connection.", "Retry");
+            showError(R.drawable.ic_cloud_off_black,
+                    R.string.error_message_internet_unavailable, R.string.fix_error_retry);
             errorLinearLayout.setVisibility(View.VISIBLE);
             listView.setVisibility(View.GONE);
         }

@@ -1,21 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Error message strings -->
-    <string name="error_message_request_timed_out">"Oh no! Data connection is slow or unavailable. Please try again in a moment..."</string>
-    <string name="error_message_no_data_connection">"Uh oh! There doesn't seem to be a data connection."</string>
-    <string name="error_message_something_went_wrong">"So sorry! Something went wrong. Please try again in a little bit..."</string>
-    <string name="error_message_location_access_denied">"Hold on! We need access to the GPS of your device to find bus stops nearby."</string>
-    <string name="error_message_location_off">"Wait a minute! We can't find bus stops nearby because the GPS on your device is turned off."</string>
-    <string name="error_message_update_google_play_services">"Can't get your current location! Please make sure you have the latest version of the Google Play Services...</string>
-    <string name="error_message_io_exception">"Sorry! We can't connect to BMTC at the moment. Please try again in a little bit..."</string>
+    <!-- Networking error message strings -->
+    <string name="error_message_url_exception">"Something went wrong. Please click 'Retry' to try again..."</string>
+    <string name="error_message_io_exception">"Server un-available at the moment. Please click 'Retry' to try again..."</string>
+    <string name="error_message_timeout_exception">"Data connection is slow or un-available. Please click 'Retry' to try again..."</string>
+    <string name="error_message_internet_unavailable">"Data connection is un-available. Please click 'Retry' to try again..."</string>
 
-    <!-- Nearby fragment error message strings -->
-    <string name="error_message_no_bus_stops_nearby">"Uh oh! There aren't any Bengaluru City bus stops nearby..."</string>
+    <!-- GPS error message strings -->
+    <string name="error_message_gps_off">"Can't find Bus Stops Nearby because the GPS is turned off. Please click 'Turn On' to continue..."</string>
+    <string name="error_message_gps_access_denied">"Can't find Bus Stops Nearby without access to the GPS. Please click 'Allow Access' to continue..."</string>
+    <string name="error_message_update_google_play_services">"Couldn't get GPS location. Please update Google Play Services to continue..."</string>
 
-    <!-- Fix error button strings -->
+    <!-- NearbyBusStopsFragment error message strings -->
+    <string name="error_message_no_bus_stops_nearby">"No Bus Stops Nearby: There aren't any Bengaluru City Bus Stops Nearby. Please click 'Retry' to try again..."</string>
+
+    <!-- BusesArrivingAtBusStopActivity error message stings -->
+    <string name="error_message_no_buses_arriving_soon">"There don't seem to be any Buses arriving at this Bus Stop any time soon. Please click 'Retry' to try again..."</string>
+
+    <!-- TrackBusActivity error message strings -->
+    <string name="error_message_track_bus_no_buses_arriving_soon">"There don't seem to be any Buses arriving at this Bus Stop any time soon. Please click 'Retry' to try again..."</string>
+
+    <!-- MainActivity error message strings -->
+    <string name="error_message_no_favorites">"No Favourites."</string>
+
+    <!-- TripPlannerActivity error message strings -->
+    <string name="error_message_no_trips">"There aren't any trips right now. Please click 'Retry' to try again..."</string>
+
+    <!-- IndirectTripDetailsActivity error message strings -->
+    <string name="error_message_no_indirect_trips">"There aren't any indirect trips via this transit point right now. Please click 'Retry' to try again..."</string>
+
+    <!-- Fix error strings -->
     <string name="fix_error_retry">"Retry"</string>
-    <string name="fix_error_allow_access">"Allow access"</string>
-    <string name="fix_error_turn_on">"Turn on"</string>
+    <string name="fix_error_allow_access">"Allow Access"</string>
+    <string name="fix_error_turn_on">"Turn On"</string>
+    <string name="fix_error_no_fix">""</string>
 
 </resources>

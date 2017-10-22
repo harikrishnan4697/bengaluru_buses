@@ -81,23 +81,6 @@ public class CommonMethods
         return travelTime;
     }
 
-    public static int getNumberOfStopsBetweenRouteOrders(int routeId, int routeOrder1, int routeOrder2)
-    {
-        Cursor cursor = db.rawQuery("select count(*) from RouteStops where RouteStops.RouteId = " + routeId +
-                " and RouteStops.StopRouteOrder > " + routeOrder1 + " and RouteStops.StopRouteOrder <= " + routeOrder2, null);
-        if (cursor.moveToNext())
-        {
-            int numberOfStopsBetweenRouteOrders = cursor.getInt(0);
-            cursor.close();
-            return numberOfStopsBetweenRouteOrders;
-        }
-        else
-        {
-            cursor.close();
-            return -1;
-        }
-    }
-
     public static String convertMinutesToHoursAndMinutes(int minutes)
     {
         if (minutes < 0)
@@ -210,8 +193,9 @@ public class CommonMethods
         {
             busRouteNumberBackgroundImageResId = R.drawable.blue_rounded_background_borderless;
         }
-        else if (busRouteNumber.length() > 1 && busRouteNumber.substring(0, 2)
-                .equals("V-"))
+        else if (busRouteNumber.length() > 1 && (busRouteNumber.substring(0, 2)
+                .equals("V-") || busRouteNumber.substring(0, 2)
+                .equals("C-")))
         {
             busRouteNumberBackgroundImageResId = R.drawable.blue_rounded_background_borderless;
         }
