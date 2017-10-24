@@ -28,8 +28,11 @@ import com.bangalorebuses.utils.Constants;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.Stack;
 
 import static com.bangalorebuses.utils.Constants.BUS_STOP_NAME;
@@ -39,6 +42,7 @@ import static com.bangalorebuses.utils.Constants.FAVORITES_TYPE_BUS_ROUTE;
 import static com.bangalorebuses.utils.Constants.FAVORITES_TYPE_BUS_STOP;
 import static com.bangalorebuses.utils.Constants.FAVORITES_TYPE_NONE;
 import static com.bangalorebuses.utils.Constants.SEARCH_TYPE_BUS_STOP;
+import static com.bangalorebuses.utils.Constants.favoritesHashMap;
 
 public class SearchActivity extends AppCompatActivity implements SearchDbQueriesHelper,
         FavoritesHelper
@@ -50,7 +54,6 @@ public class SearchActivity extends AppCompatActivity implements SearchDbQueries
     private LinearLayout favoritesLinearLayout;
     private AllBusStopNamesTask allBusStopNamesTask;
     private ListView favoritesListView;
-    private String favoritesType;
     private boolean hasFavorites = false;
 
     @Override
@@ -80,7 +83,6 @@ public class SearchActivity extends AppCompatActivity implements SearchDbQueries
 
         String searchType = getIntent().getStringExtra("SEARCH_TYPE");
         String editTextHint = getIntent().getStringExtra("EDIT_TEXT_HINT");
-        favoritesType = getIntent().getStringExtra(FAVORITES_TYPE);
 
         if (editTextHint != null)
         {
@@ -98,10 +100,7 @@ public class SearchActivity extends AppCompatActivity implements SearchDbQueries
             allBusStopNamesTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
 
-        if (!favoritesType.equals(FAVORITES_TYPE_NONE))
-        {
-            initialiseFavorites();
-        }
+        initialiseFavorites();
     }
 
     @Override
@@ -198,82 +197,36 @@ public class SearchActivity extends AppCompatActivity implements SearchDbQueries
     {
         if (favoritesListView != null)
         {
-            try
+            ArrayList<String> favorites = new ArrayList<>();
+
+            Set favoriteKeys = favoritesHashMap.keySet();
+
+            Iterator iterator = favoriteKeys.iterator();
+            while (iterator.hasNext())
             {
-                FileInputStream fileInputStream = openFileInput(Constants.FAVORITES_FILE_NAME);
-                InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String key = (String) iterator.next();
+                String value = favoritesHashMap.get(key);
 
-                ArrayList<String> favorites = new ArrayList<>();
-                String line;
-
-                while ((line = bufferedReader.readLine()) != null)
+                if (key.substring(0, 3).equals("^%s"))
                 {
-                    favorites.add(line);
+                    favorites.add(key + "^%si" + value);
                 }
-
-                Stack<String> favoritesBackwards = new Stack<>();
-                ArrayList<String> favoritesForwards = new ArrayList<>();
-
-                for (String favorite : favorites)
-                {
-                    favoritesBackwards.push(favorite);
-                }
-
-                if (favoritesType.equals(FAVORITES_TYPE_BUS_ROUTE))
-                {
-                    while (!favoritesBackwards.isEmpty())
-                    {
-                        String favorite = favoritesBackwards.pop();
-
-                        if (favorite.substring(0, 3).equals("^%b"))
-                        {
-                            favoritesForwards.add(favorite);
-                        }
-                    }
-                }
-                else if (favoritesType.equals(FAVORITES_TYPE_BUS_STOP))
-                {
-                    while (!favoritesBackwards.isEmpty())
-                    {
-                        String favorite = favoritesBackwards.pop();
-
-                        if (favorite.substring(0, 3).equals("^%s"))
-                        {
-                            favoritesForwards.add(favorite.substring(0, favorite.indexOf("^%sd") + 4));
-                        }
-                    }
-                }
-                else
-                {
-                    while (!favoritesBackwards.isEmpty())
-                    {
-                        favoritesForwards.add(favoritesBackwards.pop());
-                    }
-                }
-
-                if (favoritesForwards.size() > 0)
-                {
-                    FavoritesListCustomAdapter adapter = new FavoritesListCustomAdapter(this, this,
-                            favoritesForwards, false);
-                    favoritesListView.setAdapter(adapter);
-                    favoritesLinearLayout.setVisibility(View.VISIBLE);
-                    searchResultsListView.setVisibility(View.GONE);
-                    hasFavorites = true;
-                }
-                else
-                {
-                    favoritesLinearLayout.setVisibility(View.GONE);
-                    searchResultsListView.setVisibility(View.VISIBLE);
-                    hasFavorites = false;
-                }
-
-                fileInputStream.close();
-                inputStreamReader.close();
             }
-            catch (Exception e)
+
+            if (favorites.size() > 0)
             {
-                e.printStackTrace();
+                FavoritesListCustomAdapter adapter = new FavoritesListCustomAdapter(this, this,
+                        favorites, false);
+                favoritesListView.setAdapter(adapter);
+                favoritesLinearLayout.setVisibility(View.VISIBLE);
+                searchResultsListView.setVisibility(View.GONE);
+                hasFavorites = true;
+            }
+            else
+            {
+                favoritesLinearLayout.setVisibility(View.GONE);
+                searchResultsListView.setVisibility(View.VISIBLE);
+                hasFavorites = false;
             }
         }
     }

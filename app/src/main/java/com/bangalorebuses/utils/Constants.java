@@ -43,7 +43,6 @@ public class Constants
     public static final String DESTINATION_BUS_STOP_SEARCH_HINT = "Ending bus stop";
 
     // Favourites constants
-    public static final String FAVORITES_FILE_NAME = "Favourites.txt";
     public static final String FAVORITES_TYPE_BUS_ROUTE = "FAVORITE_BUS_ROUTE";
     public static final String FAVORITES_TYPE_BUS_STOP = "FAVORITE_BUS_STOP";
     public static final String FAVORITES_TYPE_NONE = "NO_FAVORITES";

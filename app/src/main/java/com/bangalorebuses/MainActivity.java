@@ -21,6 +21,7 @@ import com.bangalorebuses.tracker.BusesActivity;
 import com.bangalorebuses.tracker.TrackBusActivity;
 import com.bangalorebuses.trips.TripPlannerActivity;
 import com.bangalorebuses.utils.BengaluruBusesDbHelper;
+import com.bangalorebuses.utils.CommonMethods;
 import com.bangalorebuses.utils.Constants;
 
 import java.io.BufferedReader;
@@ -28,6 +29,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.Stack;
 
 import static com.bangalorebuses.utils.Constants.db;
@@ -156,84 +159,44 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
     {
         if (favoritesListView != null)
         {
-            try
+            CommonMethods.readFavoritesFileToHashMap(this);
+
+            ArrayList<String> favorites = new ArrayList<>();
+
+            Set favoriteKeys = favoritesHashMap.keySet();
+
+            Iterator iterator = favoriteKeys.iterator();
+            while (iterator.hasNext())
             {
-                FileInputStream fileInputStream = openFileInput(Constants.FAVORITES_FILE_NAME);
-                InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String key = (String) iterator.next();
+                String value = favoritesHashMap.get(key);
 
-                ArrayList<String> favorites = new ArrayList<>();
-                String line;
-
-                while ((line = bufferedReader.readLine()) != null)
+                if (key.substring(0, 3).equals("^%b"))
                 {
-                    favorites.add(line);
+                    favorites.add(key + "^%bs" + value);
                 }
-
-                favorites.trimToSize();
-                initialiseFavoritesHashMap(favorites);
-
-                if (favorites.size() > 0)
+                else if (key.substring(0, 3).equals("^%s"))
                 {
-                    FavoritesListCustomAdapter adapter = new FavoritesListCustomAdapter(this, this,
-                            favorites, true);
-                    favoritesListView.setAdapter(adapter);
-                    favoritesListView.setVisibility(View.VISIBLE);
-                    noFavoritesLinearLayout.setVisibility(View.GONE);
+                    favorites.add(key + "^%si" + value);
                 }
-                else
+                else if (key.substring(0, 3).equals("^%t"))
                 {
-                    favoritesListView.setVisibility(View.GONE);
-                    noFavoritesLinearLayout.setVisibility(View.VISIBLE);
+                    favorites.add(key);
                 }
-
-                fileInputStream.close();
-                inputStreamReader.close();
             }
-            catch (Exception e)
+
+            if (favorites.size() > 0)
             {
-                e.printStackTrace();
+                FavoritesListCustomAdapter adapter = new FavoritesListCustomAdapter(this, this,
+                        favorites, true);
+                favoritesListView.setAdapter(adapter);
+                favoritesListView.setVisibility(View.VISIBLE);
+                noFavoritesLinearLayout.setVisibility(View.GONE);
             }
-        }
-    }
-
-    private void initialiseFavoritesHashMap(ArrayList<String> favorites)
-    {
-        favoritesHashMap.clear();
-        for (String favorite : favorites)
-        {
-            if (favorite.substring(0, 3).equals("^%b"))
+            else
             {
-                String busRouteNumber = favorite.substring(3,
-                        favorite.indexOf("^%bd"));
-                String busRouteDirectionName = favorite.substring(favorite
-                        .indexOf("^%bd") + 4, favorite.indexOf("^%bs"));
-                String busRouteStopId = favorite.substring(favorite
-                        .indexOf("^%bs") + 4, favorite.length());
-
-                favoritesHashMap.put("^%b" + busRouteNumber + "^%bd" +
-                        busRouteDirectionName, busRouteStopId);
-            }
-            else if (favorite.substring(0, 3).equals("^%s"))
-            {
-                String busStopName = favorite.substring(3, favorite.indexOf("^%sd"));
-                String busStopDirectionName = favorite.substring(favorite
-                        .indexOf("^%sd") + 4, favorite.indexOf("^%si"));
-                String busStopId = favorite.substring(favorite.indexOf("^%si") + 4,
-                        favorite.length());
-
-                favoritesHashMap.put("^%s" + busStopName + "^%sd" +
-                        busStopDirectionName, busStopId);
-            }
-            else if (favorite.substring(0, 3).equals("^%t"))
-            {
-                String originBusStopName = favorite.substring(3,
-                        favorite.indexOf("^%td"));
-                String destinationBusStopName = favorite.substring(favorite
-                        .indexOf("^%td") + 4, favorite.length());
-
-                favoritesHashMap.put("^%t" + originBusStopName + "^%td" +
-                        destinationBusStopName, destinationBusStopName);
+                favoritesListView.setVisibility(View.GONE);
+                noFavoritesLinearLayout.setVisibility(View.VISIBLE);
             }
         }
     }
@@ -292,41 +255,21 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
     @Override
     public void onFavoriteDeleted(String favorite)
     {
-        try
+        if (favorite.substring(0, 3).equals("^%b"))
         {
-            FileInputStream fileInputStream = openFileInput(Constants.FAVORITES_FILE_NAME);
-            InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream,
-                    "UTF-8");
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-
-            ArrayList<String> favorites = new ArrayList<>();
-            String line;
-
-            while ((line = bufferedReader.readLine()) != null)
-            {
-                favorites.add(line);
-            }
-
-            favorites.remove(favorite);
-
-            favorites.trimToSize();
-            fileInputStream.close();
-            inputStreamReader.close();
-
-            FileOutputStream fileOutputStream = openFileOutput(Constants.FAVORITES_FILE_NAME,
-                    MODE_PRIVATE);
-            for (String aFavorite : favorites)
-            {
-                fileOutputStream.write((aFavorite + "\n").getBytes());
-            }
-            fileOutputStream.close();
-
+            favoritesHashMap.remove(favorite.substring(0, favorite
+                    .indexOf("^%bs")));
         }
-        catch (Exception e)
+        else if (favorite.substring(0, 3).equals("^%s"))
         {
-            Toast.makeText(this, "Unknown error occurred! Couldn't un-favourite this bus...", Toast
-                    .LENGTH_SHORT).show();
+            favoritesHashMap.remove(favorite.substring(0, favorite
+                    .indexOf("^%si")));
         }
+        else if (favorite.substring(0, 3).equals("^%t"))
+        {
+            favoritesHashMap.remove(favorite);
+        }
+        CommonMethods.writeFavoritesHashMapToFile(this);
 
         initialiseFavorites();
     }

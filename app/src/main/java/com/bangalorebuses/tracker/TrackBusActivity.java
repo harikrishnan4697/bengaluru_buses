@@ -329,7 +329,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         {
             if (currentlySelectedDirection.equals(DIRECTION_UP))
             {
-                favoritesHashMap.remove("^%b" + routeUp.getBusRouteNumber() + "^%sd" +
+                favoritesHashMap.remove("^%b" + routeUp.getBusRouteNumber() + "^%bd" +
                         getBusRouteDestinationName(routeUp.getBusRouteDirectionName()));
 
                 favoritesHashMap.put("^%b" + routeUp.getBusRouteNumber() +
@@ -339,7 +339,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
             }
             else
             {
-                favoritesHashMap.remove("^%b" + routeDown.getBusRouteNumber() + "^%sd" +
+                favoritesHashMap.remove("^%b" + routeDown.getBusRouteNumber() + "^%bd" +
                         getBusRouteDestinationName(routeDown.getBusRouteDirectionName()));
 
                 favoritesHashMap.put("^%b" + routeDown.getBusRouteNumber() +
@@ -366,12 +366,12 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         {
             if (currentlySelectedDirection.equals(DIRECTION_UP))
             {
-                favoritesHashMap.remove("^%b" + routeUp.getBusRouteNumber() + "^%sd" +
+                favoritesHashMap.remove("^%b" + routeUp.getBusRouteNumber() + "^%bd" +
                         getBusRouteDestinationName(routeUp.getBusRouteDirectionName()));
             }
             else
             {
-                favoritesHashMap.remove("^%b" + routeDown.getBusRouteNumber() + "^%sd" +
+                favoritesHashMap.remove("^%b" + routeDown.getBusRouteNumber() + "^%bd" +
                         getBusRouteDestinationName(routeDown.getBusRouteDirectionName()));
             }
 

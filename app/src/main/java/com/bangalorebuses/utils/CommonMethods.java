@@ -12,8 +12,12 @@ import android.widget.Toast;
 import com.bangalorebuses.R;
 import com.bangalorebuses.core.BusStop;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -25,6 +29,8 @@ import static com.bangalorebuses.utils.Constants.favoritesHashMap;
 
 public class CommonMethods
 {
+    public static final String FAVORITES_FILE_NAME = "Favourites.txt";
+
     public static int calculateTravelTime(int busRouteId, String busRouteNumber,
                                           int originBusStopRouteOrder, int destinationBusStopRouteOrder)
     {
@@ -227,6 +233,69 @@ public class CommonMethods
         return activeNetworkInfo != null;
     }
 
+    public static boolean readFavoritesFileToHashMap(Context context)
+    {
+        try
+        {
+            FileInputStream fileInputStream = context.openFileInput(FAVORITES_FILE_NAME);
+            InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+            ArrayList<String> favorites = new ArrayList<>();
+            String line;
+
+            while ((line = bufferedReader.readLine()) != null)
+            {
+                favorites.add(line);
+            }
+            favorites.trimToSize();
+
+            favoritesHashMap.clear();
+            for (String favorite : favorites)
+            {
+                if (favorite.substring(0, 3).equals("^%b"))
+                {
+                    String busRouteNumber = favorite.substring(3,
+                            favorite.indexOf("^%bd"));
+                    String busRouteDirectionName = favorite.substring(favorite
+                            .indexOf("^%bd") + 4, favorite.indexOf("^%bs"));
+                    String busRouteStopId = favorite.substring(favorite
+                            .indexOf("^%bs") + 4, favorite.length());
+
+                    favoritesHashMap.put("^%b" + busRouteNumber + "^%bd" +
+                            busRouteDirectionName, busRouteStopId);
+                }
+                else if (favorite.substring(0, 3).equals("^%s"))
+                {
+                    String busStopName = favorite.substring(3, favorite.indexOf("^%sd"));
+                    String busStopDirectionName = favorite.substring(favorite
+                            .indexOf("^%sd") + 4, favorite.indexOf("^%si"));
+                    String busStopId = favorite.substring(favorite.indexOf("^%si") + 4,
+                            favorite.length());
+
+                    favoritesHashMap.put("^%s" + busStopName + "^%sd" +
+                            busStopDirectionName, busStopId);
+                }
+                else if (favorite.substring(0, 3).equals("^%t"))
+                {
+                    String originBusStopName = favorite.substring(3,
+                            favorite.indexOf("^%td"));
+                    String destinationBusStopName = favorite.substring(favorite
+                            .indexOf("^%td") + 4, favorite.length());
+
+                    favoritesHashMap.put("^%t" + originBusStopName + "^%td" +
+                            destinationBusStopName, destinationBusStopName);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
     public static boolean writeFavoritesHashMapToFile(Context context)
     {
         try
@@ -234,7 +303,7 @@ public class CommonMethods
             Set favoriteKeys = favoritesHashMap.keySet();
 
             FileOutputStream fileOutputStream = context.openFileOutput(
-                    Constants.FAVORITES_FILE_NAME, MODE_PRIVATE);
+                    FAVORITES_FILE_NAME, MODE_PRIVATE);
 
             Iterator iterator = favoriteKeys.iterator();
             while (iterator.hasNext())
