@@ -66,41 +66,46 @@ public class FavoritesListCustomAdapter extends BaseAdapter
             holder = (FavoritesListCustomAdapter.ViewHolder) convertView.getTag();
         }
 
-        if (favorites.get(position).substring(0, 3).equals("^%b"))
+        try
         {
-            holder.favoriteTypeImageView.setImageResource(R.drawable.ic_directions_bus_black);
-            holder.favoriteNameTextView.setText(favorites.get(position).substring(3, favorites.get(position).length()));
-        }
-        else if (favorites.get(position).substring(0, 3).equals("^%s"))
-        {
-            holder.favoriteTypeImageView.setImageResource(R.drawable.ic_location_on_black);
-
-            String favoriteBusStopName = favorites.get(position).substring(favorites.get(position)
-                    .indexOf("^%sn") + 4, favorites.get(position).indexOf("^%sd"));
-
-            String favoriteBusStopDirectionName = favorites.get(position).substring(favorites
-                    .get(position).indexOf("^%sd") + 4, favorites.get(position).length());
-
-            if (!favoriteBusStopDirectionName.equals(""))
+            if (favorites.get(position).substring(0, 3).equals("^%b"))
             {
-                holder.favoriteNameTextView.setText(favoriteBusStopName + " (" +
-                        favoriteBusStopDirectionName + ")");
+                holder.favoriteTypeImageView.setImageResource(R.drawable.ic_directions_bus_black);
+                holder.favoriteNameTextView.setText(favorites.get(position).substring(3, favorites
+                        .get(position).indexOf("^%bd")) + " (To " + favorites.get(position).substring(
+                        favorites.get(position).indexOf("^%bd") + 4, favorites.get(position)
+                                .indexOf("^%bs")) + ")");
+            }
+            else if (favorites.get(position).substring(0, 3).equals("^%s"))
+            {
+                holder.favoriteTypeImageView.setImageResource(R.drawable.ic_location_on_black);
+                String favoriteBusStopName = favorites.get(position).substring(3,
+                        favorites.get(position).indexOf("^%sd"));
+                String favoriteBusStopDirectionName = favorites.get(position).substring(favorites
+                        .get(position).indexOf("^%sd") + 4, favorites.get(position).indexOf("^%si"));
+                if (!favoriteBusStopDirectionName.equals(""))
+                {
+                    holder.favoriteNameTextView.setText(favoriteBusStopName + " (" +
+                            favoriteBusStopDirectionName + ")");
+                }
+                else
+                {
+                    holder.favoriteNameTextView.setText(favoriteBusStopName);
+                }
             }
             else
             {
-                holder.favoriteNameTextView.setText(favoriteBusStopName);
+                holder.favoriteTypeImageView.setImageResource(R.drawable.ic_directions_black);
+                String originBusStopName = favorites.get(position).substring(favorites.get(position)
+                        .indexOf("^%t") + 3, favorites.get(position).indexOf("^%td"));
+                String destinationBusStopName = favorites.get(position).substring(favorites.get(position)
+                        .indexOf("^%td") + 4, favorites.get(position).length());
+                holder.favoriteNameTextView.setText(originBusStopName + " to " + destinationBusStopName);
             }
         }
-        else
+        catch (Exception e)
         {
-            holder.favoriteTypeImageView.setImageResource(R.drawable.ic_directions_black);
-
-            String originBusStopName = favorites.get(position).substring(favorites.get(position)
-                    .indexOf("^%t") + 3, favorites.get(position).indexOf("^%td"));
-            String destinationBusStopName = favorites.get(position).substring(favorites.get(position)
-                    .indexOf("^%td") + 4, favorites.get(position).length());
-
-            holder.favoriteNameTextView.setText(originBusStopName + " to " + destinationBusStopName);
+            e.printStackTrace();
         }
 
         holder.favoriteNameTextView.setOnClickListener(new View.OnClickListener()

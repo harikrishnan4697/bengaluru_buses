@@ -159,9 +159,10 @@ public class SearchActivity extends AppCompatActivity implements SearchDbQueries
                 {
                     if (hasFavorites)
                     {
-                        searchResultsListView.setVisibility(View.GONE);
                         favoritesLinearLayout.setVisibility(View.VISIBLE);
                     }
+
+                    searchResultsListView.setVisibility(View.VISIBLE);
                 }
                 else
                 {
@@ -186,7 +187,7 @@ public class SearchActivity extends AppCompatActivity implements SearchDbQueries
         }
         else
         {
-            searchResultsListView.setVisibility(View.GONE);
+            searchResultsListView.setVisibility(View.VISIBLE);
             favoritesLinearLayout.setVisibility(View.VISIBLE);
         }
 

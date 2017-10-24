@@ -18,8 +18,8 @@ public class BusRoute implements Serializable
     private String busRouteNumber;
     private String busRouteDirection;
     private String busRouteDirectionName;
-    private ArrayList<BusStop> busRouteStops;
-    private ArrayList<Bus> busRouteBuses;
+    private ArrayList<BusStop> busRouteStops = new ArrayList<>();
+    private ArrayList<Bus> busRouteBuses = new ArrayList<>();
     private int selectedBusStopRouteOrder;
 
     public int getBusRouteId()

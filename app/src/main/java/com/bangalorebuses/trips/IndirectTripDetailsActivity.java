@@ -159,8 +159,10 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
         if (indirectTrips.size() == 0)
         {
             swipeRefreshLayout.setRefreshing(false);
-            showError(R.drawable.ic_directions_bus_black_big,
-                    R.string.error_message_no_indirect_trips, R.string.fix_error_retry);
+            showStringError(R.drawable.ic_directions_bus_black_big,
+                    "There aren't any Indirect Trips via " +
+                            transitPointBusStopName + " right now.",
+                    R.string.fix_error_no_fix);
             errorLinearLayout.setVisibility(View.VISIBLE);
             return;
         }
@@ -227,8 +229,10 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
 
                 if (indirectTripsToDisplay.size() == 0)
                 {
-                    showError(R.drawable.ic_directions_bus_black_big,
-                            R.string.error_message_no_indirect_trips, R.string.fix_error_retry);
+                    showStringError(R.drawable.ic_directions_bus_black_big,
+                            "There aren't any Indirect Trips via " +
+                                    transitPointBusStopName + " right now.",
+                            R.string.fix_error_no_fix);
                 }
             }
         }
@@ -352,6 +356,16 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
         swipeRefreshLayout.setRefreshing(false);
         errorImageView.setImageResource(drawableResId);
         errorMessageTextView.setText(errorMessageStringResId);
+        errorResolutionTextView.setText(resolutionButtonStringResId);
+        errorLinearLayout.setVisibility(View.VISIBLE);
+    }
+
+    private void showStringError(int drawableResId, String errorMessage,
+                                 int resolutionButtonStringResId)
+    {
+        swipeRefreshLayout.setRefreshing(false);
+        errorImageView.setImageResource(drawableResId);
+        errorMessageTextView.setText(errorMessage);
         errorResolutionTextView.setText(resolutionButtonStringResId);
         errorLinearLayout.setVisibility(View.VISIBLE);
     }

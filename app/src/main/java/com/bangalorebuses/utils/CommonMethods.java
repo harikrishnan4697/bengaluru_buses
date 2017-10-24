@@ -7,13 +7,21 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.StringBuilderPrinter;
+import android.widget.Toast;
 
 import com.bangalorebuses.R;
 import com.bangalorebuses.core.BusStop;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Calendar;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
+import static android.content.Context.MODE_PRIVATE;
 import static com.bangalorebuses.utils.Constants.db;
+import static com.bangalorebuses.utils.Constants.favoritesHashMap;
 
 public class CommonMethods
 {
@@ -217,5 +225,46 @@ public class CommonMethods
                 context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null;
+    }
+
+    public static boolean writeFavoritesHashMapToFile(Context context)
+    {
+        try
+        {
+            Set favoriteKeys = favoritesHashMap.keySet();
+
+            FileOutputStream fileOutputStream = context.openFileOutput(
+                    Constants.FAVORITES_FILE_NAME, MODE_PRIVATE);
+
+            Iterator iterator = favoriteKeys.iterator();
+            while (iterator.hasNext())
+            {
+                String key = (String) iterator.next();
+                String value = favoritesHashMap.get(key);
+
+                if (key.substring(0, 3).equals("^%b"))
+                {
+                    fileOutputStream.write((key + "^%bs" + value +
+                            "\n").getBytes());
+                }
+                else if (key.substring(0, 3).equals("^%s"))
+                {
+                    fileOutputStream.write((key + "^%si" + value +
+                            "\n").getBytes());
+                }
+                else if (key.substring(0, 3).equals("^%t"))
+                {
+                    fileOutputStream.write((key + "\n").getBytes());
+                }
+            }
+
+            fileOutputStream.close();
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+
+        return true;
     }
 }

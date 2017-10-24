@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 import static com.bangalorebuses.utils.Constants.db;
+import static com.bangalorebuses.utils.Constants.favoritesHashMap;
 
 /**
  * This is the main activity of the app. It displays the
@@ -169,23 +170,13 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
                     favorites.add(line);
                 }
 
-                Stack<String> favoritesBackwards = new Stack<>();
-                ArrayList<String> favoritesForwards = new ArrayList<>();
+                favorites.trimToSize();
+                initialiseFavoritesHashMap(favorites);
 
-                for (String favorite : favorites)
-                {
-                    favoritesBackwards.push(favorite);
-                }
-
-                while (!favoritesBackwards.isEmpty())
-                {
-                    favoritesForwards.add(favoritesBackwards.pop());
-                }
-
-                if (favoritesForwards.size() > 0)
+                if (favorites.size() > 0)
                 {
                     FavoritesListCustomAdapter adapter = new FavoritesListCustomAdapter(this, this,
-                            favoritesForwards, true);
+                            favorites, true);
                     favoritesListView.setAdapter(adapter);
                     favoritesListView.setVisibility(View.VISIBLE);
                     noFavoritesLinearLayout.setVisibility(View.GONE);
@@ -206,28 +197,77 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
         }
     }
 
+    private void initialiseFavoritesHashMap(ArrayList<String> favorites)
+    {
+        favoritesHashMap.clear();
+        for (String favorite : favorites)
+        {
+            if (favorite.substring(0, 3).equals("^%b"))
+            {
+                String busRouteNumber = favorite.substring(3,
+                        favorite.indexOf("^%bd"));
+                String busRouteDirectionName = favorite.substring(favorite
+                        .indexOf("^%bd") + 4, favorite.indexOf("^%bs"));
+                String busRouteStopId = favorite.substring(favorite
+                        .indexOf("^%bs") + 4, favorite.length());
+
+                favoritesHashMap.put("^%b" + busRouteNumber + "^%bd" +
+                        busRouteDirectionName, busRouteStopId);
+            }
+            else if (favorite.substring(0, 3).equals("^%s"))
+            {
+                String busStopName = favorite.substring(3, favorite.indexOf("^%sd"));
+                String busStopDirectionName = favorite.substring(favorite
+                        .indexOf("^%sd") + 4, favorite.indexOf("^%si"));
+                String busStopId = favorite.substring(favorite.indexOf("^%si") + 4,
+                        favorite.length());
+
+                favoritesHashMap.put("^%s" + busStopName + "^%sd" +
+                        busStopDirectionName, busStopId);
+            }
+            else if (favorite.substring(0, 3).equals("^%t"))
+            {
+                String originBusStopName = favorite.substring(3,
+                        favorite.indexOf("^%td"));
+                String destinationBusStopName = favorite.substring(favorite
+                        .indexOf("^%td") + 4, favorite.length());
+
+                favoritesHashMap.put("^%t" + originBusStopName + "^%td" +
+                        destinationBusStopName, destinationBusStopName);
+            }
+        }
+    }
+
     @Override
     public void onFavoriteClicked(String favorite)
     {
         if (favorite.substring(0, 3).equals("^%b"))
         {
             Intent busTrackerIntent = new Intent(this, TrackBusActivity.class);
+
             busTrackerIntent.putExtra("ROUTE_NUMBER", favorite.substring(3,
-                    favorite.length()));
+                    favorite.indexOf("^%bd")));
+
+            busTrackerIntent.putExtra("ROUTE_DIRECTION", favorite.substring(
+                    favorite.indexOf("^%bd") + 4, favorite.indexOf("^%bs")));
+
+            busTrackerIntent.putExtra("ROUTE_STOP_ID", favorite.substring(
+                    favorite.indexOf("^%bs") + 4, favorite.length()));
+
             startActivity(busTrackerIntent);
         }
         else if (favorite.substring(0, 3).equals("^%s"))
         {
             Intent busesArrivingAtBusStopIntent = new Intent(this, BusesArrivingAtBusStopActivity.class);
 
-            busesArrivingAtBusStopIntent.putExtra("BUS_STOP_ID", Integer.parseInt(favorite.substring(3,
-                    favorite.indexOf("^%sn"))));
+            busesArrivingAtBusStopIntent.putExtra("BUS_STOP_ID", Integer.parseInt(favorite
+                    .substring(favorite.indexOf("^%si") + 4, favorite.length())));
 
-            busesArrivingAtBusStopIntent.putExtra("BUS_STOP_NAME", favorite.substring(favorite
-                    .indexOf("^%sn") + 4, favorite.indexOf("^%sd")));
+            busesArrivingAtBusStopIntent.putExtra("BUS_STOP_NAME", favorite
+                    .substring(3, favorite.indexOf("^%sd")));
 
-            busesArrivingAtBusStopIntent.putExtra("BUS_STOP_DIRECTION_NAME", favorite.substring(favorite
-                    .indexOf("^%sd") + 4, favorite.length()));
+            busesArrivingAtBusStopIntent.putExtra("BUS_STOP_DIRECTION_NAME", favorite
+                    .substring(favorite.indexOf("^%sd") + 4, favorite.indexOf("^%si")));
 
             startActivity(busesArrivingAtBusStopIntent);
         }
@@ -323,11 +363,6 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
         activityWasPaused = false;
 
         initialiseFavorites();
-
-        if (db == null)
-        {
-            initialiseDatabase();
-        }
     }
 
     @Override

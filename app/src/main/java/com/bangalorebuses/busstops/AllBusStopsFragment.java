@@ -1,6 +1,7 @@
 package com.bangalorebuses.busstops;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -25,7 +27,7 @@ import com.bangalorebuses.search.AllBusStopSearchListCustomAdaptor;
 import java.util.ArrayList;
 
 public class AllBusStopsFragment extends Fragment implements BusStopsDbQueriesHelper,
-        ListView.OnItemClickListener, TextWatcher
+        ListView.OnItemClickListener, TextWatcher, EditText.OnFocusChangeListener
 {
     private ListView listView;
     private ProgressBar progressBar;
@@ -50,6 +52,7 @@ public class AllBusStopsFragment extends Fragment implements BusStopsDbQueriesHe
         listView = (ListView) view.findViewById(R.id.list_view);
         progressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
         editText = (EditText) view.findViewById(R.id.edit_text);
+        editText.setOnFocusChangeListener(this);
 
         // Hide the soft keyboard by default when the activity is started
         getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
@@ -107,6 +110,17 @@ public class AllBusStopsFragment extends Fragment implements BusStopsDbQueriesHe
     public void onTextChanged(CharSequence s, int start, int before, int count)
     {
         adaptor.getFilter().filter(s);
+    }
+
+    @Override
+    public void onFocusChange(View view, boolean hasFocus)
+    {
+        if (!hasFocus)
+        {
+            InputMethodManager imm = (InputMethodManager) getActivity()
+                    .getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+        }
     }
 
     @Override

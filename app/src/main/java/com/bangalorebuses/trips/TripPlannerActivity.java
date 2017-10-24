@@ -30,6 +30,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Set;
 
 import static com.bangalorebuses.utils.Constants.FAVORITES_TYPE;
 import static com.bangalorebuses.utils.Constants.FAVORITES_TYPE_BUS_STOP;
@@ -39,12 +41,16 @@ import static com.bangalorebuses.utils.Constants.NUMBER_OF_ROUTES_TYPE_TRANSIT_P
 import static com.bangalorebuses.utils.Constants.SEARCH_END_BUS_STOP_REQUEST_CODE;
 import static com.bangalorebuses.utils.Constants.SEARCH_START_BUS_STOP_REQUEST_CODE;
 import static com.bangalorebuses.utils.Constants.SEARCH_TYPE_BUS_STOP;
+import static com.bangalorebuses.utils.Constants.favoritesHashMap;
 
 public class TripPlannerActivity extends AppCompatActivity implements
         SwipeRefreshLayout.OnRefreshListener, DirectTripsHelper, TransitPointsHelper
 {
     private FloatingActionButton favoritesFloatingActionButton;
     private boolean isFavorite = false;
+    private boolean backFinishesActivity = false;
+    private boolean startSearchOpenedEndSearch = true;
+    private boolean endSearchOpenedStartSearch = true;
     private TextView originSelectionTextView;
     private TextView destinationSelectionTextView;
     private ImageView swapDirectionImageView;
@@ -90,6 +96,8 @@ public class TripPlannerActivity extends AppCompatActivity implements
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setTitle(R.string.trip_planner_title);
         }
+
+        backFinishesActivity = true;
 
         favoritesFloatingActionButton = (FloatingActionButton) findViewById(R.id
                 .favorites_floating_action_button);
@@ -184,6 +192,10 @@ public class TripPlannerActivity extends AppCompatActivity implements
         {
             selectDestinationBusStop();
         }
+        else
+        {
+            backFinishesActivity = false;
+        }
 
         if (originBusStopName != null && destinationBusStopName != null)
         {
@@ -242,16 +254,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
         originSelectionTextView.setText(originBusStopName);
         destinationSelectionTextView.setText(destinationBusStopName);
 
-        if (originBusStopName != null && destinationBusStopName != null)
-        {
-            findDirectTrips();
-            checkIfTripIsFavorite(originBusStopName, destinationBusStopName);
-            favoritesFloatingActionButton.setVisibility(View.VISIBLE);
-        }
-        else
-        {
-            favoritesFloatingActionButton.setVisibility(View.GONE);
-        }
+        updateTrips();
     }
 
     @Override
@@ -273,44 +276,102 @@ public class TripPlannerActivity extends AppCompatActivity implements
     {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (resultCode == RESULT_OK)
+        switch (requestCode)
         {
-            switch (requestCode)
-            {
-                case SEARCH_START_BUS_STOP_REQUEST_CODE:
+            case SEARCH_START_BUS_STOP_REQUEST_CODE:
+
+                if (resultCode == RESULT_OK)
+                {
                     originBusStopName = data.getStringExtra("BUS_STOP_NAME");
                     originSelectionTextView.setText(originBusStopName);
 
                     if (destinationBusStopName == null)
                     {
+                        endSearchOpenedStartSearch = false;
+                        startSearchOpenedEndSearch = true;
                         selectDestinationBusStop();
                     }
+                    else
+                    {
+                        updateTrips();
+                    }
+                }
+                else
+                {
+                    if (backFinishesActivity)
+                    {
+                        finish();
+                    }
+                    else if (endSearchOpenedStartSearch)
+                    {
+                        endSearchOpenedStartSearch = false;
+                        startSearchOpenedEndSearch = true;
+                        selectDestinationBusStop();
+                    }
+                }
 
-                    break;
-                case SEARCH_END_BUS_STOP_REQUEST_CODE:
+                break;
+            case SEARCH_END_BUS_STOP_REQUEST_CODE:
+
+                if (resultCode == RESULT_OK)
+                {
                     destinationBusStopName = data.getStringExtra("BUS_STOP_NAME");
                     destinationSelectionTextView.setText(destinationBusStopName);
 
                     if (originBusStopName == null)
                     {
+                        startSearchOpenedEndSearch = false;
+                        endSearchOpenedStartSearch = true;
                         selectOriginBusStop();
                     }
+                    else
+                    {
+                        updateTrips();
+                    }
+                }
+                else
+                {
+                    if (startSearchOpenedEndSearch)
+                    {
+                        startSearchOpenedEndSearch = false;
+                        endSearchOpenedStartSearch = true;
+                        selectOriginBusStop();
+                    }
+                }
 
-                    break;
-                default:
-                    break;
-            }
+                break;
+            default:
+                break;
+        }
+    }
 
-            if (originBusStopName != null && destinationBusStopName != null)
+    private void updateTrips()
+    {
+        if (originBusStopName != null && destinationBusStopName != null)
+        {
+            backFinishesActivity = false;
+            startSearchOpenedEndSearch = false;
+            endSearchOpenedStartSearch = false;
+
+            if (!originBusStopName.equals(destinationBusStopName))
             {
                 findDirectTrips();
                 checkIfTripIsFavorite(originBusStopName, destinationBusStopName);
                 favoritesFloatingActionButton.setVisibility(View.VISIBLE);
+                swipeRefreshLayout.setVisibility(View.VISIBLE);
             }
             else
             {
+                showError(R.drawable.ic_directions_bus_black_big,
+                        R.string.error_message_same_origin_and_destination,
+                        R.string.fix_error_no_fix);
                 favoritesFloatingActionButton.setVisibility(View.GONE);
+                swipeRefreshLayout.setVisibility(View.GONE);
             }
+        }
+        else
+        {
+            favoritesFloatingActionButton.setVisibility(View.GONE);
         }
     }
 
@@ -476,7 +537,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
         {
             swipeRefreshLayout.setRefreshing(false);
             showError(R.drawable.ic_directions_bus_black_big,
-                    R.string.error_message_no_trips, R.string.fix_error_retry);
+                    R.string.error_message_no_trips, R.string.fix_error_no_fix);
             return;
         }
 
@@ -514,7 +575,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
         {
             swipeRefreshLayout.setRefreshing(false);
             showError(R.drawable.ic_directions_bus_black_big,
-                    R.string.error_message_no_trips, R.string.fix_error_retry);
+                    R.string.error_message_no_trips, R.string.fix_error_no_fix);
             return;
         }
 
@@ -551,7 +612,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
             recyclerView.setVisibility(View.GONE);
 
             showError(R.drawable.ic_directions_bus_black_big,
-                    R.string.error_message_no_trips, R.string.fix_error_retry);
+                    R.string.error_message_no_trips, R.string.fix_error_no_fix);
             errorLinearLayout.setVisibility(View.VISIBLE);
 
             return;
@@ -648,7 +709,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
                 recyclerView.setVisibility(View.GONE);
 
                 showError(R.drawable.ic_directions_bus_black_big,
-                        R.string.error_message_no_trips, R.string.fix_error_retry);
+                        R.string.error_message_no_trips, R.string.fix_error_no_fix);
                 errorLinearLayout.setVisibility(View.VISIBLE);
             }
         }
@@ -656,32 +717,8 @@ public class TripPlannerActivity extends AppCompatActivity implements
 
     private void checkIfTripIsFavorite(String originBusStopName, String destinationBusStopName)
     {
-        try
-        {
-            FileInputStream fileInputStream = openFileInput(Constants.FAVORITES_FILE_NAME);
-            InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-
-            ArrayList<String> favorites = new ArrayList<>();
-            String line;
-
-            while ((line = bufferedReader.readLine()) != null)
-            {
-                favorites.add(line);
-            }
-
-            isFavorite = favorites.contains("^%t" + originBusStopName + "^%td" +
-                    destinationBusStopName);
-
-            favorites.trimToSize();
-            fileInputStream.close();
-            inputStreamReader.close();
-
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        isFavorite = favoritesHashMap.containsKey("^%t" + originBusStopName +
+                "^%td" + destinationBusStopName);
 
         if (isFavorite)
         {
@@ -697,23 +734,18 @@ public class TripPlannerActivity extends AppCompatActivity implements
     {
         if (!isFavorite)
         {
-            try
+            favoritesHashMap.put("^%t" + originBusStopName + "^%td" +
+                    destinationBusStopName, destinationBusStopName);
+
+            if (!CommonMethods.writeFavoritesHashMapToFile(this))
             {
-                FileOutputStream fileOutputStream = openFileOutput(Constants.FAVORITES_FILE_NAME,
-                        MODE_APPEND);
-
-                fileOutputStream.write(("^%t" + originBusStopName + "^%td" + destinationBusStopName +
-                        "\n").getBytes());
-
-                Toast.makeText(this, "Added trip to favourites.", Toast.LENGTH_SHORT)
-                        .show();
-
-                fileOutputStream.close();
-            }
-            catch (IOException e)
-            {
-                Toast.makeText(this, "Unknown error occurred! Couldn't favourite this trip...",
+                Toast.makeText(this, "Unknown error occurred! Couldn't favourite this Trip...",
                         Toast.LENGTH_SHORT).show();
+            }
+            else
+            {
+                Toast.makeText(this, "Added Trip to favourites.", Toast.LENGTH_SHORT)
+                        .show();
             }
 
             favoritesFloatingActionButton.setImageResource(R.drawable.ic_favorite_white);
@@ -721,44 +753,18 @@ public class TripPlannerActivity extends AppCompatActivity implements
         }
         else
         {
-            try
+            favoritesHashMap.remove("^%t" + originBusStopName + "^%td" +
+                    destinationBusStopName);
+
+            if (!CommonMethods.writeFavoritesHashMapToFile(this))
             {
-                FileInputStream fileInputStream = openFileInput(Constants.FAVORITES_FILE_NAME);
-                InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream,
-                        "UTF-8");
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-
-                ArrayList<String> favorites = new ArrayList<>();
-                String line;
-
-                while ((line = bufferedReader.readLine()) != null)
-                {
-                    favorites.add(line);
-                }
-
-                favorites.remove("^%t" + originBusStopName + "^%td" + destinationBusStopName);
-
-                Toast.makeText(this, "Removed trip from favourites.", Toast.LENGTH_SHORT)
-                        .show();
-
-                favorites.trimToSize();
-                fileInputStream.close();
-                inputStreamReader.close();
-
-                FileOutputStream fileOutputStream = openFileOutput(Constants.FAVORITES_FILE_NAME,
-                        MODE_PRIVATE);
-                for (String favorite : favorites)
-                {
-                    fileOutputStream.write((favorite + "\n").getBytes());
-                }
-                fileOutputStream.close();
-
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                Toast.makeText(this, "Unknown error occurred! Couldn't un-favourite this trip...",
+                Toast.makeText(this, "Unknown error occurred! Couldn't un-favourite this Trip...",
                         Toast.LENGTH_SHORT).show();
+            }
+            else
+            {
+                Toast.makeText(this, "Removed Trip from favourites.", Toast.LENGTH_SHORT)
+                        .show();
             }
 
             favoritesFloatingActionButton.setImageResource(R.drawable.ic_favorite_border_white);
@@ -776,9 +782,9 @@ public class TripPlannerActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onStop()
+    protected void onDestroy()
     {
-        super.onStop();
+        super.onDestroy();
         cancelAllPreviousTasks();
     }
 }

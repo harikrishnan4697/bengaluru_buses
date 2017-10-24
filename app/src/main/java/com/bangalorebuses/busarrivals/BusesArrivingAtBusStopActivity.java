@@ -33,6 +33,7 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import static com.bangalorebuses.utils.Constants.NETWORK_QUERY_NO_ERROR;
+import static com.bangalorebuses.utils.Constants.favoritesHashMap;
 
 /**
  * @author Nihar Thakkar
@@ -200,32 +201,8 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
 
     private void initialiseFavorites()
     {
-        try
-        {
-            FileInputStream fileInputStream = openFileInput(Constants.FAVORITES_FILE_NAME);
-            InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-
-            ArrayList<String> favorites = new ArrayList<>();
-            String line;
-
-            while ((line = bufferedReader.readLine()) != null)
-            {
-                favorites.add(line);
-            }
-
-            isFavorite = favorites.contains("^%s" + selectedBusStop.getBusStopId() + "^%sn" +
-                    selectedBusStop.getBusStopName() + "^%sd" + selectedBusStop.getBusStopDirectionName());
-
-            favorites.trimToSize();
-            fileInputStream.close();
-            inputStreamReader.close();
-
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        isFavorite = favoritesHashMap.containsKey("^%s" + selectedBusStop
+                .getBusStopName() + "^%sd" + selectedBusStop.getBusStopDirectionName());
 
         if (isFavorite)
         {
@@ -241,23 +218,19 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
     {
         if (!isFavorite)
         {
-            try
+            favoritesHashMap.put("^%s" + selectedBusStop.getBusStopName() +
+                            "^%sd" + selectedBusStop.getBusStopDirectionName(),
+                    String.valueOf(selectedBusStop.getBusStopId()));
+
+            if (!CommonMethods.writeFavoritesHashMapToFile(this))
             {
-                FileOutputStream fileOutputStream = openFileOutput(Constants.FAVORITES_FILE_NAME, MODE_APPEND);
-
-                fileOutputStream.write(("^%s" + selectedBusStop.getBusStopId() + "^%sn" +
-                        selectedBusStop.getBusStopName() + "^%sd" + selectedBusStop.getBusStopDirectionName()
-                        + "\n").getBytes());
-
-                Toast.makeText(this, "Added " + selectedBusStop.getBusStopName() + " to favourites.", Toast.LENGTH_SHORT)
-                        .show();
-
-                fileOutputStream.close();
+                Toast.makeText(this, "Unknown error occurred! Couldn't favourite this Bus Stop...",
+                        Toast.LENGTH_SHORT).show();
             }
-            catch (IOException e)
+            else
             {
-                e.printStackTrace();
-                Toast.makeText(this, "Unknown error occurred! Couldn't favourite this bus stop...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Added Bus Stop to favourites.", Toast.LENGTH_SHORT)
+                        .show();
             }
 
             favoriteFloatingActionButton.setImageResource(R.drawable.ic_favorite_white);
@@ -265,42 +238,18 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
         }
         else
         {
-            try
+            favoritesHashMap.remove("^%s" + selectedBusStop.getBusStopName() +
+                    "^%sd" + selectedBusStop.getBusStopDirectionName());
+
+            if (!CommonMethods.writeFavoritesHashMapToFile(this))
             {
-                FileInputStream fileInputStream = openFileInput(Constants.FAVORITES_FILE_NAME);
-                InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-
-                ArrayList<String> favorites = new ArrayList<>();
-                String line;
-
-                while ((line = bufferedReader.readLine()) != null)
-                {
-                    favorites.add(line);
-                }
-
-                favorites.remove("^%s" + selectedBusStop.getBusStopId() + "^%sn" +
-                        selectedBusStop.getBusStopName() + "^%sd" + selectedBusStop.getBusStopDirectionName());
-
-                Toast.makeText(this, "Removed " + selectedBusStop.getBusStopName() + " from favourites.", Toast.LENGTH_SHORT)
-                        .show();
-
-                favorites.trimToSize();
-                fileInputStream.close();
-                inputStreamReader.close();
-
-                FileOutputStream fileOutputStream = openFileOutput(Constants.FAVORITES_FILE_NAME, MODE_PRIVATE);
-                for (String favorite : favorites)
-                {
-                    fileOutputStream.write((favorite + "\n").getBytes());
-                }
-                fileOutputStream.close();
-
+                Toast.makeText(this, "Unknown error occurred! Couldn't un-favourite this Bus Stop...",
+                        Toast.LENGTH_SHORT).show();
             }
-            catch (Exception e)
+            else
             {
-                e.printStackTrace();
-                Toast.makeText(this, "Unknown error occurred! Couldn't un-favourite this bus stop...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Removed Bus Stop from favourites.", Toast.LENGTH_SHORT)
+                        .show();
             }
 
             favoriteFloatingActionButton.setImageResource(R.drawable.ic_favorite_border_white);
@@ -357,7 +306,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
             swipeRefreshLayout.setRefreshing(false);
             listView.setVisibility(View.GONE);
             showError(R.drawable.ic_directions_bus_black_big,
-                    R.string.error_message_no_buses_arriving_soon, R.string.fix_error_retry);
+                    R.string.error_message_no_buses_arriving_soon, R.string.fix_error_no_fix);
             errorLinearLayout.setVisibility(View.VISIBLE);
         }
     }
@@ -450,7 +399,7 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
             {
                 listView.setVisibility(View.GONE);
                 showError(R.drawable.ic_directions_bus_black_big,
-                        R.string.error_message_no_buses_arriving_soon, R.string.fix_error_retry);
+                        R.string.error_message_no_buses_arriving_soon, R.string.fix_error_no_fix);
                 errorLinearLayout.setVisibility(View.VISIBLE);
             }
         }

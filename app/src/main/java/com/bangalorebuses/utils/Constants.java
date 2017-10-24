@@ -4,6 +4,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.StrictMode;
 import android.util.StringBuilderPrinter;
 
+import java.util.HashMap;
+
 /**
  * This class is used to store all the constant values in the app.
  *
@@ -35,9 +37,11 @@ public class Constants
     // Constants for db query tasks
     public static final String NUMBER_OF_ROUTES_TYPE_ORIGIN_TO_TRANSIT_POINT = "ORIGIN-TRANSIT_POINT";
     public static final String NUMBER_OF_ROUTES_TYPE_TRANSIT_POINT_TO_DESTINATION = "TRANSIT_POINT-DESTINATION";
+
     // Constants for the Trip Planner Fragment
     public static final String ORIGIN_BUS_STOP_SEARCH_HINT = "Starting bus stop";
     public static final String DESTINATION_BUS_STOP_SEARCH_HINT = "Ending bus stop";
+
     // Favourites constants
     public static final String FAVORITES_FILE_NAME = "Favourites.txt";
     public static final String FAVORITES_TYPE_BUS_ROUTE = "FAVORITE_BUS_ROUTE";
@@ -48,10 +52,13 @@ public class Constants
     public static final String BUS_STOP_NAME = "BUS_STOP_NAME";
     public static final String TRIP_ORIGIN_BUS_STOP_NAME = "FAV_ORIGIN_BUS_STOP_NAME";
     public static final String TRIP_DESTINATION_BUS_STOP_NAME = "FAV_DESTINATION_BUS_STOP_NAME";
-    public static SQLiteDatabase db;
 
     // Constants for IndirectTripDetailsActivity
     public static final String ORIGIN_BUS_STOP_NAME = "PARAM_ORIGIN_BUS_STOP_NAME";
     public static final String TRANSIT_POINT_BUS_STOP_NAME = "PARAM_TRANSIT_POINT_BUS_STOP_NAME";
     public static final String DESTINATION_BUS_STOP_NAME = "PARAM_DESTINATION_BUS_STOP_NAME";
+
+    // Other not so constants
+    public static SQLiteDatabase db;
+    public static HashMap<String, String> favoritesHashMap = new HashMap<>();
 }

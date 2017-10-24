@@ -429,7 +429,7 @@ public class NearbyBusStopsFragment extends Fragment implements NetworkingHelper
             if (busStops.size() == 0)
             {
                 showError(R.drawable.ic_person_pin_circle_black, R.string.error_message_no_bus_stops_nearby,
-                        R.string.fix_error_retry);
+                        R.string.fix_error_no_fix);
                 nearbyBusStopsRecyclerView.setVisibility(View.GONE);
             }
             else
@@ -465,7 +465,7 @@ public class NearbyBusStopsFragment extends Fragment implements NetworkingHelper
             else if (errorMessage.equals(NETWORK_QUERY_JSON_EXCEPTION))
             {
                 showError(R.drawable.ic_person_pin_circle_black, R.string.error_message_no_bus_stops_nearby,
-                        R.string.fix_error_retry);
+                        R.string.fix_error_no_fix);
             }
         }
     }

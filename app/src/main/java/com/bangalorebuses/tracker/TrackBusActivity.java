@@ -47,6 +47,7 @@ import static com.bangalorebuses.utils.Constants.NETWORK_QUERY_NO_ERROR;
 import static com.bangalorebuses.utils.Constants.NETWORK_QUERY_REQUEST_TIMEOUT_EXCEPTION;
 import static com.bangalorebuses.utils.Constants.NETWORK_QUERY_URL_EXCEPTION;
 import static com.bangalorebuses.utils.Constants.db;
+import static com.bangalorebuses.utils.Constants.favoritesHashMap;
 
 /**
  * This activity allows the user to track a bus route
@@ -79,6 +80,8 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
     private TextView errorResolutionTextView;
     private FloatingActionButton favoritesFloatingActionButton;
     private boolean isFavorite = false;
+    private String favoriteRouteStopId;
+    private String favoriteRouteDirectionName;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
@@ -130,6 +133,12 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         // Set the colors to be used for the swipe refresh layout
         swipeRefreshLayout.setColorSchemeResources(R.color.colorNonACBus, R.color.colorACBus,
                 R.color.colorMetroFeederBus);
+
+        if (getIntent().getStringExtra("ROUTE_DIRECTION") != null)
+        {
+            favoriteRouteDirectionName = getIntent().getStringExtra("ROUTE_DIRECTION");
+            favoriteRouteStopId = getIntent().getStringExtra("ROUTE_STOP_ID");
+        }
 
         trackBusesOnRoute(getIntent().getStringExtra("ROUTE_NUMBER"));
     }
@@ -187,6 +196,8 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
             errorLinearLayout.setVisibility(View.VISIBLE);
             listView.setVisibility(View.GONE);
         }
+
+        initialiseFavorites();
     }
 
     @Override
@@ -207,15 +218,33 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
             {
                 directionTextView.setText(getBusRouteDestinationName(routeDown.getBusRouteDirectionName()));
                 currentlySelectedDirection = DIRECTION_DOWN;
-                getStopsOnRouteTask = new GetStopsOnRouteTask(routeDown);
-                getStopsOnRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, routeDown.getBusRouteId());
+
+                if (routeDown.getBusRouteStops().size() != 0)
+                {
+                    updateSpinner(DIRECTION_DOWN);
+                }
+                else
+                {
+                    getStopsOnRouteTask = new GetStopsOnRouteTask(routeDown);
+                    getStopsOnRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
+                            routeDown.getBusRouteId());
+                }
             }
             else if (currentlySelectedDirection.equals(DIRECTION_DOWN) && routeUp != null)
             {
                 directionTextView.setText(getBusRouteDestinationName(routeUp.getBusRouteDirectionName()));
                 currentlySelectedDirection = DIRECTION_UP;
-                getStopsOnRouteTask = new GetStopsOnRouteTask(routeUp);
-                getStopsOnRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, routeUp.getBusRouteId());
+
+                if (routeUp.getBusRouteStops().size() != 0)
+                {
+                    updateSpinner(DIRECTION_UP);
+                }
+                else
+                {
+                    getStopsOnRouteTask = new GetStopsOnRouteTask(routeUp);
+                    getStopsOnRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
+                            routeUp.getBusRouteId());
+                }
             }
             else
             {
@@ -256,30 +285,27 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
     {
         try
         {
-            FileInputStream fileInputStream = openFileInput(Constants.FAVORITES_FILE_NAME);
-            InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-
-            ArrayList<String> favorites = new ArrayList<>();
-            String line;
-
-            while ((line = bufferedReader.readLine()) != null)
-            {
-                favorites.add(line);
-            }
-
+            String key;
             if (currentlySelectedDirection.equals(DIRECTION_UP))
             {
-                isFavorite = favorites.contains("^%b" + routeUp.getBusRouteNumber());
+                key = "^%b" + routeUp.getBusRouteNumber() + "^%bd" +
+                        getBusRouteDestinationName(routeUp.getBusRouteDirectionName());
             }
             else
             {
-                isFavorite = favorites.contains("^%b" + routeDown.getBusRouteNumber());
+                key = "^%b" + routeDown.getBusRouteNumber() + "^%bd" +
+                        getBusRouteDestinationName(routeDown.getBusRouteDirectionName());
             }
 
-            favorites.trimToSize();
-            fileInputStream.close();
-            inputStreamReader.close();
+            if (favoritesHashMap.containsKey(key) && favoritesHashMap.get(key)
+                    .equals(String.valueOf(currentlySelectedBusStop.getBusStopId())))
+            {
+                isFavorite = true;
+            }
+            else
+            {
+                isFavorite = false;
+            }
 
         }
         catch (Exception e)
@@ -301,28 +327,36 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
     {
         if (!isFavorite)
         {
-            try
+            if (currentlySelectedDirection.equals(DIRECTION_UP))
             {
-                FileOutputStream fileOutputStream = openFileOutput(Constants.FAVORITES_FILE_NAME, MODE_APPEND);
+                favoritesHashMap.remove("^%b" + routeUp.getBusRouteNumber() + "^%sd" +
+                        getBusRouteDestinationName(routeUp.getBusRouteDirectionName()));
 
-                if (currentlySelectedDirection.equals(DIRECTION_UP))
-                {
-                    fileOutputStream.write(("^%b" + routeUp.getBusRouteNumber() + "\n").getBytes());
-                    Toast.makeText(this, "Added " + routeUp.getBusRouteNumber() + " to favourites.", Toast.LENGTH_SHORT)
-                            .show();
-                }
-                else
-                {
-                    fileOutputStream.write(("^%b" + routeDown.getBusRouteNumber() + "\n").getBytes());
-                    Toast.makeText(this, "Added " + routeDown.getBusRouteNumber() + " to favourites.", Toast.LENGTH_SHORT)
-                            .show();
-                }
-                fileOutputStream.close();
+                favoritesHashMap.put("^%b" + routeUp.getBusRouteNumber() +
+                                "^%bd" + getBusRouteDestinationName(
+                        routeUp.getBusRouteDirectionName()),
+                        String.valueOf(currentlySelectedBusStop.getBusStopId()));
             }
-            catch (IOException e)
+            else
             {
-                e.printStackTrace();
-                Toast.makeText(this, "Unknown error occurred! Couldn't favourite this bus...", Toast.LENGTH_SHORT).show();
+                favoritesHashMap.remove("^%b" + routeDown.getBusRouteNumber() + "^%sd" +
+                        getBusRouteDestinationName(routeDown.getBusRouteDirectionName()));
+
+                favoritesHashMap.put("^%b" + routeDown.getBusRouteNumber() +
+                                "^%bd" + getBusRouteDestinationName(
+                        routeDown.getBusRouteDirectionName()),
+                        String.valueOf(currentlySelectedBusStop.getBusStopId()));
+            }
+
+            if (!CommonMethods.writeFavoritesHashMapToFile(this))
+            {
+                Toast.makeText(this, "Unknown error occurred! Couldn't favourite this Bus...",
+                        Toast.LENGTH_SHORT).show();
+            }
+            else
+            {
+                Toast.makeText(this, "Added Bus to favourites.", Toast.LENGTH_SHORT)
+                        .show();
             }
 
             favoritesFloatingActionButton.setImageResource(R.drawable.ic_favorite_white);
@@ -330,49 +364,26 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         }
         else
         {
-            try
+            if (currentlySelectedDirection.equals(DIRECTION_UP))
             {
-                FileInputStream fileInputStream = openFileInput(Constants.FAVORITES_FILE_NAME);
-                InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-
-                ArrayList<String> favorites = new ArrayList<>();
-                String line;
-
-                while ((line = bufferedReader.readLine()) != null)
-                {
-                    favorites.add(line);
-                }
-
-                if (currentlySelectedDirection.equals(DIRECTION_UP))
-                {
-                    favorites.remove("^%b" + routeUp.getBusRouteNumber());
-                    Toast.makeText(this, "Removed " + routeUp.getBusRouteNumber() + " from favourites.", Toast.LENGTH_SHORT)
-                            .show();
-                }
-                else
-                {
-                    favorites.remove("^%b" + routeDown.getBusRouteNumber());
-                    Toast.makeText(this, "Removed " + routeDown.getBusRouteNumber() + " from favourites.", Toast.LENGTH_SHORT)
-                            .show();
-                }
-
-                favorites.trimToSize();
-                fileInputStream.close();
-                inputStreamReader.close();
-
-                FileOutputStream fileOutputStream = openFileOutput(Constants.FAVORITES_FILE_NAME, MODE_PRIVATE);
-                for (String favorite : favorites)
-                {
-                    fileOutputStream.write((favorite + "\n").getBytes());
-                }
-                fileOutputStream.close();
-
+                favoritesHashMap.remove("^%b" + routeUp.getBusRouteNumber() + "^%sd" +
+                        getBusRouteDestinationName(routeUp.getBusRouteDirectionName()));
             }
-            catch (Exception e)
+            else
             {
-                e.printStackTrace();
-                Toast.makeText(this, "Unknown error occurred! Couldn't un-favourite this bus...", Toast.LENGTH_SHORT).show();
+                favoritesHashMap.remove("^%b" + routeDown.getBusRouteNumber() + "^%sd" +
+                        getBusRouteDestinationName(routeDown.getBusRouteDirectionName()));
+            }
+
+            if (!CommonMethods.writeFavoritesHashMapToFile(this))
+            {
+                Toast.makeText(this, "Unknown error occurred! Couldn't un-favourite this Bus...",
+                        Toast.LENGTH_SHORT).show();
+            }
+            else
+            {
+                Toast.makeText(this, "Removed Bus from favourites.", Toast.LENGTH_SHORT)
+                        .show();
             }
 
             favoritesFloatingActionButton.setImageResource(R.drawable.ic_favorite_border_white);
@@ -397,6 +408,40 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
             else if (busRoute.getBusRouteDirection().equals(DIRECTION_DOWN))
             {
                 routeDown = busRoute;
+            }
+        }
+
+        if (favoriteRouteDirectionName != null)
+        {
+            if (routeUp != null && getBusRouteDestinationName(routeUp
+                    .getBusRouteDirectionName()).equals(favoriteRouteDirectionName))
+            {
+                directionTextView.setText(getBusRouteDestinationName(routeUp.getBusRouteDirectionName()));
+                currentlySelectedDirection = DIRECTION_UP;
+
+                if (routeDown == null)
+                {
+                    routeIsOnlyInOneDirection = true;
+                }
+
+                getStopsOnRouteTask = new GetStopsOnRouteTask(routeUp);
+                getStopsOnRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, routeUp.getBusRouteId());
+                return;
+            }
+            else if (routeDown != null && getBusRouteDestinationName(routeDown
+                    .getBusRouteDirectionName()).equals(favoriteRouteDirectionName))
+            {
+                directionTextView.setText(getBusRouteDestinationName(routeDown.getBusRouteDirectionName()));
+                currentlySelectedDirection = DIRECTION_DOWN;
+
+                if (routeUp == null)
+                {
+                    routeIsOnlyInOneDirection = true;
+                }
+
+                getStopsOnRouteTask = new GetStopsOnRouteTask(routeDown);
+                getStopsOnRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, routeDown.getBusRouteId());
+                return;
             }
         }
 
@@ -426,8 +471,6 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
                 getStopsOnRouteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, routeDown.getBusRouteId());
             }
         }
-
-        initialiseFavorites();
     }
 
     private void onBusStopsOnRouteFound(BusRoute busRoute)
@@ -447,9 +490,23 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
     private void updateSpinner(String direction)
     {
         ArrayList<String> routeStopNames = new ArrayList<>();
+        int favoriteRouteStopItemCount = -1;
 
         if (direction.equals(DIRECTION_UP))
         {
+            if (favoriteRouteStopId != null)
+            {
+                for (int i = 0; i < routeUp.getBusRouteStops().size(); i++)
+                {
+                    if (routeUp.getBusRouteStops().get(i).getBusStopId()
+                            == Integer.parseInt(favoriteRouteStopId))
+                    {
+                        favoriteRouteStopItemCount = i;
+                        break;
+                    }
+                }
+            }
+
             for (BusStop routeStop : routeUp.getBusRouteStops())
             {
                 routeStopNames.add(routeStop.getBusStopName());
@@ -457,6 +514,19 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
         }
         else if (direction.equals(DIRECTION_DOWN))
         {
+            if (favoriteRouteStopId != null)
+            {
+                for (int i = 0; i < routeDown.getBusRouteStops().size(); i++)
+                {
+                    if (routeDown.getBusRouteStops().get(i).getBusStopId()
+                            == Integer.parseInt(favoriteRouteStopId))
+                    {
+                        favoriteRouteStopItemCount = i;
+                        break;
+                    }
+                }
+            }
+
             for (BusStop routeStop : routeDown.getBusRouteStops())
             {
                 routeStopNames.add(routeStop.getBusStopName());
@@ -469,7 +539,17 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item, routeStopNames);
         spinner.setAdapter(adapter);
-        spinner.setSelection(routeStopNames.size() - 1);
+
+        if (favoriteRouteStopId != null && favoriteRouteStopItemCount > -1 &&
+                favoriteRouteStopItemCount < routeStopNames.size())
+        {
+            spinner.setSelection(favoriteRouteStopItemCount);
+        }
+        else
+        {
+            spinner.setSelection(routeStopNames.size() - 1);
+        }
+
         spinner.setOnItemSelectedListener(this);
     }
 
@@ -515,7 +595,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
             {
                 swipeRefreshLayout.setRefreshing(false);
                 showError(R.drawable.ic_directions_bus_black,
-                        R.string.error_message_track_bus_no_buses_arriving_soon, R.string.fix_error_retry);
+                        R.string.error_message_track_bus_no_buses_arriving_soon, R.string.fix_error_no_fix);
                 listView.setVisibility(View.GONE);
             }
         }
@@ -537,7 +617,7 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
                     {
                         showError(R.drawable.ic_directions_bus_black,
                                 R.string.error_message_track_bus_no_buses_arriving_soon,
-                                R.string.fix_error_retry);
+                                R.string.fix_error_no_fix);
                         listView.setVisibility(View.GONE);
                         break;
                     }
