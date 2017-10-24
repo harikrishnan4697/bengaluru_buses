@@ -32,6 +32,7 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
@@ -199,13 +200,14 @@ public class SearchActivity extends AppCompatActivity implements SearchDbQueries
         {
             ArrayList<String> favorites = new ArrayList<>();
 
-            Set favoriteKeys = favoritesHashMap.keySet();
+            //Set favoriteKeys = favoritesHashMap.keySet();
 
-            Iterator iterator = favoriteKeys.iterator();
+            Iterator iterator = favoritesHashMap.entrySet().iterator();
             while (iterator.hasNext())
             {
-                String key = (String) iterator.next();
-                String value = favoritesHashMap.get(key);
+                Map.Entry pair = (Map.Entry) iterator.next();
+                String key = (String) pair.getKey();
+                String value = (String) pair.getValue();
 
                 if (key.substring(0, 3).equals("^%s"))
                 {

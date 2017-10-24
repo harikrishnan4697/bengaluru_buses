@@ -72,7 +72,7 @@ public class FavoritesListCustomAdapter extends BaseAdapter
             {
                 holder.favoriteTypeImageView.setImageResource(R.drawable.ic_directions_bus_black);
                 holder.favoriteNameTextView.setText(favorites.get(position).substring(3, favorites
-                        .get(position).indexOf("^%bd")) + " (" + favorites.get(position).substring(
+                        .get(position).indexOf("^%bd")) + " (To " + favorites.get(position).substring(
                         favorites.get(position).indexOf("^%bd") + 4, favorites.get(position)
                                 .indexOf("^%bs")) + ")");
             }

@@ -30,6 +30,7 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
@@ -103,6 +104,8 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
             initialiseDatabase();
         }
 
+        CommonMethods.readFavoritesFileToHashMap(this);
+
         LinearLayout busesLinearLayout = (LinearLayout) findViewById(R.id.buses_linear_layout);
         busesLinearLayout.setOnClickListener(new View.OnClickListener()
         {
@@ -159,17 +162,16 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
     {
         if (favoritesListView != null)
         {
-            CommonMethods.readFavoritesFileToHashMap(this);
-
             ArrayList<String> favorites = new ArrayList<>();
 
-            Set favoriteKeys = favoritesHashMap.keySet();
+            //Set favoriteKeys = favoritesHashMap.keySet();
 
-            Iterator iterator = favoriteKeys.iterator();
+            Iterator iterator = favoritesHashMap.entrySet().iterator();
             while (iterator.hasNext())
             {
-                String key = (String) iterator.next();
-                String value = favoritesHashMap.get(key);
+                Map.Entry pair = (Map.Entry) iterator.next();
+                String key = (String) pair.getKey();
+                String value = (String) pair.getValue();
 
                 if (key.substring(0, 3).equals("^%b"))
                 {
@@ -185,10 +187,23 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
                 }
             }
 
-            if (favorites.size() > 0)
+            Stack<String> favoritesBackwards = new Stack<>();
+            ArrayList<String> favoritesForwards = new ArrayList<>();
+
+            for (String favorite : favorites)
+            {
+                favoritesBackwards.push(favorite);
+            }
+
+            while (!favoritesBackwards.isEmpty())
+            {
+                favoritesForwards.add(favoritesBackwards.pop());
+            }
+
+            if (favoritesForwards.size() > 0)
             {
                 FavoritesListCustomAdapter adapter = new FavoritesListCustomAdapter(this, this,
-                        favorites, true);
+                        favoritesForwards, true);
                 favoritesListView.setAdapter(adapter);
                 favoritesListView.setVisibility(View.VISIBLE);
                 noFavoritesLinearLayout.setVisibility(View.GONE);

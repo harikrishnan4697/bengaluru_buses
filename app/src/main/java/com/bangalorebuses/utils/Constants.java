@@ -5,6 +5,7 @@ import android.os.StrictMode;
 import android.util.StringBuilderPrinter;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * This class is used to store all the constant values in the app.
@@ -59,5 +60,5 @@ public class Constants
 
     // Other not so constants
     public static SQLiteDatabase db;
-    public static HashMap<String, String> favoritesHashMap = new HashMap<>();
+    public static LinkedHashMap<String, String> favoritesHashMap = new LinkedHashMap<>();
 }

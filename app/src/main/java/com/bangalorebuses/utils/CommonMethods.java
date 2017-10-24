@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -300,16 +301,17 @@ public class CommonMethods
     {
         try
         {
-            Set favoriteKeys = favoritesHashMap.keySet();
+            //Set favoriteKeys = favoritesHashMap.keySet();
 
             FileOutputStream fileOutputStream = context.openFileOutput(
                     FAVORITES_FILE_NAME, MODE_PRIVATE);
 
-            Iterator iterator = favoriteKeys.iterator();
+            Iterator iterator = favoritesHashMap.entrySet().iterator();
             while (iterator.hasNext())
             {
-                String key = (String) iterator.next();
-                String value = favoritesHashMap.get(key);
+                Map.Entry pair = (Map.Entry) iterator.next();
+                String key = (String) pair.getKey();
+                String value = (String) pair.getValue();
 
                 if (key.substring(0, 3).equals("^%b"))
                 {
