@@ -550,6 +550,8 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
             spinner.setSelection(routeStopNames.size() - 1);
         }
 
+        favoriteRouteStopId = null;
+        favoriteRouteDirectionName = null;
         spinner.setOnItemSelectedListener(this);
     }
 

@@ -15,7 +15,7 @@ android {
         applicationId "com.bangalorebuses"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 13 // Updated version code from 12 to 13 on 22/10/2017
+        versionCode 14 // Updated version code from 13 to 14 on 25/10/2017
         versionName "2.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.release

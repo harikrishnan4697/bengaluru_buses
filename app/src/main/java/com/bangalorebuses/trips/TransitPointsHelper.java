@@ -1,7 +1,5 @@
 package com.bangalorebuses.trips;
 
-import com.bangalorebuses.core.BusRoute;
-
 import java.util.ArrayList;
 
 /**
@@ -16,21 +14,7 @@ import java.util.ArrayList;
 
 interface TransitPointsHelper
 {
-    /**
-     * This call-back method is called by TransitPointsWithNumberOfRoutesDbTask
-     *
-     * @param transitPoints This is an ArrayList of transit points with the number
-     *                      of bus routes between the origin and transit point.
-     */
-    void onTransitPointsAndRouteCountOriginToTPFound(ArrayList<TransitPoint> transitPoints);
-
-    /**
-     * This call-back method is called by TransitPointsWithNumberOfRoutesDbTask
-     *
-     * @param transitPoints This is an ArrayList of transit points with the number
-     *                      of bus routes between the transit point and the destination.
-     */
-    void onTransitPointsAndRouteCountTPToDestFound(ArrayList<TransitPoint> transitPoints);
+    void onTransitPointsFound(ArrayList<TransitPoint> transitPoints);
 
     void onIndirectTripFound(IndirectTrip indirectTrip);
 }

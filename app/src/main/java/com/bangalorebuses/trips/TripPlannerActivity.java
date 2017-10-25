@@ -78,9 +78,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
     private ArrayList<IndirectTrip> indirectTripsToDisplay =
             new ArrayList<>();
     private ArrayList<MostFrequentIndirectTripDbTask> mostFrequentIndirectTripDbTasks = new ArrayList<>();
-    private ArrayList<TransitPoint> transitPoints = new ArrayList<>();
-    private TransitPointsWithNumberOfRoutesDbTask transitPointsWithNumberOfRoutesDbTask1;
-    private TransitPointsWithNumberOfRoutesDbTask transitPointsWithNumberOfRoutesDbTask2;
+    private TransitPointsWithNumberOfRoutesDbTask transitPointsWithNumberOfRoutesDbTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -401,14 +399,9 @@ public class TripPlannerActivity extends AppCompatActivity implements
             directTripsDbTask.cancel(true);
         }
 
-        if (transitPointsWithNumberOfRoutesDbTask1 != null)
+        if (transitPointsWithNumberOfRoutesDbTask != null)
         {
-            transitPointsWithNumberOfRoutesDbTask1.cancel(true);
-        }
-
-        if (transitPointsWithNumberOfRoutesDbTask2 != null)
-        {
-            transitPointsWithNumberOfRoutesDbTask2.cancel(true);
+            transitPointsWithNumberOfRoutesDbTask.cancel(true);
         }
     }
 
@@ -419,7 +412,6 @@ public class TripPlannerActivity extends AppCompatActivity implements
         errorLinearLayout.setVisibility(View.GONE);
         swipeRefreshLayout.setRefreshing(true);
         recyclerView.setVisibility(View.GONE);
-        transitPoints.clear();
 
         directTripsDbTask = new DirectTripsDbTask(this, originBusStopName,
                 destinationBusStopName);
@@ -511,13 +503,9 @@ public class TripPlannerActivity extends AppCompatActivity implements
     {
         if (CommonMethods.checkNetworkConnectivity(this))
         {
-            transitPointsWithNumberOfRoutesDbTask1 = new TransitPointsWithNumberOfRoutesDbTask(this, originBusStopName,
-                    destinationBusStopName, NUMBER_OF_ROUTES_TYPE_ORIGIN_TO_TRANSIT_POINT);
-            transitPointsWithNumberOfRoutesDbTask1.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-
-            transitPointsWithNumberOfRoutesDbTask2 = new TransitPointsWithNumberOfRoutesDbTask(this, originBusStopName,
-                    destinationBusStopName, NUMBER_OF_ROUTES_TYPE_TRANSIT_POINT_TO_DESTINATION);
-            transitPointsWithNumberOfRoutesDbTask2.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            transitPointsWithNumberOfRoutesDbTask = new TransitPointsWithNumberOfRoutesDbTask(this, originBusStopName,
+                    destinationBusStopName);
+            transitPointsWithNumberOfRoutesDbTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
         else
         {
@@ -530,82 +518,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onTransitPointsAndRouteCountOriginToTPFound(ArrayList<TransitPoint> transitPoints)
-    {
-        // Make sure that there are transit points.
-        if (transitPoints.size() == 0)
-        {
-            swipeRefreshLayout.setRefreshing(false);
-            showError(R.drawable.ic_directions_bus_black_big,
-                    R.string.error_message_no_trips, R.string.fix_error_no_fix);
-            return;
-        }
-
-        if (this.transitPoints.size() == 0)
-        {
-            this.transitPoints = transitPoints;
-        }
-        else
-        {
-            for (TransitPoint transitPoint : this.transitPoints)
-            {
-                for (TransitPoint tp : transitPoints)
-                {
-                    if (transitPoint.getBusStopName().equals(tp.getBusStopName()))
-                    {
-                        transitPoint.setNumberOfRoutesBetweenOriginAndTransitPoint(
-                                tp.getNumberOfRoutesBetweenOriginAndTransitPoint());
-                    }
-                }
-            }
-        }
-
-        if (this.transitPoints.get(0).getNumberOfRoutesBetweenOriginAndTransitPoint() != 0 &&
-                this.transitPoints.get(0).getNumberOfRoutesBetweenTransitPointAndDestination() != 0)
-        {
-            onTransitPointsFound();
-        }
-    }
-
-    @Override
-    public void onTransitPointsAndRouteCountTPToDestFound(ArrayList<TransitPoint> transitPoints)
-    {
-        // Make sure that there are transit points.
-        if (transitPoints.size() == 0)
-        {
-            swipeRefreshLayout.setRefreshing(false);
-            showError(R.drawable.ic_directions_bus_black_big,
-                    R.string.error_message_no_trips, R.string.fix_error_no_fix);
-            return;
-        }
-
-        if (this.transitPoints.size() == 0)
-        {
-            this.transitPoints = transitPoints;
-        }
-        else
-        {
-            for (TransitPoint transitPoint : this.transitPoints)
-            {
-                for (TransitPoint tp : transitPoints)
-                {
-                    if (transitPoint.getBusStopName().equals(tp.getBusStopName()))
-                    {
-                        transitPoint.setNumberOfRoutesBetweenTransitPointAndDestination(
-                                tp.getNumberOfRoutesBetweenTransitPointAndDestination());
-                    }
-                }
-            }
-        }
-
-        if (this.transitPoints.get(0).getNumberOfRoutesBetweenOriginAndTransitPoint() != 0 &&
-                this.transitPoints.get(0).getNumberOfRoutesBetweenTransitPointAndDestination() != 0)
-        {
-            onTransitPointsFound();
-        }
-    }
-
-    private void onTransitPointsFound()
+    public void onTransitPointsFound(ArrayList<TransitPoint> transitPoints)
     {
         if (transitPoints.size() == 0)
         {
@@ -620,7 +533,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
 
         // For each transit point, set the score to the smaller number of routes
         // of the two legs.
-        for (TransitPoint transitPoint : this.transitPoints)
+        for (TransitPoint transitPoint : transitPoints)
         {
             if (transitPoint.getNumberOfRoutesBetweenOriginAndTransitPoint() <
                     transitPoint.getNumberOfRoutesBetweenTransitPointAndDestination())
@@ -634,7 +547,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
         }
 
         // Sort the transit points in descending order based on their scores
-        Collections.sort(this.transitPoints, new Comparator<TransitPoint>()
+        Collections.sort(transitPoints, new Comparator<TransitPoint>()
         {
             @Override
             public int compare(TransitPoint tp1, TransitPoint tp2)
@@ -648,13 +561,13 @@ public class TripPlannerActivity extends AppCompatActivity implements
 
         for (int i = 0; i < 5; i++)
         {
-            if (i < this.transitPoints.size())
+            if (i < transitPoints.size())
             {
-                tempTransitPoints.add(this.transitPoints.get(i));
+                tempTransitPoints.add(transitPoints.get(i));
             }
         }
 
-        this.transitPoints = tempTransitPoints;
+        transitPoints = tempTransitPoints;
 
         indirectTripsToDisplay.clear();
         numberOfMostFrequentBusRouteQueriesMade = 0;
@@ -668,7 +581,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
                 destinationBusStopName, indirectTripsToDisplay);
         recyclerView.setAdapter(indirectTripsAdapter);
 
-        for (TransitPoint transitPoint : this.transitPoints)
+        for (TransitPoint transitPoint : transitPoints)
         {
             MostFrequentIndirectTripDbTask task = new MostFrequentIndirectTripDbTask(this,
                     originBusStopName, transitPoint.getBusStopName(), destinationBusStopName);
