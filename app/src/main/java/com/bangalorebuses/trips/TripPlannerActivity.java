@@ -597,20 +597,23 @@ public class TripPlannerActivity extends AppCompatActivity implements
     {
         numberOfMostFrequentBusRouteQueriesComplete++;
 
-        indirectTripsToDisplay.add(indirectTrip);
-        indirectTripsToDisplay.trimToSize();
-
-        Collections.sort(indirectTripsToDisplay, new Comparator<IndirectTrip>()
+        if (indirectTrip != null)
         {
-            @Override
-            public int compare(IndirectTrip i1, IndirectTrip i2)
-            {
-                return i1.getTripDuration() - i2.getTripDuration();
-            }
-        });
+            indirectTripsToDisplay.add(indirectTrip);
+            indirectTripsToDisplay.trimToSize();
 
-        indirectTripsAdapter.notifyDataSetChanged();
-        recyclerView.setVisibility(View.VISIBLE);
+            Collections.sort(indirectTripsToDisplay, new Comparator<IndirectTrip>()
+            {
+                @Override
+                public int compare(IndirectTrip i1, IndirectTrip i2)
+                {
+                    return i1.getTripDuration() - i2.getTripDuration();
+                }
+            });
+
+            indirectTripsAdapter.notifyDataSetChanged();
+            recyclerView.setVisibility(View.VISIBLE);
+        }
 
         if (numberOfMostFrequentBusRouteQueriesComplete ==
                 numberOfMostFrequentBusRouteQueriesMade)

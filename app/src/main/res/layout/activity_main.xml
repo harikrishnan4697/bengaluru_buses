@@ -19,6 +19,7 @@
             android:id="@+id/trip_planner_linear_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
             android:gravity="start"
             android:orientation="horizontal"
             android:padding="@dimen/layout_padding_small">
@@ -35,10 +36,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:background="@drawable/white_rounded_background_borderless"
                 android:hint="@string/trip_planner_text_view_hint"
+                android:padding="@dimen/layout_margin_tiny"
                 android:textColor="@color/black_text_color"
-                android:textSize="@dimen/text_size_big"/>
+                android:textColorHint="@color/black_text_color"
+                android:textSize="@dimen/text_size_big"
+                android:textStyle="italic"/>
 
         </LinearLayout>
 
