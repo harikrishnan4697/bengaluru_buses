@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -28,6 +29,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -280,7 +282,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
 
                 if (resultCode == RESULT_OK)
                 {
-                    originBusStopName = data.getStringExtra("BUS_STOP_NAME");
+                    originBusStopName = data.getStringExtra("BUS_STOP_NAME" );
                     originSelectionTextView.setText(originBusStopName);
 
                     if (destinationBusStopName == null)
@@ -313,7 +315,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
 
                 if (resultCode == RESULT_OK)
                 {
-                    destinationBusStopName = data.getStringExtra("BUS_STOP_NAME");
+                    destinationBusStopName = data.getStringExtra("BUS_STOP_NAME" );
                     destinationSelectionTextView.setText(destinationBusStopName);
 
                     if (originBusStopName == null)
@@ -581,6 +583,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
                 destinationBusStopName, indirectTripsToDisplay);
         recyclerView.setAdapter(indirectTripsAdapter);
 
+
         for (TransitPoint transitPoint : transitPoints)
         {
             MostFrequentIndirectTripDbTask task = new MostFrequentIndirectTripDbTask(this,
@@ -590,6 +593,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
             mostFrequentIndirectTripDbTasks.add(task);
             numberOfMostFrequentBusRouteQueriesMade++;
         }
+
     }
 
     @Override

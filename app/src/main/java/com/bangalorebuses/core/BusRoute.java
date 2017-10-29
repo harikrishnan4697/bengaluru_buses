@@ -82,6 +82,11 @@ public class BusRoute implements Serializable
         this.busRouteBuses = busRouteBuses;
     }
 
+    public void addBusToBusRouteBuses(Bus bus)
+    {
+        busRouteBuses.add(bus);
+    }
+
     public int getSelectedBusStopRouteOrder()
     {
         return selectedBusStopRouteOrder;
