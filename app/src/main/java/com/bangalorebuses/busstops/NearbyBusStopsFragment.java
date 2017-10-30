@@ -509,29 +509,26 @@ public class NearbyBusStopsFragment extends Fragment implements NetworkingHelper
     }
 
     @Override
-    public void onPause()
+    public void onDestroy()
     {
-        super.onPause();
+        super.onDestroy();
+
         if (isRequestingLocationUpdates)
         {
             locationHasToBeUpdated = true;
             stopLocationUpdates();
         }
 
-        cancelAllTasks();
-    }
-
-    @Override
-    public void onDestroy()
-    {
-        super.onDestroy();
         if (googleApiClient != null)
         {
             googleApiClient.disconnect();
         }
+
+        cancelAllTasks();
     }
 
-    private class GetRoutesArrivingAtStopTask extends AsyncTask<ArrayList<BusStop>, Void, ArrayList<BusStop>>
+    private class GetRoutesArrivingAtStopTask extends AsyncTask<ArrayList<BusStop>,
+            Void, ArrayList<BusStop>>
     {
 
         @Override

@@ -32,7 +32,7 @@
     <string name="buses_title">"Buses"</string>
 
     <!-- Bus Stops Activity Strings -->
-    <string name="bus_stops_all_tab_title">"All"</string>
+    <string name="bus_stops_all_tab_title">"Search"</string>
     <string name="bus_stops_nearby_tab_title">"Nearby"</string>
     <string name="bus_stops_title">"Bus Stops"</string>
     <string name="bus_stops_search_edit_text_hint">"Search for a Bus Stop..."</string>
