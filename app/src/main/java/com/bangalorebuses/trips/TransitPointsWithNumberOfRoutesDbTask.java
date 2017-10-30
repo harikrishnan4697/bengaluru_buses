@@ -2,12 +2,9 @@ package com.bangalorebuses.trips;
 
 import android.database.Cursor;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
-import static com.bangalorebuses.utils.Constants.NUMBER_OF_ROUTES_TYPE_ORIGIN_TO_TRANSIT_POINT;
 import static com.bangalorebuses.utils.Constants.db;
 
 class TransitPointsWithNumberOfRoutesDbTask extends AsyncTask<Void, Void, ArrayList<TransitPoint>>

@@ -1,35 +1,22 @@
 <resources>
     <string name="app_name">Bengaluru Buses</string>
-    <string name="favourites_navigation_item_text">Favourites</string>
-    <string name="near_me_navigation_item_text">Nearby</string>
-    <string name="track_buses_navigation_item_text">Bus tracker</string>
-    <string name="trip_planner_navigation_item_text">Trip planner</string>
 
     <!-- Strings for Track Bus Activity -->
     <string name="direction_label_text">Towards</string>
-    <string name="bus_stop_label_text">Bus stop</string>
+    <string name="bus_stop_label_text">Bus Stop</string>
 
     <!-- Search Activity strings -->
-    <string name="search_activity_default_hint">Search"</string>
-
-    <!-- Strings for Trip Planner Fragment -->
-    <string name="trip_planner_origin_label">Starting bus stop</string>
-    <string name="trip_planner_destination_label">Ending bus stop</string>
+    <string name="search_activity_default_hint">"Search"</string>
+    <string name="search_activity_starting_bus_stop_hint">"Starting Bus Stop..."</string>
+    <string name="search_activity_ending_bus_stop_hint">"Ending Bus Stop..."</string>
 
     <!-- Strings for Bus Tracker Fragment -->
-    <string name="bus_tracker_edit_text_hint">"Bus number"</string>
+    <string name="bus_tracker_edit_text_hint">"Bus Number"</string>
 
     <!-- Main Activity Strings -->
-    <string name="trip_planner_text_view_hint">"Let's plan a trip..."</string>
-    <string name="other_options_title">"Transport Info"</string>
+    <string name="trip_planner_text_view_hint">"Let's plan a Trip..."</string>
     <string name="favourites_title">"Favourites"</string>
-    <string name="help_title">"Help"</string>
-    <string name="help_website_title">" BMTC Website"</string>
-    <string name="help_helpline_title">"BMTC Helpline"</string>
-    <string name="favourites_home_title">"Home"</string>
-    <string name="favourites_work_title">"Work"</string>
-    <string name="tips_title">"Things to know"</string>
-    <string name="no_favorites_text">"No favourites"</string>
+    <string name="no_favorites_text">"No Favourites"</string>
     <string name="trip_planner_title">"Trip Planner (Beta)</string>
 
     <!-- Trip Planner Activity Strings -->
@@ -41,11 +28,13 @@
     <string name="transit_point_label">"Change at"</string>
 
     <!-- Buses Activity Strings -->
-    <string name="bus_search_edit_text_hint">"Search for a bus..."</string>
+    <string name="bus_search_edit_text_hint">"Search for a Bus..."</string>
     <string name="buses_title">"Buses"</string>
 
     <!-- Bus Stops Activity Strings -->
+    <string name="bus_stops_all_tab_title">"All"</string>
+    <string name="bus_stops_nearby_tab_title">"Nearby"</string>
     <string name="bus_stops_title">"Bus Stops"</string>
-    <string name="bus_stops_search_edit_text_hint">"Search for a bus stop..."</string>
+    <string name="bus_stops_search_edit_text_hint">"Search for a Bus Stop..."</string>
 
 </resources>

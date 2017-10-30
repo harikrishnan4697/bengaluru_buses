@@ -26,13 +26,13 @@ public class BusStopsActivity extends AppCompatActivity
         if (getSupportActionBar() != null)
         {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("Bus stops");
+            getSupportActionBar().setTitle(R.string.bus_stops_title);
         }
 
         // Create the two tabs
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-        tabLayout.addTab(tabLayout.newTab().setText("Nearby"));
-        tabLayout.addTab(tabLayout.newTab().setText("All"));
+        tabLayout.addTab(tabLayout.newTab().setText(R.string.bus_stops_nearby_tab_title));
+        tabLayout.addTab(tabLayout.newTab().setText(R.string.bus_stops_all_tab_title));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         // Use a ViewPager to allow the user to swipe between the tabs

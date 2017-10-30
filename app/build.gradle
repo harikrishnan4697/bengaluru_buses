@@ -5,7 +5,7 @@ android {
         release {
             keyAlias 'bangalorebuseskey'
             keyPassword 'chaoxcil4096'
-            storeFile file('/Users/nihar/keystores/android.jks')
+            storeFile file('/home/nihar/keystores/android.jks')
             storePassword 'banupllow4096'
         }
     }

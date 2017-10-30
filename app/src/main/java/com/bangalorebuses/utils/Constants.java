@@ -28,27 +28,18 @@ public class Constants
     public static final String DIRECTION_UP = "UP";
     public static final String DIRECTION_DOWN = "DN";
 
-    // Constants for fragments
-    public static final String SEARCH_TYPE_BUS_STOP = "BUS_STOP";
+    // Request codes
+    public static final int FAVORITES_REQUEST_CODE = 4;
     public static final int SEARCH_NEARBY_BUS_STOP_REQUEST_CODE = 7;
     public static final int SEARCH_START_BUS_STOP_REQUEST_CODE = 20;
     public static final int SEARCH_END_BUS_STOP_REQUEST_CODE = 47;
     public static final int LOCATION_PERMISSION_REQUEST_CODE = 36;
 
-    // Constants for db query tasks
-    public static final String NUMBER_OF_ROUTES_TYPE_ORIGIN_TO_TRANSIT_POINT = "ORIGIN-TRANSIT_POINT";
-    public static final String NUMBER_OF_ROUTES_TYPE_TRANSIT_POINT_TO_DESTINATION = "TRANSIT_POINT-DESTINATION";
-
     // Constants for the Trip Planner Fragment
-    public static final String ORIGIN_BUS_STOP_SEARCH_HINT = "Starting bus stop";
-    public static final String DESTINATION_BUS_STOP_SEARCH_HINT = "Ending bus stop";
+    public static final String ORIGIN_BUS_STOP_SEARCH_HINT = "Starting Bus Stop...";
+    public static final String DESTINATION_BUS_STOP_SEARCH_HINT = "Ending Bus Stop...";
 
     // Favourites constants
-    public static final String FAVORITES_TYPE_BUS_ROUTE = "FAVORITE_BUS_ROUTE";
-    public static final String FAVORITES_TYPE_BUS_STOP = "FAVORITE_BUS_STOP";
-    public static final String FAVORITES_TYPE_NONE = "NO_FAVORITES";
-    public static final String FAVORITES_TYPE = "FAVORITES_TYPE";
-    public static final int FAVORITES_REQUEST_CODE = 4;
     public static final String BUS_STOP_NAME = "BUS_STOP_NAME";
     public static final String TRIP_ORIGIN_BUS_STOP_NAME = "FAV_ORIGIN_BUS_STOP_NAME";
     public static final String TRIP_DESTINATION_BUS_STOP_NAME = "FAV_DESTINATION_BUS_STOP_NAME";

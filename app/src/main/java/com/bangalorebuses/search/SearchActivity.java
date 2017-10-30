@@ -38,11 +38,6 @@ import java.util.Stack;
 
 import static com.bangalorebuses.utils.Constants.BUS_STOP_NAME;
 import static com.bangalorebuses.utils.Constants.FAVORITES_REQUEST_CODE;
-import static com.bangalorebuses.utils.Constants.FAVORITES_TYPE;
-import static com.bangalorebuses.utils.Constants.FAVORITES_TYPE_BUS_ROUTE;
-import static com.bangalorebuses.utils.Constants.FAVORITES_TYPE_BUS_STOP;
-import static com.bangalorebuses.utils.Constants.FAVORITES_TYPE_NONE;
-import static com.bangalorebuses.utils.Constants.SEARCH_TYPE_BUS_STOP;
 import static com.bangalorebuses.utils.Constants.favoritesHashMap;
 
 public class SearchActivity extends AppCompatActivity implements SearchDbQueriesHelper,
@@ -81,8 +76,6 @@ public class SearchActivity extends AppCompatActivity implements SearchDbQueries
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         favoritesLinearLayout = (LinearLayout) findViewById(R.id.favorites_linear_layout);
         favoritesListView = (ListView) findViewById(R.id.favorites_list_view);
-
-        String searchType = getIntent().getStringExtra("SEARCH_TYPE");
         String editTextHint = getIntent().getStringExtra("EDIT_TEXT_HINT");
 
         if (editTextHint != null)
@@ -95,11 +88,8 @@ public class SearchActivity extends AppCompatActivity implements SearchDbQueries
         searchEditText.setEnabled(false);
         favoritesLinearLayout.setVisibility(View.GONE);
 
-        if (searchType.equals(SEARCH_TYPE_BUS_STOP))
-        {
-            allBusStopNamesTask = new AllBusStopNamesTask(this);
-            allBusStopNamesTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        }
+        allBusStopNamesTask = new AllBusStopNamesTask(this);
+        allBusStopNamesTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
         initialiseFavorites();
     }

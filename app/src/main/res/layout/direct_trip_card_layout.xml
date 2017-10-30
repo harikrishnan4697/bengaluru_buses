@@ -71,7 +71,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_margin="@dimen/layout_margin_tiny"
                 android:ellipsize="end"
-                android:maxLines="1"
+                android:maxLines="2"
                 android:text="Dodda Nekkundi (Towards - Hebbala Bridge)"
                 android:textColor="@color/black_text_color"
                 android:textSize="@dimen/text_size_small"/>

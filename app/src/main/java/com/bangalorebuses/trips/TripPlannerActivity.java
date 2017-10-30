@@ -9,7 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -23,26 +22,13 @@ import com.bangalorebuses.utils.Animations;
 import com.bangalorebuses.utils.CommonMethods;
 import com.bangalorebuses.utils.Constants;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Set;
 
-import static com.bangalorebuses.utils.Constants.FAVORITES_TYPE;
-import static com.bangalorebuses.utils.Constants.FAVORITES_TYPE_BUS_STOP;
 import static com.bangalorebuses.utils.Constants.NETWORK_QUERY_NO_ERROR;
-import static com.bangalorebuses.utils.Constants.NUMBER_OF_ROUTES_TYPE_ORIGIN_TO_TRANSIT_POINT;
-import static com.bangalorebuses.utils.Constants.NUMBER_OF_ROUTES_TYPE_TRANSIT_POINT_TO_DESTINATION;
 import static com.bangalorebuses.utils.Constants.SEARCH_END_BUS_STOP_REQUEST_CODE;
 import static com.bangalorebuses.utils.Constants.SEARCH_START_BUS_STOP_REQUEST_CODE;
-import static com.bangalorebuses.utils.Constants.SEARCH_TYPE_BUS_STOP;
 import static com.bangalorebuses.utils.Constants.favoritesHashMap;
 
 public class TripPlannerActivity extends AppCompatActivity implements
@@ -226,18 +212,14 @@ public class TripPlannerActivity extends AppCompatActivity implements
     private void selectOriginBusStop()
     {
         Intent searchOriginIntent = new Intent(this, SearchActivity.class);
-        searchOriginIntent.putExtra("SEARCH_TYPE", SEARCH_TYPE_BUS_STOP);
         searchOriginIntent.putExtra("EDIT_TEXT_HINT", Constants.ORIGIN_BUS_STOP_SEARCH_HINT);
-        searchOriginIntent.putExtra(FAVORITES_TYPE, FAVORITES_TYPE_BUS_STOP);
         startActivityForResult(searchOriginIntent, SEARCH_START_BUS_STOP_REQUEST_CODE);
     }
 
     private void selectDestinationBusStop()
     {
         Intent searchDestinationIntent = new Intent(this, SearchActivity.class);
-        searchDestinationIntent.putExtra("SEARCH_TYPE", SEARCH_TYPE_BUS_STOP);
         searchDestinationIntent.putExtra("EDIT_TEXT_HINT", Constants.DESTINATION_BUS_STOP_SEARCH_HINT);
-        searchDestinationIntent.putExtra(FAVORITES_TYPE, FAVORITES_TYPE_BUS_STOP);
         startActivityForResult(searchDestinationIntent, SEARCH_END_BUS_STOP_REQUEST_CODE);
     }
 
@@ -282,7 +264,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
 
                 if (resultCode == RESULT_OK)
                 {
-                    originBusStopName = data.getStringExtra("BUS_STOP_NAME" );
+                    originBusStopName = data.getStringExtra("BUS_STOP_NAME");
                     originSelectionTextView.setText(originBusStopName);
 
                     if (destinationBusStopName == null)
@@ -315,7 +297,7 @@ public class TripPlannerActivity extends AppCompatActivity implements
 
                 if (resultCode == RESULT_OK)
                 {
-                    destinationBusStopName = data.getStringExtra("BUS_STOP_NAME" );
+                    destinationBusStopName = data.getStringExtra("BUS_STOP_NAME");
                     destinationSelectionTextView.setText(destinationBusStopName);
 
                     if (originBusStopName == null)
