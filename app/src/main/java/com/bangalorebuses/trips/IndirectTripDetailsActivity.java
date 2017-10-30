@@ -69,8 +69,11 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
 
         if (getSupportActionBar() != null)
         {
-            getSupportActionBar().setTitle(getIntent()
+            getSupportActionBar().setTitle(R.string.indirect_trip_details_title);
+
+            getSupportActionBar().setSubtitle("Via " + getIntent()
                     .getStringExtra(Constants.TRANSIT_POINT_BUS_STOP_NAME));
+
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 

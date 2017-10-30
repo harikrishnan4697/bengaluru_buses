@@ -17,9 +17,10 @@
     <string name="trip_planner_text_view_hint">"Let's plan a Trip..."</string>
     <string name="favourites_title">"Favourites"</string>
     <string name="no_favorites_text">"No Favourites"</string>
-    <string name="trip_planner_title">"Trip Planner (Beta)</string>
+    <string name="trip_planner_title">"Trip Planner</string>
 
     <!-- Trip Planner Activity Strings -->
+    <string name="indirect_trip_details_title">"Indirect Trips"</string>
     <string name="swap_action_text">"Swap"</string>
     <string name="refresh_text">"Refresh"</string>
     <string name="favorite_action_text">"Favorite"</string>
