@@ -26,15 +26,9 @@ import com.bangalorebuses.core.BusStop;
 import com.bangalorebuses.utils.Animations;
 import com.bangalorebuses.utils.BusETAsOnBusRouteTask;
 import com.bangalorebuses.utils.CommonMethods;
-import com.bangalorebuses.utils.Constants;
 import com.bangalorebuses.utils.DbQueries;
 import com.bangalorebuses.utils.NetworkingHelper;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -97,6 +91,11 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
             getSupportActionBar().setTitle(getIntent().getStringExtra(
                     "ROUTE_NUMBER"));
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
+        if (db == null)
+        {
+            CommonMethods.initialiseDatabase(this);
         }
 
         favoritesFloatingActionButton = (FloatingActionButton) findViewById(R.id
@@ -297,15 +296,8 @@ public class TrackBusActivity extends AppCompatActivity implements NetworkingHel
                         getBusRouteDestinationName(routeDown.getBusRouteDirectionName());
             }
 
-            if (favoritesHashMap.containsKey(key) && favoritesHashMap.get(key)
-                    .equals(String.valueOf(currentlySelectedBusStop.getBusStopId())))
-            {
-                isFavorite = true;
-            }
-            else
-            {
-                isFavorite = false;
-            }
+            isFavorite = favoritesHashMap.containsKey(key) && favoritesHashMap.get(key)
+                    .equals(String.valueOf(currentlySelectedBusStop.getBusStopId()));
 
         }
         catch (Exception e)

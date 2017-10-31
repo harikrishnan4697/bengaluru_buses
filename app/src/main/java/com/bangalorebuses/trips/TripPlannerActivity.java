@@ -29,6 +29,7 @@ import java.util.Comparator;
 import static com.bangalorebuses.utils.Constants.NETWORK_QUERY_NO_ERROR;
 import static com.bangalorebuses.utils.Constants.SEARCH_END_BUS_STOP_REQUEST_CODE;
 import static com.bangalorebuses.utils.Constants.SEARCH_START_BUS_STOP_REQUEST_CODE;
+import static com.bangalorebuses.utils.Constants.db;
 import static com.bangalorebuses.utils.Constants.favoritesHashMap;
 
 public class TripPlannerActivity extends AppCompatActivity implements
@@ -81,6 +82,11 @@ public class TripPlannerActivity extends AppCompatActivity implements
         {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setTitle(R.string.trip_planner_title);
+        }
+
+        if (db == null)
+        {
+            CommonMethods.initialiseDatabase(this);
         }
 
         backFinishesActivity = true;

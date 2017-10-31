@@ -15,29 +15,22 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 
 import com.bangalorebuses.R;
 import com.bangalorebuses.favorites.FavoritesHelper;
 import com.bangalorebuses.favorites.FavoritesListCustomAdapter;
-import com.bangalorebuses.utils.Constants;
+import com.bangalorebuses.utils.CommonMethods;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
 
 import static com.bangalorebuses.utils.Constants.BUS_STOP_NAME;
 import static com.bangalorebuses.utils.Constants.FAVORITES_REQUEST_CODE;
+import static com.bangalorebuses.utils.Constants.db;
 import static com.bangalorebuses.utils.Constants.favoritesHashMap;
 
 public class SearchActivity extends AppCompatActivity implements SearchDbQueriesHelper,
@@ -65,6 +58,11 @@ public class SearchActivity extends AppCompatActivity implements SearchDbQueries
         {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setTitle(R.string.search_activity_default_hint);
+        }
+
+        if (db == null)
+        {
+            CommonMethods.initialiseDatabase(this);
         }
 
         // Hide the soft keyboard by default when the activity is started

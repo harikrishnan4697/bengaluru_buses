@@ -1,9 +1,9 @@
 package com.bangalorebuses.trips;
 
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -27,6 +27,7 @@ import java.util.Comparator;
 import static com.bangalorebuses.utils.Constants.DESTINATION_BUS_STOP_NAME;
 import static com.bangalorebuses.utils.Constants.ORIGIN_BUS_STOP_NAME;
 import static com.bangalorebuses.utils.Constants.TRANSIT_POINT_BUS_STOP_NAME;
+import static com.bangalorebuses.utils.Constants.db;
 
 public class IndirectTripDetailsActivity extends AppCompatActivity implements
         SwipeRefreshLayout.OnRefreshListener, IndirectTripDetailsHelper
@@ -75,6 +76,11 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
                     .getStringExtra(Constants.TRANSIT_POINT_BUS_STOP_NAME));
 
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
+        if (db == null)
+        {
+            CommonMethods.initialiseDatabase(this);
         }
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);

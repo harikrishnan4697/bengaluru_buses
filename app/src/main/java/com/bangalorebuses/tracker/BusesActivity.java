@@ -2,7 +2,6 @@ package com.bangalorebuses.tracker;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -15,14 +14,15 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.bangalorebuses.R;
+import com.bangalorebuses.utils.CommonMethods;
 
 import java.util.ArrayList;
+
+import static com.bangalorebuses.utils.Constants.db;
 
 public class BusesActivity extends AppCompatActivity implements BusesDbQueriesHelper,
         ListView.OnItemClickListener, TextWatcher
@@ -46,6 +46,11 @@ public class BusesActivity extends AppCompatActivity implements BusesDbQueriesHe
         {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setTitle(R.string.buses_title);
+        }
+
+        if (db == null)
+        {
+            CommonMethods.initialiseDatabase(this);
         }
 
         // Hide the soft keyboard by default when the activity is started

@@ -3,26 +3,20 @@ package com.bangalorebuses.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.util.StringBuilderPrinter;
 import android.widget.Toast;
 
 import com.bangalorebuses.R;
-import com.bangalorebuses.core.BusStop;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 import static android.content.Context.MODE_PRIVATE;
 import static com.bangalorebuses.utils.Constants.db;
@@ -337,5 +331,21 @@ public class CommonMethods
         }
 
         return true;
+    }
+
+    public static void initialiseDatabase(Activity context)
+    {
+        BengaluruBusesDbHelper bengaluruBusesDbHelper = new BengaluruBusesDbHelper(context);
+
+        // Try to initialise the db.
+        try
+        {
+            db = bengaluruBusesDbHelper.getReadableDatabase();
+        }
+        catch (Exception e)
+        {
+            Toast.makeText(context, "Unable to load data! Please try again later...", Toast.LENGTH_LONG).show();
+            context.finish();
+        }
     }
 }

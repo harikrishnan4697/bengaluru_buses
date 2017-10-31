@@ -20,19 +20,14 @@ import com.bangalorebuses.core.BusRoute;
 import com.bangalorebuses.core.BusStop;
 import com.bangalorebuses.utils.BusETAsOnBusRouteTask;
 import com.bangalorebuses.utils.CommonMethods;
-import com.bangalorebuses.utils.Constants;
 import com.bangalorebuses.utils.NetworkingHelper;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
 import static com.bangalorebuses.utils.Constants.NETWORK_QUERY_NO_ERROR;
+import static com.bangalorebuses.utils.Constants.db;
 import static com.bangalorebuses.utils.Constants.favoritesHashMap;
 
 /**
@@ -83,6 +78,11 @@ public class BusesArrivingAtBusStopActivity extends AppCompatActivity implements
                 favoriteBusStop();
             }
         });
+
+        if (db == null)
+        {
+            CommonMethods.initialiseDatabase(this);
+        }
 
         // Initialize some variables
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);

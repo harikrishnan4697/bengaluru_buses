@@ -1,17 +1,14 @@
 package com.bangalorebuses;
 
 import android.content.Intent;
-import android.database.sqlite.SQLiteException;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bangalorebuses.busarrivals.BusesArrivingAtBusStopActivity;
 import com.bangalorebuses.busstops.BusStopsActivity;
@@ -20,18 +17,12 @@ import com.bangalorebuses.favorites.FavoritesListCustomAdapter;
 import com.bangalorebuses.tracker.BusesActivity;
 import com.bangalorebuses.tracker.TrackBusActivity;
 import com.bangalorebuses.trips.TripPlannerActivity;
-import com.bangalorebuses.utils.BengaluruBusesDbHelper;
 import com.bangalorebuses.utils.CommonMethods;
 import com.bangalorebuses.utils.Constants;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.Stack;
 
 import static com.bangalorebuses.utils.Constants.db;
@@ -101,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
 
         if (db == null)
         {
-            initialiseDatabase();
+            CommonMethods.initialiseDatabase(this);
         }
 
         CommonMethods.readFavoritesFileToHashMap(this);
@@ -140,22 +131,6 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
         noFavoritesLinearLayout = (LinearLayout) findViewById(R.id
                 .no_favorites_linear_layout);
         initialiseFavorites();
-    }
-
-    private void initialiseDatabase()
-    {
-        BengaluruBusesDbHelper bengaluruBusesDbHelper = new BengaluruBusesDbHelper(MainActivity.this);
-
-        // Try to initialise the db.
-        try
-        {
-            db = bengaluruBusesDbHelper.getReadableDatabase();
-        }
-        catch (Exception e)
-        {
-            Toast.makeText(this, "Unable to load data! Please try again later...", Toast.LENGTH_LONG).show();
-            finish();
-        }
     }
 
     private void initialiseFavorites()
@@ -318,6 +293,7 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
         {
             showSplashScreen();
         }
+
         activityWasPaused = false;
 
         initialiseFavorites();

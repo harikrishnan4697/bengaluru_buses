@@ -9,6 +9,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.bangalorebuses.R;
+import com.bangalorebuses.utils.CommonMethods;
+
+import static com.bangalorebuses.utils.Constants.db;
 
 public class BusStopsActivity extends AppCompatActivity
 {
@@ -27,6 +30,11 @@ public class BusStopsActivity extends AppCompatActivity
         {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setTitle(R.string.bus_stops_title);
+        }
+
+        if (db == null)
+        {
+            CommonMethods.initialiseDatabase(this);
         }
 
         // Create the two tabs
