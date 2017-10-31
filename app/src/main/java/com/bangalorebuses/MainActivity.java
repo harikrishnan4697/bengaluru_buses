@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -25,6 +26,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Stack;
 
+import static com.bangalorebuses.utils.Constants.MAIN_ACTIVITY_FORCEFULLY_KILLED;
 import static com.bangalorebuses.utils.Constants.db;
 import static com.bangalorebuses.utils.Constants.favoritesHashMap;
 
@@ -61,7 +63,15 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
         Typeface typeFace = Typeface.createFromAsset(getAssets(), "fonts/Righteous-Regular.ttf");
         appTitleTextView.setTypeface(typeFace);
 
-        showSplashScreen();
+        if (savedInstanceState != null &&
+                savedInstanceState.getBoolean(MAIN_ACTIVITY_FORCEFULLY_KILLED))
+        {
+            initializeActivity();
+        }
+        else
+        {
+            showSplashScreen();
+        }
     }
 
     private void showSplashScreen()
@@ -283,6 +293,14 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+
+        outState.putBoolean(MAIN_ACTIVITY_FORCEFULLY_KILLED, true);
+    }
+
+    @Override
     protected void onResume()
     {
         super.onResume();
@@ -303,7 +321,12 @@ public class MainActivity extends AppCompatActivity implements FavoritesHelper
     protected void onPause()
     {
         super.onPause();
-        countDownTimer.cancel();
+
+        if (countDownTimer != null)
+        {
+            countDownTimer.cancel();
+        }
+
         activityWasPaused = true;
     }
 

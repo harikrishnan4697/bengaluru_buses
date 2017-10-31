@@ -52,4 +52,7 @@ public class Constants
     // Other not so constants
     public static SQLiteDatabase db;
     public static LinkedHashMap<String, String> favoritesHashMap = new LinkedHashMap<>();
+
+    // MaiActivity Constants
+    public static String MAIN_ACTIVITY_FORCEFULLY_KILLED = "MAIN_ACTIVITY_FORCEFULLY_KILLED";
 }
