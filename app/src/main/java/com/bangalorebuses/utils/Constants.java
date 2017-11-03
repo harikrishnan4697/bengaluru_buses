@@ -1,10 +1,7 @@
 package com.bangalorebuses.utils;
 
 import android.database.sqlite.SQLiteDatabase;
-import android.os.StrictMode;
-import android.util.StringBuilderPrinter;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 /**
@@ -48,11 +45,11 @@ public class Constants
     public static final String ORIGIN_BUS_STOP_NAME = "PARAM_ORIGIN_BUS_STOP_NAME";
     public static final String TRANSIT_POINT_BUS_STOP_NAME = "PARAM_TRANSIT_POINT_BUS_STOP_NAME";
     public static final String DESTINATION_BUS_STOP_NAME = "PARAM_DESTINATION_BUS_STOP_NAME";
-
+    // Nearby Bus Stop Constants
+    public static final float NEARBY_BUS_STOPS_RANGE = 1000f;
     // Other not so constants
     public static SQLiteDatabase db;
     public static LinkedHashMap<String, String> favoritesHashMap = new LinkedHashMap<>();
-
     // MaiActivity Constants
     public static String MAIN_ACTIVITY_FORCEFULLY_KILLED = "MAIN_ACTIVITY_FORCEFULLY_KILLED";
 }

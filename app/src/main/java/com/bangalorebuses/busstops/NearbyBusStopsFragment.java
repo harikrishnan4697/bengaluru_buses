@@ -1,14 +1,11 @@
 package com.bangalorebuses.busstops;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -32,7 +29,7 @@ import com.bangalorebuses.busarrivals.BusesArrivingAtBusStopActivity;
 import com.bangalorebuses.core.Bus;
 import com.bangalorebuses.core.BusRoute;
 import com.bangalorebuses.core.BusStop;
-import com.bangalorebuses.utils.CommonMethods;
+import com.bangalorebuses.utils.Constants;
 import com.bangalorebuses.utils.DbQueries;
 import com.bangalorebuses.utils.NetworkingHelper;
 import com.google.android.gms.common.ConnectionResult;
@@ -47,8 +44,6 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 
 import static android.app.Activity.RESULT_OK;
@@ -64,7 +59,7 @@ import static com.bangalorebuses.utils.Constants.db;
 
 public class NearbyBusStopsFragment extends Fragment implements NetworkingHelper, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener, NearbyBusStopsRecyclerViewAdapter.ItemClickListener,
-        SwipeRefreshLayout.OnRefreshListener
+        SwipeRefreshLayout.OnRefreshListener, NearbyBusStopsDbHelper
 {
     private ArrayList<BusStop> busStops = new ArrayList<>();
     private NearestBusStopsTask nearestBusStopsTask;
@@ -92,16 +87,16 @@ public class NearbyBusStopsFragment extends Fragment implements NetworkingHelper
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         View view = inflater.inflate(R.layout.fragment_nearby_bus_stops, container, false);
-        nearbyBusStopsRecyclerView = (RecyclerView) view.findViewById(R.id.nearbyBusStopsRecyclerView);
+        nearbyBusStopsRecyclerView = view.findViewById(R.id.nearbyBusStopsRecyclerView);
         nearbyBusStopsRecyclerView.setVisibility(View.GONE);
-        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorNonACBus, R.color.colorACBus, R.color.colorMetroFeederBus);
 
-        errorLinearLayout = (LinearLayout) view.findViewById(R.id.errorLinearLayout);
+        errorLinearLayout = view.findViewById(R.id.errorLinearLayout);
         errorLinearLayout.setVisibility(View.GONE);
-        errorImageView = (ImageView) view.findViewById(R.id.errorImageView);
-        errorMessageTextView = (TextView) view.findViewById(R.id.errorTextView);
-        errorResolutionTextView = (TextView) view.findViewById(R.id.errorResolutionTextView);
+        errorImageView = view.findViewById(R.id.errorImageView);
+        errorMessageTextView = view.findViewById(R.id.errorTextView);
+        errorResolutionTextView = view.findViewById(R.id.errorResolutionTextView);
 
         errorResolutionTextView.setOnClickListener(new View.OnClickListener()
         {
@@ -329,7 +324,7 @@ public class NearbyBusStopsFragment extends Fragment implements NetworkingHelper
         adaptor = new NearbyBusStopsRecyclerViewAdapter(getContext(), busStops);
         nearbyBusStopsRecyclerView.setAdapter(adaptor);
 
-        try
+        /*try
         {
             if (CommonMethods.checkNetworkConnectivity(getActivity()))
             {
@@ -350,6 +345,30 @@ public class NearbyBusStopsFragment extends Fragment implements NetworkingHelper
             showError(R.drawable.ic_sad_face, R.string.error_message_url_exception,
                     R.string.fix_error_retry);
             nearbyBusStopsRecyclerView.setVisibility(View.GONE);
+        }*/
+
+        new NearbyBusStopsDbTask(this, (float) location.getLatitude(),
+                (float) location.getLongitude(), Constants.NEARBY_BUS_STOPS_RANGE).executeOnExecutor(
+                AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    @Override
+    public void onNearbyBusStopsFound(ArrayList<BusStop> busStops)
+    {
+        this.busStops.clear();
+
+        if (busStops.size() == 0)
+        {
+            showError(R.drawable.ic_person_pin_circle_black, R.string.error_message_no_bus_stops_nearby,
+                    R.string.fix_error_no_fix);
+            nearbyBusStopsRecyclerView.setVisibility(View.GONE);
+        }
+        else
+        {
+            this.busStops.addAll(busStops);
+
+            getRoutesArrivingAtStopTask = new GetRoutesArrivingAtStopTask();
+            getRoutesArrivingAtStopTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, this.busStops);
         }
     }
 

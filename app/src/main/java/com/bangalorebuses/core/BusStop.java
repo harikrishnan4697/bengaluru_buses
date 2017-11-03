@@ -10,7 +10,13 @@ public class BusStop implements Serializable
     private int busStopRouteOrder;
     private String busStopDirectionName;
     private String busStopDistance;
+    private float busStopLat;
+    private float busStopLong;
     private ArrayList<BusRoute> busesArrivingAtBusStop;
+
+    public BusStop()
+    {
+    }
 
     public int getBusStopId()
     {
@@ -70,5 +76,25 @@ public class BusStop implements Serializable
     public void setBusesArrivingAtBusStop(ArrayList<BusRoute> busesArrivingAtBusStop)
     {
         this.busesArrivingAtBusStop = busesArrivingAtBusStop;
+    }
+
+    public float getBusStopLat()
+    {
+        return busStopLat;
+    }
+
+    public void setBusStopLat(float busStopLat)
+    {
+        this.busStopLat = busStopLat;
+    }
+
+    public float getBusStopLong()
+    {
+        return busStopLong;
+    }
+
+    public void setBusStopLong(float busStopLong)
+    {
+        this.busStopLong = busStopLong;
     }
 }

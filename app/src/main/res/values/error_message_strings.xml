@@ -13,7 +13,7 @@
     <string name="error_message_update_google_play_services">"Couldn't get GPS location. Please update Google Play Services to continue..."</string>
 
     <!-- NearbyBusStopsFragment error message strings -->
-    <string name="error_message_no_bus_stops_nearby">"No Bus Stops Nearby: There aren't any Bengaluru City Bus Stops Nearby."</string>
+    <string name="error_message_no_bus_stops_nearby">"There aren't any Bengaluru City Bus Stops Nearby."</string>
 
     <!-- BusesArrivingAtBusStopActivity error message stings -->
     <string name="error_message_no_buses_arriving_soon">"There don't seem to be any Buses arriving at this Bus Stop any time soon."</string>
