@@ -29,7 +29,7 @@ import com.bangalorebuses.busarrivals.BusesArrivingAtBusStopActivity;
 import com.bangalorebuses.core.Bus;
 import com.bangalorebuses.core.BusRoute;
 import com.bangalorebuses.core.BusStop;
-import com.bangalorebuses.utils.Constants;
+import com.bangalorebuses.utils.CommonMethods;
 import com.bangalorebuses.utils.DbQueries;
 import com.bangalorebuses.utils.NetworkingHelper;
 import com.google.android.gms.common.ConnectionResult;
@@ -44,6 +44,8 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 
 import static android.app.Activity.RESULT_OK;
@@ -59,7 +61,7 @@ import static com.bangalorebuses.utils.Constants.db;
 
 public class NearbyBusStopsFragment extends Fragment implements NetworkingHelper, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener, NearbyBusStopsRecyclerViewAdapter.ItemClickListener,
-        SwipeRefreshLayout.OnRefreshListener, NearbyBusStopsDbHelper
+        SwipeRefreshLayout.OnRefreshListener
 {
     private ArrayList<BusStop> busStops = new ArrayList<>();
     private NearestBusStopsTask nearestBusStopsTask;
@@ -324,7 +326,7 @@ public class NearbyBusStopsFragment extends Fragment implements NetworkingHelper
         adaptor = new NearbyBusStopsRecyclerViewAdapter(getContext(), busStops);
         nearbyBusStopsRecyclerView.setAdapter(adaptor);
 
-        /*try
+        try
         {
             if (CommonMethods.checkNetworkConnectivity(getActivity()))
             {
@@ -345,30 +347,6 @@ public class NearbyBusStopsFragment extends Fragment implements NetworkingHelper
             showError(R.drawable.ic_sad_face, R.string.error_message_url_exception,
                     R.string.fix_error_retry);
             nearbyBusStopsRecyclerView.setVisibility(View.GONE);
-        }*/
-
-        new NearbyBusStopsDbTask(this, (float) location.getLatitude(),
-                (float) location.getLongitude(), Constants.NEARBY_BUS_STOPS_RANGE).executeOnExecutor(
-                AsyncTask.THREAD_POOL_EXECUTOR);
-    }
-
-    @Override
-    public void onNearbyBusStopsFound(ArrayList<BusStop> busStops)
-    {
-        this.busStops.clear();
-
-        if (busStops.size() == 0)
-        {
-            showError(R.drawable.ic_person_pin_circle_black, R.string.error_message_no_bus_stops_nearby,
-                    R.string.fix_error_no_fix);
-            nearbyBusStopsRecyclerView.setVisibility(View.GONE);
-        }
-        else
-        {
-            this.busStops.addAll(busStops);
-
-            getRoutesArrivingAtStopTask = new GetRoutesArrivingAtStopTask();
-            getRoutesArrivingAtStopTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, this.busStops);
         }
     }
 
