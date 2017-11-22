@@ -60,8 +60,7 @@ import static com.bangalorebuses.utils.Constants.SEARCH_NEARBY_BUS_STOP_REQUEST_
 import static com.bangalorebuses.utils.Constants.db;
 
 public class NearbyBusStopsFragment extends Fragment implements NetworkingHelper, GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener, LocationListener, NearbyBusStopsRecyclerViewAdapter.ItemClickListener,
-        SwipeRefreshLayout.OnRefreshListener
+        GoogleApiClient.OnConnectionFailedListener, LocationListener, SwipeRefreshLayout.OnRefreshListener
 {
     private ArrayList<BusStop> busStops = new ArrayList<>();
     private NearestBusStopsTask nearestBusStopsTask;
@@ -114,7 +113,6 @@ public class NearbyBusStopsFragment extends Fragment implements NetworkingHelper
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
             nearbyBusStopsRecyclerView.setLayoutManager(linearLayoutManager);
             nearbyBusStopsRecyclerView.setAdapter(adaptor);
-            adaptor.setClickListener(NearbyBusStopsFragment.this);
             nearbyBusStopsRecyclerView.setVisibility(View.VISIBLE);
         }
         return view;
@@ -407,16 +405,6 @@ public class NearbyBusStopsFragment extends Fragment implements NetworkingHelper
     }
 
     @Override
-    public void onClick(View view, int position)
-    {
-        Intent getBusesArrivingAtBusStopIntent = new Intent(getContext(), BusesArrivingAtBusStopActivity.class);
-        getBusesArrivingAtBusStopIntent.putExtra("BUS_STOP_NAME", busStops.get(position).getBusStopName());
-        getBusesArrivingAtBusStopIntent.putExtra("BUS_STOP_DIRECTION_NAME", busStops.get(position).getBusStopDirectionName());
-        getBusesArrivingAtBusStopIntent.putExtra("BUS_STOP_ID", busStops.get(position).getBusStopId());
-        startActivity(getBusesArrivingAtBusStopIntent);
-    }
-
-    @Override
     public void onBusStopsNearbyFound(String errorMessage, ArrayList<BusStop> busStops)
     {
         this.busStops.clear();
@@ -548,7 +536,6 @@ public class NearbyBusStopsFragment extends Fragment implements NetworkingHelper
                 errorLinearLayout.setVisibility(View.GONE);
                 swipeRefreshLayout.setRefreshing(false);
                 adaptor.notifyDataSetChanged();
-                adaptor.setClickListener(NearbyBusStopsFragment.this);
                 nearbyBusStopsRecyclerView.setVisibility(View.VISIBLE);
             }
         }
