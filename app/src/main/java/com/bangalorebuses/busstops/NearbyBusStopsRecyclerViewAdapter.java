@@ -93,6 +93,11 @@ public class NearbyBusStopsRecyclerViewAdapter extends RecyclerView.Adapter<Near
     @Override
     public int getItemCount()
     {
+        if (nearbyBusStops == null)
+        {
+            return 0;
+        }
+
         return nearbyBusStops.size();
     }
 

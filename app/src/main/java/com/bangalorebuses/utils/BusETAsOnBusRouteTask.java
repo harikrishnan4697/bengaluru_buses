@@ -103,7 +103,6 @@ public class BusETAsOnBusRouteTask extends AsyncTask<String, Void, Void>
                                 {
                                     bus.setDue(true);
                                 }
-                                String nearestLatLong = jsonArray.getJSONArray(i + j).getString(6).replace("nearestlatlng:", "");
                                 bus.setBusRegistrationNumber(jsonArray.getJSONArray(i + j).getString(0).replace("vehicleno:", ""));
                                 bus.setBusRouteOrder(Integer.parseInt(jsonArray.getJSONArray(i + j).getString(12).replace("routeorder:", "")));
                                 bus.setBusRoute(busRoute);
