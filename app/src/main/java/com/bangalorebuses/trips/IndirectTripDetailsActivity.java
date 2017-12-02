@@ -30,8 +30,7 @@ import static com.bangalorebuses.utils.Constants.TRANSIT_POINT_BUS_STOP_NAME;
 import static com.bangalorebuses.utils.Constants.db;
 
 public class IndirectTripDetailsActivity extends AppCompatActivity implements
-        SwipeRefreshLayout.OnRefreshListener, IndirectTripDetailsHelper
-{
+        SwipeRefreshLayout.OnRefreshListener, IndirectTripDetailsHelper {
     // Bus stop names
     private String originBusStopName;
     private String transitPointBusStopName;
@@ -59,8 +58,7 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
     private IndirectTripDetailsRecyclerViewAdapter indirectTripsAdapter;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_indirect_trip_details);
 
@@ -68,8 +66,7 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        if (getSupportActionBar() != null)
-        {
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(R.string.indirect_trip_details_title);
 
             getSupportActionBar().setSubtitle("Via " + getIntent()
@@ -78,8 +75,7 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        if (db == null)
-        {
+        if (db == null) {
             CommonMethods.initialiseDatabase(this);
         }
 
@@ -89,11 +85,9 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
         errorMessageTextView = (TextView) findViewById(R.id.errorTextView);
         errorResolutionTextView = (TextView) findViewById(R.id.errorResolutionTextView);
 
-        errorResolutionTextView.setOnClickListener(new View.OnClickListener()
-        {
+        errorResolutionTextView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 findIndirectTrips();
             }
         });
@@ -115,10 +109,8 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        switch (item.getItemId())
-        {
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
                 break;
@@ -128,22 +120,18 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
         return true;
     }
 
-    private void findIndirectTrips()
-    {
+    private void findIndirectTrips() {
         errorLinearLayout.setVisibility(View.GONE);
         recyclerView.setVisibility(View.GONE);
 
         swipeRefreshLayout.setRefreshing(true);
 
         if (originBusStopName != null && transitPointBusStopName != null
-                && destinationBusStopName != null)
-        {
+                && destinationBusStopName != null) {
             indirectTripsDbTask = new IndirectTripsDbTask(this, originBusStopName,
                     transitPointBusStopName, destinationBusStopName);
             indirectTripsDbTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        }
-        else
-        {
+        } else {
             swipeRefreshLayout.setRefreshing(false);
             swipeRefreshLayout.setVisibility(View.GONE);
             showError(R.drawable.ic_sad_face,
@@ -152,8 +140,7 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onIndirectTripsFound(ArrayList<IndirectTrip> indirectTrips)
-    {
+    public void onIndirectTripsFound(ArrayList<IndirectTrip> indirectTrips) {
         indirectTripsToDisplay.clear();
         numberOfIndirectTripQueriesMade = 0;
         numberOfIndirectTripQueriesComplete = 0;
@@ -165,8 +152,7 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
                 IndirectTripDetailsRecyclerViewAdapter(indirectTripsToDisplay);
         recyclerView.setAdapter(indirectTripsAdapter);
 
-        if (indirectTrips.size() == 0)
-        {
+        if (indirectTrips.size() == 0) {
             swipeRefreshLayout.setRefreshing(false);
             showStringError(R.drawable.ic_directions_bus_black_big,
                     "There aren't any Indirect Trips via " +
@@ -176,8 +162,7 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
             return;
         }
 
-        for (IndirectTrip indirectTrip : indirectTrips)
-        {
+        for (IndirectTrip indirectTrip : indirectTrips) {
             BusETAsOnLeg1BusRouteTask task = new BusETAsOnLeg1BusRouteTask(this,
                     indirectTrip);
             task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -189,15 +174,12 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
 
     @Override
     public void onBusETAsOnLeg1BusRouteFound(String errorMessage,
-                                             IndirectTrip indirectTrip)
-    {
+                                             IndirectTrip indirectTrip) {
         numberOfIndirectTripQueriesComplete++;
 
-        if (errorMessage.equals(Constants.NETWORK_QUERY_NO_ERROR))
-        {
+        if (errorMessage.equals(Constants.NETWORK_QUERY_NO_ERROR)) {
             if (indirectTrip.getDirectTripOnFirstLeg().getBusRoute()
-                    .getBusRouteBuses().size() != 0)
-            {
+                    .getBusRouteBuses().size() != 0) {
                 BusRoute busRouteOnFirstLeg = indirectTrip.getDirectTripOnFirstLeg()
                         .getBusRoute();
 
@@ -219,8 +201,7 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
                 indirectTrip.setDirectTripOnSecondLeg(selectBestDirectTripOnSecondLeg(
                         indirectTrip));
 
-                if (indirectTrip.getDirectTripOnSecondLeg() != null)
-                {
+                if (indirectTrip.getDirectTripOnSecondLeg() != null) {
                     indirectTripsToDisplay.add(setIndirectTripTravelTime(indirectTrip));
                     sortIndirectTripsToDisplay();
 
@@ -230,14 +211,11 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
             }
         }
 
-        synchronized (this)
-        {
-            if (numberOfIndirectTripQueriesComplete == numberOfIndirectTripQueriesMade)
-            {
+        synchronized (this) {
+            if (numberOfIndirectTripQueriesComplete == numberOfIndirectTripQueriesMade) {
                 swipeRefreshLayout.setRefreshing(false);
 
-                if (indirectTripsToDisplay.size() == 0)
-                {
+                if (indirectTripsToDisplay.size() == 0) {
                     showStringError(R.drawable.ic_directions_bus_black_big,
                             "There aren't any Indirect Trips via " +
                                     transitPointBusStopName + " right now.",
@@ -247,8 +225,7 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
         }
     }
 
-    private DirectTrip selectBestDirectTripOnSecondLeg(IndirectTrip indirectTrip)
-    {
+    private DirectTrip selectBestDirectTripOnSecondLeg(IndirectTrip indirectTrip) {
         DirectTrip directTripOnFirstLeg = indirectTrip
                 .getDirectTripOnFirstLeg();
 
@@ -257,26 +234,19 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
         Bus bestBusOnSecondLeg = null;
 
         for (DirectTrip directTripOnSecondLeg :
-                indirectTrip.getPossibleDirectTripsOnSecondLeg())
-        {
+                indirectTrip.getPossibleDirectTripsOnSecondLeg()) {
             for (Bus busOnSecondLeg : directTripOnSecondLeg.getBusRoute()
-                    .getBusRouteBuses())
-            {
+                    .getBusRouteBuses()) {
                 if (busOnSecondLeg.getBusETA() > (directTripOnFirstLeg
-                        .getTripDuration() + 2))
-                {
-                    if (bestBusOnSecondLeg != null)
-                    {
+                        .getTripDuration() + 10)) {
+                    if (bestBusOnSecondLeg != null) {
                         if (busOnSecondLeg.getBusETA() <
-                                bestBusOnSecondLeg.getBusETA())
-                        {
+                                bestBusOnSecondLeg.getBusETA()) {
                             bestBusOnSecondLeg = busOnSecondLeg;
                             bestDirectTripOnSecondLeg =
                                     directTripOnSecondLeg;
                         }
-                    }
-                    else
-                    {
+                    } else {
                         bestBusOnSecondLeg = busOnSecondLeg;
                         bestDirectTripOnSecondLeg =
                                 directTripOnSecondLeg;
@@ -285,8 +255,7 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
             }
         }
 
-        if (bestDirectTripOnSecondLeg != null)
-        {
+        if (bestDirectTripOnSecondLeg != null) {
             ArrayList<Bus> busesOnBestDirectTripOnSecondLeg = new ArrayList<>();
             busesOnBestDirectTripOnSecondLeg.add(bestBusOnSecondLeg);
 
@@ -311,8 +280,7 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
     }
 
     private IndirectTrip setIndirectTripTravelTime(IndirectTrip
-                                                           indirectTrip)
-    {
+                                                           indirectTrip) {
         DirectTrip directTripOnFirstLeg = indirectTrip.getDirectTripOnFirstLeg();
         DirectTrip directTripOnSecondLeg = indirectTrip.getDirectTripOnSecondLeg();
         Bus busOnSecondLeg = directTripOnSecondLeg.getBusRoute().getBusRouteBuses()
@@ -325,43 +293,34 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
         return indirectTrip;
     }
 
-    private void sortIndirectTripsToDisplay()
-    {
-        Collections.sort(indirectTripsToDisplay, new Comparator<IndirectTrip>()
-        {
+    private void sortIndirectTripsToDisplay() {
+        Collections.sort(indirectTripsToDisplay, new Comparator<IndirectTrip>() {
             @Override
-            public int compare(IndirectTrip i1, IndirectTrip i2)
-            {
+            public int compare(IndirectTrip i1, IndirectTrip i2) {
                 return i1.getTripDuration() - i2.getTripDuration();
             }
         });
     }
 
-    private void cancelAllTasks()
-    {
-        if (indirectTripsDbTask != null)
-        {
+    private void cancelAllTasks() {
+        if (indirectTripsDbTask != null) {
             indirectTripsDbTask.cancel(true);
         }
 
-        for (BusETAsOnLeg1BusRouteTask task : busETAsOnLeg1BusRouteTasks)
-        {
-            if (task != null)
-            {
+        for (BusETAsOnLeg1BusRouteTask task : busETAsOnLeg1BusRouteTasks) {
+            if (task != null) {
                 task.cancel(true);
             }
         }
     }
 
     @Override
-    public void onRefresh()
-    {
+    public void onRefresh() {
         findIndirectTrips();
     }
 
     private void showError(int drawableResId, int errorMessageStringResId,
-                           int resolutionButtonStringResId)
-    {
+                           int resolutionButtonStringResId) {
         swipeRefreshLayout.setRefreshing(false);
         errorImageView.setImageResource(drawableResId);
         errorMessageTextView.setText(errorMessageStringResId);
@@ -370,8 +329,7 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
     }
 
     private void showStringError(int drawableResId, String errorMessage,
-                                 int resolutionButtonStringResId)
-    {
+                                 int resolutionButtonStringResId) {
         swipeRefreshLayout.setRefreshing(false);
         errorImageView.setImageResource(drawableResId);
         errorMessageTextView.setText(errorMessage);
@@ -380,8 +338,7 @@ public class IndirectTripDetailsActivity extends AppCompatActivity implements
     }
 
     @Override
-    protected void onDestroy()
-    {
+    protected void onDestroy() {
         super.onDestroy();
         cancelAllTasks();
     }

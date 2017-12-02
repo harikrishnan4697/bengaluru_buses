@@ -13,8 +13,7 @@ import java.util.Calendar;
 
 import static com.bangalorebuses.utils.Constants.db;
 
-class MostFrequentIndirectTripDbTask extends AsyncTask<Void, Void, IndirectTrip>
-{
+class MostFrequentIndirectTripDbTask extends AsyncTask<Void, Void, IndirectTrip> {
     private TransitPointsHelper caller;
     private String originBusStopName;
     private String transitPointBusStopName;
@@ -25,8 +24,7 @@ class MostFrequentIndirectTripDbTask extends AsyncTask<Void, Void, IndirectTrip>
 
     MostFrequentIndirectTripDbTask(TransitPointsHelper caller, String originBusStopName,
                                    String transitPointBusStopName,
-                                   String destinationBusStopName)
-    {
+                                   String destinationBusStopName) {
         this.originBusStopName = originBusStopName;
         this.transitPointBusStopName = transitPointBusStopName;
         this.destinationBusStopName = destinationBusStopName;
@@ -34,21 +32,18 @@ class MostFrequentIndirectTripDbTask extends AsyncTask<Void, Void, IndirectTrip>
     }
 
     @Override
-    protected IndirectTrip doInBackground(Void... voids)
-    {
+    protected IndirectTrip doInBackground(Void... voids) {
         DirectTrip directTripOnFirstLeg = getDirectTripOnFirstLeg(originBusStopName,
                 transitPointBusStopName);
 
-        if (directTripOnFirstLeg == null)
-        {
+        if (directTripOnFirstLeg == null) {
             return null;
         }
 
         DirectTrip directTripOnSecondLeg = getDirectTripOnSecondLeg(transitPointBusStopName,
                 destinationBusStopName, directTripOnFirstLeg.getTripDuration());
 
-        if (directTripOnSecondLeg == null)
-        {
+        if (directTripOnSecondLeg == null) {
             return null;
         }
 
@@ -66,8 +61,7 @@ class MostFrequentIndirectTripDbTask extends AsyncTask<Void, Void, IndirectTrip>
     }
 
     private DirectTrip getDirectTripOnFirstLeg(String originBusStopName,
-                                               String transitPointBusStopName)
-    {
+                                               String transitPointBusStopName) {
         Cursor cursor = db.rawQuery("SELECT Routes.RouteId, Routes.RouteNumber," +
                 " routesBetweenOriginAndTP.originBusStopRouteOrder, routesBetweenOriginAndTP" +
                 ".destinationBusStopRouteOrder FROM Routes JOIN ( SELECT sub1.RouteId," +
@@ -85,16 +79,13 @@ class MostFrequentIndirectTripDbTask extends AsyncTask<Void, Void, IndirectTrip>
 
         DirectTrip fastestDirectTrip = null;
 
-        while (cursor.moveToNext())
-        {
-            if (fastestDirectTrip == null)
-            {
+        while (cursor.moveToNext()) {
+            if (fastestDirectTrip == null) {
                 ArrayList<Bus> buses = getScheduledBuses(cursor.getInt(0),
                         cursor.getString(1), cursor.getInt(2),
                         currentTimeInMinutesSinceMidnight);
 
-                if (buses != null)
-                {
+                if (buses != null) {
                     int travelTimeOnFirstLeg = CommonMethods.calculateTravelTime(
                             cursor.getInt(0), cursor.getString(1),
                             cursor.getInt(2), cursor.getInt(3));
@@ -119,22 +110,18 @@ class MostFrequentIndirectTripDbTask extends AsyncTask<Void, Void, IndirectTrip>
 
                     fastestDirectTrip.setTripDuration(buses.get(0).getBusETA() + travelTimeOnFirstLeg);
                 }
-            }
-            else
-            {
+            } else {
                 ArrayList<Bus> buses = getScheduledBuses(cursor.getInt(0),
                         cursor.getString(1), cursor.getInt(2),
                         currentTimeInMinutesSinceMidnight);
 
-                if (buses != null)
-                {
+                if (buses != null) {
                     int travelTimeOnFirstLeg = CommonMethods.calculateTravelTime(
                             cursor.getInt(0), cursor.getString(1),
                             cursor.getInt(2), cursor.getInt(3));
 
                     if ((buses.get(0).getBusETA() + travelTimeOnFirstLeg) <
-                            fastestDirectTrip.getTripDuration())
-                    {
+                            fastestDirectTrip.getTripDuration()) {
                         BusStop originBusStop = new BusStop();
                         originBusStop.setBusStopName(originBusStopName);
                         originBusStop.setBusStopRouteOrder(cursor.getInt(2));
@@ -163,8 +150,7 @@ class MostFrequentIndirectTripDbTask extends AsyncTask<Void, Void, IndirectTrip>
 
     private DirectTrip getDirectTripOnSecondLeg(String transitPointBusStopName,
                                                 String destinationBusStopName,
-                                                int firstLegTripDuration)
-    {
+                                                int firstLegTripDuration) {
         Cursor cursor = db.rawQuery("SELECT Routes.RouteId, Routes.RouteNumber," +
                 " routesBetweenOriginAndTP.originBusStopRouteOrder, routesBetweenOriginAndTP" +
                 ".destinationBusStopRouteOrder FROM Routes JOIN ( SELECT sub1.RouteId," +
@@ -182,16 +168,13 @@ class MostFrequentIndirectTripDbTask extends AsyncTask<Void, Void, IndirectTrip>
 
         DirectTrip fastestDirectTrip = null;
 
-        while (cursor.moveToNext())
-        {
-            if (fastestDirectTrip == null)
-            {
+        while (cursor.moveToNext()) {
+            if (fastestDirectTrip == null) {
                 ArrayList<Bus> buses = getScheduledBuses(cursor.getInt(0),
                         cursor.getString(1), cursor.getInt(2),
-                        currentTimeInMinutesSinceMidnight + firstLegTripDuration + 2);
+                        currentTimeInMinutesSinceMidnight + firstLegTripDuration + 10);
 
-                if (buses != null)
-                {
+                if (buses != null) {
                     int travelTimeOnSecondLeg = CommonMethods.calculateTravelTime(
                             cursor.getInt(0), cursor.getString(1),
                             cursor.getInt(2), cursor.getInt(3));
@@ -216,22 +199,18 @@ class MostFrequentIndirectTripDbTask extends AsyncTask<Void, Void, IndirectTrip>
 
                     fastestDirectTrip.setTripDuration(buses.get(0).getBusETA() + travelTimeOnSecondLeg);
                 }
-            }
-            else
-            {
+            } else {
                 ArrayList<Bus> buses = getScheduledBuses(cursor.getInt(0),
                         cursor.getString(1), cursor.getInt(2),
-                        currentTimeInMinutesSinceMidnight + firstLegTripDuration + 2);
+                        currentTimeInMinutesSinceMidnight + firstLegTripDuration + 10);
 
-                if (buses != null)
-                {
+                if (buses != null) {
                     int travelTimeOnSecondLeg = CommonMethods.calculateTravelTime(
                             cursor.getInt(0), cursor.getString(1),
                             cursor.getInt(2), cursor.getInt(3));
 
                     if ((buses.get(0).getBusETA() + travelTimeOnSecondLeg) <
-                            fastestDirectTrip.getTripDuration())
-                    {
+                            fastestDirectTrip.getTripDuration()) {
                         BusStop originBusStop = new BusStop();
                         originBusStop.setBusStopName(transitPointBusStopName);
                         originBusStop.setBusStopRouteOrder(cursor.getInt(2));
@@ -259,8 +238,7 @@ class MostFrequentIndirectTripDbTask extends AsyncTask<Void, Void, IndirectTrip>
     }
 
     private ArrayList<Bus> getScheduledBuses(int busRouteId, String busRouteNumber,
-                                             int originBusStopRouteOrder, int currentTime)
-    {
+                                             int originBusStopRouteOrder, int currentTime) {
         int travelTimeToOrigin = CommonMethods.calculateTravelTime(busRouteId,
                 busRouteNumber, 1, originBusStopRouteOrder);
 
@@ -271,8 +249,7 @@ class MostFrequentIndirectTripDbTask extends AsyncTask<Void, Void, IndirectTrip>
                         ".RouteDepartureTime asc limit 1",
                 null);
 
-        if (cursor.moveToNext())
-        {
+        if (cursor.moveToNext()) {
             int timeOfDayBusWillArrive = cursor.getInt(0) + travelTimeToOrigin;
 
             int busETA = timeOfDayBusWillArrive - currentTimeInMinutesSinceMidnight;
@@ -285,16 +262,13 @@ class MostFrequentIndirectTripDbTask extends AsyncTask<Void, Void, IndirectTrip>
             ArrayList<Bus> buses = new ArrayList<>();
             buses.add(bus);
             return buses;
-        }
-        else
-        {
+        } else {
             cursor.close();
             return null;
         }
     }
 
-    private IndirectTrip setIndirectTripTravelTime(IndirectTrip indirectTrip)
-    {
+    private IndirectTrip setIndirectTripTravelTime(IndirectTrip indirectTrip) {
         Bus busOnSecondLeg = indirectTrip.getDirectTripOnSecondLeg().getBusRoute().getBusRouteBuses()
                 .get(0);
 
@@ -306,12 +280,10 @@ class MostFrequentIndirectTripDbTask extends AsyncTask<Void, Void, IndirectTrip>
     }
 
     @Override
-    protected void onPostExecute(IndirectTrip indirectTrip)
-    {
+    protected void onPostExecute(IndirectTrip indirectTrip) {
         super.onPostExecute(indirectTrip);
 
-        if (!isCancelled())
-        {
+        if (!isCancelled()) {
             caller.onIndirectTripFound(indirectTrip);
         }
     }

@@ -19,43 +19,36 @@ import com.bangalorebuses.core.BusStop;
 
 import java.util.List;
 
-public class NearbyBusStopsRecyclerViewAdapter extends RecyclerView.Adapter<NearbyBusStopsRecyclerViewAdapter.NearbyBusStopViewHolder>
-{
+public class NearbyBusStopsRecyclerViewAdapter extends RecyclerView.Adapter<NearbyBusStopsRecyclerViewAdapter.NearbyBusStopViewHolder> {
     private List<BusStop> nearbyBusStops;
     private Context context;
 
-    public NearbyBusStopsRecyclerViewAdapter(Context context, List<BusStop> nearbyBusStops)
-    {
+    public NearbyBusStopsRecyclerViewAdapter(Context context, List<BusStop> nearbyBusStops) {
         this.nearbyBusStops = nearbyBusStops;
         this.context = context;
     }
 
     @Override
-    public void onAttachedToRecyclerView(RecyclerView recyclerView)
-    {
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
     }
 
     @Override
-    public NearbyBusStopViewHolder onCreateViewHolder(ViewGroup viewGroup, int i)
-    {
+    public NearbyBusStopViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.nearby_bus_stop_card_layout, viewGroup, false);
         return new NearbyBusStopViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(NearbyBusStopViewHolder nearbyBusStopsViewHolder, final int position)
-    {
+    public void onBindViewHolder(NearbyBusStopViewHolder nearbyBusStopsViewHolder, final int position) {
         nearbyBusStopsViewHolder.busStopNameTextView.setText(nearbyBusStops.get(position).getBusStopName());
         nearbyBusStopsViewHolder.busStopDirectionNameTextView.setText(nearbyBusStops.get(position).getBusStopDirectionName());
         nearbyBusStopsViewHolder.busStopDistanceTextView.setText(nearbyBusStops.get(position).getBusStopDistance());
 
         nearbyBusStopsViewHolder.busesArrivingAtBusStopLinearLayout.removeAllViews();
         nearbyBusStopsViewHolder.busesArrivingAtBusStopLinearLayout.setVisibility(View.GONE);
-        for (int i = 0; i < 5; i++)
-        {
-            if (i < nearbyBusStops.get(position).getBusesArrivingAtBusStop().size())
-            {
+        for (int i = 0; i < 5; i++) {
+            if (i < nearbyBusStops.get(position).getBusesArrivingAtBusStop().size()) {
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.WRAP_CONTENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT
@@ -76,11 +69,9 @@ public class NearbyBusStopsRecyclerViewAdapter extends RecyclerView.Adapter<Near
             }
         }
 
-        nearbyBusStopsViewHolder.cardView.setOnClickListener(new View.OnClickListener()
-        {
+        nearbyBusStopsViewHolder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 Intent getBusesArrivingAtBusStopIntent = new Intent(context, BusesArrivingAtBusStopActivity.class);
                 getBusesArrivingAtBusStopIntent.putExtra("BUS_STOP_NAME", nearbyBusStops.get(position).getBusStopName());
                 getBusesArrivingAtBusStopIntent.putExtra("BUS_STOP_DIRECTION_NAME", nearbyBusStops.get(position).getBusStopDirectionName());
@@ -91,26 +82,22 @@ public class NearbyBusStopsRecyclerViewAdapter extends RecyclerView.Adapter<Near
     }
 
     @Override
-    public int getItemCount()
-    {
-        if (nearbyBusStops == null)
-        {
+    public int getItemCount() {
+        if (nearbyBusStops == null) {
             return 0;
         }
 
         return nearbyBusStops.size();
     }
 
-    class NearbyBusStopViewHolder extends RecyclerView.ViewHolder
-    {
+    class NearbyBusStopViewHolder extends RecyclerView.ViewHolder {
         CardView cardView;
         TextView busStopNameTextView;
         TextView busStopDirectionNameTextView;
         TextView busStopDistanceTextView;
         LinearLayout busesArrivingAtBusStopLinearLayout;
 
-        NearbyBusStopViewHolder(View itemView)
-        {
+        NearbyBusStopViewHolder(View itemView) {
             super(itemView);
             cardView = itemView.findViewById(R.id.nearbyBusStopCardView);
             busStopNameTextView = itemView.findViewById(R.id.nearby_bus_stop_name_text_view);
