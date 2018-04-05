@@ -3,8 +3,8 @@
 
     <!-- Networking error message strings -->
     <string name="error_message_url_exception">"Something went wrong. Please click 'Retry' to try again..."</string>
-    <string name="error_message_io_exception">"Server un-available at the moment. Please click 'Retry' to try again..."</string>
-    <string name="error_message_timeout_exception">"Data connection is slow or un-available. Please click 'Retry' to try again..."</string>
+    <string name="error_message_io_exception">"BMTC Server is un-available. Please click 'Retry' to try again..."</string>
+    <string name="error_message_timeout_exception">"BMTC Server is un-available. Please click 'Retry' to try again..."</string>
     <string name="error_message_internet_unavailable">"Data connection is un-available. Please click 'Retry' to try again..."</string>
 
     <!-- GPS error message strings -->
@@ -13,7 +13,7 @@
     <string name="error_message_update_google_play_services">"Couldn't get GPS location. Please update Google Play Services to continue..."</string>
 
     <!-- NearbyBusStopsFragment error message strings -->
-    <string name="error_message_no_bus_stops_nearby">"There aren't any Bengaluru City Bus Stops Nearby."</string>
+    <string name="error_message_no_bus_stops_nearby">"There aren't any Bengaluru City Bus Stops nearby."</string>
 
     <!-- BusesArrivingAtBusStopActivity error message stings -->
     <string name="error_message_no_buses_arriving_soon">"There don't seem to be any Buses arriving at this Bus Stop any time soon."</string>
