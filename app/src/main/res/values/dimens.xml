@@ -1,0 +1,34 @@
+<resources>
+    <!-- Layout margin dimensions -->
+    <dimen name="layout_margin">16dp</dimen>
+    <dimen name="layout_margin_small">8dp</dimen>
+    <dimen name="layout_margin_tiny">4dp</dimen>
+
+    <!-- Layout padding dimensions -->
+    <dimen name="layout_padding">16dp</dimen>
+    <dimen name="layout_padding_small">8dp</dimen>
+    <dimen name="layout_padding_tiny">4dp</dimen>
+
+    <!-- ImageView dimensions -->
+    <dimen name="image_view_height">24dp</dimen>
+    <dimen name="image_view_width">24dp</dimen>
+    <dimen name="swap_image_view_width">32dp</dimen>
+    <dimen name="swap_image_view_height">32dp</dimen>
+    <dimen name="error_image_view_height">64dp</dimen>
+    <dimen name="error_image_view_width">64dp</dimen>
+    <dimen name="real_time_image_view_height">16dp</dimen>
+    <dimen name="real_time_image_view_width">16dp</dimen>
+
+    <!-- Text dimensions -->
+    <dimen name="text_size_big">16sp</dimen>
+    <dimen name="text_size_medium">14sp</dimen>
+    <dimen name="text_size_small">12sp</dimen>
+
+    <!-- CardView dimensions -->
+    <dimen name="card_view_corner_radius">4dp</dimen>
+
+    <!-- Main Activity tile dimensions -->
+    <dimen name="tile_width">104dp</dimen>
+    <dimen name="tile_height">88dp</dimen>
+
+</resources>

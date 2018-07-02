@@ -1,22 +1,41 @@
 <resources>
     <string name="app_name">Bengaluru Buses</string>
-    <string name="error_connecting_to_the_internet_text">Cannot connect to the Internet!</string>
-    <string name="error_connecting_to_the_internet_click_refresh_text">Cannot connect to the Internet! Please click the refresh button below to try again.</string>
 
-    <!-- Strings for menus -->
-    <string name="refresh_action_title">Refresh</string>
-    <string name="track_entered_bus_action_title">Track entered bus number</string>
+    <!-- Strings for Track Bus Activity -->
+    <string name="direction_label_text">Towards</string>
+    <string name="bus_stop_label_text">Bus Stop</string>
 
-    <!-- Strings for ChooseActivity -->+
-    <string name="bus_stops_nearby_label_text">Bus stops nearby</string>
-    <string name="track_bus_edit_text_hint">Enter a bus number or choose one below</string>
-    <string name="error_could_not_get_buses_at_stop_text">There are no buses arriving at this bus stop anytime soon!</string>
-    <string name="error_no_bus_stops_found_text">Could not find any Bengaluru city bus stops nearby!</string>
+    <!-- Search Activity strings -->
+    <string name="search_activity_default_hint">"Search"</string>
+    <string name="search_activity_starting_bus_stop_hint">"Starting Bus Stop..."</string>
+    <string name="search_activity_ending_bus_stop_hint">"Ending Bus Stop..."</string>
 
-    <!-- Strings for TrackBusActivity -->
-    <string name="direction_label_text">Direction</string>
-    <string name="bus_stop_label_text">Bus stop</string>
-    <string name="image_content_description_text">Type of bus service</string>
-    <string name="error_invalid_route_text">This bus cannot be tracked.</string>
-    <string name="error_getting_stop_details_text">Error getting bus stop details! Please try again later.</string>
+    <!-- Strings for Bus Tracker Fragment -->
+    <string name="bus_tracker_edit_text_hint">"Bus Number"</string>
+
+    <!-- Main Activity Strings -->
+    <string name="trip_planner_text_view_hint">"Let's plan a Trip..."</string>
+    <string name="favourites_title">"Favourites"</string>
+    <string name="no_favorites_text">"No Favourites"</string>
+    <string name="trip_planner_title">"Trip Planner</string>
+
+    <!-- Trip Planner Activity Strings -->
+    <string name="indirect_trip_details_title">"Indirect Trips"</string>
+    <string name="swap_action_text">"Swap"</string>
+    <string name="refresh_text">"Refresh"</string>
+    <string name="favorite_action_text">"Favorite"</string>
+    <string name="starting_bus_stop_label">"Start"</string>
+    <string name="ending_bus_stop_label">"End"</string>
+    <string name="transit_point_label">"Change at"</string>
+
+    <!-- Buses Activity Strings -->
+    <string name="bus_search_edit_text_hint">"Search for a Bus..."</string>
+    <string name="buses_title">"Buses"</string>
+
+    <!-- Bus Stops Activity Strings -->
+    <string name="bus_stops_all_tab_title">"Search"</string>
+    <string name="bus_stops_nearby_tab_title">"Nearby"</string>
+    <string name="bus_stops_title">"Bus Stops"</string>
+    <string name="bus_stops_search_edit_text_hint">"Search for a Bus Stop..."</string>
+
 </resources>

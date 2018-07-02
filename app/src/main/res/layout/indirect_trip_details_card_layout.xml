@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/indirect_trip_card_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/layout_margin_small"
+    android:layout_marginLeft="@dimen/layout_margin_small"
+    android:layout_marginRight="@dimen/layout_margin_small">
+
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/layout_padding_small">
+
+        <RelativeLayout
+            android:id="@+id/trip_info_relative_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true">
+
+            <TextView
+                android:id="@+id/indirect_trip_duration_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/grey_rounded_background_borderless"
+                android:text="1 hr 17 mins"
+                android:textColor="@color/black_text_color"
+                android:textSize="@dimen/text_size_medium"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:text="Indirect"
+                android:textAllCaps="true"
+                android:textColor="@color/black_text_color"
+                android:textSize="@dimen/text_size_medium"/>
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/from_linear_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/trip_info_relative_layout"
+            android:layout_marginTop="@dimen/layout_margin_tiny"
+            android:gravity="start"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="@dimen/layout_margin_tiny"
+                android:text="From:"
+                android:textColor="@color/black_text_color"
+                android:textSize="@dimen/text_size_medium"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/origin_bus_stop_name_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="@dimen/layout_margin_tiny"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="Dodda Nekkundi (Towards - Hebbala Bridge)"
+                android:textColor="@color/black_text_color"
+                android:textSize="@dimen/text_size_small"/>
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/first_leg_relative_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/from_linear_layout"
+            android:layout_marginTop="@dimen/layout_margin_tiny"
+            android:background="@drawable/white_rounded_background_borderless">
+
+            <ImageView
+                android:id="@+id/first_leg_bus_service_type_image_view"
+                android:layout_width="@dimen/image_view_width"
+                android:layout_height="@dimen/image_view_height"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="@dimen/layout_margin_tiny"
+                android:layout_marginRight="@dimen/layout_margin_tiny"
+                android:src="@drawable/ic_directions_bus_ac"/>
+
+            <TextView
+                android:id="@+id/first_leg_bus_eta_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:text="7 mins"
+                android:textColor="@color/black_text_color"
+                android:textSize="@dimen/text_size_medium"/>
+
+            <ImageView
+                android:id="@+id/first_leg_real_time_image_view"
+                android:layout_width="@dimen/real_time_image_view_width"
+                android:layout_height="@dimen/real_time_image_view_height"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="@dimen/layout_margin_tiny"
+                android:layout_marginRight="@dimen/layout_margin_tiny"
+                android:layout_toLeftOf="@id/first_leg_bus_eta_text_view"
+                android:layout_toStartOf="@id/first_leg_bus_eta_text_view"
+                android:src="@drawable/ic_rss_feed_orange"/>
+
+            <TextView
+                android:id="@+id/first_leg_bus_number_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="@dimen/layout_margin_tiny"
+                android:layout_marginRight="@dimen/layout_margin_tiny"
+                android:layout_toEndOf="@id/first_leg_bus_service_type_image_view"
+                android:layout_toRightOf="@id/first_leg_bus_service_type_image_view"
+                android:background="@drawable/blue_rounded_background_borderless"
+                android:ellipsize="end"
+                android:gravity="start"
+                android:maxLines="1"
+                android:text="V-500D"
+                android:textColor="@color/white_text_color"
+                android:textSize="@dimen/text_size_medium"
+                android:textStyle="bold"/>
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/change_at_linear_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/first_leg_relative_layout"
+            android:layout_marginTop="@dimen/layout_margin_tiny"
+            android:gravity="start"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="@dimen/layout_margin_tiny"
+                android:text="Change at:"
+                android:textColor="@color/black_text_color"
+                android:textSize="@dimen/text_size_medium"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/transit_point_bus_stop_name_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="@dimen/layout_margin_tiny"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="B Channasandra Bridge (Towards - Banasawadi)"
+                android:textColor="@color/black_text_color"
+                android:textSize="@dimen/text_size_small"/>
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/second_leg_relative_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/change_at_linear_layout"
+            android:layout_marginTop="@dimen/layout_margin_tiny"
+            android:background="@drawable/white_rounded_background_borderless">
+
+            <ImageView
+                android:id="@+id/second_leg_bus_service_type_image_view"
+                android:layout_width="@dimen/image_view_width"
+                android:layout_height="@dimen/image_view_height"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="@dimen/layout_margin_tiny"
+                android:layout_marginRight="@dimen/layout_margin_tiny"
+                android:src="@drawable/ic_directions_bus_ac"/>
+
+            <TextView
+                android:id="@+id/second_leg_bus_eta_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:text="7 mins"
+                android:textColor="@color/black_text_color"
+                android:textSize="@dimen/text_size_medium"/>
+
+            <TextView
+                android:id="@+id/second_leg_bus_number_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="@dimen/layout_margin_tiny"
+                android:layout_marginRight="@dimen/layout_margin_tiny"
+                android:layout_toEndOf="@id/second_leg_bus_service_type_image_view"
+                android:layout_toRightOf="@id/second_leg_bus_service_type_image_view"
+                android:background="@drawable/blue_rounded_background_borderless"
+                android:ellipsize="end"
+                android:gravity="start"
+                android:maxLines="1"
+                android:text="V-500D"
+                android:textColor="@color/white_text_color"
+                android:textSize="@dimen/text_size_medium"
+                android:textStyle="bold"/>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

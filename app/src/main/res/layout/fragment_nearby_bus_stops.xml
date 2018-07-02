@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/nearbyFragmentContainerRelativeLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/nearbyBusStopsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/updatingBusStopsProgressBarLinearLayout"
+            android:orientation="vertical"/>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+    <LinearLayout
+        android:id="@+id/errorLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_margin="@dimen/layout_margin"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <ImageView
+            android:id="@+id/errorImageView"
+            android:layout_width="@dimen/error_image_view_width"
+            android:layout_height="@dimen/error_image_view_height"
+            android:layout_margin="@dimen/layout_margin"
+            android:src="@drawable/ic_sad_face"/>
+
+        <TextView
+            android:id="@+id/errorTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/layout_margin"
+            android:layout_marginRight="@dimen/layout_margin"
+            android:textAlignment="center"
+            android:textColor="@color/black_text_color"
+            android:textSize="@dimen/text_size_big"/>
+
+        <TextView
+            android:id="@+id/errorResolutionTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/layout_margin"
+            android:padding="@dimen/layout_padding"
+            android:text="@string/fix_error_retry"
+            android:textAllCaps="true"
+            android:textColor="@color/colorMetroFeederBus"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

@@ -11,30 +11,50 @@
 
     <application
         android:allowBackup="false"
-        android:icon="@mipmap/ic_launcher_round"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:resizeableActivity="false"
+        android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity
-            android:name=".ChooseRouteActivity"
+            android:name=".MainActivity"
+            android:label="@string/app_name"
             android:screenOrientation="portrait">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-
         </activity>
-
         <activity
-            android:name=".TrackBusActivity"
-            android:label="Track bus"
-            android:parentActivityName=".ChooseRouteActivity"
-            android:screenOrientation="portrait">
-        </activity>
-
+            android:name=".tracker.TrackBusActivity"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".search.SearchActivity"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".busarrivals.BusesArrivingAtBusStopActivity"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".tracker.BusesActivity"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".busstops.BusStopsActivity"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".trips.TripPlannerActivity"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".trips.IndirectTripDetailsActivity"
+            android:parentActivityName=".trips.TripPlannerActivity"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

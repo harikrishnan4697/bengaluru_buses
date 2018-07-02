@@ -1,320 +1,200 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:ads="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
-    tools:context="com.bangalorebuses.TrackBusActivity">
+    tools:context="com.bangalorebuses.tracker.TrackBusActivity">
 
-    <RadioGroup
-        android:id="@+id/direction_selection_radio_group"
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:background="@color/colorPrimary"
-        android:orientation="vertical"
-        android:paddingBottom="4dp"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:visibility="visible">
+        app:theme="@style/AppTheme.AppBarOverlay">
 
-        <TextView
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:gravity="start"
-            android:text="@string/direction_label_text"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"/>
-
-        <RadioButton
-            android:id="@+id/direction_up_radio_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/white_rounded_background_borderless"
-            android:maxLines="2"
-            android:onClick="directionChosen"
-            android:padding="8dp"
-            android:textSize="16sp"/>
-
-        <RadioButton
-            android:id="@+id/direction_down_radio_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:background="@drawable/white_rounded_background_borderless"
-            android:maxLines="2"
-            android:onClick="directionChosen"
-            android:padding="8dp"
-            android:textSize="16sp"/>
-    </RadioGroup>
-
-    <LinearLayout
-        android:id="@+id/bus_stop_selection_linear_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/direction_selection_radio_group"
-        android:background="@color/colorPrimary"
-        android:orientation="vertical"
-        android:padding="8dp"
-        android:visibility="visible">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginBottom="5dp"
-            android:text="@string/bus_stop_label_text"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"/>
+            android:layout_height="?actionBarSize"
+            android:background="@color/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay"/>
 
         <RelativeLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/white_rounded_background_borderless">
+            android:paddingBottom="@dimen/layout_padding_small"
+            android:paddingLeft="@dimen/layout_padding_small"
+            android:paddingRight="@dimen/layout_padding_small">
 
-            <Spinner
-                android:id="@+id/route_stop_list_spinner"
+            <RelativeLayout
+                android:id="@+id/directionSelectionRelativeLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:clickable="true"
-                android:spinnerMode="dropdown"
-                android:textAlignment="viewStart"/>
+                android:layout_alignParentTop="true"
+                android:background="@color/colorPrimary">
 
-            <View
+                <ImageView
+                    android:id="@+id/changeDirectionImageView"
+                    android:layout_width="@dimen/swap_image_view_width"
+                    android:layout_height="@dimen/swap_image_view_height"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="@dimen/layout_margin_small"
+                    android:layout_marginStart="@dimen/layout_margin_small"
+                    android:background="@drawable/white_circle_background_borderless"
+                    android:clickable="true"
+                    android:onClick="swapDirection"
+                    android:src="@drawable/ic_swap_horiz_black"/>
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_toLeftOf="@id/changeDirectionImageView"
+                    android:layout_toStartOf="@id/changeDirectionImageView"
+                    android:background="@drawable/white_rounded_background_borderless">
+
+                    <TextView
+                        android:id="@+id/direction_hint_text_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="@dimen/layout_margin_tiny"
+                        android:layout_marginRight="@dimen/layout_margin_tiny"
+                        android:text="@string/direction_label_text"
+                        android:textAllCaps="true"
+                        android:textColor="@color/grey_text_color"
+                        android:textSize="@dimen/text_size_small"/>
+
+                    <TextView
+                        android:id="@+id/directionNameTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@id/direction_hint_text_view"
+                        android:layout_toRightOf="@id/direction_hint_text_view"
+                        android:ellipsize="end"
+                        android:gravity="start"
+                        android:maxLines="1"
+                        android:onClick="swapDirection"
+                        android:padding="@dimen/layout_padding_tiny"
+                        android:textColor="@color/black_text_color"
+                        android:textSize="@dimen/text_size_medium"/>
+
+                </RelativeLayout>
+
+            </RelativeLayout>
+
+            <RelativeLayout
                 android:layout_width="wrap_content"
-                android:layout_height="1dp"
-                android:layout_below="@id/route_stop_list_spinner"
-                android:background="#000000"/>
-        </RelativeLayout>
-    </LinearLayout>
+                android:layout_height="wrap_content"
+                android:layout_below="@id/directionSelectionRelativeLayout"
+                android:layout_marginTop="@dimen/layout_margin_small"
+                android:background="@drawable/white_rounded_background_borderless">
 
-    <com.google.android.gms.ads.AdView
-        android:id="@+id/track_bus_activity_footer_ad"
+                <TextView
+                    android:id="@+id/bus_stop_hint_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="@dimen/layout_margin_tiny"
+                    android:layout_marginRight="@dimen/layout_margin_tiny"
+                    android:text="@string/bus_stop_label_text"
+                    android:textAllCaps="true"
+                    android:textColor="@color/grey_text_color"
+                    android:textSize="@dimen/text_size_small"/>
+
+                <Spinner
+                    android:id="@+id/route_stop_list_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_toEndOf="@id/bus_stop_hint_text_view"
+                    android:layout_toRightOf="@id/bus_stop_hint_text_view"
+                    android:clickable="true"
+                    android:spinnerMode="dropdown"
+                    android:textAlignment="viewStart"
+                    android:theme="@style/ThemeOverlay.AppCompat.Light"/>
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_centerInParent="true"
-        ads:adSize="BANNER"
-        ads:adUnitId="ca-app-pub-4515741125560154/2111234828"/>
+        android:layout_below="@id/app_bar_layout">
+
+        <ListView
+            android:id="@+id/listView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="none"/>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 
     <LinearLayout
-        android:id="@+id/buses_linear_layout"
+        android:id="@+id/errorLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/track_bus_activity_footer_ad"
-        android:layout_below="@id/bus_stop_selection_linear_layout"
-        android:background="#FFFFFF"
+        android:layout_below="@id/app_bar_layout"
+        android:layout_margin="@dimen/layout_margin"
+        android:gravity="center"
         android:orientation="vertical"
         android:visibility="visible">
 
+        <ImageView
+            android:id="@+id/errorImageView"
+            android:layout_width="@dimen/error_image_view_width"
+            android:layout_height="@dimen/error_image_view_height"
+            android:layout_margin="@dimen/layout_margin"
+            android:src="@drawable/ic_sad_face"/>
+
         <TextView
-            android:id="@+id/error_message_text_view"
-            android:layout_width="match_parent"
+            android:id="@+id/errorTextView"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:gravity="center"
-            android:textColor="#000000"
-            android:textSize="16sp"
-            android:visibility="gone"/>
+            android:layout_marginLeft="@dimen/layout_margin"
+            android:layout_marginRight="@dimen/layout_margin"
+            android:text="An error occurred!"
+            android:textAlignment="center"
+            android:textColor="@color/black_text_color"
+            android:textSize="16sp"/>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="#000000"/>
-
-        <ScrollView
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/errorResolutionTextView"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:scrollbars="none">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <LinearLayout
-                    android:id="@+id/bus_linear_layout_1"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:id="@+id/bus_icon_1"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_marginEnd="16dp"
-                        android:layout_marginRight="16dp"
-                        android:contentDescription="@string/image_content_description_text"/>
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/buses_text_view_1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="#000000"
-                            android:textSize="18sp"/>
-
-                        <TextView
-                            android:id="@+id/is_at_stop_text_view_1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="5dp"
-                            android:maxLines="1"
-                            android:textSize="14sp"/>
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/bus_linear_layout_2"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:id="@+id/bus_icon_2"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_marginEnd="16dp"
-                        android:layout_marginRight="16dp"
-                        android:contentDescription="@string/image_content_description_text"/>
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/buses_text_view_2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="#000000"
-                            android:textSize="18sp"/>
-
-                        <TextView
-                            android:id="@+id/is_at_stop_text_view_2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="5dp"
-                            android:maxLines="1"
-                            android:textSize="14sp"/>
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/bus_linear_layout_3"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:id="@+id/bus_icon_3"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_marginEnd="16dp"
-                        android:layout_marginRight="16dp"
-                        android:contentDescription="@string/image_content_description_text"/>
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/buses_text_view_3"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="#000000"
-                            android:textSize="18sp"/>
-
-                        <TextView
-                            android:id="@+id/is_at_stop_text_view_3"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="5dp"
-                            android:maxLines="1"
-                            android:textSize="14sp"/>
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/bus_linear_layout_4"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="24dp"
-                    android:layout_marginTop="24dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:id="@+id/bus_icon_4"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_marginEnd="16dp"
-                        android:layout_marginRight="16dp"
-                        android:contentDescription="@string/image_content_description_text"/>
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/buses_text_view_4"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="#000000"
-                            android:textSize="18sp"/>
-
-                        <TextView
-                            android:id="@+id/is_at_stop_text_view_4"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="5dp"
-                            android:maxLines="1"
-                            android:textSize="14sp"/>
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </ScrollView>
+            android:layout_margin="@dimen/layout_margin"
+            android:padding="@dimen/layout_padding"
+            android:text="@string/fix_error_retry"
+            android:textAllCaps="true"
+            android:textColor="@color/colorMetroFeederBus"/>
 
     </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/floatingBusTimingsRefreshActionButton"
+        android:id="@+id/favorites_floating_action_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@id/track_bus_activity_footer_ad"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_margin="10dp"
-        android:clickable="true"
-        android:onClick="refresh"
-        android:src="@drawable/ic_refresh_white"
+        android:layout_margin="@dimen/layout_margin"
+        android:src="@drawable/ic_favorite_border_white"
         app:fabSize="mini"/>
 
 </RelativeLayout>
